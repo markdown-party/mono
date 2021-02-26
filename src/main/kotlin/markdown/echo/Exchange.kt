@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
+@file:OptIn(
+    ExperimentalCoroutinesApi::class,
+    ExperimentalTypeInference::class,
+)
 
 package markdown.echo
 
@@ -7,6 +10,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
+import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * An [Exchange] allows for asymmetric communication, with a request-reply paradigm. The
@@ -42,7 +46,7 @@ typealias ExchangeChannelBuilder<I, O> = suspend ProducerScope<O>.(ReceiveChanne
  * @param O the type of the outgoing messages.
  */
 fun <I, O> exchange(
-    block: ExchangeFlowBuilder<I, O>,
+    @BuilderInference block: ExchangeFlowBuilder<I, O>,
 ): Exchange<I, O> = Exchange { incoming ->
     flow { block.invoke(this, incoming) }
 }
@@ -65,7 +69,7 @@ fun <I, O> exchange(
 @ExperimentalCoroutinesApi
 @OptIn(FlowPreview::class)
 fun <I, O> channelExchange(
-    block: ExchangeChannelBuilder<I, O>,
+    @BuilderInference block: ExchangeChannelBuilder<I, O>,
 ): Exchange<I, O> = Exchange { incoming ->
     channelFlow { block.invoke(this, incoming.produceIn(this)) }
 }
