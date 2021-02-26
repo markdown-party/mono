@@ -1,4 +1,4 @@
-package markdown.echo
+package markdown.echo.events
 
 import markdown.echo.causal.EventIdentifier
 
