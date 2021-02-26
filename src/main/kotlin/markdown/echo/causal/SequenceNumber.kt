@@ -11,4 +11,12 @@ inline class SequenceNumber internal constructor(
 ) : Comparable<SequenceNumber> {
     operator fun inc(): SequenceNumber = SequenceNumber(index + 1)
     override fun compareTo(other: SequenceNumber) = index.compareTo(other.index)
+
+    companion object {
+
+        /**
+         * The base [SequenceNumber], that is expected when no events have been issued yet.
+         */
+        val Zero: SequenceNumber = SequenceNumber(0)
+    }
 }
