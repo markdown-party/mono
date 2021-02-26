@@ -22,6 +22,25 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
 }
 
+// TODO : Factorize all Kotlin tasks
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
+        freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
+        freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
+    }
+}
+
+
 test {
     useJUnitPlatform()
 }
