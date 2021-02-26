@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.*
  * @param [I] the type of the incoming messages.
  * @param [O] the type of the outgoing messages.
  */
-fun interface Exchange<I, O> {
+fun interface Exchange<in I, out O> {
 
     /**
      * Starts an asymmetric communication.
