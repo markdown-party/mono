@@ -59,7 +59,7 @@ object Message {
      * - If you're the receiver and you receive an [Incoming.Done] event, you should not send any
      *   additional request. You are still allowed to process in-flight messages for advertisements
      *   and events, but may not issue any additional request. You should send a _Done_ message
-     *   right away, before emplyting the in-flight queue.
+     *   right away, before emptying the in-flight queue.
      */
     sealed class V1<out T> {
 
