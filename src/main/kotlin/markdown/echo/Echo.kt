@@ -6,8 +6,8 @@ package markdown.echo
  * @param I the type of the domain-specific incoming events for this [SendEcho].
  * @param O the type of the domain-specific outgoing events for this [SendEcho].
  */
-fun interface SendEcho<out I, in O> {
-    fun outgoing(): Exchange<O, I>
+fun interface SendEcho<in I, out O> {
+    fun outgoing(): Exchange<I, O>
 }
 
 /**
@@ -16,8 +16,8 @@ fun interface SendEcho<out I, in O> {
  * @param I the type of the domain-specific incoming events for this [ReceiveEcho].
  * @param O the type of the domain-specific outgoing events for this [ReceiveEcho].
  */
-fun interface ReceiveEcho<in I, out O> {
-    fun incoming(): Exchange<I, O>
+fun interface ReceiveEcho<out I, in O> {
+    fun incoming(): Exchange<O, I>
 }
 
 /**

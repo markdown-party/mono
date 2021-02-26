@@ -55,11 +55,11 @@ class MemoryEcho<T>(
     private val mutex = Mutex()
     private val lastInserted = MutableStateFlow<EventIdentifier?>(null)
 
-    override fun outgoing(): Exchange<O<T>, I<T>> = channelExchange { incoming ->
+    override fun outgoing(): Exchange<I<T>, O<T>> = channelExchange { incoming ->
         // TODO : Support outgoing exchanges.
     }
 
-    override fun incoming(): Exchange<I<T>, O<T>> = channelExchange { incoming ->
+    override fun incoming(): Exchange<O<T>, I<T>> = channelExchange { incoming ->
         // TODO : Support incoming exchanges.
     }
 }

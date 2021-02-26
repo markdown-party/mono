@@ -35,21 +35,13 @@ suspend fun <I, O> sync(
         val rIncoming = right.incoming()
         val rOutgoing = right.outgoing()
 
-        val lToRIncoming = Channel<I>()
         val lToROutgoing = Channel<O>()
-        val rToLIncoming = Channel<I>()
+        val lToRIncoming = Channel<I>()
         val rToLOutgoing = Channel<O>()
+        val rToLIncoming = Channel<I>()
 
         launch {
             lIncoming
-                .talk(rToLIncoming.consumeAsFlow())
-                .onEach { lToROutgoing.send(it) }
-                .onCompletion { lToROutgoing.close() }
-                .collect()
-        }
-
-        launch {
-            lOutgoing
                 .talk(rToLOutgoing.consumeAsFlow())
                 .onEach { lToRIncoming.send(it) }
                 .onCompletion { lToRIncoming.close() }
@@ -57,18 +49,26 @@ suspend fun <I, O> sync(
         }
 
         launch {
+            lOutgoing
+                .talk(rToLIncoming.consumeAsFlow())
+                .onEach { lToROutgoing.send(it) }
+                .onCompletion { lToROutgoing.close() }
+                .collect()
+        }
+
+        launch {
             rIncoming
-                .talk(lToRIncoming.consumeAsFlow())
-                .onEach { rToLOutgoing.send(it) }
-                .onCompletion { rToLOutgoing.close() }
+                .talk(lToROutgoing.consumeAsFlow())
+                .onEach { rToLIncoming.send(it) }
+                .onCompletion { rToLIncoming.close() }
                 .collect()
         }
 
         launch {
             rOutgoing
-                .talk(lToROutgoing.consumeAsFlow())
-                .onEach { rToLIncoming.send(it) }
-                .onCompletion { rToLIncoming.close() }
+                .talk(lToRIncoming.consumeAsFlow())
+                .onEach { rToLOutgoing.send(it) }
+                .onCompletion { rToLOutgoing.close() }
                 .collect()
         }
     }
