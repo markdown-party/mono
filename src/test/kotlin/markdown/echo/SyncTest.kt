@@ -1,13 +1,11 @@
 package markdown.echo
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 class SyncTest {
 
     @Test
-    @ExperimentalCoroutinesApi
     fun `NoOp exchange sync eventually terminates`() = runBlocking {
         val alice = NoOpEcho
         val bob = NoOpEcho
