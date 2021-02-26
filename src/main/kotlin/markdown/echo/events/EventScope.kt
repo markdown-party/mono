@@ -6,7 +6,7 @@ import markdown.echo.causal.EventIdentifier
  * An interface describing the operations that can be performed when we want to issue some events.
  * Usually, commands will be described as extensions to the [EventScope] interface.
  *
- * @param T The type of the application-specific event data.
+ * @param T the type of the application-specific event data.
  */
 @EventDsl
 interface EventScope<T> {
@@ -27,7 +27,7 @@ interface EventScope<T> {
     /**
      * Appends an [Iterator] of events to the operations of this site.
      *
-     * @param events The events that will be added to the log.
+     * @param events the events that will be added to the log.
      */
     suspend fun yieldAll(
         events: Iterator<T>,
@@ -40,7 +40,7 @@ interface EventScope<T> {
     /**
      * Appends an [Iterable] of events to the operations of this site.
      *
-     * @param events The events that will be added to the log.
+     * @param events the events that will be added to the log.
      */
     suspend fun yieldAll(
         events: Iterable<T>,

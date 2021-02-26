@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.map
  * therefore, such failures should be thrown as exceptions and managed by the [Exchange]
  * implementations or their callers directly.
  *
- * @param incoming Transforms the incoming messages to the existing message type.
- * @param outgoing Transforms the outgoing messages to the new message type.
+ * @param incoming transforms the incoming messages to the existing message type.
+ * @param outgoing transforms the outgoing messages to the new message type.
  */
 fun <I1, O1, I2, O2> Exchange<I1, O1>.coding(
     incoming: suspend (I2) -> I1,
