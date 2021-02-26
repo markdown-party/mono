@@ -1,5 +1,7 @@
 package markdown.echo
 
+import markdown.echo.causal.EventIdentifier
+
 /**
  * An interface describing the operations that can be performed when we want to issue some events.
  * Usually, commands will be described as extensions to the [EventScope] interface.
@@ -15,10 +17,12 @@ interface EventScope<T> {
      * calls to [yield] guarantee that the order of the operations will be preserved.
      *
      * @param event The event that will be added to the log.
+     *
+     * @return the [EventIdentifier] that's issued for this new event.
      */
     suspend fun yield(
         event: T,
-    )
+    ): EventIdentifier
 
     /**
      * Appends an [Iterator] of events to the operations of this site.
