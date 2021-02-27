@@ -22,7 +22,7 @@ fun EventIdentifier(
  * @param packed the packed value for this identifier. Prefer building an instance with the
  *               dedicated builder function.
  */
-class EventIdentifier internal constructor(
+inline class EventIdentifier internal constructor(
     private val packed: Long,
 ) : Comparable<EventIdentifier> {
 
