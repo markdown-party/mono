@@ -78,7 +78,7 @@ suspend fun <T> SiteSendEcho<I<T>, O<T>>.event(
     //                                    <- Request
     //
     //
-    // Once the CLOSED state is reached, channels are closed and the connection with the
+    // Once the COMPLETED state is reached, channels are closed and the connection with the
     // other side is terminated.
 
     // Start up a sender coroutine, with a dedicated channel for incoming messages.
