@@ -1,13 +1,20 @@
-@file:OptIn(EchoPreview::class)
+@file:OptIn(
+    EchoPreview::class,
+    ExperimentalCoroutinesApi::class,
+    FlowPreview::class,
+)
 
 package markdown.echo.memory
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.sync.Mutex
 import markdown.echo.Echo
 import markdown.echo.EchoPreview
-import markdown.echo.Exchange
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelExchange
@@ -55,11 +62,39 @@ class MemoryEcho<T>(
     private val mutex = Mutex()
     private val lastInserted = MutableStateFlow<EventIdentifier?>(null)
 
-    override fun outgoing(): Exchange<I<T>, O<T>> = channelExchange { incoming ->
+    override fun outgoing() = channelExchange<I<T>, O<T>> { incoming ->
         // TODO : Support outgoing exchanges.
+        val insertion = lastInserted.buffer(Channel.RENDEZVOUS).produceIn(this)
+        var state: OutgoingState<T> = OutgoingState.New
+
+        while (state != OutgoingState.Completed && !(incoming.isClosedForReceive && isClosedForSend)) {
+            state = when (state) {
+                is OutgoingState.New -> OutgoingState.Completed // TODO
+                is OutgoingState.Completed -> OutgoingState.Completed
+            }
+        }
     }
 
-    override fun incoming(): Exchange<O<T>, I<T>> = channelExchange { incoming ->
+    override fun incoming() = channelExchange<O<T>, I<T>> { incoming ->
         // TODO : Support incoming exchanges.
+        val insertion = lastInserted.buffer(Channel.RENDEZVOUS).produceIn(this)
+        var state: IncomingState<T> = IncomingState.New
+
+        while (state != IncomingState.Completed && !(incoming.isClosedForReceive && isClosedForSend)) {
+            state = when (state) {
+                is IncomingState.New -> IncomingState.Completed // TODO
+                is IncomingState.Completed -> IncomingState.Completed
+            }
+        }
     }
+}
+
+private sealed class OutgoingState<out T> {
+    object New : OutgoingState<Nothing>()
+    object Completed : OutgoingState<Nothing>()
+}
+
+private sealed class IncomingState<out T> {
+    object New : IncomingState<Nothing>()
+    object Completed : IncomingState<Nothing>()
 }
