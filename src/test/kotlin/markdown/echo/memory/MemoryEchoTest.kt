@@ -8,7 +8,6 @@ import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.runBlocking
 import markdown.echo.*
 import markdown.echo.causal.SiteIdentifier
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -30,15 +29,13 @@ class MemoryEchoTest {
         sync(echo.incoming(), exchange)
     }
 
-    @Ignore
     @Test
     fun `Only Done works on rendezvous incoming`() = runBlocking {
         val echo = Echo.memory<Nothing>(SiteIdentifier(123)).buffer(Channel.RENDEZVOUS)
         val exchange = channelExchange<I<Nothing>, O<Nothing>> { incoming ->
+            assertTrue(incoming.receive() is I.Ready)
             send(O.Done)
-            val msg = incoming.receive()
-            println(msg)
-            //assertTrue(msg is I.Done)
+            assertTrue(incoming.receive() is I.Done)
             assertNull(incoming.receiveOrNull())
         }.buffer(Channel.RENDEZVOUS)
         sync(echo.incoming(), exchange)
