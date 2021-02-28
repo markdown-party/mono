@@ -86,7 +86,7 @@ class MemoryEcho<T>(
         var state: IncomingState<T> = mutex.withLock {
             IncomingState.New(
                 advertisedSites = emptyList(),
-                pendingSites = log.sites.toList(),
+                pendingSites = mutex.withLock { log.sites.toList() },
             )
         }
 
