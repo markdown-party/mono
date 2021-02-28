@@ -41,6 +41,11 @@ fun <T> mutableEventLogOf(
 interface EventLog<out T> {
 
     /**
+     * Returns an [Iterable] of all the [SiteIdentifier] that are known to this [EventLog].
+     */
+    val sites: Set<SiteIdentifier>
+
+    /**
      * Returns the [SequenceNumber] that is expected from this [EventLog].
      */
     fun expected(site: SiteIdentifier): SequenceNumber
@@ -55,6 +60,22 @@ interface EventLog<out T> {
         seqno: SequenceNumber,
         site: SiteIdentifier,
     ): T?
+
+    /**
+     * Returns all the events greater or equal to the provided [SequenceNumber] for the given
+     * [SiteIdentifier].
+     *
+     * @param seqno the lowest sequence number of the expected events.
+     * @param site the site of the event.
+     *
+     * @return all the events that are equal or higher to this [seqno] for the [site].
+     *
+     * TODO : Use a custom return type ?
+     */
+    fun events(
+        seqno: SequenceNumber,
+        site: SiteIdentifier,
+    ): Iterable<Pair<EventIdentifier, T>>
 }
 
 @EchoPreview

@@ -164,7 +164,7 @@ suspend fun <T> SiteSendEcho<I<T>, O<T>>.event(
                     incoming.onReceiveOrClosed { v ->
                         when (val msg = v.valueOrNull) {
                             is O.Request -> {
-                                if (msg.site == site) Sending(s.remaining, s.allowed + msg.count)
+                                if (msg.site == site) Sending(s.remaining, msg.count)
                                 else Sending(s.remaining, s.allowed)
                             }
                             is O.Done -> Cancelling

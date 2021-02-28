@@ -49,6 +49,9 @@ internal class SortedMapEventLog<T> internal constructor(
         table[event.site] = next
     }
 
+    override val sites: Set<SiteIdentifier>
+        get() = table.keys
+
     override fun expected(
         site: SiteIdentifier,
     ) = table[site]?.inc() ?: SequenceNumber.Zero
@@ -57,6 +60,16 @@ internal class SortedMapEventLog<T> internal constructor(
         seqno: SequenceNumber,
         site: SiteIdentifier,
     ): T? = buffer[EventIdentifier(seqno, site)]
+
+    override fun events(
+        seqno: SequenceNumber,
+        site: SiteIdentifier,
+    ): Iterable<Pair<EventIdentifier, T>> = buffer.asSequence()
+        .filter { (id, _) -> id.site == site }
+        .filter { (id, _) -> id.seqno >= seqno }
+        .sortedBy { (id, _) -> id }
+        .map { (id, body) -> id to body }
+        .asIterable()
 
     override operator fun set(
         seqno: SequenceNumber,

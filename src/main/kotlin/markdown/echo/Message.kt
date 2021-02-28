@@ -82,6 +82,7 @@ object Message {
              */
             data class Advertisement(
                 val site: SiteIdentifier,
+                // val seqno: SequenceNumber?,
             ) : Incoming<Nothing>()
 
             /**
