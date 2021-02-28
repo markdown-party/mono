@@ -11,10 +11,7 @@ import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.memory.log.mutableEventLogOf
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
 
@@ -57,6 +54,31 @@ class MemoryEchoTest {
             send(O.Done)
             assertTrue(incoming.receive() is I.Done)
             assertNull(incoming.receiveOrNull())
+        }.buffer(RENDEZVOUS)
+        sync(echo.incoming(), exchange)
+    }
+
+    @Test
+    fun `Advertises all sites in incoming`() = runBlocking {
+        val count = 100
+        val sites = List(count) { SiteIdentifier.random() }
+        val seqno = SequenceNumber.Zero
+        val events = sites.map { site -> EventIdentifier(seqno, site) to 123 }
+        val log = mutableEventLogOf(*events.toTypedArray())
+        val echo = Echo.memory(SiteIdentifier.random(), log).buffer(RENDEZVOUS)
+        val exchange = channelExchange<I<Int>, O<Int>> { incoming ->
+            val received = mutableListOf<SiteIdentifier>()
+            while (true) {
+                when (val msg = incoming.receive()) {
+                    is I.Advertisement -> received.add(msg.site)
+                    is I.Ready -> break
+                    else -> fail("Unexpected message $msg.")
+                }
+            }
+            assertTrue(received.containsAll(sites))
+            send(O.Done)
+            incoming.receive() as I.Done
+            incoming.receiveOrNull()
         }.buffer(RENDEZVOUS)
         sync(echo.incoming(), exchange)
     }
