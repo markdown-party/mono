@@ -6,6 +6,26 @@ import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 
 /**
+ * Creates an empty [EventLog].
+ *
+ * @param T the type of the events in the log.
+ */
+@EchoPreview
+fun <T> emptyEventLog(): EventLog<T> = EmptyEventLog
+
+/**
+ * Creates a new instance of [EventLog],
+ *
+ * @param events the pairs of event identifiers and event bodies to include in the log.
+ *
+ * @param T the type of events in the log.
+ */
+@EchoPreview
+fun <T> eventLogOf(
+    vararg events: Pair<EventIdentifier, T>,
+): EventLog<T> = mutableEventLogOf(*events)
+
+/**
  * Creates a new instance of [MutableEventLog].
  *
  * @param events the pairs of event identifiers and event bodies to include in the log.
@@ -18,7 +38,7 @@ fun <T> mutableEventLogOf(
 ): MutableEventLog<T> = SortedMapEventLog(*events)
 
 @EchoPreview
-interface EventLog<T> {
+interface EventLog<out T> {
 
     /**
      * Returns the [SequenceNumber] that is expected from this [EventLog].
