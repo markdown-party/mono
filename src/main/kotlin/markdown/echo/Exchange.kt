@@ -59,8 +59,6 @@ fun <I, O> exchange(
  * On a single [Echo], multiple [Exchange] might be open simultaneously. Therefore, exchanges should
  * make sure that concurrency is handled properly.
  *
- * // TODO : Offer more control on the buffering of channelExchange.
- *
  * @param block the initialization block for this [Exchange].
  *
  * @param I the type of the incoming messages.
