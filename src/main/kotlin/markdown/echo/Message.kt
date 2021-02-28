@@ -65,6 +65,21 @@ object Message {
 
         sealed class Incoming<out T> : V1<T>() {
 
+            /**
+             * This message is sent to let the other site know that we have some events at our
+             * disposable for a certain site. When an [Exchange] is started, the [Incoming] site
+             * will send some [Advertisement] for all the sites it knows about, before sending a
+             * [Ready] message.
+             *
+             * Afterwards, if messages from new sites become available, some additional
+             * [Advertisement] may eventually get sent.
+             *
+             * TODO : Eventually provide a [SequenceNumber] with the highest event available ?
+             *        This could help with one-off syncs, letting the other side know what's a good
+             *        request if one wants to only stick to the pre-[Ready] events.
+             *
+             * @param site the [SiteIdentifier] for the available site.
+             */
             data class Advertisement(
                 val site: SiteIdentifier,
             ) : Incoming<Nothing>()
@@ -81,23 +96,61 @@ object Message {
              */
             object Ready : Incoming<Nothing>()
 
-            data class Event<T>(
+            /**
+             * Sends an event, alongside its body, to the [Outgoing] side. When sending an event,
+             * you guarantee that you'll never send any [Event] for the same [SiteIdentifier] and
+             * with a smaller [SequenceNumber].
+             *
+             * @param seqno the sequence number for this [Event].
+             * @param site the site that issued this [Event].
+             * @param body the domain-specific body of the [Event].
+             */
+            data class Event<out T>(
                 val seqno: SequenceNumber,
                 val site: SiteIdentifier,
                 val body: T,
             ) : Incoming<T>()
 
+            /**
+             * Indicates that the [Incoming] side of the [Exchange] would like to terminate the
+             * communication. Once the [Done] message is emitted, the [Incoming] side will drain
+             * all the in-flight messages until the other side's [Outgoing.Done] message is
+             * received.
+             *
+             * Afterwards, both sites may disconnect.
+             */
             object Done : Incoming<Nothing>()
         }
 
         sealed class Outgoing<out T> : V1<T>() {
 
+            /**
+             * Indicates that the [Outgoing] side of the [Exchange] is ready to receive some
+             * events. A [Request] message can not be sent before the [Incoming.Ready] message
+             * has already been received.
+             *
+             * @param seqno the starting sequence number that we're interested in.
+             * @param site the site identifier for which we're interested in this sequence number.
+             * @param count how many events were requested.
+             *
+             * TODO : Eventually send the highest seqno that's been distributed to this site ? This
+             *        would eventually help the event { ... } callers generated proper causality
+             *        relationships in the log, and always append events to the end.
+             */
             data class Request(
                 val seqno: SequenceNumber,
                 val site: SiteIdentifier,
                 val count: Long = Long.MAX_VALUE,
             ) : Outgoing<Nothing>()
 
+            /**
+             * Indicates that the [Outgoing] side of the [Exchange] would like to terminate the
+             * communication. Once the [Done] message is emitted, the [Outgoing] side will drain
+             * all the in-flight messages until the other's side [Incoming.Done] message is
+             * received.
+             *
+             * Afterwards, both sites may disconnect.
+             */
             object Done : Outgoing<Nothing>()
         }
     }

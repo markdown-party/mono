@@ -110,6 +110,7 @@ suspend fun <T> SiteSendEcho<I<T>, O<T>>.event(
                     incoming.onReceiveOrClosed { v ->
                         when (val msg = v.valueOrNull) {
                             is O.Request ->
+                                // TODO : Check how the seqno is calculated.
                                 if (msg.site == site && msg.count > 0) {
                                     val remaining = events(site, msg.seqno, scope)
                                     if (remaining.isNotEmpty()) Sending(remaining, msg.count)
@@ -130,6 +131,7 @@ suspend fun <T> SiteSendEcho<I<T>, O<T>>.event(
                     incoming.onReceiveOrClosed { v ->
                         when (val msg = v.valueOrNull) {
                             is O.Request ->
+                                // TODO : Check how the seqno is calculated.
                                 if (msg.site == site && msg.count > 0) {
                                     val remaining = events(site, msg.seqno, scope)
                                     if (remaining.isNotEmpty()) Sending(remaining, msg.count)
