@@ -221,8 +221,9 @@ class MemoryEcho<T>(
             }
         }
 
-        // End of communication.
-        cancel()
+        // Cancel the different coroutines.
+        incoming.cancel()
+        insertion.cancel()
     }
 }
 
