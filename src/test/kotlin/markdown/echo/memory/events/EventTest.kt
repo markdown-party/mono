@@ -76,25 +76,26 @@ class EventTest {
     }
 
     @Test
-    fun `Three events generate appropriate messages`() = runBlocking {
+    fun `Many events generate appropriate messages`() = runBlocking {
         val site = SiteIdentifier(123)
+        val count = 1000
         val echo = object : SiteSendEcho<I<Int>, O<Int>> {
             override val site = site
             override fun outgoing() = channelExchange<I<Int>, O<Int>> { incoming ->
                 incoming.receive() as I.Advertisement
                 incoming.receive() as I.Ready
                 send(O.Request(SequenceNumber.Zero, site))
-                assertEquals(1, (incoming.receive() as I.Event).body)
-                assertEquals(2, (incoming.receive() as I.Event).body)
-                assertEquals(3, (incoming.receive() as I.Event).body)
+                for (i in 0..count) {
+                    assertEquals(i, (incoming.receive() as I.Event).body)
+                }
                 incoming.receive() as I.Done
                 send(O.Done)
             }
         }
         echo.event {
-            assertEquals(EventIdentifier(SequenceNumber(0), site), yield(1))
-            assertEquals(EventIdentifier(SequenceNumber(1), site), yield(2))
-            assertEquals(EventIdentifier(SequenceNumber(2), site), yield(3))
+            for (i in 0..count) {
+                assertEquals(EventIdentifier(SequenceNumber(i), site), yield(i))
+            }
         }
     }
 

@@ -10,6 +10,7 @@ package markdown.echo.memory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
@@ -19,6 +20,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Echo
 import markdown.echo.EchoPreview
+import markdown.echo.buffer
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -219,7 +221,8 @@ class MemoryEcho<T>(
             }
         }
 
-        insertion.cancel()
+        // End of communication.
+        cancel()
     }
 }
 
