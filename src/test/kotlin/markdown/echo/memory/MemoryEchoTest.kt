@@ -5,6 +5,9 @@ package markdown.echo.memory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
 import kotlinx.coroutines.channels.receiveOrNull
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import markdown.echo.*
 import markdown.echo.causal.EventIdentifier
@@ -31,7 +34,14 @@ class MemoryEchoTest {
     }
 
     @Test
-    fun `Only Done works on rendezvous incoming`() = runBlocking {
+    fun `No messages to incoming works`() = runBlocking {
+        val echo = Echo.memory<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
+        val received = echo.incoming().talk(emptyFlow()).toList()
+        assertEquals(listOf(I.Ready, I.Done), received)
+    }
+
+    @Test
+    fun `Only Done works on 1-buffer incoming`() = runBlocking {
         val echo = Echo.memory<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
         val exchange = channelExchange<I<Nothing>, O<Nothing>> { incoming ->
             assertTrue(incoming.receive() is I.Ready)
