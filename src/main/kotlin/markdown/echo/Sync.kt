@@ -11,6 +11,38 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
+ * Syncs the provided [Exchange] instances until they are done communicating. The [sync] operator
+ * creates bidirectional communication between the two [Exchange], which communicate with
+ * some [Channel].
+ *
+ * The communication stops when both [Exchange] are completed.
+ *
+ * @param I the type of the incoming data.
+ * @param O the type of the outgoing data.
+ */
+@EchoPreview
+suspend fun <I, O> sync(
+    first: Exchange<I, O>,
+    second: Exchange<O, I>,
+): Unit = coroutineScope {
+    val fToS = Channel<O>()
+    val sToF = Channel<I>()
+    launch {
+        first
+            .talk(sToF.consumeAsFlow())
+            .onEach { fToS.send(it) }
+            .onCompletion { fToS.close() }
+            .collect()
+    }
+    launch {
+        second.talk(fToS.consumeAsFlow())
+            .onEach { sToF.send(it) }
+            .onCompletion { fToS.close() }
+            .collect()
+    }
+}
+
+/**
  * Syncs the provided [Echo] until they are all done communicating. The [sync] operator creates a
  * chain of [Echo], and for each pair of the chain, some [Exchange] that are then used for
  * communication until all the data is eventually synced.
@@ -25,7 +57,7 @@ import kotlinx.coroutines.launch
 suspend fun <I, O> sync(
     first: Echo<I, O>,
     vararg others: Echo<I, O>,
-) = coroutineScope {
+): Unit = coroutineScope {
     for (index in others.indices) {
         val left = if (index == 0) first else others[index - 1]
         val right = others[index]
