@@ -29,6 +29,8 @@ compileKotlin {
         jvmTarget = "1.8"
         freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
         freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
+
+        freeCompilerArgs += ["-Xopt-in=kotlin.ExperimentalUnsignedTypes"] // Unsigned numbers.
     }
 }
 
@@ -37,6 +39,8 @@ compileTestKotlin {
         jvmTarget = "1.8"
         freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
         freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
+
+        freeCompilerArgs += ["-Xopt-in=kotlin.ExperimentalUnsignedTypes"] // Unsigned numbers.
     }
 }
 

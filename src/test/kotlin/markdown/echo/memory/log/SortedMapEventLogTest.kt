@@ -11,7 +11,7 @@ class SortedMapEventLogTest {
     fun `Inserted event is properly acked`() {
         val log = SortedMapEventLog<Unit>()
         val site = SiteIdentifier(456)
-        val seqno = SequenceNumber(123)
+        val seqno = SequenceNumber(123U)
 
         log[seqno, site] = Unit
 
@@ -22,8 +22,8 @@ class SortedMapEventLogTest {
     fun `Maximum seqno is acked`() {
         val log = SortedMapEventLog<Unit>()
         val site = SiteIdentifier(123)
-        val low = SequenceNumber(1)
-        val high = SequenceNumber(2)
+        val low = SequenceNumber(1U)
+        val high = SequenceNumber(2U)
 
         // Insert the highest first.
         log[high, site] = Unit
@@ -44,7 +44,7 @@ class SortedMapEventLogTest {
     fun `Inserted event can be read`() {
         val log = SortedMapEventLog<Int>()
         val site = SiteIdentifier(456)
-        val seqno = SequenceNumber(1)
+        val seqno = SequenceNumber(1U)
 
         log[seqno, site] = 42
 

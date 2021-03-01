@@ -28,7 +28,7 @@ class MemoryEchoEventTest {
         val site = SiteIdentifier(145)
         with(Echo.memory<Int>(site)) {
             event {
-                assertEquals(EventIdentifier(SequenceNumber(0), site), yield(123))
+                assertEquals(EventIdentifier(SequenceNumber(0U), site), yield(123))
             }
         }
     }
@@ -38,8 +38,8 @@ class MemoryEchoEventTest {
         val site = SiteIdentifier(145)
         with(Echo.memory<Int>(site)) {
             event {
-                assertEquals(EventIdentifier(SequenceNumber(0), site), yield(123))
-                assertEquals(EventIdentifier(SequenceNumber(1), site), yield(456))
+                assertEquals(EventIdentifier(SequenceNumber(0U), site), yield(123))
+                assertEquals(EventIdentifier(SequenceNumber(1U), site), yield(456))
             }
         }
     }

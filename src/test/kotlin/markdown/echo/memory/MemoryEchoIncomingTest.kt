@@ -54,7 +54,7 @@ class MemoryEchoIncomingTest {
 
     @Test
     fun `Advertises one event and cancels if rendezvous and not empty`() = runBlocking {
-        val seqno = SequenceNumber(123)
+        val seqno = SequenceNumber(123U)
         val site = SiteIdentifier(456)
         val log = mutableEventLogOf(EventIdentifier(seqno, site) to 42)
         val echo = Echo.memory(site, log).buffer(RENDEZVOUS)
@@ -96,7 +96,7 @@ class MemoryEchoIncomingTest {
     @Test
     fun `Issues one event on request`() = runBlocking {
         val site = SiteIdentifier(10)
-        val seqno = SequenceNumber(150)
+        val seqno = SequenceNumber(150U)
         val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
         val echo = Echo.memory(SiteIdentifier(0), events).buffer(RENDEZVOUS)
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
@@ -114,7 +114,7 @@ class MemoryEchoIncomingTest {
     @Test
     fun `No event is sent if request size is zero`() = runBlocking {
         val site = SiteIdentifier(123)
-        val seqno = SequenceNumber(150)
+        val seqno = SequenceNumber(150U)
         val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
         val echo = Echo.memory(SiteIdentifier(0), events)
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
@@ -133,7 +133,7 @@ class MemoryEchoIncomingTest {
     @Test
     fun `An event is sent if first request size is zero and second is non-zero`() = runBlocking {
         val site = SiteIdentifier(123)
-        val seqno = SequenceNumber(150)
+        val seqno = SequenceNumber(150U)
         val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
         val echo = Echo.memory(SiteIdentifier(0), events)
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->

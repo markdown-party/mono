@@ -56,7 +56,7 @@ class EventTest {
     fun `Single event generates appropriate messages`() = runBlocking {
         val site = SiteIdentifier(123)
         val body = 1000
-        val expected = SequenceNumber(42)
+        val expected = SequenceNumber(42U)
         val echo = object : SiteSendEcho<I<Int>, O<Int>> {
             override val site = site
             override fun outgoing() = channelExchange<I<Int>, O<Int>> { incoming ->
@@ -78,14 +78,14 @@ class EventTest {
     @Test
     fun `Many events generate appropriate messages`() = runBlocking {
         val site = SiteIdentifier(123)
-        val count = 1000
+        val count = 1000U
         val echo = object : SiteSendEcho<I<Int>, O<Int>> {
             override val site = site
             override fun outgoing() = channelExchange<I<Int>, O<Int>> { incoming ->
                 incoming.receive() as I.Advertisement
                 incoming.receive() as I.Ready
                 send(O.Request(SequenceNumber.Zero, site))
-                for (i in 0..count) {
+                for (i in 0..count.toInt()) {
                     assertEquals(i, (incoming.receive() as I.Event).body)
                 }
                 incoming.receive() as I.Done
@@ -93,8 +93,8 @@ class EventTest {
             }
         }
         echo.event {
-            for (i in 0..count) {
-                assertEquals(EventIdentifier(SequenceNumber(i), site), yield(i))
+            for (i in 0U..count) {
+                assertEquals(EventIdentifier(SequenceNumber(i), site), yield(i.toInt()))
             }
         }
     }

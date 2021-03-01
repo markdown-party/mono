@@ -2,6 +2,10 @@
 
 package markdown.echo.causal
 
+import markdown.echo.util.packInts
+import markdown.echo.util.unpackInt1
+import markdown.echo.util.unpackInt2
+
 /**
  * Builds a new [EventIdentifier], for a given [SequenceNumber] and a given [SiteIdentifier].
  *
@@ -12,7 +16,7 @@ package markdown.echo.causal
 fun EventIdentifier(
     seqno: SequenceNumber,
     site: SiteIdentifier,
-): EventIdentifier = EventIdentifier(packInts(seqno.index, site.unique))
+): EventIdentifier = EventIdentifier(packInts(seqno.index.toInt(), site.unique))
 
 /**
  * An [EventIdentifier] uniquely identifies events and their causality relationships in a
@@ -30,32 +34,9 @@ inline class EventIdentifier internal constructor(
     // compare event identifiers as longs to find a total order.
     override fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
 
-    val seqno: SequenceNumber get() = SequenceNumber(unpackInt1(packed))
+    val seqno: SequenceNumber get() = SequenceNumber(unpackInt1(packed).toUInt())
     val site: SiteIdentifier get() = SiteIdentifier(unpackInt2(packed))
 
-    operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed))
+    operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed).toUInt())
     operator fun component2(): SiteIdentifier = SiteIdentifier(unpackInt2(packed))
-}
-
-// PACKING UTILITIES
-
-/**
- * Packs two Int values into one Long value for use in inline classes.
- */
-private inline fun packInts(val1: Int, val2: Int): Long {
-    return val1.toLong().shl(32) or (val2.toLong() and 0xFFFFFFFF)
-}
-
-/**
- * Unpacks the first Int value in [packInts] from its returned ULong.
- */
-private inline fun unpackInt1(value: Long): Int {
-    return value.shr(32).toInt()
-}
-
-/**
- * Unpacks the second Int value in [packInts] from its returned ULong.
- */
-private inline fun unpackInt2(value: Long): Int {
-    return value.and(0xFFFFFFFF).toInt()
 }
