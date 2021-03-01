@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import markdown.echo.*
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
@@ -108,5 +109,24 @@ class MemoryEchoTest {
             assertNull(incoming.receiveOrNull())
         }.buffer(RENDEZVOUS)
         sync(echo.incoming(), exchange)
+    }
+
+    @Test
+    fun `No event is sent if request size is zero`() = runBlocking {
+        val site = SiteIdentifier(123)
+        val seqno = SequenceNumber(150)
+        val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+        val echo = Echo.memory(SiteIdentifier(0), events)
+        val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
+            assertEquals(I.Advertisement(site), incoming.receive())
+            assertEquals(I.Ready, incoming.receive())
+            send(O.Request(seqno, site, count = 0))
+            incoming.receive()
+            fail("incoming.receive() should have timeout.")
+        }
+        val nullIfFailure = withTimeoutOrNull(1000) {
+            sync(echo.incoming(), exchange)
+        }
+        assertNull(nullIfFailure)
     }
 }
