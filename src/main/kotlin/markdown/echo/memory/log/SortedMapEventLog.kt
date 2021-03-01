@@ -46,10 +46,9 @@ internal class SortedMapEventLog<T> internal constructor(
         seqno: SequenceNumber,
         site: SiteIdentifier,
     ): Iterable<Pair<EventIdentifier, T>> {
-        val lower = seqno
-        val upper = buffer[site]?.lastKey()?.inc() ?: SequenceNumber.Zero
+        // TODO : Change implementation so read-only events() does not mutate [buffer]
         return buffer.getOrPut(site) { sortedMapOf() }
-            .subMap(lower, upper)
+            .tailMap(seqno)
             .asSequence()
             .map { (seqno, body) -> EventIdentifier(seqno, site) to body }
             .asIterable()
