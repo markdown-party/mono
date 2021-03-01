@@ -31,7 +31,12 @@ When the library becomes stable enough, non- `-SNAPSHOT` releases will be upload
 
 ### Principles
 
-The library is built on top of two main abstractions :
+> In the `kotlin-echo` log replication protocol, one site **requests** events from another site
+> which **provides** them. The `Exchange` interface makes it possible to represent these
+> asymmetrical messages. On the other hand, the `Echo` interface is well-suited to model a replica
+> which is able to both **request AND provide** log events.
+
+These abstractions are modeled as follows :
 
 + The `Exchange<I, O>` functional interface, which models an asynchronous and asymmetrical
   communication channel between two  sites. When the `fun talk(incoming: Flow<I>): Flow<O>` method
@@ -55,10 +60,7 @@ Exchange :                             Echo :
     +------ O <-----+                       outgoing(): Exchange<O, I>
 ```
 
-In the `kotlin-echo` log replication protocol, one site **requests** events from another site which
-**provides** them. The `Exchange` interface makes it possible to represent these asymmetrical
-messages. On the other hand, the `Echo` interface is well-suited to model a replica which is able to
-both **request AND provide** log events.
+
 
 #### Replication protocol
 
