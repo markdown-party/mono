@@ -19,7 +19,7 @@ import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
 
 @OptIn(EchoPreview::class)
-class MemoryEchoTest {
+class MemoryEchoIncomingTest {
 
     @Test
     fun `Only Done works on buffered incoming`() = runBlocking {
