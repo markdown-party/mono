@@ -43,7 +43,7 @@ These abstractions are modeled as follows :
   is called, a new **cold** `Flow` of messages is generated. An `Exchange` may `emit(..)` different
   messages of type `O` depending on what messages of type `I` it receives in its `incoming` inbox
 + The `Echo<I, O>` interface, which returns two asymmetrical `Exchange` with inverted directions.
-  Essentially, an `Echo` a site in the distributed system, which can then "talk" and "reply" to
+  Essentially, an `Echo` is a site in the distributed system, which can then "talk" and "reply" to
   other sites.
 
 ```
