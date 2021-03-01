@@ -129,4 +129,23 @@ class MemoryEchoTest {
         }
         assertNull(nullIfFailure)
     }
+
+    @Test
+    fun `An event is sent if request size is zero and second is non-zero`() = runBlocking {
+        val site = SiteIdentifier(123)
+        val seqno = SequenceNumber(150)
+        val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+        val echo = Echo.memory(SiteIdentifier(0), events)
+        val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
+            assertEquals(I.Advertisement(site), incoming.receive())
+            assertEquals(I.Ready, incoming.receive())
+            send(O.Request(seqno, site, count = 0))
+            send(O.Request(seqno, site, count = 1))
+            assertEquals(I.Event(seqno, site, true), incoming.receive())
+            send(O.Done)
+            assertEquals(I.Done, incoming.receive())
+            assertNull(incoming.receiveOrNull())
+        }
+        sync(echo.incoming(), exchange)
+    }
 }
