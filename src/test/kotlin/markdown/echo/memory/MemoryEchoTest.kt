@@ -91,4 +91,22 @@ class MemoryEchoTest {
         }.buffer(RENDEZVOUS)
         sync(echo.incoming(), exchange)
     }
+
+    @Test
+    fun `Issues one event on request`() = runBlocking {
+        val site = SiteIdentifier(10)
+        val seqno = SequenceNumber(150)
+        val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+        val echo = Echo.memory(SiteIdentifier(0), events).buffer(RENDEZVOUS)
+        val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
+            assertEquals(I.Advertisement(site), incoming.receive())
+            assertEquals(I.Ready, incoming.receive())
+            send(O.Request(seqno, site))
+            assertEquals(I.Event(seqno, site, true), incoming.receive())
+            send(O.Done)
+            assertEquals(I.Done, incoming.receive())
+            assertNull(incoming.receiveOrNull())
+        }.buffer(RENDEZVOUS)
+        sync(echo.incoming(), exchange)
+    }
 }
