@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import markdown.echo.EchoPreview
-import markdown.echo.Message
 import markdown.echo.ReceiveEcho
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber.Companion.Zero
@@ -65,12 +64,12 @@ fun <M, T> ReceiveEcho<I<T>, O<T>>.projectWithIdentifiers(
                     incoming.onReceiveOrClosed { v ->
                         when (val msg = v.valueOrNull) {
                             is I.Done, null -> State.Cancelling
-                            is Message.V1.Incoming.Advertisement -> {
+                            is I.Advertisement -> {
                                 s.advertisedSites += msg.site
                                 return@onReceiveOrClosed s // Updated a mutable state.
                             }
-                            is Message.V1.Incoming.Event -> error("Event should not be send before Ready.")
-                            is Message.V1.Incoming.Ready -> State.Listening(
+                            is I.Event -> error("Event should not be send before Ready.")
+                            is I.Ready -> State.Listening(
                                 advertisedSites = s.advertisedSites,
                                 requestedSites = mutableListOf(),
                                 log = mutableEventLogOf(),
