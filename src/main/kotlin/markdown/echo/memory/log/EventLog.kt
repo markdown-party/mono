@@ -76,6 +76,13 @@ interface EventLog<out T> {
         seqno: SequenceNumber,
         site: SiteIdentifier,
     ): Iterable<Pair<EventIdentifier, T>>
+
+    // This API is transient and will be removed in the future.
+    @EchoPreview
+    fun <R> foldl(
+        base: R,
+        step: (Pair<EventIdentifier, T>, R) -> R,
+    ): R
 }
 
 @EchoPreview

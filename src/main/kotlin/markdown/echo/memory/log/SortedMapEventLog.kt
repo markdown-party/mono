@@ -61,4 +61,19 @@ internal class SortedMapEventLog<T> internal constructor(
     ) {
         buffer.getOrPut(site) { sortedMapOf() }[seqno] = body
     }
+
+    override fun <R> foldl(
+        base: R,
+        step: (Pair<EventIdentifier, T>, R) -> R,
+    ): R = buffer.asSequence()
+        .flatMap { entry ->
+            entry.value.asSequence()
+                .map {
+                    val id = EventIdentifier(it.key, entry.key)
+                    val body = it.value
+                    Pair(id, body)
+                }
+        }
+        .sortedBy { it.first }
+        .fold(base) { m, p -> step(p, m) }
 }
