@@ -56,7 +56,12 @@ fun <T> Echo.Companion.memory(
  *
  * @param T the type of the domain-specific events that this [MemoryEcho] supports.
  */
-@OptIn(ExperimentalCoroutinesApi::class, InternalCoroutinesApi::class, FlowPreview::class)
+@OptIn(
+    EchoPreview::class,
+    ExperimentalCoroutinesApi::class,
+    InternalCoroutinesApi::class,
+    FlowPreview::class,
+)
 class MemoryEcho<T>(
     override val site: SiteIdentifier,
     private val log: MutableEventLog<T> = mutableEventLogOf(),
