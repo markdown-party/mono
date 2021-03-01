@@ -6,6 +6,7 @@ import markdown.echo.EchoPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import java.util.*
 
 /**
  * An implementation of a [MutableEventLog] that makes use of [java.util.SortedMap].
@@ -21,13 +22,7 @@ internal class SortedMapEventLog<T> internal constructor(
      * identifiers are totally ordered, it's possible to efficient iterate on the events from the
      * [MutableEventLog].
      */
-    private val buffer = sortedMapOf<EventIdentifier, T>()
-
-    /**
-     * A table that stores the last acknowledge event for each [SiteIdentifier]. This is updated
-     * through the [ack] method.
-     */
-    private val table = mutableMapOf<SiteIdentifier, SequenceNumber>()
+    private val buffer = mutableMapOf<SiteIdentifier, SortedMap<SequenceNumber, T>>()
 
     init {
         for ((key, value) in events) {
@@ -35,50 +30,36 @@ internal class SortedMapEventLog<T> internal constructor(
         }
     }
 
-    /**
-     * Acknowledges the provided event identifier as known by this [MutableEventLog].
-     */
-    private fun ack(
-        event: EventIdentifier,
-    ) {
-        val current = table[event.site]
-        val next =
-            if (current == null) event.seqno
-            else maxOf(current, event.seqno)
-
-        table[event.site] = next
-    }
-
     override val sites: Set<SiteIdentifier>
-        get() = table.keys
+        get() = buffer.keys
 
     override fun expected(
         site: SiteIdentifier,
-    ) = table[site]?.inc() ?: SequenceNumber.Zero
+    ) = buffer[site]?.lastKey()?.inc() ?: SequenceNumber.Zero
 
     override fun get(
         seqno: SequenceNumber,
         site: SiteIdentifier,
-    ): T? = buffer[EventIdentifier(seqno, site)]
+    ): T? = buffer[site]?.get(seqno)
 
     override fun events(
         seqno: SequenceNumber,
         site: SiteIdentifier,
-    ): Iterable<Pair<EventIdentifier, T>> = buffer.asSequence()
-        .filter { (id, _) -> id.site == site }
-        .filter { (id, _) -> id.seqno >= seqno }
-        .sortedBy { (id, _) -> id }
-        .map { (id, body) -> id to body }
-        .asIterable()
+    ): Iterable<Pair<EventIdentifier, T>> {
+        val lower = seqno
+        val upper = buffer[site]?.lastKey()?.inc() ?: SequenceNumber.Zero
+        return buffer.getOrPut(site) { sortedMapOf() }
+            .subMap(lower, upper)
+            .asSequence()
+            .map { (seqno, body) -> EventIdentifier(seqno, site) to body }
+            .asIterable()
+    }
 
     override operator fun set(
         seqno: SequenceNumber,
         site: SiteIdentifier,
         body: T,
     ) {
-        with(EventIdentifier(seqno, site)) {
-            ack(this)
-            buffer[this] = body
-        }
+        buffer.getOrPut(site) { sortedMapOf() }[seqno] = body
     }
 }
