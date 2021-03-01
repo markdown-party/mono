@@ -36,7 +36,7 @@ The library is built on top of two main abstractions :
 + The `Exchange<I, O>` functional interface, which models an asynchronous and asymmetrical
   communication channel between two  sites. When the `fun talk(incoming: Flow<I>): Flow<O>` method
   is called, a new **cold** `Flow` of messages is generated. An `Exchange` may `emit(..)` different
-  messages of type `O` depending on what it receives in its `incoming` inbox
+  messages of type `O` depending on what messages of type `I` it receives in its `incoming` inbox
 + The `Echo<I, O>` interface, which returns two asymmetrical `Exchange` with inverted directions.
   Essentially, an `Echo` a site in the distributed system, which can then "talk" and "reply" to
   other sites.
@@ -47,9 +47,9 @@ Exchange :                             Echo :
     +-----> I ------+                       incoming(): Exchange<I, O>
     |               |                     +----------------------------+
     |               |                     |                            |
-+--------+      +--------+                |                         +------+
-| Site 1 |      | Site 2 |     <----------+                         | Echo |
-+--------+      +--------+                |                         +------+
++--------+      +--------+                |                     +------------+
+| Site 1 |      | Site 2 |     <----------+                     | Echo<I, O> |
++--------+      +--------+                |                     +------------+
     ^               |                     |                            |
     |               |                     +----------------------------+
     +------ O <-----+                       outgoing(): Exchange<O, I>
