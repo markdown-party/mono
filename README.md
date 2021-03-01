@@ -43,5 +43,5 @@ tests locally, please proceed as follows :
 > git clone git@github.com:markdown-party/kotlin-echo.git && cd kotlin-echo
 
 # Run Gradle tests.
-./gradlew test
+> ./gradlew test
 ```
