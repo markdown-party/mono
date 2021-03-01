@@ -131,7 +131,7 @@ class MemoryEchoTest {
     }
 
     @Test
-    fun `An event is sent if request size is zero and second is non-zero`() = runBlocking {
+    fun `An event is sent if first request size is zero and second is non-zero`() = runBlocking {
         val site = SiteIdentifier(123)
         val seqno = SequenceNumber(150)
         val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
