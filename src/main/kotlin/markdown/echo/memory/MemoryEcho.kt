@@ -19,8 +19,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Echo
 import markdown.echo.EchoPreview
+import markdown.echo.Message
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
+import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelExchange
 import markdown.echo.events.SiteSendEcho
@@ -74,12 +76,88 @@ class MemoryEcho<T>(
 
     override fun outgoing() = channelExchange<I<T>, O<T>> { incoming ->
         // TODO : Support outgoing exchanges.
-        val insertion = lastInserted.buffer(Channel.RENDEZVOUS).produceIn(this)
-        var state: OutgoingState<T> = OutgoingState.New
+        var state: OutgoingState<T> = OutgoingState.Advertising(mutableListOf())
 
         while (state != OutgoingState.Completed && !(incoming.isClosedForReceive && isClosedForSend)) {
-            state = when (state) {
-                is OutgoingState.New -> OutgoingState.Completed // TODO
+            state = when (val s = state) {
+
+                is OutgoingState.Advertising -> select {
+                    incoming.onReceiveOrClosed { v ->
+                        when (val msg = v.valueOrNull) {
+                            is I.Advertisement -> {
+                                s.availableSites += msg.site
+                                return@onReceiveOrClosed s // Updated a mutable state.
+                            }
+                            is I.Ready -> {
+                                OutgoingState.Listening(
+                                    pendingRequests = s.availableSites,
+                                    requested = mutableListOf(),
+                                )
+                            }
+                            is I.Done, null -> OutgoingState.Cancelling
+                            is I.Event -> error("Expected Advertisement or Ready.")
+                        }
+                    }
+                }
+
+                is OutgoingState.Listening -> {
+                    val request = s.pendingRequests.lastOrNull()
+                    val expected = mutex.withLock { request?.let(log::expected) } ?: Zero
+                    select {
+                        if (request != null) {
+                            onSend(O.Request(
+                                seqno = expected,
+                                site = request,
+                                count = Long.MAX_VALUE,
+                            )) {
+                                s.pendingRequests.removeLast()
+                                s.requested.add(request)
+                                return@onSend s // Updated a mutable state.
+                            }
+                        }
+                        incoming.onReceiveOrClosed { v ->
+                            when (val msg = v.valueOrNull) {
+                                is I.Done, null -> OutgoingState.Cancelling
+                                is Message.V1.Incoming.Advertisement -> {
+                                    s.pendingRequests.add(msg.site)
+                                    return@onReceiveOrClosed s // Updated a mutable state.
+                                }
+                                is Message.V1.Incoming.Event -> {
+                                    mutex.withLock {
+                                        val present = log[msg.seqno, msg.site] != null
+                                        if (!present) {
+                                            log[msg.seqno, msg.site] = msg.body
+                                            lastInserted.value = EventIdentifier(
+                                                msg.seqno,
+                                                msg.site,
+                                            )
+                                        }
+                                    }
+                                    return@onReceiveOrClosed s // No-Op on the local state.
+                                }
+                                is Message.V1.Incoming.Ready -> error("Duplicate Ready message.")
+                            }
+                        }
+                    }
+                }
+
+                // 1. We can send a Done message, and move to Completed.
+                is OutgoingState.Cancelling -> select {
+                    onSend(O.Done) { OutgoingState.Completed }
+                }
+
+                // 1. We receive a Done message, and move to Completed.
+                is OutgoingState.Completing -> select {
+                    incoming.onReceiveOrClosed { v ->
+                        when (v.valueOrNull) {
+                            is I.Done, null -> OutgoingState.Completed
+                            // TODO : Eventually store these "free" events ?
+                            else -> OutgoingState.Completing // Draining.
+                        }
+                    }
+                }
+
+                // This should never be called. It's included for completeness.
                 is OutgoingState.Completed -> OutgoingState.Completed
             }
         }
@@ -231,7 +309,17 @@ class MemoryEcho<T>(
 
 @EchoPreview
 private sealed class OutgoingState<out T> {
-    object New : OutgoingState<Nothing>()
+    data class Advertising(
+        val availableSites: MutableList<SiteIdentifier>,
+    ) : OutgoingState<Nothing>()
+
+    data class Listening(
+        val pendingRequests: MutableList<SiteIdentifier>,
+        val requested: MutableList<SiteIdentifier>,
+    ) : OutgoingState<Nothing>()
+
+    object Cancelling : OutgoingState<Nothing>()
+    object Completing : OutgoingState<Nothing>()
     object Completed : OutgoingState<Nothing>()
 }
 
