@@ -10,7 +10,6 @@ package markdown.echo.memory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
@@ -20,7 +19,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Echo
 import markdown.echo.EchoPreview
-import markdown.echo.buffer
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -58,7 +56,7 @@ fun <T> Echo.Companion.memory(
  *
  * @param T the type of the domain-specific events that this [MemoryEcho] supports.
  */
-@OptIn(ExperimentalCoroutinesApi::class, InternalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, InternalCoroutinesApi::class, FlowPreview::class)
 class MemoryEcho<T>(
     override val site: SiteIdentifier,
     private val log: MutableEventLog<T> = mutableEventLogOf(),
@@ -87,8 +85,8 @@ class MemoryEcho<T>(
         val insertion = lastInserted.buffer(Channel.RENDEZVOUS).produceIn(this)
         var state: IncomingState<T> = mutex.withLock {
             IncomingState.New(
-                advertisedSites = emptyList(),
-                pendingSites = log.sites.toList(),
+                advertisedSites = mutableListOf(),
+                pendingSites = log.sites.toMutableList(),
             )
         }
 
@@ -103,13 +101,12 @@ class MemoryEcho<T>(
                 // 3. We receive a Done event, so we move to Cancelling.
                 // 4. We receive an unsupported message, which we just ignore. // TODO : Fail fast instead ?
                 is IncomingState.New -> select {
-                    val first = s.pendingSites.firstOrNull()
-                    if (first != null) {
-                        onSend(I.Advertisement(first)) {
-                            IncomingState.New(
-                                advertisedSites = s.advertisedSites.plus(first),
-                                pendingSites = s.pendingSites.drop(1),
-                            )
+                    val pending = s.pendingSites.lastOrNull()
+                    if (pending != null) {
+                        onSend(I.Advertisement(pending)) {
+                            s.advertisedSites.add(pending)
+                            s.pendingSites.removeLast()
+                            return@onSend s // Updated a mutable state.
                         }
                     } else {
                         onSend(I.Ready) {
@@ -236,10 +233,9 @@ private sealed class OutgoingState<out T> {
 @EchoPreview
 private sealed class IncomingState<out T> {
 
-    // TODO : Optimize with mutable states.
     data class New(
-        val advertisedSites: List<SiteIdentifier>,
-        val pendingSites: List<SiteIdentifier>,
+        val advertisedSites: MutableList<SiteIdentifier>,
+        val pendingSites: MutableList<SiteIdentifier>,
     ) : IncomingState<Nothing>()
 
     // TODO : Optimize with mutable states.
