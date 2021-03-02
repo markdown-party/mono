@@ -134,6 +134,10 @@ object Message {
              *
              * - The request is tied to a specific [site]. You may not issue a [Request] for a
              *   [SiteIdentifier] that has not been advertised through an [Incoming.Advertisement].
+             * - The [nextForSite] indicates what the requested sequence number for the specific
+             *   [site] is.
+             * - The [nextForAll] indicates the requested sequence number if the other site was to
+             *   generate an event that's definitely higher than your current knowledge.
              *
              * @param nextForAll the next [SequenceNumber] that is expected for all the sites.
              * @param nextForSite the next [SequenceNumber] that is expected for the [site].
