@@ -8,8 +8,6 @@ import markdown.echo.util.plusBoundOverflows
  *
  * Increasing sequence numbers do not imply a causality relationship, but a causality relationship
  * implies increasing sequence numbers.
- *
- * TODO : Eventually use unsigned integers at some point.
  */
 inline class SequenceNumber internal constructor(
     internal val index: UInt,
