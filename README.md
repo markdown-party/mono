@@ -23,7 +23,7 @@ The library is made available through
 you can then add the following dependency in your `build.gradle` file :
 
 ```groovy
-implementation "markdown.party:echo:0.2.0-SNAPSHOT"
+implementation "markdown.party:echo:0.2.1-SNAPSHOT"
 ```
 
 `-SNAPSHOT` releases are regularly released. Every week, the minor version number is incremented.
