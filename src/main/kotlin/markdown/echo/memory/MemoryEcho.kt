@@ -1,5 +1,4 @@
 @file:OptIn(
-    EchoPreview::class,
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
     InternalCoroutinesApi::class,
@@ -18,7 +17,6 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Echo
-import markdown.echo.EchoPreview
 import markdown.echo.Message
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
@@ -59,7 +57,6 @@ fun <T> Echo.Companion.memory(
  * @param T the type of the domain-specific events that this [MemoryEcho] supports.
  */
 @OptIn(
-    EchoPreview::class,
     ExperimentalCoroutinesApi::class,
     InternalCoroutinesApi::class,
     FlowPreview::class,
@@ -307,7 +304,6 @@ class MemoryEcho<T>(
     }
 }
 
-@EchoPreview
 private sealed class OutgoingState<out T> {
     data class Advertising(
         val availableSites: MutableList<SiteIdentifier>,
@@ -323,7 +319,6 @@ private sealed class OutgoingState<out T> {
     object Completed : OutgoingState<Nothing>()
 }
 
-@EchoPreview
 private sealed class IncomingState<out T> {
 
     data class New(
@@ -353,7 +348,7 @@ private sealed class IncomingState<out T> {
             val newEvents = advertisedSites
                 .asSequence().flatMap { site ->
                     log.events(
-                        seqno = receivedAcks[site] ?: SequenceNumber.Zero,
+                        seqno = receivedAcks[site] ?: Zero,
                         site = site,
                     )
                 }

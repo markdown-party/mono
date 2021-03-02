@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
-import markdown.echo.EchoPreview
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.ReceiveEcho
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber.Companion.Zero
@@ -39,7 +39,6 @@ fun <M, T> ReceiveEcho<I<T>, O<T>>.projection(
  * @param T the type of the events managed by the [ReceiveEcho].
  */
 @OptIn(
-    EchoPreview::class,
     ExperimentalCoroutinesApi::class,
     InternalCoroutinesApi::class,
 )
@@ -130,7 +129,6 @@ private sealed class State<out T> {
         val advertisedSites: MutableList<SiteIdentifier>,
     ) : State<Nothing>()
 
-    @EchoPreview
     data class Listening<T>(
         val advertisedSites: MutableList<SiteIdentifier>,
         val requestedSites: MutableList<SiteIdentifier>,
@@ -141,7 +139,7 @@ private sealed class State<out T> {
     object Completed : State<Nothing>()
 }
 
-@EchoPreview
+@OptIn(EchoEventLogPreview::class)
 private fun <M, T> EventLog<T>.aggregate(
     model: M,
     transform: OneWayProjection<M, Pair<EventIdentifier, T>>,

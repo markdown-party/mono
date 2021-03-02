@@ -1,12 +1,30 @@
 package markdown.echo
 
+import kotlin.RequiresOptIn.Level.ERROR
 import kotlin.RequiresOptIn.Level.WARNING
 
 /**
- * A marker for experimental APIs in the Echo library.
+ * This EventLog API is still experimental, and will likely be reworked and refactored. Please make
+ * sure you understand the tradeoffs before using it.
+ */
+@RequiresOptIn(
+    level = ERROR,
+    message = """
+        This EventLog API is still experimental, and will likely be reworked and refactored. Please
+        make sure you understand the tradeoffs before using it.
+        """,
+)
+annotation class EchoEventLogPreview
+
+/**
+ * This Sync API is still experimental, and will likely be reworked and refactored. Please make sure
+ * you understand the tradeoffs before using it.
  */
 @RequiresOptIn(
     level = WARNING,
-    message = "This API is still experimental and should be used with care.",
+    message = """
+        This Sync API is still experimental, and will likely be reworked and refactored. Please
+        make sure you understand the tradeoffs before using it.
+""",
 )
-annotation class EchoPreview
+annotation class EchoSyncPreview

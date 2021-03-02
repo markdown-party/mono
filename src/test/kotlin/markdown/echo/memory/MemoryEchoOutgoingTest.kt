@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.runBlocking
 import markdown.echo.Echo
-import markdown.echo.EchoPreview
+import markdown.echo.EchoSyncPreview
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelExchange
 import markdown.echo.sync
@@ -15,7 +15,7 @@ import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
 
 @OptIn(
-    EchoPreview::class,
+    EchoSyncPreview::class,
     ExperimentalCoroutinesApi::class,
 )
 class MemoryEchoOutgoingTest {

@@ -2,7 +2,6 @@ package markdown.echo.memory
 
 import kotlinx.coroutines.runBlocking
 import markdown.echo.Echo
-import markdown.echo.EchoPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -11,7 +10,6 @@ import markdown.echo.memory.log.mutableEventLogOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(EchoPreview::class)
 class MemoryEchoEventTest {
 
     @Test

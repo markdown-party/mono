@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  * @param I the type of the incoming data.
  * @param O the type of the outgoing data.
  */
-@EchoPreview
+@EchoSyncPreview
 suspend fun <I, O> sync(
     first: Exchange<I, O>,
     second: Exchange<O, I>,

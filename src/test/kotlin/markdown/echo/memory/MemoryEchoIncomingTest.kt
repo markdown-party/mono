@@ -18,7 +18,7 @@ import kotlin.test.*
 import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
 
-@OptIn(EchoPreview::class)
+@OptIn(EchoSyncPreview::class)
 class MemoryEchoIncomingTest {
 
     @Test

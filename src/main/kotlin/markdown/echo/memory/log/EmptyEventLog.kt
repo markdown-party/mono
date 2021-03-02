@@ -1,6 +1,6 @@
 package markdown.echo.memory.log
 
-import markdown.echo.EchoPreview
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -8,7 +8,6 @@ import markdown.echo.causal.SiteIdentifier
 /**
  * An implementation of [EventLog] that's empty.
  */
-@EchoPreview
 internal object EmptyEventLog : EventLog<Nothing> {
 
     override val sites = emptySet<SiteIdentifier>()
@@ -22,6 +21,7 @@ internal object EmptyEventLog : EventLog<Nothing> {
         site: SiteIdentifier,
     ) = emptyList<Pair<EventIdentifier, Nothing>>()
 
+    @EchoEventLogPreview
     override fun <R> foldl(
         base: R,
         step: (Pair<EventIdentifier, Nothing>, R) -> R,

@@ -1,6 +1,6 @@
 package markdown.echo.memory.log
 
-import markdown.echo.EchoPreview
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -10,7 +10,6 @@ import markdown.echo.causal.SiteIdentifier
  *
  * @param T the type of the events in the log.
  */
-@EchoPreview
 fun <T> emptyEventLog(): EventLog<T> = EmptyEventLog
 
 /**
@@ -20,7 +19,6 @@ fun <T> emptyEventLog(): EventLog<T> = EmptyEventLog
  *
  * @param T the type of events in the log.
  */
-@EchoPreview
 fun <T> eventLogOf(
     vararg events: Pair<EventIdentifier, T>,
 ): EventLog<T> = mutableEventLogOf(*events)
@@ -32,12 +30,18 @@ fun <T> eventLogOf(
  *
  * @param T the type of events in the log.
  */
-@EchoPreview
 fun <T> mutableEventLogOf(
     vararg events: Pair<EventIdentifier, T>,
 ): MutableEventLog<T> = SortedMapEventLog(*events)
 
-@EchoPreview
+/**
+ * An [EventLog] is a data structure that contains events of type [T], alongside with their unique
+ * identifiers. An [EventLog] has no notion of "current site" or whatsoever; it only acts as the
+ * backing store for a set of events, which can be retrieved and traversed in a more or less optimal
+ * fashion.
+ *
+ * @param T the type of of the body of one event.
+ */
 interface EventLog<out T> {
 
     /**
@@ -78,14 +82,16 @@ interface EventLog<out T> {
     ): Iterable<Pair<EventIdentifier, T>>
 
     // This API is transient and will be removed in the future.
-    @EchoPreview
+    @EchoEventLogPreview
     fun <R> foldl(
         base: R,
         step: (Pair<EventIdentifier, T>, R) -> R,
     ): R
 }
 
-@EchoPreview
+/**
+ * A [MutableEventLog] is an [EventLog] which supports the insertion of events.
+ */
 interface MutableEventLog<T> : EventLog<T> {
 
     /**

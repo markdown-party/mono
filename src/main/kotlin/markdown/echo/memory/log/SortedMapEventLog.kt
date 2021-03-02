@@ -1,8 +1,6 @@
-@file:OptIn(EchoPreview::class)
-
 package markdown.echo.memory.log
 
-import markdown.echo.EchoPreview
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
@@ -62,6 +60,7 @@ internal class SortedMapEventLog<T> internal constructor(
         buffer.getOrPut(site) { sortedMapOf() }[seqno] = body
     }
 
+    @EchoEventLogPreview
     override fun <R> foldl(
         base: R,
         step: (Pair<EventIdentifier, T>, R) -> R,
