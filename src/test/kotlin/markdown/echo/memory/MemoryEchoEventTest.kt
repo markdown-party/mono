@@ -5,6 +5,7 @@ import markdown.echo.Echo
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.events.SiteSendEcho
 import markdown.echo.events.event
 import markdown.echo.memory.log.mutableEventLogOf
 import kotlin.test.Test
@@ -58,5 +59,32 @@ class MemoryEchoEventTest {
         assertEquals(456, log[SequenceNumber(1U), site])
         assertEquals(SequenceNumber(2U), log.expected(site))
         assertEquals(setOf(site), log.sites)
+    }
+
+    @Test
+    fun `MemoryEcho creates events with good ordering on multiple event {} calls`() = runBlocking {
+
+        // A small utility that lets multiple sites use the same Echo, without requiring inter-Echo
+        // sync.
+        fun <A, B> SiteSendEcho<A, B>.with(site: SiteIdentifier): SiteSendEcho<A, B> {
+            return object : SiteSendEcho<A, B> by this {
+                override val site = site
+            }
+        }
+
+        val alice = SiteIdentifier(1)
+        val bob = SiteIdentifier(2)
+        val log = mutableEventLogOf<Int>()
+        val echo = Echo.memory(SiteIdentifier(0), log)
+
+        echo.with(alice).event {
+            yield(123)
+        }
+        echo.with(bob).event {
+            yield(456)
+        }
+        assertEquals(123, log[SequenceNumber(0U), alice])
+        assertEquals(456, log[SequenceNumber(1U), bob])
+        assertEquals(setOf(alice, bob), log.sites)
     }
 }
