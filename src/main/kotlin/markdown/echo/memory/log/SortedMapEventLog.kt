@@ -31,6 +31,11 @@ internal class SortedMapEventLog<T> internal constructor(
     override val sites: Set<SiteIdentifier>
         get() = buffer.keys
 
+    @EchoEventLogPreview
+    override val expected: SequenceNumber
+        // TODO : Optimize this to be constant time.
+        get() = buffer.values.maxOfOrNull { it.lastKey() + 1U } ?: SequenceNumber.Zero
+
     override fun expected(
         site: SiteIdentifier,
     ) = buffer[site]?.lastKey()?.inc() ?: SequenceNumber.Zero

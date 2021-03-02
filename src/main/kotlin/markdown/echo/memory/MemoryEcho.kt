@@ -17,6 +17,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Echo
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.Message
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
@@ -100,10 +101,12 @@ class MemoryEcho<T>(
                 is OutgoingState.Listening -> {
                     val request = s.pendingRequests.lastOrNull()
                     val expected = mutex.withLock { request?.let(log::expected) } ?: Zero
+                    val max = mutex.withLock { @OptIn(EchoEventLogPreview::class) log.expected }
                     select {
                         if (request != null) {
                             onSend(O.Request(
-                                seqno = expected,
+                                nextForAll = max,
+                                nextForSite = expected,
                                 site = request,
                                 count = Long.MAX_VALUE,
                             )) {
@@ -258,8 +261,10 @@ class MemoryEcho<T>(
                         when (val msg = v.valueOrNull) {
                             is O.Request -> {
                                 // Ack based on request, and set credits for the given site.
-                                val ackForSite =
-                                    maxOf(s.receivedAcks[msg.site] ?: msg.seqno, msg.seqno)
+                                val ackForSite = maxOf(
+                                    s.receivedAcks[msg.site] ?: msg.nextForSite,
+                                    msg.nextForSite,
+                                )
                                 val newAcks = s.receivedAcks + (msg.site to ackForSite)
                                 val newCredits = s.receivedCredits + (msg.site to msg.count)
                                 IncomingState.Sending(

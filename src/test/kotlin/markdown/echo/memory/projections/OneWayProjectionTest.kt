@@ -43,7 +43,8 @@ class OneWayProjectionTest {
                 send(I.Advertisement(site))
                 send(I.Ready)
                 val request = incoming.receive() as O.Request
-                assertEquals(SequenceNumber.Zero, request.seqno)
+                assertEquals(SequenceNumber.Zero, request.nextForAll)
+                assertEquals(SequenceNumber.Zero, request.nextForSite)
                 assertEquals(site, request.site)
                 assertTrue(request.count >= 2)
                 send(I.Event(seqno = SequenceNumber.Zero, site = site, body = 5))

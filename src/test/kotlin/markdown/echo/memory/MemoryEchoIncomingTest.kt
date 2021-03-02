@@ -102,7 +102,7 @@ class MemoryEchoIncomingTest {
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
             assertEquals(I.Advertisement(site), incoming.receive())
             assertEquals(I.Ready, incoming.receive())
-            send(O.Request(seqno, site))
+            send(O.Request(seqno, seqno, site = site))
             assertEquals(I.Event(seqno, site, true), incoming.receive())
             send(O.Done)
             assertEquals(I.Done, incoming.receive())
@@ -120,7 +120,7 @@ class MemoryEchoIncomingTest {
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
             assertEquals(I.Advertisement(site), incoming.receive())
             assertEquals(I.Ready, incoming.receive())
-            send(O.Request(seqno, site, count = 0))
+            send(O.Request(seqno, seqno, site, count = 0))
             incoming.receive()
             fail("incoming.receive() should have timeout.")
         }
@@ -139,8 +139,8 @@ class MemoryEchoIncomingTest {
         val exchange = channelExchange<I<Boolean>, O<Boolean>> { incoming ->
             assertEquals(I.Advertisement(site), incoming.receive())
             assertEquals(I.Ready, incoming.receive())
-            send(O.Request(seqno, site, count = 0))
-            send(O.Request(seqno, site, count = 1))
+            send(O.Request(seqno, seqno, site, count = 0))
+            send(O.Request(seqno, seqno, site, count = 1))
             assertEquals(I.Event(seqno, site, true), incoming.receive())
             send(O.Done)
             assertEquals(I.Done, incoming.receive())

@@ -50,6 +50,13 @@ interface EventLog<out T> {
     val sites: Set<SiteIdentifier>
 
     /**
+     * Returns the [SequenceNumber] that is expected for the next event, such that this
+     * [SequenceNumber] is higher than any [SequenceNumber] from the [EventLog].
+     */
+    @EchoEventLogPreview
+    val expected: SequenceNumber
+
+    /**
      * Returns the [SequenceNumber] that is expected from this [EventLog].
      */
     fun expected(site: SiteIdentifier): SequenceNumber

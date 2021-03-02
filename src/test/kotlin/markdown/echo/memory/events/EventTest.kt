@@ -26,7 +26,12 @@ class EventTest {
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 incoming.receive() as I.Ready
-                send(O.Request(site = site, seqno = SequenceNumber.Zero, count = 1))
+                send(O.Request(
+                    site = site,
+                    nextForSite = SequenceNumber.Zero,
+                    nextForAll = SequenceNumber.Zero,
+                    count = 1,
+                ))
                 incoming.receive() as I.Done
                 send(O.Done)
             }
@@ -43,7 +48,12 @@ class EventTest {
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 // Skip waiting for Ready, and instead directly issue a request.
-                send(O.Request(site = site, seqno = SequenceNumber.Zero, count = 1))
+                send(O.Request(
+                    site = site,
+                    nextForSite = SequenceNumber.Zero,
+                    nextForAll = SequenceNumber.Zero,
+                    count = 1,
+                ))
                 incoming.receive() as I.Ready
                 incoming.receive() as I.Done
                 send(O.Done)
@@ -63,7 +73,7 @@ class EventTest {
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 incoming.receive() as I.Ready
-                send(O.Request(expected, site, count = 1))
+                send(O.Request(expected, expected, site, count = 1))
                 val event = incoming.receive() as I.Event
                 assertEquals(body, event.body)
                 assertEquals(expected, event.seqno)
@@ -84,7 +94,7 @@ class EventTest {
             override fun outgoing() = channelExchange<I<Int>, O<Int>> { incoming ->
                 incoming.receive() as I.Advertisement
                 incoming.receive() as I.Ready
-                send(O.Request(SequenceNumber.Zero, site))
+                send(O.Request(SequenceNumber.Zero, SequenceNumber.Zero, site))
                 for (i in 0..count.toInt()) {
                     assertEquals(i, (incoming.receive() as I.Event).body)
                 }

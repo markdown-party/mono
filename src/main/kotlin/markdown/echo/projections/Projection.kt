@@ -81,7 +81,12 @@ fun <M, T> ReceiveEcho<I<T>, O<T>>.projectWithIdentifiers(
 
                     val request = s.advertisedSites.lastOrNull()
                     if (request != null) {
-                        onSend(O.Request(site = request, seqno = Zero)) {
+                        @OptIn(EchoEventLogPreview::class)
+                        onSend(O.Request(
+                            nextForAll = s.log.expected,
+                            nextForSite = Zero,
+                            site = request,
+                        )) {
                             s.advertisedSites.removeLast()
                             return@onSend s // Updated a mutable state.
                         }

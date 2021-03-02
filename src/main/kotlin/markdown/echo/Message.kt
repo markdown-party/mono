@@ -130,16 +130,19 @@ object Message {
              * events. A [Request] message can not be sent before the [Incoming.Ready] message
              * has already been received.
              *
-             * @param seqno the starting sequence number that we're interested in.
+             * A [Request] works as follows :
+             *
+             * - The request is tied to a specific [site]. You may not issue a [Request] for a
+             *   [SiteIdentifier] that has not been advertised through an [Incoming.Advertisement].
+             *
+             * @param nextForAll the next [SequenceNumber] that is expected for all the sites.
+             * @param nextForSite the next [SequenceNumber] that is expected for the [site].
              * @param site the site identifier for which we're interested in this sequence number.
              * @param count how many events were requested.
-             *
-             * TODO : Eventually send the highest seqno that's been distributed to this site ? This
-             *        would eventually help the event { ... } callers generated proper causality
-             *        relationships in the log, and always append events to the end.
              */
             data class Request(
-                val seqno: SequenceNumber,
+                val nextForAll: SequenceNumber,
+                val nextForSite: SequenceNumber,
                 val site: SiteIdentifier,
                 val count: Long = Long.MAX_VALUE,
             ) : Outgoing<Nothing>()

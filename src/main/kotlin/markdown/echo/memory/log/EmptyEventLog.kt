@@ -12,6 +12,9 @@ internal object EmptyEventLog : EventLog<Nothing> {
 
     override val sites = emptySet<SiteIdentifier>()
 
+    @EchoEventLogPreview
+    override val expected = SequenceNumber.Zero
+
     override fun expected(site: SiteIdentifier) = SequenceNumber.Zero
 
     override fun get(seqno: SequenceNumber, site: SiteIdentifier) = null
