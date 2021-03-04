@@ -14,6 +14,7 @@ import kotlin.RequiresOptIn.Level.WARNING
         make sure you understand the tradeoffs before using it.
         """,
 )
+@MustBeDocumented
 annotation class EchoEventLogPreview
 
 /**
@@ -27,4 +28,5 @@ annotation class EchoEventLogPreview
         make sure you understand the tradeoffs before using it.
 """,
 )
+@MustBeDocumented
 annotation class EchoSyncPreview
