@@ -4,13 +4,16 @@ package markdown.echo
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
  * Syncs the provided [Exchange] instances until they are done communicating. The [sync] operator
- * creates bidirectional communication between the two [Exchange], which communicate with
- * some [Channel].
+ * creates bidirectional communication between the two [Exchange], which communicate with some
+ * [Channel].
  *
  * The communication stops when both [Exchange] are completed.
  *
@@ -22,21 +25,22 @@ suspend fun <I, O> sync(
     first: Exchange<I, O>,
     second: Exchange<O, I>,
 ): Unit = coroutineScope {
-    val fToS = Channel<O>()
-    val sToF = Channel<I>()
-    launch {
-        first
-            .talk(sToF.consumeAsFlow())
-            .onEach { fToS.send(it) }
-            .onCompletion { fToS.close() }
-            .collect()
-    }
-    launch {
-        second.talk(fToS.consumeAsFlow())
-            .onEach { sToF.send(it) }
-            .onCompletion { fToS.close() }
-            .collect()
-    }
+  val fToS = Channel<O>()
+  val sToF = Channel<I>()
+  launch {
+    first
+        .talk(sToF.consumeAsFlow())
+        .onEach { fToS.send(it) }
+        .onCompletion { fToS.close() }
+        .collect()
+  }
+  launch {
+    second
+        .talk(fToS.consumeAsFlow())
+        .onEach { sToF.send(it) }
+        .onCompletion { fToS.close() }
+        .collect()
+  }
 }
 
 /**
@@ -55,50 +59,50 @@ suspend fun <I, O> sync(
     first: Echo<I, O>,
     vararg others: Echo<I, O>,
 ): Unit = coroutineScope {
-    for (index in others.indices) {
-        val left = if (index == 0) first else others[index - 1]
-        val right = others[index]
+  for (index in others.indices) {
+    val left = if (index == 0) first else others[index - 1]
+    val right = others[index]
 
-        val lIncoming = left.incoming()
-        val lOutgoing = left.outgoing()
-        val rIncoming = right.incoming()
-        val rOutgoing = right.outgoing()
+    val lIncoming = left.incoming()
+    val lOutgoing = left.outgoing()
+    val rIncoming = right.incoming()
+    val rOutgoing = right.outgoing()
 
-        val lToROutgoing = Channel<O>()
-        val lToRIncoming = Channel<I>()
-        val rToLOutgoing = Channel<O>()
-        val rToLIncoming = Channel<I>()
+    val lToROutgoing = Channel<O>()
+    val lToRIncoming = Channel<I>()
+    val rToLOutgoing = Channel<O>()
+    val rToLIncoming = Channel<I>()
 
-        launch {
-            lIncoming
-                .talk(rToLOutgoing.consumeAsFlow())
-                .onEach { lToRIncoming.send(it) }
-                .onCompletion { lToRIncoming.close() }
-                .collect()
-        }
-
-        launch {
-            lOutgoing
-                .talk(rToLIncoming.consumeAsFlow())
-                .onEach { lToROutgoing.send(it) }
-                .onCompletion { lToROutgoing.close() }
-                .collect()
-        }
-
-        launch {
-            rIncoming
-                .talk(lToROutgoing.consumeAsFlow())
-                .onEach { rToLIncoming.send(it) }
-                .onCompletion { rToLIncoming.close() }
-                .collect()
-        }
-
-        launch {
-            rOutgoing
-                .talk(lToRIncoming.consumeAsFlow())
-                .onEach { rToLOutgoing.send(it) }
-                .onCompletion { rToLOutgoing.close() }
-                .collect()
-        }
+    launch {
+      lIncoming
+          .talk(rToLOutgoing.consumeAsFlow())
+          .onEach { lToRIncoming.send(it) }
+          .onCompletion { lToRIncoming.close() }
+          .collect()
     }
+
+    launch {
+      lOutgoing
+          .talk(rToLIncoming.consumeAsFlow())
+          .onEach { lToROutgoing.send(it) }
+          .onCompletion { lToROutgoing.close() }
+          .collect()
+    }
+
+    launch {
+      rIncoming
+          .talk(lToROutgoing.consumeAsFlow())
+          .onEach { rToLIncoming.send(it) }
+          .onCompletion { rToLIncoming.close() }
+          .collect()
+    }
+
+    launch {
+      rOutgoing
+          .talk(lToRIncoming.consumeAsFlow())
+          .onEach { rToLOutgoing.send(it) }
+          .onCompletion { rToLOutgoing.close() }
+          .collect()
+    }
+  }
 }

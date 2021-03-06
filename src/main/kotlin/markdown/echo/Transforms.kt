@@ -16,9 +16,7 @@ import kotlinx.coroutines.flow.map
 fun <I1, O1, I2, O2> Exchange<I1, O1>.coding(
     incoming: suspend (I2) -> I1,
     outgoing: suspend (O1) -> O2,
-): Exchange<I2, O2> = Exchange {
-    this.talk(it.map(incoming)).map(outgoing)
-}
+): Exchange<I2, O2> = Exchange { this.talk(it.map(incoming)).map(outgoing) }
 
 /**
  * Transforms an [Exchange] by buffering its contents. This buffers the underlying flows in both
@@ -30,17 +28,15 @@ fun <I1, O1, I2, O2> Exchange<I1, O1>.coding(
  */
 fun <I, O> Exchange<I, O>.buffer(
     capacity: Int = Channel.BUFFERED,
-): Exchange<I, O> = Exchange {
-    this.talk(it.buffer(capacity)).buffer(capacity)
-}
+): Exchange<I, O> = Exchange { this.talk(it.buffer(capacity)).buffer(capacity) }
 
 // An implementation of a Buffered Echo.
 private class BufferedEcho<I, O>(
     private val capacity: Int,
     private val backing: Echo<I, O>,
 ) : Echo<I, O> {
-    override fun outgoing() = backing.outgoing().buffer(capacity)
-    override fun incoming() = backing.incoming().buffer(capacity)
+  override fun outgoing() = backing.outgoing().buffer(capacity)
+  override fun incoming() = backing.incoming().buffer(capacity)
 }
 
 /**

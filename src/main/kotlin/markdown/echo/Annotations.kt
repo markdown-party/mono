@@ -9,7 +9,8 @@ import kotlin.RequiresOptIn.Level.WARNING
  */
 @RequiresOptIn(
     level = ERROR,
-    message = """
+    message =
+        """
         This EventLog API is still experimental, and will likely be reworked and refactored. Please
         make sure you understand the tradeoffs before using it.
         """,
@@ -23,7 +24,8 @@ annotation class EchoEventLogPreview
  */
 @RequiresOptIn(
     level = WARNING,
-    message = """
+    message =
+        """
         This Sync API is still experimental, and will likely be reworked and refactored. Please
         make sure you understand the tradeoffs before using it.
 """,

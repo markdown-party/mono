@@ -24,19 +24,24 @@ fun EventIdentifier(
  * identifier for each client to disambiguate duplicate timestamps.
  *
  * @param packed the packed value for this identifier. Prefer building an instance with the
+ * ```
  *               dedicated builder function.
+ * ```
  */
-inline class EventIdentifier internal constructor(
+inline class EventIdentifier
+internal constructor(
     private val packed: Long,
 ) : Comparable<EventIdentifier> {
 
-    // Because we're using packed values and giving precedence to the sequence number, we can simply
-    // compare event identifiers as longs to find a total order.
-    override fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
+  // Because we're using packed values and giving precedence to the sequence number, we can simply
+  // compare event identifiers as longs to find a total order.
+  override fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
 
-    val seqno: SequenceNumber get() = SequenceNumber(unpackInt1(packed).toUInt())
-    val site: SiteIdentifier get() = SiteIdentifier(unpackInt2(packed))
+  val seqno: SequenceNumber
+    get() = SequenceNumber(unpackInt1(packed).toUInt())
+  val site: SiteIdentifier
+    get() = SiteIdentifier(unpackInt2(packed))
 
-    operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed).toUInt())
-    operator fun component2(): SiteIdentifier = SiteIdentifier(unpackInt2(packed))
+  operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed).toUInt())
+  operator fun component2(): SiteIdentifier = SiteIdentifier(unpackInt2(packed))
 }

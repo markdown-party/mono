@@ -7,7 +7,7 @@ package markdown.echo
  * @param O the type of the domain-specific outgoing events for this [SendEcho].
  */
 fun interface SendEcho<in I, out O> {
-    fun outgoing(): Exchange<I, O>
+  fun outgoing(): Exchange<I, O>
 }
 
 /**
@@ -17,7 +17,7 @@ fun interface SendEcho<in I, out O> {
  * @param O the type of the domain-specific outgoing events for this [ReceiveEcho].
  */
 fun interface ReceiveEcho<out I, in O> {
-    fun incoming(): Exchange<O, I>
+  fun incoming(): Exchange<O, I>
 }
 
 /**
@@ -29,6 +29,6 @@ fun interface ReceiveEcho<out I, in O> {
  */
 interface Echo<I, O> : SendEcho<I, O>, ReceiveEcho<I, O> {
 
-    // Useful for creating static functions.
-    companion object
+  // Useful for creating static functions.
+  companion object
 }

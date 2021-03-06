@@ -9,8 +9,6 @@ package markdown.echo.projections
  */
 fun interface OneWayProjection<M, T> {
 
-    /**
-     * Applies the event [body] to the given [model], and returns a new immutable model.
-     */
-    fun forward(body: T, model: M): M
+  /** Applies the event [body] to the given [model], and returns a new immutable model. */
+  fun forward(body: T, model: M): M
 }
