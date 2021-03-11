@@ -50,9 +50,8 @@ internal constructor(
       seqno: SequenceNumber,
       site: SiteIdentifier,
   ): Iterable<Pair<EventIdentifier, T>> {
-    // TODO : Change implementation so read-only events() does not mutate [buffer]
     return buffer
-        .getOrPut(site) { sortedMapOf() }
+        .getOrElse(site) { sortedMapOf() }
         .tailMap(seqno)
         .asSequence()
         .map { (seqno, body) -> EventIdentifier(seqno, site) to body }
