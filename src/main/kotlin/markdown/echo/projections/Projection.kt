@@ -73,7 +73,6 @@ fun <M, T> ReceiveEcho<I<T>, O<T>>.projectWithIdentifiers(
                           is I.Ready ->
                               State.Listening(
                                   advertisedSites = s.advertisedSites,
-                                  requestedSites = mutableListOf(),
                                   log = mutableEventLogOf(),
                               )
                         }
@@ -138,7 +137,6 @@ private sealed class State<out T> {
 
   data class Listening<T>(
       val advertisedSites: MutableList<SiteIdentifier>,
-      val requestedSites: MutableList<SiteIdentifier>,
       val log: MutableEventLog<T>,
   ) : State<T>()
 
