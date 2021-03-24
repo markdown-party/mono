@@ -6,7 +6,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import markdown.echo.Echo
+import markdown.echo.Exchange
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.event
 import markdown.echo.memory.memory
@@ -31,7 +31,7 @@ class GSetTest {
   @Test
   fun `one site can create a set and create new events`() = runBlocking {
     val alice = SiteIdentifier.random()
-    val echo = Echo.memory<GSetEvent<Int>>(site = alice)
+    val echo = Exchange.memory<GSetEvent<Int>>(site = alice)
 
     echo.event {
       yield(GSetEvent.Add(1))
@@ -47,11 +47,11 @@ class GSetTest {
   fun `two sites can create a shared set and eventually sync`() = runBlocking {
     // Create Alice, our first site.
     val alice = SiteIdentifier.random()
-    val aliceEcho = Echo.memory<GSetEvent<Int>>(site = alice)
+    val aliceEcho = Exchange.memory<GSetEvent<Int>>(site = alice)
 
     // Create Bob, our second site.
     val bob = SiteIdentifier.random()
-    val bobEcho = Echo.memory<GSetEvent<Int>>(site = bob)
+    val bobEcho = Exchange.memory<GSetEvent<Int>>(site = bob)
 
     // Alice adds the elements 1 and 2.
     aliceEcho.event {

@@ -6,10 +6,10 @@ import kotlin.test.fail
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import markdown.echo.Echo
+import markdown.echo.Exchange
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.event
-import markdown.echo.memory.MemoryEcho
+import markdown.echo.memory.MemoryExchange
 import markdown.echo.memory.memory
 import markdown.echo.projections.OneWayProjection
 import markdown.echo.projections.projection
@@ -37,7 +37,7 @@ private class LWWProjection<T> : OneWayProjection<T?, LWWRegisterEvent<T>> {
 }
 
 /** A class representing a [LWWRegister]. */
-private class LWWRegister<T>(private val echo: MemoryEcho<LWWRegisterEvent<T>>) {
+private class LWWRegister<T>(private val echo: MemoryExchange<LWWRegisterEvent<T>>) {
 
   /** The latest available value from the [LWWRegister]. */
   val value: Flow<T?> = echo.projection(null, LWWProjection())
@@ -53,12 +53,12 @@ class LWWRegisterTest {
   @Test
   fun `two sites eventually converge on a LWW value`(): Unit = runBlocking {
     val alice = SiteIdentifier(123)
-    val aliceEcho = Echo.memory<LWWRegisterEvent<Int>>(alice)
-    val aliceRegister = LWWRegister(aliceEcho)
+    val aliceExchange = Exchange.memory<LWWRegisterEvent<Int>>(alice)
+    val aliceRegister = LWWRegister(aliceExchange)
 
     val bob = SiteIdentifier(456)
-    val bobEcho = Echo.memory<LWWRegisterEvent<Int>>(bob)
-    val bobRegister = LWWRegister(bobEcho)
+    val bobExchange = Exchange.memory<LWWRegisterEvent<Int>>(bob)
+    val bobRegister = LWWRegister(bobExchange)
 
     aliceRegister.set(123)
     bobRegister.set(456)
@@ -67,7 +67,7 @@ class LWWRegisterTest {
     assertEquals(456, bobRegister.value.filterNotNull().first())
 
     // Sync for a bit.
-    withTimeoutOrNull(1000) { sync(aliceEcho, bobEcho) }
+    withTimeoutOrNull(1000) { sync(aliceExchange, bobExchange) }
 
     // Ensure convergence over a non-null value.
     val shared =
@@ -89,7 +89,7 @@ class LWWRegisterTest {
 
     // Set the shared value and sync a bit.
     register.set(789)
-    withTimeoutOrNull(1000) { sync(aliceEcho, bobEcho) }
+    withTimeoutOrNull(1000) { sync(aliceExchange, bobExchange) }
 
     // Ensure convergence over a non-null value.
     val result =

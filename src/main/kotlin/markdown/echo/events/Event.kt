@@ -46,11 +46,11 @@ private sealed class State<out T> {
 
 /**
  * Creates some new events, that are generated in the [EventScope]. This function returns once the
- * events have been successfully added to the underlying [SiteSendEcho].
+ * events have been successfully added to the underlying [SiteSendExchange].
  *
  * @param T the type of the domain-specific events to add.
  */
-suspend fun <T> SiteSendEcho<I<T>, O<T>>.event(
+suspend fun <T> SiteSendExchange<I<T>, O<T>>.event(
     scope: suspend EventScope<T>.() -> Unit,
 ): Unit = coroutineScope {
 

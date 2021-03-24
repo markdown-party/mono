@@ -1,69 +1,34 @@
-@file:OptIn(
-    ExperimentalCoroutinesApi::class,
-    ExperimentalTypeInference::class,
-)
-
 package markdown.echo
 
-import kotlin.experimental.ExperimentalTypeInference
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.flow.*
-
 /**
- * An [Exchange] allows for asymmetric communication, with a request-reply paradigm. The [Exchange]
- * issues some outgoing messages, and receives some incoming messages. The other party receives some
- * outgoing messages, and sends some incoming messages.
+ * An interface defining an asymmetrical replication site, biased towards sending data.
  *
- * @param [I] the type of the incoming messages.
- * @param [O] the type of the outgoing messages.
+ * @param I the type of the domain-specific incoming events for this [SendExchange].
+ * @param O the type of the domain-specific outgoing events for this [SendExchange].
  */
-fun interface Exchange<in I, out O> {
-
-  /** Starts an asymmetric communication. */
-  fun talk(incoming: Flow<I>): Flow<O>
+fun interface SendExchange<in I, out O> {
+  fun outgoing(): Link<I, O>
 }
 
-// BUILDER DSL SCOPES
-
-typealias ExchangeFlowBuilder<I, O> = suspend FlowCollector<O>.(Flow<I>) -> Unit
-
-typealias ExchangeChannelBuilder<I, O> = suspend ProducerScope<O>.(ReceiveChannel<I>) -> Unit
+/**
+ * An interface defining an asymmetrical replication site, biased towards receiving data.
+ *
+ * @param I the type of the domain-specific incoming events for this [ReceiveExchange].
+ * @param O the type of the domain-specific outgoing events for this [ReceiveExchange].
+ */
+fun interface ReceiveExchange<out I, in O> {
+  fun incoming(): Link<O, I>
+}
 
 /**
- * Creates a _cold_ exchange from the given suspending [block]. The exchange being _cold_ means that
- * the [block] is called every time a terminal operator is applied to the resulting exchange.
+ * An interface defining an [Exchange], which is able to generate some links that are used for
+ * bidirectional communication and transmission of data.
  *
- * On a single [Echo], multiple [Exchange] might be open simultaneously. Therefore, exchanges should
- * make sure that concurrency is handled properly.
- *
- * @param block the initialization block for this [Exchange].
- *
- * @param I the type of the incoming messages.
- * @param O the type of the outgoing messages.
+ * @param I the type of the domain-specific incoming events for this [Exchange].
+ * @param O the type of the domain-specific outgoing events for this [Exchange].
  */
-fun <I, O> exchange(
-    @BuilderInference block: ExchangeFlowBuilder<I, O>,
-): Exchange<I, O> = Exchange { incoming -> flow { block.invoke(this, incoming) } }
+interface Exchange<I, O> : SendExchange<I, O>, ReceiveExchange<I, O> {
 
-/**
- * Creates a _cold_ exchange from elements that are send to a send channel through a [ProducerScope]
- * . The incoming messages are produced through a [ReceiveChannel], passed through the [block].
- *
- * On a single [Echo], multiple [Exchange] might be open simultaneously. Therefore, exchanges should
- * make sure that concurrency is handled properly.
- *
- * @param block the initialization block for this [Exchange].
- *
- * @param I the type of the incoming messages.
- * @param O the type of the outgoing messages.
- */
-@ExperimentalCoroutinesApi
-@OptIn(FlowPreview::class)
-fun <I, O> channelExchange(
-    @BuilderInference block: ExchangeChannelBuilder<I, O>,
-): Exchange<I, O> = Exchange { incoming ->
-  channelFlow { block.invoke(this, incoming.produceIn(this)) }
+  // Useful for creating static functions.
+  companion object
 }

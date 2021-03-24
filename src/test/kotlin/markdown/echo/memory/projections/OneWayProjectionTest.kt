@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
-import markdown.echo.ReceiveEcho
+import markdown.echo.ReceiveExchange
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.channelExchange
+import markdown.echo.channelLink
 import markdown.echo.projections.projection
 
 @OptIn(
@@ -23,8 +23,8 @@ class OneWayProjectionTest {
 
   @Test
   fun `Test empty projection returns base value`() = runBlocking {
-    val echo = ReceiveEcho {
-      channelExchange<O<Int>, I<Int>> { incoming ->
+    val echo = ReceiveExchange {
+      channelLink<O<Int>, I<Int>> { incoming ->
         send(I.Ready)
         send(I.Done)
         assertEquals(O.Done, incoming.receive())
@@ -38,8 +38,8 @@ class OneWayProjectionTest {
   @Test
   fun `Test projection with two event returns base and aggregated values`() = runBlocking {
     val site = SiteIdentifier(123)
-    val echo = ReceiveEcho {
-      channelExchange<O<Int>, I<Int>> { incoming ->
+    val echo = ReceiveExchange {
+      channelLink<O<Int>, I<Int>> { incoming ->
         send(I.Advertisement(site))
         send(I.Ready)
         val request = incoming.receive() as O.Request

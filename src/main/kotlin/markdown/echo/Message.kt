@@ -25,7 +25,7 @@ object Message {
    * - The sender answers the requests with the right events, and advertises when new events are
    * available that the receiver might not know about.
    *
-   * In a real-world [Echo], both sites play both roles simultaneously. Because messages and roles
+   * In a real-world [Exchange], both sites play both roles simultaneously. Because messages and roles
    * are clearly separated between the server and the receiver, it's possible for sites to perform
    * as a sender and a receiver simultaneously with a single communication channel.
    *
@@ -66,7 +66,7 @@ object Message {
 
       /**
        * This message is sent to let the other site know that we have some events at our disposable
-       * for a certain site. When an [Exchange] is started, the [Incoming] site will send some
+       * for a certain site. When an [Link] is started, the [Incoming] site will send some
        * [Advertisement] for all the sites it knows about, before sending a [Ready] message.
        *
        * Afterwards, if messages from new sites become available, some additional [Advertisement]
@@ -90,7 +90,7 @@ object Message {
        * This message is sent once the sender is done advertising all of its initial sites. This
        * does not mean that additional [Advertisement] messages will not be sent later, but instead
        * provides a "best-effort guarantee" that the site has issued advertisements for all the
-       * messages it was aware of when the [Exchange] was established.
+       * messages it was aware of when the [Link] was established.
        *
        * When you're interested in one-off syncs, this is usually a good place to start ignoring new
        * [Advertisement] messages.
@@ -113,7 +113,7 @@ object Message {
       ) : Incoming<T>()
 
       /**
-       * Indicates that the [Incoming] side of the [Exchange] would like to terminate the
+       * Indicates that the [Incoming] side of the [Link] would like to terminate the
        * communication. Once the [Done] message is emitted, the [Incoming] side will drain all the
        * in-flight messages until the other side's [Outgoing.Done] message is received.
        *
@@ -125,7 +125,7 @@ object Message {
     sealed class Outgoing<out T> : V1<T>() {
 
       /**
-       * Indicates that the [Outgoing] side of the [Exchange] is ready to receive some events. A
+       * Indicates that the [Outgoing] side of the [Link] is ready to receive some events. A
        * [Request] message can not be sent before the [Incoming.Ready] message has already been
        * received.
        *
@@ -151,7 +151,7 @@ object Message {
       ) : Outgoing<Nothing>()
 
       /**
-       * Indicates that the [Outgoing] side of the [Exchange] would like to terminate the
+       * Indicates that the [Outgoing] side of the [Link] would like to terminate the
        * communication. Once the [Done] message is emitted, the [Outgoing] side will drain all the
        * in-flight messages until the other's side [Incoming.Done] message is received.
        *

@@ -11,8 +11,8 @@ import markdown.echo.Message.V1.Outgoing as O
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.channelExchange
-import markdown.echo.events.SiteSendEcho
+import markdown.echo.channelLink
+import markdown.echo.events.SiteSendExchange
 import markdown.echo.events.event
 
 class EventTest {
@@ -21,10 +21,10 @@ class EventTest {
   fun `Empty event scope generates appropriate messages`() = runBlocking {
     val site = SiteIdentifier(123)
     val echo =
-        object : SiteSendEcho<I<Nothing>, O<Nothing>> {
+        object : SiteSendExchange<I<Nothing>, O<Nothing>> {
           override val site = site
           override fun outgoing() =
-              channelExchange<I<Nothing>, O<Nothing>> { incoming ->
+              channelLink<I<Nothing>, O<Nothing>> { incoming ->
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 incoming.receive() as I.Ready
@@ -46,10 +46,10 @@ class EventTest {
   fun `Empty event skipping Done reception generates appropriate messages`() = runBlocking {
     val site = SiteIdentifier(123)
     val echo =
-        object : SiteSendEcho<I<Nothing>, O<Nothing>> {
+        object : SiteSendExchange<I<Nothing>, O<Nothing>> {
           override val site = site
           override fun outgoing() =
-              channelExchange<I<Nothing>, O<Nothing>> { incoming ->
+              channelLink<I<Nothing>, O<Nothing>> { incoming ->
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 // Skip waiting for Ready, and instead directly issue a request.
@@ -74,10 +74,10 @@ class EventTest {
     val body = 1000
     val expected = SequenceNumber(42U)
     val echo =
-        object : SiteSendEcho<I<Int>, O<Int>> {
+        object : SiteSendExchange<I<Int>, O<Int>> {
           override val site = site
           override fun outgoing() =
-              channelExchange<I<Int>, O<Int>> { incoming ->
+              channelLink<I<Int>, O<Int>> { incoming ->
                 val adv = incoming.receive() as I.Advertisement
                 assertEquals(site, adv.site)
                 incoming.receive() as I.Ready
@@ -98,10 +98,10 @@ class EventTest {
     val site = SiteIdentifier(123)
     val count = 1000U
     val echo =
-        object : SiteSendEcho<I<Int>, O<Int>> {
+        object : SiteSendExchange<I<Int>, O<Int>> {
           override val site = site
           override fun outgoing() =
-              channelExchange<I<Int>, O<Int>> { incoming ->
+              channelLink<I<Int>, O<Int>> { incoming ->
                 incoming.receive() as I.Advertisement
                 incoming.receive() as I.Ready
                 send(O.Request(SequenceNumber.Zero, SequenceNumber.Zero, site))

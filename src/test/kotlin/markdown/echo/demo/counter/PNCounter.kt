@@ -1,5 +1,6 @@
 package markdown.echo.demo.counter
 
+import kotlin.test.Test
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -11,7 +12,6 @@ import markdown.echo.events.event
 import markdown.echo.projections.OneWayProjection
 import markdown.echo.projections.projection
 import markdown.echo.sync
-import kotlin.test.Test
 
 private sealed class PNCounterEvent {
   object Increment : PNCounterEvent() {

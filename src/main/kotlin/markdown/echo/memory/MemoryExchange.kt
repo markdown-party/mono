@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import markdown.echo.Echo
 import markdown.echo.EchoEventLogPreview
+import markdown.echo.Exchange
 import markdown.echo.Message
 import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
@@ -25,47 +25,47 @@ import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.channelExchange
-import markdown.echo.events.SiteSendEcho
+import markdown.echo.channelLink
+import markdown.echo.events.SiteSendExchange
 import markdown.echo.memory.log.EventLog
 import markdown.echo.memory.log.MutableEventLog
 import markdown.echo.memory.log.mutableEventLogOf
 
 /**
- * Creates a new [MemoryEcho] instance, that uses a memory-backed store for the events. This [Echo]
- * has a unique identifier, and considers that it is the unique issuer of the events for this
- * specific site identifier.
+ * Creates a new [MemoryExchange] instance, that uses a memory-backed store for the events. This
+ * [Exchange] has a unique identifier, and considers that it is the unique issuer of the events for
+ * this specific site identifier.
  *
- * This [Echo] offers bi-directional syncing capabilities, with one-off and continuous sync. It
+ * This [Exchange] offers bi-directional syncing capabilities, with one-off and continuous sync. It
  * issues push updates when the events in the memory store are modified by a different site.
  *
- * @param site the unique identifier for the site of this [Echo].
- * @param log the [MutableEventLog] backing this [MemoryEcho].
+ * @param site the unique identifier for the site of this [Exchange].
+ * @param log the [MutableEventLog] backing this [MemoryExchange].
  *
- * @param T the type of the domain-specific events that this [MemoryEcho] supports.
+ * @param T the type of the domain-specific events that this [MemoryExchange] supports.
  */
-fun <T> Echo.Companion.memory(
+fun <T> Exchange.Companion.memory(
     site: SiteIdentifier,
     log: MutableEventLog<T> = mutableEventLogOf(),
-): MemoryEcho<T> = MemoryEcho(site, log)
+): MemoryExchange<T> = MemoryExchange(site, log)
 
 /**
- * An implementation of [Echo] and [SiteSendEcho] that uses an in-memory [MutableEventLog], and has
- * the authority to issue operations for a given [site].
+ * An implementation of [Exchange] and [SiteSendExchange] that uses an in-memory [MutableEventLog],
+ * and has the authority to issue operations for a given [site].
  *
- * @param site the unique identifier for the site of this [Echo].
+ * @param site the unique identifier for the site of this [Exchange].
  *
- * @param T the type of the domain-specific events that this [MemoryEcho] supports.
+ * @param T the type of the domain-specific events that this [MemoryExchange] supports.
  */
 @OptIn(
     ExperimentalCoroutinesApi::class,
     InternalCoroutinesApi::class,
     FlowPreview::class,
 )
-class MemoryEcho<T>(
+class MemoryExchange<T>(
     override val site: SiteIdentifier,
     private val log: MutableEventLog<T> = mutableEventLogOf(),
-) : Echo<I<T>, O<T>>, SiteSendEcho<I<T>, O<T>> {
+) : Exchange<I<T>, O<T>>, SiteSendExchange<I<T>, O<T>> {
 
   // TODO : Handle variable request size.
 
@@ -73,7 +73,7 @@ class MemoryEcho<T>(
   private val lastInserted = MutableStateFlow<EventIdentifier?>(null)
 
   override fun outgoing() =
-      channelExchange<I<T>, O<T>> { incoming ->
+      channelLink<I<T>, O<T>> { incoming ->
         // TODO : Support outgoing exchanges.
         var state: OutgoingState<T> = OutgoingState.Advertising(mutableListOf())
 
@@ -167,7 +167,7 @@ class MemoryEcho<T>(
       }
 
   override fun incoming() =
-      channelExchange<O<T>, I<T>> { incoming ->
+      channelLink<O<T>, I<T>> { incoming ->
         // TODO : Support incoming exchanges.
         val insertion = lastInserted.buffer(Channel.RENDEZVOUS).produceIn(this)
         var state: IncomingState<T> =

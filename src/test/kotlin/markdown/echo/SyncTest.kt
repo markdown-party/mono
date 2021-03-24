@@ -6,23 +6,23 @@ import kotlinx.coroutines.runBlocking
 class SyncTest {
 
   @Test
-  fun `NoOp exchange sync eventually terminates`() = runBlocking {
-    val alice = NoOpEcho
-    val bob = NoOpEcho
+  fun `NoOp simple sync eventually terminates`() = runBlocking {
+    val alice = NoOpExchange
+    val bob = NoOpExchange
 
     sync(alice, bob)
   }
 
   @Test
   fun `NoOp chain sync eventually terminates`() = runBlocking {
-    val head = NoOpEcho
-    val tail = Array(10) { NoOpEcho }
+    val head = NoOpExchange
+    val tail = Array(10) { NoOpExchange }
 
     sync(head, *tail)
   }
 }
 
-object NoOpEcho : Echo<Nothing, Nothing> {
-  override fun incoming() = exchange<Nothing, Nothing> {}
-  override fun outgoing() = exchange<Nothing, Nothing> {}
+object NoOpExchange : Exchange<Nothing, Nothing> {
+  override fun incoming() = link<Nothing, Nothing> {}
+  override fun outgoing() = link<Nothing, Nothing> {}
 }

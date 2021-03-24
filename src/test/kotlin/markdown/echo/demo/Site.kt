@@ -1,8 +1,8 @@
 package markdown.echo.demo
 
-import markdown.echo.Echo
+import markdown.echo.Exchange
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.memory.MemoryEcho
+import markdown.echo.memory.MemoryExchange
 import markdown.echo.memory.log.MutableEventLog
 import markdown.echo.memory.log.mutableEventLogOf
 import markdown.echo.memory.memory
@@ -25,7 +25,7 @@ class Site private constructor() {
     fun <T> createMemoryEchos() = Factory<T>()
 
     /**
-     * Creates a new [MemoryEcho] with the provided log and operation type.
+     * Creates a new [MemoryExchange] with the provided log and operation type.
      *
      * @param identifier the site identifier.
      * @param log the [MutableEventLog] that backs this site.
@@ -33,8 +33,8 @@ class Site private constructor() {
     fun <T> create(
         identifier: SiteIdentifier,
         log: MutableEventLog<T> = mutableEventLogOf(),
-    ): MemoryEcho<T> =
-        Echo.memory(
+    ): MemoryExchange<T> =
+        Exchange.memory(
             site = identifier,
             log = log,
         )
