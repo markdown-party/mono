@@ -9,7 +9,7 @@ import markdown.echo.causal.EventIdentifier
  * @param T the type of the application-specific event data.
  */
 @EventDsl
-interface EventScope<T> {
+interface EventScope<in T> {
 
   /**
    * Append a new event to the issued operations by this site. A happens-before relationship is
