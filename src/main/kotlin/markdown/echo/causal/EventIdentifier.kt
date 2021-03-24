@@ -44,4 +44,6 @@ internal constructor(
 
   operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed).toUInt())
   operator fun component2(): SiteIdentifier = SiteIdentifier(unpackInt2(packed))
+
+  override fun toString(): String = "EventIdentifier(seqno = ${seqno.index}, site = ${site.unique})"
 }

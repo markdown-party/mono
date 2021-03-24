@@ -17,6 +17,8 @@ internal constructor(
   operator fun plus(steps: UInt): SequenceNumber = SequenceNumber(index.plusBoundOverflows(steps))
   override fun compareTo(other: SequenceNumber) = index.compareTo(other.index)
 
+  override fun toString(): String = "SequenceNumber(index = $index)"
+
   companion object {
 
     /** The base [SequenceNumber], that is expected when no events have been issued yet. */
