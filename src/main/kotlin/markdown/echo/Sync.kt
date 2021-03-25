@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
  * @param I the type of the incoming data.
  * @param O the type of the outgoing data.
  */
-@EchoSyncPreview
 suspend fun <I, O> sync(
     first: Link<I, O>,
     second: Link<O, I>,

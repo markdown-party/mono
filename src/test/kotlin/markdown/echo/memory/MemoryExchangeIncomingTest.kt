@@ -18,7 +18,6 @@ import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.logs.mutableEventLogOf
 
-@OptIn(EchoSyncPreview::class)
 class MemoryExchangeIncomingTest {
 
   @Test
