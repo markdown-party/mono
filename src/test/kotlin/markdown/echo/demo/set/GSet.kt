@@ -1,18 +1,16 @@
 package markdown.echo.demo.set
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import markdown.echo.Exchange
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.events.event
-import markdown.echo.memory.memory
+import markdown.echo.mutableSite
 import markdown.echo.projections.OneWayProjection
 import markdown.echo.projections.projection
 import markdown.echo.sync
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 private sealed class GSetEvent<out T> {
   data class Add<out T>(val item: T) : GSetEvent<T>()
@@ -31,7 +29,7 @@ class GSetTest {
   @Test
   fun `one site can create a set and create new events`() = runBlocking {
     val alice = SiteIdentifier.random()
-    val echo = Exchange.memory<GSetEvent<Int>>(site = alice)
+    val echo = mutableSite<GSetEvent<Int>>(identifier = alice)
 
     echo.event {
       yield(GSetEvent.Add(1))
@@ -47,11 +45,11 @@ class GSetTest {
   fun `two sites can create a shared set and eventually sync`() = runBlocking {
     // Create Alice, our first site.
     val alice = SiteIdentifier.random()
-    val aliceEcho = Exchange.memory<GSetEvent<Int>>(site = alice)
+    val aliceEcho = mutableSite<GSetEvent<Int>>(identifier = alice)
 
     // Create Bob, our second site.
     val bob = SiteIdentifier.random()
-    val bobEcho = Exchange.memory<GSetEvent<Int>>(site = bob)
+    val bobEcho = mutableSite<GSetEvent<Int>>(identifier = bob)
 
     // Alice adds the elements 1 and 2.
     aliceEcho.event {

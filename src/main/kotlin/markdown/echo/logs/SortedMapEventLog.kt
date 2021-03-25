@@ -1,4 +1,4 @@
-package markdown.echo.memory.log
+package markdown.echo.logs
 
 import java.util.*
 import markdown.echo.EchoEventLogPreview
@@ -82,4 +82,8 @@ internal constructor(
           }
           .sortedBy { it.first }
           .fold(base) { m, p -> step(p, m) }
+
+  override fun toString(): String {
+    return "SortedMapEventLog(buffer: $buffer)"
+  }
 }

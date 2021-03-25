@@ -2,7 +2,6 @@ package markdown.echo.logs
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +17,6 @@ import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelLink
 import markdown.echo.events.EventScope
-import markdown.echo.memory.log.EventLog
-import markdown.echo.memory.log.MutableEventLog
-import markdown.echo.memory.log.mutableEventLogOf
 
 /** An implementation of [StepScope] that delegates behaviors. */
 private class StepScopeImpl<I, O>(
@@ -73,7 +69,6 @@ internal class MutableEventLogSite<T>(
   override fun outgoing() =
       channelLink<Inc<T>, Out<T>> { inc ->
         // Iterate within the FSM until we're over.
-        println("Start out")
         var state: OutgoingState<T> = OutgoingState()
         val insertions = inserted.produceIn(this)
         while (state.keepGoing(inc, this)) {
@@ -81,7 +76,6 @@ internal class MutableEventLogSite<T>(
           val log = SentinelMutableEventLog(log, inserted)
           state = state.step().invoke(scope, log)
         }
-        println("Done out")
         inc.cancel()
         insertions.cancel()
       }
@@ -89,7 +83,6 @@ internal class MutableEventLogSite<T>(
   override fun incoming() =
       channelLink<Out<T>, Inc<T>> { inc ->
         // Iterate within the FSM until we're over.
-        println("Start inc")
         var state: IncomingState<T> = mutex.withLock { IncomingState(log.sites) }
         val insertions = inserted.produceIn(this)
         while (state.keepGoing(inc, this)) {
@@ -97,7 +90,6 @@ internal class MutableEventLogSite<T>(
           val log = SentinelMutableEventLog(log, inserted)
           state = state.step().invoke(scope, log)
         }
-        println("Done inc")
         inc.cancel()
         insertions.cancel()
       }

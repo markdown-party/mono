@@ -7,7 +7,6 @@ import kotlinx.coroutines.sync.Mutex
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.EventIdentifier
-import markdown.echo.memory.log.MutableEventLog
 
 /**
  * A scope that's available when creating the next FSM step. This provides access to the following

@@ -13,9 +13,9 @@ import markdown.echo.ReceiveExchange
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.memory.log.EventLog
-import markdown.echo.memory.log.MutableEventLog
-import markdown.echo.memory.log.mutableEventLogOf
+import markdown.echo.logs.EventLog
+import markdown.echo.logs.MutableEventLog
+import markdown.echo.logs.mutableEventLogOf
 
 /**
  * Projects the provided [ReceiveExchange] instance with a [OneWayProjection].

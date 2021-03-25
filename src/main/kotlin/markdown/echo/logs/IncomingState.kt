@@ -9,13 +9,11 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.withLock
-import markdown.echo.Message
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.memory.log.EventLog
 
 /**
  * A sealed class representing the different states that the finite state machine may be in. Each
@@ -47,7 +45,7 @@ internal sealed class IncomingState<T> {
       incoming: ReceiveChannel<*>,
       outgoing: SendChannel<*>,
   ): Boolean {
-    return !incoming.isClosedForReceive && !outgoing.isClosedForSend
+    return !(incoming.isClosedForReceive && outgoing.isClosedForSend)
   }
 
   /** Computes the next step. */
@@ -72,7 +70,7 @@ private fun notReachable(name: String? = null): Nothing {
 //    move to the Sending state.
 // 3. We receive a Done event, so we move to Cancelling.
 // 4. We receive an unsupported message, which we just ignore. // TODO : Fail fast instead ?
-private class IncomingNew<T>(
+private data class IncomingNew<T>(
     private val advertisedSites: MutableList<SiteIdentifier>,
     private val pendingSites: MutableList<SiteIdentifier>,
 ) : IncomingState<T>() {
@@ -111,7 +109,7 @@ private class IncomingNew<T>(
 }
 
 // TODO : Optimize with mutable states.
-private class IncomingSending<T>(
+private data class IncomingSending<T>(
     private val advertisedSites: List<SiteIdentifier>,
     private val pendingEvents: List<Pair<EventIdentifier, T>>,
     private val pendingSites: List<SiteIdentifier>,
@@ -216,8 +214,20 @@ private class IncomingSending<T>(
 
 // 1. We can send a Done message, and move to Completed.
 private class IncomingCancelling<T> : IncomingState<T>() {
+
   override suspend fun step(): IncomingStep<T> = {
     select { onSend(Inc.Done) { IncomingCompleted() } }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is IncomingCancelling<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
   }
 }
 
@@ -233,6 +243,17 @@ private class IncomingCompleting<T> : IncomingState<T>() {
       }
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is IncomingCompleting<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
+  }
 }
 
 private class IncomingCompleted<T> : IncomingState<T>() {
@@ -243,4 +264,15 @@ private class IncomingCompleted<T> : IncomingState<T>() {
   ): Boolean = false
 
   override suspend fun step(): IncomingStep<T> = notReachable("Completed")
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is IncomingCompleted<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
+  }
 }

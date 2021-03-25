@@ -16,14 +16,14 @@ import markdown.echo.Message.V1.Outgoing as O
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.memory.log.mutableEventLogOf
+import markdown.echo.logs.mutableEventLogOf
 
 @OptIn(EchoSyncPreview::class)
 class MemoryExchangeIncomingTest {
 
   @Test
   fun `Only Done works on buffered incoming`() = runBlocking {
-    val echo = Exchange.memory<Nothing>(SiteIdentifier(123))
+    val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
         channelLink<I<Nothing>, O<Nothing>> { incoming ->
           assertTrue(incoming.receive() is I.Ready)
@@ -36,14 +36,14 @@ class MemoryExchangeIncomingTest {
 
   @Test
   fun `No messages to incoming works`() = runBlocking {
-    val echo = Exchange.memory<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
+    val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val received = echo.incoming().talk(emptyFlow()).toList()
     assertEquals(listOf(I.Ready, I.Done), received)
   }
 
   @Test
   fun `Only Done works on 1-buffer incoming`() = runBlocking {
-    val echo = Exchange.memory<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
+    val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Nothing>, O<Nothing>> { incoming ->
               assertTrue(incoming.receive() is I.Ready)
@@ -60,7 +60,7 @@ class MemoryExchangeIncomingTest {
     val seqno = SequenceNumber(123U)
     val site = SiteIdentifier(456)
     val log = mutableEventLogOf(EventIdentifier(seqno, site) to 42)
-    val echo = Exchange.memory(site, log).buffer(RENDEZVOUS)
+    val echo = mutableSite(site, log).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Int>, O<Int>> { incoming ->
               assertEquals(I.Advertisement(site), incoming.receive())
@@ -80,7 +80,7 @@ class MemoryExchangeIncomingTest {
     val seqno = SequenceNumber.Zero
     val events = sites.map { site -> EventIdentifier(seqno, site) to 123 }
     val log = mutableEventLogOf(*events.toTypedArray())
-    val echo = Exchange.memory(SiteIdentifier.random(), log).buffer(RENDEZVOUS)
+    val echo = mutableSite(SiteIdentifier.random(), log).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Int>, O<Int>> { incoming ->
               val received = mutableListOf<SiteIdentifier>()
@@ -105,7 +105,7 @@ class MemoryExchangeIncomingTest {
     val site = SiteIdentifier(10)
     val seqno = SequenceNumber(150U)
     val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
-    val echo = Exchange.memory(SiteIdentifier(0), events).buffer(RENDEZVOUS)
+    val echo = mutableSite(SiteIdentifier(0), events).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
               assertEquals(I.Advertisement(site), incoming.receive())
@@ -125,7 +125,7 @@ class MemoryExchangeIncomingTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
-    val echo = Exchange.memory(SiteIdentifier(0), events)
+    val echo = mutableSite(SiteIdentifier(0), events)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
           assertEquals(I.Advertisement(site), incoming.receive())
@@ -143,7 +143,7 @@ class MemoryExchangeIncomingTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
-    val echo = Exchange.memory(SiteIdentifier(0), events)
+    val echo = mutableSite(SiteIdentifier(0), events)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
           assertEquals(I.Advertisement(site), incoming.receive())

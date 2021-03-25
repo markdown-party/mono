@@ -6,11 +6,9 @@ import kotlin.test.fail
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import markdown.echo.Exchange
+import markdown.echo.MutableSite
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.events.event
-import markdown.echo.memory.MemoryExchange
-import markdown.echo.memory.memory
+import markdown.echo.mutableSite
 import markdown.echo.projections.OneWayProjection
 import markdown.echo.projections.projection
 import markdown.echo.sync
@@ -37,7 +35,7 @@ private class LWWProjection<T> : OneWayProjection<T?, LWWRegisterEvent<T>> {
 }
 
 /** A class representing a [LWWRegister]. */
-private class LWWRegister<T>(private val echo: MemoryExchange<LWWRegisterEvent<T>>) {
+private class LWWRegister<T>(private val echo: MutableSite<LWWRegisterEvent<T>>) {
 
   /** The latest available value from the [LWWRegister]. */
   val value: Flow<T?> = echo.projection(null, LWWProjection())
@@ -53,11 +51,11 @@ class LWWRegisterTest {
   @Test
   fun `two sites eventually converge on a LWW value`(): Unit = runBlocking {
     val alice = SiteIdentifier(123)
-    val aliceExchange = Exchange.memory<LWWRegisterEvent<Int>>(alice)
+    val aliceExchange = mutableSite<LWWRegisterEvent<Int>>(alice)
     val aliceRegister = LWWRegister(aliceExchange)
 
     val bob = SiteIdentifier(456)
-    val bobExchange = Exchange.memory<LWWRegisterEvent<Int>>(bob)
+    val bobExchange = mutableSite<LWWRegisterEvent<Int>>(bob)
     val bobRegister = LWWRegister(bobExchange)
 
     aliceRegister.set(123)

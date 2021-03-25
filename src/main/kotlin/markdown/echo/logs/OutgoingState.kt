@@ -59,7 +59,7 @@ private fun notReachable(name: String? = null): Nothing {
 
 // FINITE STATE MACHINE
 
-private class OutgoingAdvertising<T>(
+private data class OutgoingAdvertising<T>(
     private val available: MutableList<SiteIdentifier>,
 ) : OutgoingState<T>() {
 
@@ -86,7 +86,7 @@ private class OutgoingAdvertising<T>(
 }
 
 @OptIn(EchoEventLogPreview::class)
-private class OutgoingListening<T>(
+private data class OutgoingListening<T>(
     private val pendingRequests: MutableList<SiteIdentifier>,
     private val requested: MutableList<SiteIdentifier>,
 ) : OutgoingState<T>() {
@@ -135,6 +135,17 @@ private class OutgoingCancelling<T> : OutgoingState<T>() {
   override suspend fun step(): OutgoingStep<T> = {
     select { onSend(Out.Done) { OutgoingCompleted() } }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OutgoingCancelling<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
+  }
 }
 
 // 1. We receive a Done message, and move to Completed.
@@ -150,6 +161,17 @@ private class OutgoingCompleting<T> : OutgoingState<T>() {
       }
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OutgoingCompleting<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
+  }
 }
 
 // We're done.
@@ -161,4 +183,15 @@ private class OutgoingCompleted<T> : OutgoingState<T>() {
   ): Boolean = false
 
   override suspend fun step(): OutgoingStep<T> = notReachable("Completed")
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OutgoingCompleted<*>) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return 31
+  }
 }

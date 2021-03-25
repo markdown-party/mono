@@ -4,10 +4,10 @@ import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
+import markdown.echo.logs.EventLog
+import markdown.echo.logs.MutableEventLog
 import markdown.echo.logs.MutableEventLogSite
-import markdown.echo.memory.log.EventLog
-import markdown.echo.memory.log.MutableEventLog
-import markdown.echo.memory.log.mutableEventLogOf
+import markdown.echo.logs.mutableEventLogOf
 
 /**
  * An interface describing a [Site] in the distributed system. Each [Site] is associated with a

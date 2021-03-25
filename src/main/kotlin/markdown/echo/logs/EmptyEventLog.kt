@@ -1,4 +1,4 @@
-package markdown.echo.memory.log
+package markdown.echo.logs
 
 import markdown.echo.EchoEventLogPreview
 import markdown.echo.causal.EventIdentifier

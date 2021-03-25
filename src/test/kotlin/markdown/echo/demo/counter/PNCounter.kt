@@ -8,7 +8,6 @@ import kotlinx.coroutines.withTimeout
 import markdown.echo.demo.Site
 import markdown.echo.demo.counter.PNCounterEvent.Decrement
 import markdown.echo.demo.counter.PNCounterEvent.Increment
-import markdown.echo.events.event
 import markdown.echo.projections.OneWayProjection
 import markdown.echo.projections.projection
 import markdown.echo.sync

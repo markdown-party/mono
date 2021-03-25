@@ -6,11 +6,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.runBlocking
 import markdown.echo.EchoSyncPreview
-import markdown.echo.Exchange
 import markdown.echo.Message.V1.Incoming as I
 import markdown.echo.Message.V1.Outgoing as O
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelLink
+import markdown.echo.mutableSite
 import markdown.echo.sync
 import org.junit.jupiter.api.Test
 
@@ -22,7 +22,7 @@ class MemoryExchangeOutgoingTest {
 
   @Test
   fun `Only Done works on buffered outgoing`() = runBlocking {
-    val echo = Exchange.memory<Nothing>(SiteIdentifier(123))
+    val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
         channelLink<O<Nothing>, I<Nothing>> { incoming ->
           send(I.Done)
