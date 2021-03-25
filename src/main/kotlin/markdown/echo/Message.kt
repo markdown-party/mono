@@ -31,7 +31,7 @@ object Message {
    *
    * ## Backpressure and termination
    *
-   * This iteration of the protocol introduces a notation of backpressure by the receiver. Instead
+   * This iteration of the protocol introduces a notion of backpressure by the receiver. Instead
    * of receiving all the events of the sender as they are produced, it becomes the responsibility
    * of the receiver to clearly indicate how many events they want delivered from the sender.
    *
