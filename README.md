@@ -66,7 +66,7 @@ As new events get `yield` in the `MutableSite`, the cold `Flow` will emit some a
 which contain the distributed counter total.
 
 At some point, you may be interested in syncing multiple sites together. This can be done with a
-suspending actor pattern, which will not resume until either both sites cooperatively finish :
+suspending actor pattern, which will not resume until both sites cooperatively finish :
 
 ```kotlin
 suspend fun myFun() {
