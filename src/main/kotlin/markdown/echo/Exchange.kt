@@ -27,8 +27,4 @@ fun interface ReceiveExchange<out I, in O> {
  * @param I the type of the domain-specific incoming events for this [Exchange].
  * @param O the type of the domain-specific outgoing events for this [Exchange].
  */
-interface Exchange<I, O> : SendExchange<I, O>, ReceiveExchange<I, O> {
-
-  // Useful for creating static functions.
-  companion object
-}
+interface Exchange<I, O> : SendExchange<I, O>, ReceiveExchange<I, O>
