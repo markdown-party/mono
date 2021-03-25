@@ -89,8 +89,8 @@ fun <M, T> mutableSite(
       projection.forward(body.second, acc)
     }
 
-// TODO : Eventually expose this, with a better name.
-internal fun <M, T> mutableSiteWithIdentifier(
+// TODO : Find a better name.
+fun <M, T> mutableSiteWithIdentifier(
     identifier: SiteIdentifier,
     log: MutableEventLog<T> = mutableEventLogOf(),
     initial: M,

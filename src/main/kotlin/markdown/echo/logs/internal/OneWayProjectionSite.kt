@@ -74,13 +74,14 @@ internal class OneWayProjectionSite<T, M>(
         insertions.cancel()
       }
 
+  @OptIn(EchoEventLogPreview::class)
   override suspend fun event(
       scope: suspend EventScope<T>.(M) -> Unit,
   ) {
     mutex.withLock {
       // TODO : Concurrent modification of log ?
       val model = log.foldl(model, projection::forward)
-      var next = log.expected(site = identifier)
+      var next = log.expected
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =
           object : EventScope<T> {

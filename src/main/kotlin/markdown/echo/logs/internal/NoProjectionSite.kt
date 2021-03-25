@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import markdown.echo.EchoEventLogPreview
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.MutableEventLogSite
@@ -68,11 +69,12 @@ internal class NoProjectionSite<T>(
         insertions.cancel()
       }
 
+  @OptIn(EchoEventLogPreview::class)
   override suspend fun event(
       scope: suspend EventScope<T>.(EventLog<T>) -> Unit,
   ) {
     mutex.withLock {
-      var next = log.expected(site = identifier)
+      var next = log.expected
       // TODO : Concurrent modification of log ?
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =
