@@ -1,46 +1,20 @@
-package markdown.echo.logs
+package markdown.echo.logs.internal
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.SelectClause1
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import markdown.echo.Message.V1.Incoming as Inc
-import markdown.echo.Message.V1.Outgoing as Out
+import markdown.echo.EchoEventLogPreview
+import markdown.echo.Message
 import markdown.echo.MutableSite
 import markdown.echo.causal.EventIdentifier
-import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelLink
 import markdown.echo.events.EventScope
-
-/** An implementation of [StepScope] that delegates behaviors. */
-private class StepScopeImpl<I, O>(
-    inc: ReceiveChannel<I>,
-    out: SendChannel<O>,
-    insertions: ReceiveChannel<EventIdentifier?>,
-    mutex: Mutex,
-) : StepScope<I, O>, ReceiveChannel<I> by inc, SendChannel<O> by out, Mutex by mutex {
-  override val onInsert: SelectClause1<EventIdentifier?> = insertions.onReceive
-}
-
-/** A [MutableEventLog] that updates a [sentinel] whenever a missing value is set. */
-private class SentinelMutableEventLog<T>(
-    private val backing: MutableEventLog<T>,
-    private val sentinel: MutableStateFlow<EventIdentifier?>,
-) : MutableEventLog<T>, EventLog<T> by backing {
-  override fun set(seqno: SequenceNumber, site: SiteIdentifier, body: T) {
-    // This considers that a Mutex is hold when performing the set operation.
-    if (backing[seqno, site] != null) {
-      sentinel.value = EventIdentifier(seqno, site)
-    }
-    backing[seqno, site] = body
-  }
-}
+import markdown.echo.logs.*
+import markdown.echo.projections.OneWayProjection
 
 /**
  * An implementation of [MutableSite] that delegates the management of data to a [MutableEventLog].
@@ -48,17 +22,23 @@ private class SentinelMutableEventLog<T>(
  *
  * @param identifier the globally unique identifier for this site.
  * @param log the backing [MutableEventLog].
+ * @param model the initial [M].
+ * @param projection the [OneWayProjection] that's used.
  *
  * @param T the type of the events.
+ * @param M the type of the model.
  */
 @OptIn(
+    EchoEventLogPreview::class,
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
 )
-internal class MutableEventLogSiteImpl<T>(
+internal class OneWayProjectionSite<T, M>(
     override val identifier: SiteIdentifier,
-    private val log: MutableEventLog<T> = mutableEventLogOf()
-) : MutableSite<T, EventLog<T>> {
+    private val log: MutableEventLog<T> = mutableEventLogOf(),
+    private val model: M,
+    private val projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
+) : MutableSite<T, M> {
 
   /** A [Mutex] which ensures serial access to the [log] and the [inserted] value. */
   private val mutex = Mutex()
@@ -67,7 +47,7 @@ internal class MutableEventLogSiteImpl<T>(
   private val inserted = MutableStateFlow<EventIdentifier?>(null)
 
   override fun outgoing() =
-      channelLink<Inc<T>, Out<T>> { inc ->
+      channelLink<Message.V1.Incoming<T>, Message.V1.Outgoing<T>> { inc ->
         // Iterate within the FSM until we're over.
         var state: OutgoingState<T> = OutgoingState()
         val insertions = inserted.produceIn(this)
@@ -81,7 +61,7 @@ internal class MutableEventLogSiteImpl<T>(
       }
 
   override fun incoming() =
-      channelLink<Out<T>, Inc<T>> { inc ->
+      channelLink<Message.V1.Outgoing<T>, Message.V1.Incoming<T>> { inc ->
         // Iterate within the FSM until we're over.
         var state: IncomingState<T> = mutex.withLock { IncomingState(log.sites) }
         val insertions = inserted.produceIn(this)
@@ -95,9 +75,11 @@ internal class MutableEventLogSiteImpl<T>(
       }
 
   override suspend fun event(
-      scope: suspend EventScope<T>.(EventLog<T>) -> Unit,
+      scope: suspend EventScope<T>.(M) -> Unit,
   ) {
     mutex.withLock {
+      // TODO : Concurrent modification of log ?
+      val model = log.foldl(model, projection::forward)
       var next = log.expected(site = identifier)
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =
@@ -107,7 +89,7 @@ internal class MutableEventLogSiteImpl<T>(
               return EventIdentifier(next++, identifier)
             }
           }
-      scope(impl, log)
+      scope(impl, model)
     }
   }
 }
