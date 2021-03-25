@@ -23,10 +23,7 @@ fun EventIdentifier(
  * distributed system. It offers the properties of a Lamport timestamp, with a unique site
  * identifier for each client to disambiguate duplicate timestamps.
  *
- * @param packed the packed value for this identifier. Prefer building an instance with the
- * ```
- *               dedicated builder function.
- * ```
+ * @param packed the packed value for this identifier.
  */
 inline class EventIdentifier
 internal constructor(
