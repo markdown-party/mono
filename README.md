@@ -19,8 +19,8 @@ editor. Feel free to reach out to me at
 
 The library is made available through
 [GitHub packages](https://github.com/markdown-party/kotlin-echo/packages). Assuming you've properly
-[set up your access credentials](https://docs.github.com/en/packages/guides/configuring-apache-maven-for-use-with-github-packages),
-you can then add the following dependency in your `build.gradle` file :
+[set up your access credentials](https://docs.github.com/en/packages/guides/configuring-apache-maven-for-use-with-github-packages)
+, you can then add the following dependency in your `build.gradle` file :
 
 ```groovy
 implementation "markdown.party:echo:0.4.0-SNAPSHOT"
@@ -29,42 +29,55 @@ implementation "markdown.party:echo:0.4.0-SNAPSHOT"
 `-SNAPSHOT` releases are regularly released. Every week, the minor version number is incremented.
 When the library becomes stable enough, non- `-SNAPSHOT` releases will be uploaded.
 
-### Principles
+### Using the library
 
-> In the `kotlin-echo` log replication protocol, one site **requests** events from another site
-> which **provides** them. The `Exchange` interface makes it possible to represent these
-> asymmetrical messages. On the other hand, the `Echo` interface is well-suited to model a replica
-> which is able to both **request AND provide** log events.
+Let's implement a distributed counter, which lets sites increment and decrement a shared value. We
+start by defining the events, as well as a `OneWayProjection` that aggregates them :
 
-These abstractions are modeled as follows :
+```kotlin
+enum class Event { Increment, Decrement }
 
-+ The `Exchange<I, O>` functional interface, which models an asynchronous and asymmetrical
-  communication channel between two  sites. When the `fun talk(incoming: Flow<I>): Flow<O>` method
-  is called, a new **cold** `Flow` of messages is generated. An `Exchange` may `emit(..)` different
-  messages of type `O` depending on what messages of type `I` it receives in its `incoming` inbox.
-+ The `Echo<I, O>` interface, which returns two asymmetrical `Exchange` with inverted directions.
-  Essentially, an `Echo` is a site in the distributed system, which can then "talk" and "reply" to
-  other sites.
-
-```
-Exchange :                             Echo :
-
-    +-----> I ------+                       incoming(): Exchange<I, O>
-    |               |                     +----------------------------+
-    |               |                     |                            |
-+--------+      +--------+                |                     +------------+
-| Site 1 |      | Site 2 |     <----------+                     | Echo<I, O> |
-+--------+      +--------+                |                     +------------+
-    ^               |                     |                            |
-    |               |                     +----------------------------+
-    +------ O <-----+                       outgoing(): Exchange<O, I>
+val counter = OneWayProjection<Int, Event> { op, acc ->
+    when (op) {
+        Increment -> acc + 1
+        Decrement -> acc - 1
+    }
+}
 ```
 
+We can then create a new site, and yield some new events :
 
+```kotlin
+val site = mutableSite<Event>(SiteIdentifier.random())
 
-#### Replication protocol
+// This is a suspend fun.
+site.event {
+    yield(Increment)
+}
+```
 
-> TBA
+It's then possible to observe the values of a site as a cold `Flow` :
+
+```kotlin
+val total: Flow<Int> = site.projection(initial = 0, counter) // emits [0, 1, ...]
+```
+
+As new events get `yield` in the `MutableSite`, the cold `Flow` will emit some additional elements
+which contain the distributed counter total.
+
+At some point, you may be interested in syncing multiple sites together. This can be done with a
+suspending actor pattern, which will not resume until either both sites cooperatively finish :
+
+```kotlin
+suspend fun myFun() {
+    val alice = mutableSite<Event>(SiteIdentifier.random())
+    val bob = mutableSite<Event>(SiteIdentifier.random())
+
+    sync(alice, bob)
+}
+```
+
+Additional examples are available in the [demo folder](src/test/kotlin/markdown/echo/demo).
 
 ## Local setup
 

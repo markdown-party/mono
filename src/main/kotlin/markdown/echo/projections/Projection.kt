@@ -26,9 +26,9 @@ import markdown.echo.logs.mutableEventLogOf
  * @param T the type of the events managed by the [ReceiveExchange].
  */
 fun <M, T> ReceiveExchange<I<T>, O<T>>.projection(
-    model: M,
+    initial: M,
     transform: OneWayProjection<M, T>,
-): Flow<M> = projectWithIdentifiers(model) { (_, e), m -> transform.forward(e, m) }
+): Flow<M> = projectWithIdentifiers(initial) { (_, e), m -> transform.forward(e, m) }
 
 /**
  * Projects the provided [ReceiveExchange] instance with a [OneWayProjection].
@@ -43,12 +43,12 @@ fun <M, T> ReceiveExchange<I<T>, O<T>>.projection(
     InternalCoroutinesApi::class,
 )
 fun <M, T> ReceiveExchange<I<T>, O<T>>.projectWithIdentifiers(
-    model: M,
+    initial: M,
     transform: OneWayProjection<M, Pair<EventIdentifier, T>>,
 ): Flow<M> = channelFlow {
 
   // Emit the initial value of the Model.
-  send(model)
+  send(initial)
 
   // Use channels for communication.
   val incoming = Channel<I<T>>()
@@ -104,7 +104,7 @@ fun <M, T> ReceiveExchange<I<T>, O<T>>.projectWithIdentifiers(
                           is I.Event -> {
                             // Issue the new state now.
                             s.log[msg.seqno, msg.site] = msg.body
-                            this@channelFlow.send(s.log.aggregate(model, transform))
+                            this@channelFlow.send(s.log.aggregate(initial, transform))
                             return@onReceiveOrClosed s // Updated a mutable state.
                           }
                           is I.Ready -> error("Ready should not be issued twice.")
