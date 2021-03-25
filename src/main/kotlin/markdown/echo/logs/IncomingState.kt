@@ -218,42 +218,6 @@ private class IncomingCancelling<T> : IncomingState<T>() {
   override suspend fun step(): IncomingStep<T> = {
     select { onSend(Inc.Done) { IncomingCompleted() } }
   }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is IncomingCancelling<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
-}
-
-// 1. We receive a Done message, and move to Completed.
-private class IncomingCompleting<T> : IncomingState<T>() {
-  override suspend fun step(): IncomingStep<T> = {
-    select {
-      onReceiveOrClosed { v ->
-        when (v.valueOrNull) {
-          is Out.Done, null -> IncomingCompleted()
-          is Out.Request -> this@IncomingCompleting // Draining.
-        }
-      }
-    }
-  }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is IncomingCompleting<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
 }
 
 private class IncomingCompleted<T> : IncomingState<T>() {
@@ -264,15 +228,4 @@ private class IncomingCompleted<T> : IncomingState<T>() {
   ): Boolean = false
 
   override suspend fun step(): IncomingStep<T> = notReachable("Completed")
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is IncomingCompleted<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
 }

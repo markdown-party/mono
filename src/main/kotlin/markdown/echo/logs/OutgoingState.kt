@@ -135,43 +135,6 @@ private class OutgoingCancelling<T> : OutgoingState<T>() {
   override suspend fun step(): OutgoingStep<T> = {
     select { onSend(Out.Done) { OutgoingCompleted() } }
   }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is OutgoingCancelling<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
-}
-
-// 1. We receive a Done message, and move to Completed.
-private class OutgoingCompleting<T> : OutgoingState<T>() {
-
-  override suspend fun step(): OutgoingStep<T> = {
-    select {
-      onReceiveOrClosed { v ->
-        when (v.valueOrNull) {
-          is Inc.Done, null -> OutgoingCompleted()
-          else -> this@OutgoingCompleting // Draining.
-        }
-      }
-    }
-  }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is OutgoingCompleting<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
 }
 
 // We're done.
@@ -183,15 +146,4 @@ private class OutgoingCompleted<T> : OutgoingState<T>() {
   ): Boolean = false
 
   override suspend fun step(): OutgoingStep<T> = notReachable("Completed")
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is OutgoingCompleted<*>) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return 31
-  }
 }
