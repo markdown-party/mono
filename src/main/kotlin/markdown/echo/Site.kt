@@ -6,7 +6,7 @@ import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
 import markdown.echo.logs.EventLog
 import markdown.echo.logs.MutableEventLog
-import markdown.echo.logs.MutableEventLogSite
+import markdown.echo.logs.MutableEventLogSiteImpl
 import markdown.echo.logs.mutableEventLogOf
 
 /**
@@ -24,15 +24,23 @@ interface Site<T> : Exchange<Inc<T>, Out<T>> {
  * method.
  *
  * @param T the type of the events managed by this [Site].
+ * @param M the type of the underlying aggregated model for this [Site].
  */
-interface MutableSite<T> : Site<T> {
+interface MutableSite<T, M> : Site<T> {
 
   /**
    * Creates some new events, that are generated in the [EventScope]. This function returns once the
    * events have been successfully added to the underlying [MutableSite].
    */
-  suspend fun event(scope: suspend EventScope<T>.(EventLog<T>) -> Unit)
+  suspend fun event(scope: suspend EventScope<T>.(M) -> Unit)
 }
+
+/**
+ * A typealias for [MutableSite] that simply expose the underlying [EventLog].
+ *
+ * @param T the type of the events managed by this [MutableSite].
+ */
+typealias MutableEventLogSite<T> = MutableSite<T, EventLog<T>>
 
 /**
  * Creates a new [Site] for the provided [SiteIdentifier], which can not be manually mutated.
@@ -53,4 +61,4 @@ fun <T> site(identifier: SiteIdentifier): Site<T> = mutableSite(identifier)
 fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: MutableEventLog<T> = mutableEventLogOf(),
-): MutableSite<T> = MutableEventLogSite(identifier, log)
+): MutableSite<T, EventLog<T>> = MutableEventLogSiteImpl(identifier, log)

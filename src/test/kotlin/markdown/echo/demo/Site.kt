@@ -1,5 +1,6 @@
 package markdown.echo.demo
 
+import markdown.echo.MutableEventLogSite
 import markdown.echo.MutableSite
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.logs.MutableEventLog
@@ -32,6 +33,6 @@ class Site private constructor() {
     fun <T> create(
         identifier: SiteIdentifier,
         log: MutableEventLog<T> = mutableEventLogOf(),
-    ): MutableSite<T> = mutableSite(identifier, log)
+    ): MutableEventLogSite<T> = mutableSite(identifier, log)
   }
 }

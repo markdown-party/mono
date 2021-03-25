@@ -55,10 +55,10 @@ private class SentinelMutableEventLog<T>(
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
 )
-internal class MutableEventLogSite<T>(
+internal class MutableEventLogSiteImpl<T>(
     override val identifier: SiteIdentifier,
     private val log: MutableEventLog<T> = mutableEventLogOf()
-) : MutableSite<T> {
+) : MutableSite<T, EventLog<T>> {
 
   /** A [Mutex] which ensures serial access to the [log] and the [inserted] value. */
   private val mutex = Mutex()
