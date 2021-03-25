@@ -189,17 +189,10 @@ private data class IncomingSending<T>(
         when (val msg = v.valueOrNull) {
           is Out.Request -> {
             // Ack based on request, and set credits for the given site.
-            val ackForSite =
-                maxOf(
-                    receivedAcks[msg.site] ?: msg.nextForSite,
-                    msg.nextForSite,
-                )
+            val ackForSite = maxOf(receivedAcks[msg.site] ?: msg.nextForSite, msg.nextForSite)
             val newAcks = receivedAcks + (msg.site to ackForSite)
             val newCredits = receivedCredits + (msg.site to msg.count)
-            IncomingSending(
-                advertisedSites = advertisedSites,
-                pendingEvents = pendingEvents,
-                pendingSites = pendingSites,
+            copy(
                 receivedAcks = newAcks,
                 receivedCredits = newCredits,
             )
