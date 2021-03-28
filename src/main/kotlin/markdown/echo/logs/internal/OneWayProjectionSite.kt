@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.EchoEventLogPreview
-import markdown.echo.Message
 import markdown.echo.MutableSite
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
@@ -46,33 +45,42 @@ internal class OneWayProjectionSite<T, M>(
   /** A [MutableStateFlow] that acts as a sentinel value that new events were inserted. */
   private val inserted = MutableStateFlow<EventIdentifier?>(null)
 
-  override fun outgoing() =
-      channelLink<Message.V1.Incoming<T>, Message.V1.Outgoing<T>> { inc ->
-        // Iterate within the FSM until we're over.
-        var state: OutgoingState<T> = OutgoingState()
+  /**
+   * Runs an exchange based on a final state machine. The FSM starts with an [initial] state, and
+   * performs steps as messages are received or sent.
+   *
+   * @param initial a lambda that creates the initial FSM state.
+   *
+   * @param I the type of the input messages.
+   * @param O the type of the output messages.
+   * @param S the type of the FSM states.
+   */
+  private fun <I, O, S : State<I, O, T, S>> exchange(initial: suspend () -> S) =
+      channelLink<I, O> { inc ->
+        var state = initial()
         val insertions = inserted.produceIn(this)
-        while (state.keepGoing(inc, this)) {
-          val scope = StepScopeImpl(inc, this, insertions, mutex)
-          val log = SentinelMutableEventLog(log, inserted)
-          state = state.step().invoke(scope, log)
+
+        // Prepare some context information for the step.
+        val scope = StepScopeImpl(inc, this, insertions, mutex)
+        val log = SentinelMutableEventLog(log, inserted)
+
+        while (true) {
+          // Run the effects, until we've moved to an error state or we were explicitly asked to
+          // terminate.
+          when (val effect = with(state) { scope.step(log) }) {
+            is Effect.Move -> state = effect.next
+            is Effect.MoveToError -> throw effect.problem
+            is Effect.Terminate -> break
+          }
         }
+
+        // Clear the jobs registered in channelLink.
         inc.cancel()
         insertions.cancel()
       }
 
-  override fun incoming() =
-      channelLink<Message.V1.Outgoing<T>, Message.V1.Incoming<T>> { inc ->
-        // Iterate within the FSM until we're over.
-        var state: IncomingState<T> = mutex.withLock { IncomingState(log.sites) }
-        val insertions = inserted.produceIn(this)
-        while (state.keepGoing(inc, this)) {
-          val scope = StepScopeImpl(inc, this, insertions, mutex)
-          val log = SentinelMutableEventLog(log, inserted)
-          state = state.step().invoke(scope, log)
-        }
-        inc.cancel()
-        insertions.cancel()
-      }
+  override fun outgoing() = exchange { OutgoingState() }
+  override fun incoming() = exchange { mutex.withLock { IncomingState(log.sites) } }
 
   @OptIn(EchoEventLogPreview::class)
   override suspend fun event(

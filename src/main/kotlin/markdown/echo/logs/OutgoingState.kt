@@ -3,10 +3,7 @@
 
 package markdown.echo.logs
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.EchoEventLogPreview
@@ -22,30 +19,14 @@ import markdown.echo.causal.SiteIdentifier
  *
  * @param T the type of the events.
  */
-internal sealed class OutgoingState<T> {
+// TODO : Update the documentation.
+internal sealed class OutgoingState<T> : State<Inc<T>, Out<T>, T, OutgoingState<T>> {
 
   companion object {
 
     /** Creates a new [OutgoingState] that's the beginning of the FSM. */
     operator fun <T> invoke(): OutgoingState<T> = OutgoingAdvertising(mutableListOf())
   }
-
-  /**
-   * Returns true iff a loop on this state should keep iterating.
-   *
-   * @param incoming the [ReceiveChannel] for events coming from other sites.
-   * @param outgoing the [SendChannel] for events going to other sites.
-   */
-  @OptIn(ExperimentalCoroutinesApi::class)
-  open fun keepGoing(
-      incoming: ReceiveChannel<*>,
-      outgoing: SendChannel<*>,
-  ): Boolean {
-    return !incoming.isClosedForReceive && !outgoing.isClosedForSend
-  }
-
-  /** Computes the next step. */
-  abstract suspend fun step(): OutgoingStep<T>
 }
 
 /**
@@ -53,8 +34,8 @@ internal sealed class OutgoingState<T> {
  *
  * @param name the name of the unreachable step.
  */
-private fun notReachable(name: String? = null): Nothing {
-  error("State ${name?.plus(" ")}should not be reachable")
+private fun notReachable(name: String? = null): Throwable {
+  return IllegalStateException("State ${name?.plus(" ")}should not be reachable")
 }
 
 // FINITE STATE MACHINE
@@ -63,26 +44,27 @@ private data class OutgoingAdvertising<T>(
     private val available: MutableList<SiteIdentifier>,
 ) : OutgoingState<T>() {
 
-  override suspend fun step(): OutgoingStep<T> = {
-    select {
-      onReceiveOrClosed { v ->
-        when (val msg = v.valueOrNull) {
-          is Inc.Advertisement -> {
-            available += msg.site
-            this@OutgoingAdvertising // mutable state update.
+  @OptIn(InternalCoroutinesApi::class)
+  override suspend fun OutgoingStepScope<T>.step(log: MutableEventLog<T>) =
+      select<Effect<OutgoingState<T>>> {
+        onReceiveOrClosed { v ->
+          when (val msg = v.valueOrNull) {
+            is Inc.Advertisement -> {
+              available += msg.site
+              Effect.Move(this@OutgoingAdvertising) // mutable state update.
+            }
+            is Inc.Ready -> {
+              Effect.Move(
+                  OutgoingListening(
+                      pendingRequests = available,
+                      requested = mutableListOf(),
+                  ))
+            }
+            is Inc.Done, null -> Effect.Move(OutgoingCancelling())
+            is Inc.Event -> Effect.MoveToError(notReachable())
           }
-          is Inc.Ready -> {
-            OutgoingListening(
-                pendingRequests = available,
-                requested = mutableListOf(),
-            )
-          }
-          is Inc.Done, null -> OutgoingCancelling()
-          is Inc.Event -> notReachable()
         }
       }
-    }
-  }
 }
 
 @OptIn(EchoEventLogPreview::class)
@@ -91,12 +73,14 @@ private data class OutgoingListening<T>(
     private val requested: MutableList<SiteIdentifier>,
 ) : OutgoingState<T>() {
 
-  override suspend fun step(): OutgoingStep<T> = { log ->
+  override suspend fun OutgoingStepScope<T>.step(
+      log: MutableEventLog<T>
+  ): Effect<OutgoingState<T>> {
     val request = pendingRequests.lastOrNull()
     val expected = withLock { request?.let(log::expected) } ?: SequenceNumber.Zero
     val max = withLock { log.expected }
 
-    select {
+    return select {
       if (request != null) {
         onSend(
             Out.Request(
@@ -107,22 +91,22 @@ private data class OutgoingListening<T>(
             )) {
           pendingRequests.removeLast()
           requested.add(request)
-          this@OutgoingListening // mutable state update.
+          Effect.Move(this@OutgoingListening) // mutable state update.
         }
       }
 
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
-          is Inc.Done, null -> OutgoingCancelling()
+          is Inc.Done, null -> Effect.Move(OutgoingCancelling())
           is Inc.Advertisement -> {
             pendingRequests.add(msg.site)
-            this@OutgoingListening // mutable state update.
+            Effect.Move(this@OutgoingListening) // mutable state update.
           }
           is Inc.Event -> {
             withLock { log[msg.seqno, msg.site] = msg.body }
-            this@OutgoingListening
+            Effect.Move(this@OutgoingListening)
           }
-          is Inc.Ready -> notReachable()
+          is Inc.Ready -> Effect.MoveToError(notReachable())
         }
       }
     }
@@ -132,18 +116,7 @@ private data class OutgoingListening<T>(
 // 1. We can send a Done message, and move to Completed.
 private class OutgoingCancelling<T> : OutgoingState<T>() {
 
-  override suspend fun step(): OutgoingStep<T> = {
-    select { onSend(Out.Done) { OutgoingCompleted() } }
-  }
-}
-
-// We're done.
-private class OutgoingCompleted<T> : OutgoingState<T>() {
-
-  override fun keepGoing(
-      incoming: ReceiveChannel<*>,
-      outgoing: SendChannel<*>,
-  ): Boolean = false
-
-  override suspend fun step(): OutgoingStep<T> = notReachable("Completed")
+  override suspend fun OutgoingStepScope<T>.step(
+      log: MutableEventLog<T>,
+  ) = select<Effect<OutgoingState<T>>> { onSend(Out.Done) { Effect.Terminate } }
 }

@@ -25,11 +25,28 @@ internal interface StepScope<I, O> : ReceiveChannel<I>, SendChannel<O>, Mutex {
   val onInsert: SelectClause1<EventIdentifier?>
 }
 
-/** A typealias that describes a step in the FSM. */
-internal typealias Step<I, O, T, S> = suspend StepScope<I, O>.(MutableEventLog<T>) -> S
+internal typealias OutgoingStepScope<T> = StepScope<Inc<T>, Out<T>>
 
-/** A step for [OutgoingState]. */
-internal typealias OutgoingStep<T> = Step<Inc<T>, Out<T>, T, OutgoingState<T>>
+internal typealias IncomingStepScope<T> = StepScope<Out<T>, Inc<T>>
 
-/** A step for [IncomingState]. */
-internal typealias IncomingStep<T> = Step<Out<T>, Inc<T>, T, IncomingState<T>>
+/**
+ * An [Effect] is a sealed class that is used to indicate what the next step of a finite state
+ * machine will be.
+ *
+ * @param T the type of the steps.
+ */
+internal sealed class Effect<out T> {
+
+  /** Moves the state machine to the given [next] state. */
+  data class Move<out T>(val next: T) : Effect<T>()
+
+  /** Moves the state machine to an error state. */
+  data class MoveToError(val problem: Throwable) : Effect<Nothing>()
+
+  /** Terminates (with success) the state machine. */
+  object Terminate : Effect<Nothing>()
+}
+
+internal interface State<I, O, T, S : State<I, O, T, S>> {
+  suspend fun StepScope<I, O>.step(log: MutableEventLog<T>): Effect<S>
+}

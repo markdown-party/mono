@@ -3,10 +3,7 @@
 
 package markdown.echo.logs
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.withLock
 import markdown.echo.Message.V1.Incoming as Inc
@@ -22,7 +19,8 @@ import markdown.echo.causal.SiteIdentifier
  *
  * @param T the type of the events.
  */
-internal sealed class IncomingState<T> {
+// TODO : Update the documentation.
+internal sealed class IncomingState<T> : State<Out<T>, Inc<T>, T, IncomingState<T>> {
 
   companion object {
 
@@ -33,23 +31,6 @@ internal sealed class IncomingState<T> {
             pendingSites = pending.toMutableList(),
         )
   }
-
-  /**
-   * Returns true iff a loop on this state should keep iterating.
-   *
-   * @param incoming the [ReceiveChannel] for events coming from other sites.
-   * @param outgoing the [SendChannel] for events going to other sites.
-   */
-  @OptIn(ExperimentalCoroutinesApi::class)
-  open fun keepGoing(
-      incoming: ReceiveChannel<*>,
-      outgoing: SendChannel<*>,
-  ): Boolean {
-    return !(incoming.isClosedForReceive && outgoing.isClosedForSend)
-  }
-
-  /** Computes the next step. */
-  abstract suspend fun step(): IncomingStep<T>
 }
 
 /**
@@ -57,8 +38,8 @@ internal sealed class IncomingState<T> {
  *
  * @param name the name of the unreachable step.
  */
-private fun notReachable(name: String? = null): Nothing {
-  error("State ${name?.plus(" ")}should not be reachable")
+private fun notReachable(name: String? = null): Throwable {
+  return IllegalStateException("State ${name?.plus(" ")}should not be reachable")
 }
 
 // FINITE STATE MACHINE
@@ -75,33 +56,36 @@ private data class IncomingNew<T>(
     private val pendingSites: MutableList<SiteIdentifier>,
 ) : IncomingState<T>() {
 
-  override suspend fun step(): IncomingStep<T> = { log ->
-    select {
+  override suspend fun IncomingStepScope<T>.step(
+      log: MutableEventLog<T>
+  ): Effect<IncomingState<T>> {
+    return select {
       val pending = pendingSites.lastOrNull()
       if (pending != null) {
         onSend(Inc.Advertisement(pending)) {
           advertisedSites.add(pending)
           pendingSites.removeLast()
-          this@IncomingNew // mutable state updated.
+          Effect.Move(this@IncomingNew) // mutable state updated.
         }
       } else {
         onSend(Inc.Ready) {
-          withLock {
-            IncomingSending<T>(
-                    advertisedSites = advertisedSites,
-                    pendingEvents = emptyList(),
-                    pendingSites = emptyList(),
-                    receivedAcks = emptyMap(),
-                    receivedCredits = emptyMap(),
-                )
-                .update(log)
-          }
+          Effect.Move(
+              withLock {
+                IncomingSending<T>(
+                        advertisedSites = advertisedSites,
+                        pendingEvents = emptyList(),
+                        pendingSites = emptyList(),
+                        receivedAcks = emptyMap(),
+                        receivedCredits = emptyMap(),
+                    )
+                    .update(log)
+              })
         }
       }
       onReceiveOrClosed { v ->
         when (v.valueOrNull) {
-          Out.Done, null -> IncomingCancelling()
-          else -> this@IncomingNew // NoOp. TODO : Handle things differently ?
+          Out.Done, null -> Effect.Move(IncomingCancelling())
+          else -> Effect.Move(this@IncomingNew) // NoOp. TODO : Handle things differently ?
         }
       }
     }
@@ -147,8 +131,10 @@ private data class IncomingSending<T>(
     )
   }
 
-  override suspend fun step(): IncomingStep<T> = { log ->
-    select {
+  override suspend fun IncomingStepScope<T>.step(
+      log: MutableEventLog<T>
+  ): Effect<IncomingState<T>> {
+    return select {
       // Highest priority, generally, is sending events that we may have in the
       // queue.
       // Each exchange can therefore work without interrupting other exchanges.
@@ -161,28 +147,30 @@ private data class IncomingSending<T>(
           val newCredits = receivedCredits + (event.first.site to creditsForSite - 1)
           val newAcks = receivedAcks + (event.first.site to maxOf(event.first.seqno, ackForSite))
           val newEvents = pendingEvents - event
-          IncomingSending(
-              advertisedSites = advertisedSites,
-              pendingEvents = newEvents,
-              pendingSites = pendingSites,
-              receivedAcks = newAcks,
-              receivedCredits = newCredits,
-          )
+          Effect.Move(
+              IncomingSending(
+                  advertisedSites = advertisedSites,
+                  pendingEvents = newEvents,
+                  pendingSites = pendingSites,
+                  receivedAcks = newAcks,
+                  receivedCredits = newCredits,
+              ))
         }
       }
       val firstSite = pendingSites.firstOrNull()
       if (firstSite != null) {
         onSend(Inc.Advertisement(firstSite)) {
-          withLock {
-            IncomingSending(
-                    advertisedSites = advertisedSites.plus(firstSite),
-                    pendingEvents = pendingEvents,
-                    pendingSites = pendingSites.drop(1),
-                    receivedAcks = receivedAcks,
-                    receivedCredits = receivedCredits,
-                )
-                .update(log)
-          }
+          Effect.Move(
+              withLock {
+                IncomingSending(
+                        advertisedSites = advertisedSites.plus(firstSite),
+                        pendingEvents = pendingEvents,
+                        pendingSites = pendingSites.drop(1),
+                        receivedAcks = receivedAcks,
+                        receivedCredits = receivedCredits,
+                    )
+                    .update(log)
+              })
         }
       }
       onReceiveOrClosed { v ->
@@ -192,15 +180,16 @@ private data class IncomingSending<T>(
             val ackForSite = maxOf(receivedAcks[msg.site] ?: msg.nextForSite, msg.nextForSite)
             val newAcks = receivedAcks + (msg.site to ackForSite)
             val newCredits = receivedCredits + (msg.site to msg.count)
-            copy(
-                receivedAcks = newAcks,
-                receivedCredits = newCredits,
-            )
+            Effect.Move(
+                copy(
+                    receivedAcks = newAcks,
+                    receivedCredits = newCredits,
+                ))
           }
-          is Out.Done, null -> IncomingCancelling()
+          is Out.Done, null -> Effect.Move(IncomingCancelling())
         }
       }
-      onInsert { withLock { update(log) } }
+      onInsert { Effect.Move(withLock { update(log) }) }
     }
   }
 }
@@ -208,17 +197,9 @@ private data class IncomingSending<T>(
 // 1. We can send a Done message, and move to Completed.
 private class IncomingCancelling<T> : IncomingState<T>() {
 
-  override suspend fun step(): IncomingStep<T> = {
-    select { onSend(Inc.Done) { IncomingCompleted() } }
+  override suspend fun IncomingStepScope<T>.step(
+      log: MutableEventLog<T>
+  ): Effect<IncomingState<T>> {
+    return select { onSend(Inc.Done) { Effect.Terminate } }
   }
-}
-
-private class IncomingCompleted<T> : IncomingState<T>() {
-
-  override fun keepGoing(
-      incoming: ReceiveChannel<*>,
-      outgoing: SendChannel<*>,
-  ): Boolean = false
-
-  override suspend fun step(): IncomingStep<T> = notReachable("Completed")
 }
