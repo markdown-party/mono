@@ -5,10 +5,11 @@ import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
-import markdown.echo.logs.EventLog
-import markdown.echo.logs.MutableEventLog
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.logs.PersistentEventLog
+import markdown.echo.logs.immutableEventLogOf
 import markdown.echo.logs.internal.OneWayProjectionSite
-import markdown.echo.logs.mutableEventLogOf
+import markdown.echo.logs.persistentEventLogOf
 import markdown.echo.projections.OneWayProjection
 
 /**
@@ -38,11 +39,11 @@ interface MutableSite<T, out M> : Site<T> {
 }
 
 /**
- * A typealias for [MutableSite] that simply expose the underlying [EventLog].
+ * A typealias for [MutableSite] that simply expose the underlying [ImmutableEventLog].
  *
  * @param T the type of the events managed by this [MutableSite].
  */
-typealias MutableEventLogSite<T> = MutableSite<T, EventLog<T>>
+typealias EventLogSite<T> = MutableSite<T, ImmutableEventLog<T>>
 
 /**
  * Creates a new [Site] for the provided [SiteIdentifier], which can not be manually mutated.
@@ -56,18 +57,18 @@ fun <T> site(identifier: SiteIdentifier): Site<T> = mutableSite(identifier)
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [MutableEventLog] for this [MutableSite].
+ * @param log the underlying [PersistentEventLog] for this [MutableSite].
  *
  * @param T the type of the events managed by this [Site].
  */
 fun <T> mutableSite(
     identifier: SiteIdentifier,
-    log: MutableEventLog<T> = mutableEventLogOf(),
-): MutableSite<T, EventLog<T>> =
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
+): MutableSite<T, ImmutableEventLog<T>> =
     OneWayProjectionSite(
         identifier = identifier,
-        log = log,
-        initial = mutableEventLogOf(),
+        log = log.toPersistentEventLog(),
+        initial = persistentEventLogOf(),
     ) { (id, event), model -> model.apply { set(id.seqno, id.site, event) } }
 
 /**
@@ -76,7 +77,7 @@ fun <T> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [MutableEventLog] for this [MutableSite].
+ * @param log the underlying [ImmutableEventLog] for this [MutableSite].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  *
@@ -85,7 +86,7 @@ fun <T> mutableSite(
  */
 fun <M, T> mutableSite(
     identifier: SiteIdentifier,
-    log: MutableEventLog<T> = mutableEventLogOf(),
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
     initial: M,
     projection: OneWayProjection<M, T>
 ): MutableSite<T, M> =
@@ -96,7 +97,8 @@ fun <M, T> mutableSite(
 // TODO : Find a better name.
 fun <M, T> mutableSiteWithIdentifier(
     identifier: SiteIdentifier,
-    log: MutableEventLog<T> = mutableEventLogOf(),
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
     initial: M,
     projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
-): MutableSite<T, M> = OneWayProjectionSite(identifier, log, initial, projection)
+): MutableSite<T, M> =
+    OneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)

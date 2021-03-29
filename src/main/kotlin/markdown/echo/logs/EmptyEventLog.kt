@@ -5,8 +5,8 @@ import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 
-/** An implementation of [EventLog] that's empty. */
-internal object EmptyEventLog : EventLog<Nothing> {
+/** An implementation of [ImmutableEventLog] that's empty. */
+internal object EmptyEventLog : ImmutableEventLog<Nothing> {
 
   override val sites = emptySet<SiteIdentifier>()
 
@@ -20,6 +20,8 @@ internal object EmptyEventLog : EventLog<Nothing> {
       seqno: SequenceNumber,
       site: SiteIdentifier,
   ) = emptyList<Pair<EventIdentifier, Nothing>>()
+
+  override fun toPersistentEventLog(): PersistentEventLog<Nothing> = persistentEventLogOf()
 
   @EchoEventLogPreview
   override fun <R> foldl(

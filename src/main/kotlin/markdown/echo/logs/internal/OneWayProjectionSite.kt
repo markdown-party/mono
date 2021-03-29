@@ -3,6 +3,7 @@ package markdown.echo.logs.internal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,11 +17,12 @@ import markdown.echo.logs.*
 import markdown.echo.projections.OneWayProjection
 
 /**
- * An implementation of [MutableSite] that delegates the management of data to a [MutableEventLog].
- * This way, optimizations can be applied directly at the [EventLog] level.
+ * An implementation of [MutableSite] that delegates the management of data to a
+ * [PersistentEventLog]. This way, optimizations can be applied directly at the [ImmutableEventLog]
+ * level.
  *
  * @param identifier the globally unique identifier for this site.
- * @param log the backing [MutableEventLog].
+ * @param log the backing [PersistentEventLog].
  * @param initial the initial [M].
  * @param projection the [OneWayProjection] that's used.
  *
@@ -34,7 +36,7 @@ import markdown.echo.projections.OneWayProjection
 )
 internal class OneWayProjectionSite<T, M>(
     override val identifier: SiteIdentifier,
-    private val log: MutableEventLog<T> = mutableEventLogOf(),
+    private var log: PersistentEventLog<T> = persistentEventLogOf(),
     private val initial: M,
     private val projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
 ) : MutableSite<T, M> {
@@ -58,16 +60,23 @@ internal class OneWayProjectionSite<T, M>(
   private fun <I, O, S : State<I, O, T, S>> exchange(initial: suspend () -> S) =
       channelLink<I, O> { inc ->
         var state = initial()
-        val insertions = inserted.produceIn(this)
+        val insertions = inserted.map { mutex.withLock { log } }.produceIn(this)
 
         // Prepare some context information for the step.
-        val scope = StepScopeImpl(inc, this, insertions, mutex)
-        val log = SentinelMutableEventLog(log, inserted)
+        val scope =
+            StepScopeImpl(inc, this, insertions) { seqno, site, body: T ->
+              mutex.withLock {
+                // Update the log, and issue an update to all sites if relevant.
+                val update = log[seqno, site] == null
+                log = log.set(seqno, site, body)
+                if (update) inserted.value = EventIdentifier(seqno, site)
+              }
+            }
 
         while (true) {
           // Run the effects, until we've moved to an error state or we were explicitly asked to
           // terminate.
-          when (val effect = with(state) { scope.step(log) }) {
+          when (val effect = with(state) { scope.step(mutex.withLock { log }) }) {
             is Effect.Move -> state = effect.next
             is Effect.MoveToError -> throw effect.problem
             is Effect.Terminate -> break
@@ -94,8 +103,8 @@ internal class OneWayProjectionSite<T, M>(
       val impl =
           object : EventScope<T> {
             override suspend fun yield(event: T): EventIdentifier {
-              log[next, identifier] = event
-              return EventIdentifier(next++, identifier)
+              log = log.set(next, identifier, event)
+              return EventIdentifier(next++, identifier).apply { inserted.value = this }
             }
           }
       scope(impl, model)

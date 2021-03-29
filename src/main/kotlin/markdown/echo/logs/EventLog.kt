@@ -6,43 +6,45 @@ import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 
 /**
- * Creates an empty [EventLog].
+ * Creates an empty [ImmutableEventLog].
  *
  * @param T the type of the events in the log.
  */
-fun <T> emptyEventLog(): EventLog<T> = EmptyEventLog
+fun <T> immutableEventLogOf(): ImmutableEventLog<T> = EmptyEventLog
 
 /**
- * Creates a new instance of [EventLog],
+ * Creates a new instance of [ImmutableEventLog],
  *
  * @param events the pairs of event identifiers and event bodies to include in the log.
  *
  * @param T the type of events in the log.
  */
-fun <T> eventLogOf(
+fun <T> immutableEventLogOf(
     vararg events: Pair<EventIdentifier, T>,
-): EventLog<T> = mutableEventLogOf(*events)
+): ImmutableEventLog<T> = persistentEventLogOf(*events)
 
 /**
- * Creates a new instance of [MutableEventLog].
+ * Creates a new instance of [PersistentEventLog].
  *
  * @param events the pairs of event identifiers and event bodies to include in the log.
  *
  * @param T the type of events in the log.
  */
-fun <T> mutableEventLogOf(
+fun <T> persistentEventLogOf(
     vararg events: Pair<EventIdentifier, T>,
-): MutableEventLog<T> = SortedMapEventLog(*events)
+): PersistentEventLog<T> = PersistentMapEventLog(*events)
 
 /**
- * An [EventLog] is a data structure that contains events of type [T], alongside with their unique
- * identifiers. An [EventLog] has no notion of "current site" or whatsoever; it only acts as the
- * backing store for a set of events, which can be retrieved and traversed in a more or less optimal
- * fashion.
+ * An [ImmutableEventLog] is a data structure that contains events of type [T], alongside with their
+ * unique identifiers. An [ImmutableEventLog] has no notion of "current site" or whatsoever; it only
+ * acts as the backing store for a set of events, which can be retrieved and traversed in a more or
+ * less optimal fashion.
+ *
+ * This collection is immutable, meaning that it can't mutated.
  *
  * @param T the type of of the body of one event.
  */
-interface EventLog<out T> {
+interface ImmutableEventLog<out T> {
 
   /** Returns an [Iterable] of all the [SiteIdentifier] that are known to this [EventLog]. */
   val sites: Set<SiteIdentifier>
@@ -84,15 +86,22 @@ interface EventLog<out T> {
   ): Iterable<Pair<EventIdentifier, T>>
 
   // This API is transient and will be removed in the future.
+  @Deprecated("This will be removed and the folding behavior will be delegated to projections.")
   @EchoEventLogPreview
   fun <R> foldl(
       base: R,
       step: (Pair<EventIdentifier, T>, R) -> R,
   ): R
+
+  /** Transforms this [ImmutableEventLog] to a persistable instance. */
+  fun toPersistentEventLog(): PersistentEventLog<T>
 }
 
-/** A [MutableEventLog] is an [EventLog] which supports the insertion of events. */
-interface MutableEventLog<T> : EventLog<T> {
+/**
+ * A [PersistentEventLog] is an [ImmutableEventLog] which supports the insertion of events. It is an
+ * immutable collection.
+ */
+interface PersistentEventLog<out T> : ImmutableEventLog<T> {
 
   /**
    * Sets the body of the event with a given [seqno] and [site].
@@ -101,9 +110,9 @@ interface MutableEventLog<T> : EventLog<T> {
    * @param site the site of the event.
    * @param body the body of the event.
    */
-  operator fun set(
+  fun set(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-      body: T,
-  )
+      body: @UnsafeVariance T,
+  ): PersistentEventLog<T>
 }

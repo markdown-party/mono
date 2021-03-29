@@ -3,10 +3,10 @@ package markdown.echo.logs
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.SelectClause1
-import kotlinx.coroutines.sync.Mutex
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
-import markdown.echo.causal.EventIdentifier
+import markdown.echo.causal.SequenceNumber
+import markdown.echo.causal.SiteIdentifier
 
 /**
  * A scope that's available when creating the next FSM step. This provides access to the following
@@ -14,20 +14,25 @@ import markdown.echo.causal.EventIdentifier
  *
  * - A [ReceiveChannel] for incoming messages.
  * - A [SendChannel] for outgoing messages.
- * - A [Mutex] for safe concurrent accesses across sites.
  *
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-internal interface StepScope<I, O> : ReceiveChannel<I>, SendChannel<O>, Mutex {
+internal interface StepScope<out I, in O, T> : ReceiveChannel<I>, SendChannel<O> {
 
   /** A [SelectClause1] that's made available when a new value is inserted in the log. */
-  val onInsert: SelectClause1<EventIdentifier?>
+  val onInsert: SelectClause1<ImmutableEventLog<T>>
+
+  /**
+   * Sets the [event] for a certain [seqno] and a given [site]. This will mutate the current site,
+   * but won't affect already emitted [ImmutableEventLog] instances.
+   */
+  suspend fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T)
 }
 
-internal typealias OutgoingStepScope<T> = StepScope<Inc<T>, Out<T>>
+internal typealias OutgoingStepScope<T> = StepScope<Inc<T>, Out<T>, T>
 
-internal typealias IncomingStepScope<T> = StepScope<Out<T>, Inc<T>>
+internal typealias IncomingStepScope<T> = StepScope<Out<T>, Inc<T>, T>
 
 /**
  * An [Effect] is a sealed class that is used to indicate what the next step of a finite state
@@ -47,6 +52,10 @@ internal sealed class Effect<out T> {
   object Terminate : Effect<Nothing>()
 }
 
-internal interface State<I, O, T, S : State<I, O, T, S>> {
-  suspend fun StepScope<I, O>.step(log: MutableEventLog<T>): Effect<S>
+// TODO : Make this a fun interface when b/KT-40165 is fixed.
+/* fun */ internal interface State<I, O, T, S : State<I, O, T, S>> {
+
+  suspend fun StepScope<I, O, T>.step(
+      log: ImmutableEventLog<T>,
+  ): Effect<S>
 }

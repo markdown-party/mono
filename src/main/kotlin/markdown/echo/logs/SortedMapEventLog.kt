@@ -1,33 +1,35 @@
 package markdown.echo.logs
 
-import java.util.*
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.persistentMapOf
 import markdown.echo.EchoEventLogPreview
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
+import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
 
 /**
- * An implementation of a [MutableEventLog] that makes use of [java.util.SortedMap].
+ * An implementation of a [PersistentEventLog] that makes use of [java.util.SortedMap].
  *
  * @param T the type of the body of the events.
  */
-internal class SortedMapEventLog<T>
+// TODO : Rename the file.
+internal class PersistentMapEventLog<T>
 internal constructor(
-    vararg events: Pair<EventIdentifier, T>,
-) : MutableEventLog<T> {
+    private val buffer: PersistentMap<SiteIdentifier, PersistentMap<SequenceNumber, T>>,
+) : PersistentEventLog<T> {
 
-  /**
-   * The sorted structure that associates event identifiers to an operation body. Because event
-   * identifiers are totally ordered, it's possible to efficient iterate on the events from the
-   * [MutableEventLog].
-   */
-  private val buffer = mutableMapOf<SiteIdentifier, SortedMap<SequenceNumber, T>>()
-
-  init {
-    for ((key, value) in events) {
-      this[key.seqno, key.site] = value
-    }
-  }
+  constructor(
+      vararg events: Pair<EventIdentifier, T>,
+  ) : this(
+      events.fold(
+          persistentMapOf<SiteIdentifier, PersistentMap<SequenceNumber, T>>(),
+      ) { acc, (id, event) ->
+        val existing = acc.getOrElse(id.site, ::persistentMapOf)
+        val updated = existing.put(id.seqno, event)
+        acc.put(id.site, updated)
+      },
+  )
 
   override val sites: Set<SiteIdentifier>
     get() = buffer.keys
@@ -35,11 +37,11 @@ internal constructor(
   @EchoEventLogPreview
   override val expected: SequenceNumber
     // TODO : Optimize this to be constant time.
-    get() = buffer.values.maxOfOrNull { it.lastKey() + 1U } ?: SequenceNumber.Zero
+    get() = buffer.keys.maxOfOrNull { expected(it) } ?: Zero
 
   override fun expected(
       site: SiteIdentifier,
-  ) = buffer[site]?.lastKey()?.inc() ?: SequenceNumber.Zero
+  ) = buffer[site]?.maxOfOrNull { it.key }?.inc() ?: Zero
 
   override fun get(
       seqno: SequenceNumber,
@@ -52,7 +54,8 @@ internal constructor(
   ): Iterable<Pair<EventIdentifier, T>> {
     return buffer
         .getOrElse(site) { sortedMapOf() }
-        .tailMap(seqno)
+        .asSequence()
+        .filter { it.key >= seqno }
         .asSequence()
         .map { (seqno, body) -> EventIdentifier(seqno, site) to body }
         .asIterable()
@@ -62,8 +65,10 @@ internal constructor(
       seqno: SequenceNumber,
       site: SiteIdentifier,
       body: T,
-  ) {
-    buffer.getOrPut(site) { sortedMapOf() }[seqno] = body
+  ): PersistentEventLog<T> {
+    val existing = buffer.getOrElse(site, ::persistentMapOf)
+    val updated = existing.put(seqno, body)
+    return PersistentMapEventLog(buffer.put(site, updated))
   }
 
   @EchoEventLogPreview
@@ -82,6 +87,8 @@ internal constructor(
           }
           .sortedBy { it.first }
           .fold(base) { m, p -> step(p, m) }
+
+  override fun toPersistentEventLog(): PersistentEventLog<T> = this
 
   override fun toString(): String {
     return "SortedMapEventLog(buffer: $buffer)"

@@ -9,6 +9,7 @@ group 'markdown.echo'
 version '0.4.0-SNAPSHOT'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -20,6 +21,9 @@ dependencies {
     // Standard library + coroutines.
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+
+    // Kotlinx Immutable Collections
+    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.3"
 }
 
 // TODO : Factorize all Kotlin tasks

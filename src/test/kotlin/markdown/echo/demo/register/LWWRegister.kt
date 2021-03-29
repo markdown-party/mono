@@ -6,7 +6,7 @@ import kotlin.test.fail
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import markdown.echo.MutableEventLogSite
+import markdown.echo.EventLogSite
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.mutableSite
 import markdown.echo.projections.OneWayProjection
@@ -35,7 +35,7 @@ private class LWWProjection<T> : OneWayProjection<T?, LWWRegisterEvent<T>> {
 }
 
 /** A class representing a [LWWRegister]. */
-private class LWWRegister<T>(private val echo: MutableEventLogSite<LWWRegisterEvent<T>>) {
+private class LWWRegister<T>(private val echo: EventLogSite<LWWRegisterEvent<T>>) {
 
   /** The latest available value from the [LWWRegister]. */
   val value: Flow<T?> = echo.projection(null, LWWProjection())

@@ -5,7 +5,6 @@ package markdown.echo.logs
 
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.withLock
 import markdown.echo.EchoEventLogPreview
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
@@ -45,7 +44,7 @@ private data class OutgoingAdvertising<T>(
 ) : OutgoingState<T>() {
 
   @OptIn(InternalCoroutinesApi::class)
-  override suspend fun OutgoingStepScope<T>.step(log: MutableEventLog<T>) =
+  override suspend fun OutgoingStepScope<T>.step(log: ImmutableEventLog<T>) =
       select<Effect<OutgoingState<T>>> {
         onReceiveOrClosed { v ->
           when (val msg = v.valueOrNull) {
@@ -74,11 +73,11 @@ private data class OutgoingListening<T>(
 ) : OutgoingState<T>() {
 
   override suspend fun OutgoingStepScope<T>.step(
-      log: MutableEventLog<T>
+      log: ImmutableEventLog<T>
   ): Effect<OutgoingState<T>> {
     val request = pendingRequests.lastOrNull()
-    val expected = withLock { request?.let(log::expected) } ?: SequenceNumber.Zero
-    val max = withLock { log.expected }
+    val expected = request?.let(log::expected) ?: SequenceNumber.Zero
+    val max = log.expected
 
     return select {
       if (request != null) {
@@ -103,7 +102,7 @@ private data class OutgoingListening<T>(
             Effect.Move(this@OutgoingListening) // mutable state update.
           }
           is Inc.Event -> {
-            withLock { log[msg.seqno, msg.site] = msg.body }
+            set(msg.seqno, msg.site, msg.body)
             Effect.Move(this@OutgoingListening)
           }
           is Inc.Ready -> Effect.MoveToError(notReachable())
@@ -117,6 +116,6 @@ private data class OutgoingListening<T>(
 private class OutgoingCancelling<T> : OutgoingState<T>() {
 
   override suspend fun OutgoingStepScope<T>.step(
-      log: MutableEventLog<T>,
+      log: ImmutableEventLog<T>,
   ) = select<Effect<OutgoingState<T>>> { onSend(Out.Done) { Effect.Terminate } }
 }

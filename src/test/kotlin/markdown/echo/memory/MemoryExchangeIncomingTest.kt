@@ -16,7 +16,7 @@ import markdown.echo.Message.V1.Outgoing as O
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.logs.mutableEventLogOf
+import markdown.echo.logs.persistentEventLogOf
 
 class MemoryExchangeIncomingTest {
 
@@ -58,7 +58,7 @@ class MemoryExchangeIncomingTest {
   fun `Advertises one event and cancels if rendezvous and not empty`() = runBlocking {
     val seqno = SequenceNumber(123U)
     val site = SiteIdentifier(456)
-    val log = mutableEventLogOf(EventIdentifier(seqno, site) to 42)
+    val log = persistentEventLogOf(EventIdentifier(seqno, site) to 42)
     val echo = mutableSite(site, log).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Int>, O<Int>> { incoming ->
@@ -78,7 +78,7 @@ class MemoryExchangeIncomingTest {
     val sites = List(count) { SiteIdentifier.random() }
     val seqno = SequenceNumber.Zero
     val events = sites.map { site -> EventIdentifier(seqno, site) to 123 }
-    val log = mutableEventLogOf(*events.toTypedArray())
+    val log = persistentEventLogOf(*events.toTypedArray())
     val echo = mutableSite(SiteIdentifier.random(), log).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Int>, O<Int>> { incoming ->
@@ -103,7 +103,7 @@ class MemoryExchangeIncomingTest {
   fun `Issues one event on request`() = runBlocking {
     val site = SiteIdentifier(10)
     val seqno = SequenceNumber(150U)
-    val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+    val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
     val echo = mutableSite(SiteIdentifier(0), events).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
@@ -123,7 +123,7 @@ class MemoryExchangeIncomingTest {
   fun `No event is sent if request size is zero`() = runBlocking {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
-    val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+    val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
     val echo = mutableSite(SiteIdentifier(0), events)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
@@ -141,7 +141,7 @@ class MemoryExchangeIncomingTest {
   fun `An event is sent if first request size is zero and second is non-zero`() = runBlocking {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
-    val events = mutableEventLogOf(EventIdentifier(seqno, site) to true)
+    val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
     val echo = mutableSite(SiteIdentifier(0), events)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->

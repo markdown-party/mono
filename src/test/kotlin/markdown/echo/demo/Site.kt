@@ -1,10 +1,10 @@
 package markdown.echo.demo
 
-import markdown.echo.MutableEventLogSite
+import markdown.echo.EventLogSite
 import markdown.echo.MutableSite
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.logs.MutableEventLog
-import markdown.echo.logs.mutableEventLogOf
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.logs.immutableEventLogOf
 import markdown.echo.mutableSite
 
 class Site private constructor() {
@@ -32,7 +32,7 @@ class Site private constructor() {
      */
     fun <T> create(
         identifier: SiteIdentifier,
-        log: MutableEventLog<T> = mutableEventLogOf(),
-    ): MutableEventLogSite<T> = mutableSite(identifier, log)
+        log: ImmutableEventLog<T> = immutableEventLogOf(),
+    ): EventLogSite<T> = mutableSite(identifier, log)
   }
 }

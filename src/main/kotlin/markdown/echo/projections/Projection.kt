@@ -13,9 +13,13 @@ import markdown.echo.ReceiveExchange
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
-import markdown.echo.logs.EventLog
-import markdown.echo.logs.MutableEventLog
-import markdown.echo.logs.mutableEventLogOf
+import markdown.echo.logs.*
+
+fun <T> ReceiveExchange<I<T>, O<T>>.projection(): Flow<ImmutableEventLog<T>> {
+  return projectWithIdentifiers(persistentEventLogOf()) { (id, body), log ->
+    log.set(id.seqno, id.site, body)
+  }
+}
 
 /**
  * Projects the provided [ReceiveExchange] instance with a [OneWayProjection].
@@ -73,7 +77,7 @@ fun <M, T> ReceiveExchange<I<T>, O<T>>.projectWithIdentifiers(
                           is I.Ready ->
                               State.Listening(
                                   advertisedSites = s.advertisedSites,
-                                  log = mutableEventLogOf(),
+                                  log = persistentEventLogOf(),
                               )
                         }
                       }
@@ -103,9 +107,10 @@ fun <M, T> ReceiveExchange<I<T>, O<T>>.projectWithIdentifiers(
                           }
                           is I.Event -> {
                             // Issue the new state now.
-                            s.log[msg.seqno, msg.site] = msg.body
-                            this@channelFlow.send(s.log.aggregate(initial, transform))
-                            return@onReceiveOrClosed s // Updated a mutable state.
+                            val log = s.log.set(msg.seqno, msg.site, msg.body)
+                            val nextState = s.copy(log = log)
+                            this@channelFlow.send(log.aggregate(initial, transform))
+                            return@onReceiveOrClosed nextState
                           }
                           is I.Ready -> error("Ready should not be issued twice.")
                         }
@@ -137,7 +142,7 @@ private sealed class State<out T> {
 
   data class Listening<T>(
       val advertisedSites: MutableList<SiteIdentifier>,
-      val log: MutableEventLog<T>,
+      val log: PersistentEventLog<T>,
   ) : State<T>()
 
   object Cancelling : State<Nothing>()
@@ -145,7 +150,7 @@ private sealed class State<out T> {
 }
 
 @OptIn(EchoEventLogPreview::class)
-private fun <M, T> EventLog<T>.aggregate(
+private fun <M, T> ImmutableEventLog<T>.aggregate(
     model: M,
     transform: OneWayProjection<M, Pair<EventIdentifier, T>>,
 ): M {

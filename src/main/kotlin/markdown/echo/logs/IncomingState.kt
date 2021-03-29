@@ -5,7 +5,6 @@ package markdown.echo.logs
 
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.withLock
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.EventIdentifier
@@ -33,15 +32,6 @@ internal sealed class IncomingState<T> : State<Out<T>, Inc<T>, T, IncomingState<
   }
 }
 
-/**
- * Indicates that a step with the given name should not be reachable.
- *
- * @param name the name of the unreachable step.
- */
-private fun notReachable(name: String? = null): Throwable {
-  return IllegalStateException("State ${name?.plus(" ")}should not be reachable")
-}
-
 // FINITE STATE MACHINE
 
 // 1. We have some pending advertisements to send before we can issue the Ready, so
@@ -57,7 +47,7 @@ private data class IncomingNew<T>(
 ) : IncomingState<T>() {
 
   override suspend fun IncomingStepScope<T>.step(
-      log: MutableEventLog<T>
+      log: ImmutableEventLog<T>
   ): Effect<IncomingState<T>> {
     return select {
       val pending = pendingSites.lastOrNull()
@@ -70,16 +60,14 @@ private data class IncomingNew<T>(
       } else {
         onSend(Inc.Ready) {
           Effect.Move(
-              withLock {
-                IncomingSending<T>(
-                        advertisedSites = advertisedSites,
-                        pendingEvents = emptyList(),
-                        pendingSites = emptyList(),
-                        receivedAcks = emptyMap(),
-                        receivedCredits = emptyMap(),
-                    )
-                    .update(log)
-              })
+              IncomingSending<T>(
+                      advertisedSites = advertisedSites,
+                      pendingEvents = emptyList(),
+                      pendingSites = emptyList(),
+                      receivedAcks = emptyMap(),
+                      receivedCredits = emptyMap(),
+                  )
+                  .update(log))
         }
       }
       onReceiveOrClosed { v ->
@@ -108,7 +96,7 @@ private data class IncomingSending<T>(
    * @param log the [EventLog] that's used to update the [Sending] state.
    */
   fun update(
-      log: EventLog<T>,
+      log: ImmutableEventLog<T>,
   ): IncomingSending<T> {
     val newSites = log.sites - advertisedSites
     val newEvents =
@@ -132,7 +120,7 @@ private data class IncomingSending<T>(
   }
 
   override suspend fun IncomingStepScope<T>.step(
-      log: MutableEventLog<T>
+      log: ImmutableEventLog<T>
   ): Effect<IncomingState<T>> {
     return select {
       // Highest priority, generally, is sending events that we may have in the
@@ -161,16 +149,14 @@ private data class IncomingSending<T>(
       if (firstSite != null) {
         onSend(Inc.Advertisement(firstSite)) {
           Effect.Move(
-              withLock {
-                IncomingSending(
-                        advertisedSites = advertisedSites.plus(firstSite),
-                        pendingEvents = pendingEvents,
-                        pendingSites = pendingSites.drop(1),
-                        receivedAcks = receivedAcks,
-                        receivedCredits = receivedCredits,
-                    )
-                    .update(log)
-              })
+              IncomingSending(
+                      advertisedSites = advertisedSites.plus(firstSite),
+                      pendingEvents = pendingEvents,
+                      pendingSites = pendingSites.drop(1),
+                      receivedAcks = receivedAcks,
+                      receivedCredits = receivedCredits,
+                  )
+                  .update(log))
         }
       }
       onReceiveOrClosed { v ->
@@ -189,7 +175,7 @@ private data class IncomingSending<T>(
           is Out.Done, null -> Effect.Move(IncomingCancelling())
         }
       }
-      onInsert { Effect.Move(withLock { update(log) }) }
+      onInsert { new -> Effect.Move(update(new)) }
     }
   }
 }
@@ -198,7 +184,7 @@ private data class IncomingSending<T>(
 private class IncomingCancelling<T> : IncomingState<T>() {
 
   override suspend fun IncomingStepScope<T>.step(
-      log: MutableEventLog<T>
+      log: ImmutableEventLog<T>
   ): Effect<IncomingState<T>> {
     return select { onSend(Inc.Done) { Effect.Terminate } }
   }
