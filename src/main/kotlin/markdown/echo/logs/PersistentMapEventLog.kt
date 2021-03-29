@@ -9,11 +9,12 @@ import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
 
 /**
- * An implementation of a [PersistentEventLog] that makes use of [java.util.SortedMap].
+ * An implementation of a [PersistentEventLog] that uses persistent data structures.
+ *
+ * @param buffer the backing [PersistentMap] data structure.
  *
  * @param T the type of the body of the events.
  */
-// TODO : Rename the file.
 internal class PersistentMapEventLog<T>
 internal constructor(
     private val buffer: PersistentMap<SiteIdentifier, PersistentMap<SequenceNumber, T>>,
