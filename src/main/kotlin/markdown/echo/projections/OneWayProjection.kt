@@ -7,7 +7,7 @@ package markdown.echo.projections
  * @param M the type of the model.
  * @param T the type of the events.
  */
-fun interface OneWayProjection<M, T> {
+fun interface OneWayProjection<M, in T> {
 
   /** Applies the event [body] to the given [model], and returns a new immutable model. */
   fun forward(body: T, model: M): M

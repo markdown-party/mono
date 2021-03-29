@@ -21,7 +21,7 @@ import markdown.echo.projections.OneWayProjection
  *
  * @param identifier the globally unique identifier for this site.
  * @param log the backing [MutableEventLog].
- * @param model the initial [M].
+ * @param initial the initial [M].
  * @param projection the [OneWayProjection] that's used.
  *
  * @param T the type of the events.
@@ -35,7 +35,7 @@ import markdown.echo.projections.OneWayProjection
 internal class OneWayProjectionSite<T, M>(
     override val identifier: SiteIdentifier,
     private val log: MutableEventLog<T> = mutableEventLogOf(),
-    private val model: M,
+    private val initial: M,
     private val projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
 ) : MutableSite<T, M> {
 
@@ -88,7 +88,7 @@ internal class OneWayProjectionSite<T, M>(
   ) {
     mutex.withLock {
       // TODO : Concurrent modification of log ?
-      val model = log.foldl(model, projection::forward)
+      val model = log.foldl(initial, projection::forward)
       var next = log.expected
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =

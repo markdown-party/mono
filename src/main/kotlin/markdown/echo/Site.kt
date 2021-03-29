@@ -7,7 +7,6 @@ import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
 import markdown.echo.logs.EventLog
 import markdown.echo.logs.MutableEventLog
-import markdown.echo.logs.internal.NoProjectionSite
 import markdown.echo.logs.internal.OneWayProjectionSite
 import markdown.echo.logs.mutableEventLogOf
 import markdown.echo.projections.OneWayProjection
@@ -29,7 +28,7 @@ interface Site<T> : Exchange<Inc<T>, Out<T>> {
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface MutableSite<T, M> : Site<T> {
+interface MutableSite<T, out M> : Site<T> {
 
   /**
    * Creates some new events, that are generated in the [EventScope]. This function returns once the
@@ -64,7 +63,12 @@ fun <T> site(identifier: SiteIdentifier): Site<T> = mutableSite(identifier)
 fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: MutableEventLog<T> = mutableEventLogOf(),
-): MutableSite<T, EventLog<T>> = NoProjectionSite(identifier, log)
+): MutableSite<T, EventLog<T>> =
+    OneWayProjectionSite(
+        identifier = identifier,
+        log = log,
+        initial = mutableEventLogOf(),
+    ) { (id, event), model -> model.apply { set(id.seqno, id.site, event) } }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
