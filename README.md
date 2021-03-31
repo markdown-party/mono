@@ -26,8 +26,10 @@ The library is made available through
 implementation "markdown.party:echo:0.4.0-SNAPSHOT"
 ```
 
-`-SNAPSHOT` releases are regularly released. Every week, the minor version number is incremented.
-When the library becomes stable enough, non- `-SNAPSHOT` releases will be uploaded.
+`-SNAPSHOT` releases are regularly released. During development, the minor version number is often
+incremented.
+
+When the library becomes stable enough, non- `-SNAPSHOT` builds will be released.
 
 ### Using the library
 
