@@ -38,7 +38,7 @@ internal class OneWayProjectionSite<T, M>(
     override val identifier: SiteIdentifier,
     private var log: PersistentEventLog<T> = persistentEventLogOf(),
     private val initial: M,
-    private val projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
+    private val projection: OneWayProjection<M, EventValue<T>>,
 ) : MutableSite<T, M> {
 
   /** A [Mutex] which ensures serial access to the [log] and the [inserted] value. */
@@ -97,7 +97,7 @@ internal class OneWayProjectionSite<T, M>(
   ) {
     mutex.withLock {
       // TODO : Concurrent modification of log ?
-      val model = log.foldl(initial) { (id, event), m -> projection.forward(id to event, m) }
+      val model = log.foldl(initial, projection::forward)
       var next = log.expected
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =

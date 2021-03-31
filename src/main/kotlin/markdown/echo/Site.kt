@@ -5,11 +5,8 @@ import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
-import markdown.echo.logs.ImmutableEventLog
-import markdown.echo.logs.PersistentEventLog
-import markdown.echo.logs.immutableEventLogOf
+import markdown.echo.logs.*
 import markdown.echo.logs.internal.OneWayProjectionSite
-import markdown.echo.logs.persistentEventLogOf
 import markdown.echo.projections.OneWayProjection
 
 /**
@@ -88,17 +85,6 @@ fun <M, T> mutableSite(
     identifier: SiteIdentifier,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
     initial: M,
-    projection: OneWayProjection<M, T>
-): MutableSite<T, M> =
-    mutableSiteWithIdentifier(identifier, log, initial) { body, acc ->
-      projection.forward(body.second, acc)
-    }
-
-// TODO : Find a better name.
-fun <M, T> mutableSiteWithIdentifier(
-    identifier: SiteIdentifier,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
-    initial: M,
-    projection: OneWayProjection<M, Pair<EventIdentifier, T>>,
+    projection: OneWayProjection<M, EventValue<T>>
 ): MutableSite<T, M> =
     OneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)

@@ -7,16 +7,15 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import markdown.echo.EchoEventLogPreview
-import markdown.echo.Message.V1.Incoming as I
-import markdown.echo.Message.V1.Outgoing as O
 import markdown.echo.ReceiveExchange
-import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber.Companion.Zero
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.logs.*
+import markdown.echo.Message.V1.Incoming as I
+import markdown.echo.Message.V1.Outgoing as O
 
 fun <T> ReceiveExchange<I<T>, O<T>>.projection(): Flow<ImmutableEventLog<T>> {
-  return projectWithIdentifiers(persistentEventLogOf()) { (id, body), log ->
+  return projectWithIdentifiers(persistentEventLogOf()) { (id, body): EventValue<T>, log: PersistentEventLog<T> ->
     log.set(id.seqno, id.site, body)
   }
 }
@@ -32,7 +31,7 @@ fun <T> ReceiveExchange<I<T>, O<T>>.projection(): Flow<ImmutableEventLog<T>> {
 fun <M, T> ReceiveExchange<I<T>, O<T>>.projection(
     initial: M,
     transform: OneWayProjection<M, T>,
-): Flow<M> = projectWithIdentifiers(initial) { (_, e), m -> transform.forward(e, m) }
+): Flow<M> = projectWithIdentifiers(initial) { (_, e): EventValue<T>, m : M -> transform.forward(e, m) }
 
 /**
  * Projects the provided [ReceiveExchange] instance with a [OneWayProjection].
@@ -48,7 +47,7 @@ fun <M, T> ReceiveExchange<I<T>, O<T>>.projection(
 )
 fun <M, T> ReceiveExchange<I<T>, O<T>>.projectWithIdentifiers(
     initial: M,
-    transform: OneWayProjection<M, Pair<EventIdentifier, T>>,
+    transform: OneWayProjection<M, EventValue<T>>,
 ): Flow<M> = channelFlow {
 
   // Emit the initial value of the Model.
@@ -152,7 +151,7 @@ private sealed class State<out T> {
 @OptIn(EchoEventLogPreview::class)
 private fun <M, T> ImmutableEventLog<T>.aggregate(
     model: M,
-    transform: OneWayProjection<M, Pair<EventIdentifier, T>>,
+    transform: OneWayProjection<M, EventValue<T>>,
 ): M {
-  return foldl(model) { (id, event), m -> transform.forward(id to event, m)}
+  return foldl(model, transform::forward)
 }

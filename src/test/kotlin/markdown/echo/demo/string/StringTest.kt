@@ -11,7 +11,7 @@ import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.demo.string.StringOperation.InsertAfter
 import markdown.echo.events.EventScope
-import markdown.echo.mutableSiteWithIdentifier
+import markdown.echo.mutableSite
 import markdown.echo.projections.projectWithIdentifiers
 import markdown.echo.sync
 
@@ -58,7 +58,7 @@ class StringTest {
   @Test
   fun `one site is able to write a simple text`(): Unit = runBlocking {
     val alice =
-        mutableSiteWithIdentifier(
+        mutableSite(
             identifier = SiteIdentifier.random(),
             initial = emptyList(),
             projection = StringProjection(),
@@ -79,7 +79,7 @@ class StringTest {
   @Test
   fun `one site can write then delete some text`(): Unit = runBlocking {
     val alice =
-        mutableSiteWithIdentifier(
+        mutableSite(
             identifier = SiteIdentifier(0), initial = emptyList(), projection = StringProjection())
     alice.event { appendStart("Hello World !") }
     alice.event { deleteRange(it, 0, 6) }
@@ -93,13 +93,13 @@ class StringTest {
   @Test
   fun `two sites are able to edit each other's text`(): Unit = runBlocking {
     val alice =
-        mutableSiteWithIdentifier(
+        mutableSite(
             identifier = SiteIdentifier(0),
             initial = emptyList(),
             projection = StringProjection(),
         )
     val bob =
-        mutableSiteWithIdentifier(
+        mutableSite(
             identifier = SiteIdentifier(1),
             initial = emptyList(),
             projection = StringProjection(),
