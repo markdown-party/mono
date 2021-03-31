@@ -7,6 +7,7 @@ import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
 import markdown.echo.logs.*
 import markdown.echo.logs.internal.OrderedOneWayProjectionSite
+import markdown.echo.logs.internal.UnorderedOneWayProjectionSite
 import markdown.echo.projections.OneWayProjection
 
 /**
@@ -63,12 +64,13 @@ fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutabl
 fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-): MutableSite<T, ImmutableEventLog<T>> =
-    OrderedOneWayProjectionSite(
+): EventLogSite<T> =
+    unorderedSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
-    ) { (id, event), model -> model.apply { set(id.seqno, id.site, event) } }
+        projection = { (id, event), model -> model.apply { set(id.seqno, id.site, event) } },
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -84,6 +86,23 @@ fun <T> mutableSite(
  * @param T the type of the events managed by this [Site].
  */
 fun <M, T> mutableSite(
+    identifier: SiteIdentifier,
+    initial: M,
+    projection: OneWayProjection<M, EventValue<T>>,
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
+): MutableSite<T, M> = orderedSite(identifier, initial, projection, log)
+
+// INTERNAL BUILDERS
+
+internal fun <M, T> unorderedSite(
+    identifier: SiteIdentifier,
+    initial: M,
+    projection: OneWayProjection<M, EventValue<T>>,
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
+): MutableSite<T, M> =
+    UnorderedOneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
+
+internal fun <M, T> orderedSite(
     identifier: SiteIdentifier,
     initial: M,
     projection: OneWayProjection<M, EventValue<T>>,
