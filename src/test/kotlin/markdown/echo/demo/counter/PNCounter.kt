@@ -8,8 +8,8 @@ import kotlinx.coroutines.withTimeout
 import markdown.echo.demo.Site
 import markdown.echo.demo.counter.PNCounterEvent.Decrement
 import markdown.echo.demo.counter.PNCounterEvent.Increment
+import markdown.echo.logs.EventValue
 import markdown.echo.projections.OneWayProjection
-import markdown.echo.projections.projection
 import markdown.echo.sync
 
 private sealed class PNCounterEvent {
@@ -22,8 +22,8 @@ private sealed class PNCounterEvent {
 }
 
 private val PNProjection =
-    OneWayProjection<Int, PNCounterEvent> { event, sum ->
-      when (event) {
+    OneWayProjection<Int, EventValue<PNCounterEvent>> { event, sum ->
+      when (event.value) {
         is Increment -> sum + 1
         is Decrement -> sum - 1
       }
@@ -33,7 +33,7 @@ class PNCounterTest {
 
   @Test
   fun `two sites can create a shared counter and eventually sync`(): Unit = runBlocking {
-    val (alice, bob) = Site.createMemoryEchos<PNCounterEvent>()
+    val (alice, bob) = Site.createMemoryEchos(0, PNProjection)
 
     alice.event {
       yield(Decrement)
@@ -54,7 +54,7 @@ class PNCounterTest {
 
     // Finally, look at the resulting set of both sites, and make sure they eventually reach the
     // right result.
-    alice.projection(0, PNProjection).first { it == 1 }
-    bob.projection(0, PNProjection).first { it == 1 }
+    alice.value.first { it == 1 }
+    bob.value.first { it == 1 }
   }
 }

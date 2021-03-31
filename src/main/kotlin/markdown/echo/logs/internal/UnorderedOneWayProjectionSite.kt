@@ -2,6 +2,7 @@ package markdown.echo.logs.internal
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.produceIn
@@ -10,6 +11,7 @@ import kotlinx.coroutines.sync.withLock
 import markdown.echo.EchoEventLogPreview
 import markdown.echo.MutableSite
 import markdown.echo.causal.EventIdentifier
+import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelLink
 import markdown.echo.events.EventScope
@@ -34,7 +36,7 @@ import markdown.echo.projections.OneWayProjection
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
 )
-internal class OneWayProjectionSite<T, M>(
+internal class UnorderedOneWayProjectionSite<T, M>(
     override val identifier: SiteIdentifier,
     private var log: PersistentEventLog<T> = persistentEventLogOf(),
     private val initial: M,
@@ -46,6 +48,32 @@ internal class OneWayProjectionSite<T, M>(
 
   /** A [MutableStateFlow] that acts as a sentinel value that new events were inserted. */
   private val inserted = MutableStateFlow<EventIdentifier?>(null)
+
+  /** The currently set value for the model for this site. */
+  private val current = MutableStateFlow(initial)
+
+  // Delegate to the current value.
+  override val value: Flow<M> = current
+
+  /** Inserts a new event in the log, and updates the different local fields appropriately. */
+  private suspend inline fun mutate(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      event: T,
+  ) =
+      // Update the log, and issue an update to all sites if relevant.
+      mutex.withLock {
+        val update = log[seqno, site] == null
+        if (update) {
+          log = log.set(seqno, site, event)
+          current.value =
+              projection.forward(
+                  EventValue(EventIdentifier(seqno, site), event),
+                  current.value,
+              )
+          inserted.value = EventIdentifier(seqno, site)
+        }
+      }
 
   /**
    * Runs an exchange based on a final state machine. The FSM starts with an [initial] state, and
@@ -64,14 +92,7 @@ internal class OneWayProjectionSite<T, M>(
 
         // Prepare some context information for the step.
         val scope =
-            StepScopeImpl(inc, this, insertions) { seqno, site, body: T ->
-              mutex.withLock {
-                // Update the log, and issue an update to all sites if relevant.
-                val update = log[seqno, site] == null
-                log = log.set(seqno, site, body)
-                if (update) inserted.value = EventIdentifier(seqno, site)
-              }
-            }
+            StepScopeImpl(inc, this, insertions) { seqno, site, body -> mutate(seqno, site, body) }
 
         while (true) {
           // Run the effects, until we've moved to an error state or we were explicitly asked to
@@ -96,14 +117,22 @@ internal class OneWayProjectionSite<T, M>(
       scope: suspend EventScope<T>.(M) -> Unit,
   ) {
     mutex.withLock {
-      // TODO : Concurrent modification of log ?
-      val model = log.foldl(initial, projection::forward)
+      val model = current.value
       var next = log.expected
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =
           object : EventScope<T> {
             override suspend fun yield(event: T): EventIdentifier {
+
+              // Update the log and the projection.
               log = log.set(next, identifier, event)
+              current.value =
+                  projection.forward(
+                      EventValue(EventIdentifier(next, identifier), event),
+                      current.value,
+                  )
+
+              // Increment the event identifier, and notify the notification flows.
               return EventIdentifier(next++, identifier).apply { inserted.value = this }
             }
           }

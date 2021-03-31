@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.logs.EventValue
 import markdown.echo.mutableSite
 import markdown.echo.projections.OneWayProjection
-import markdown.echo.projections.projection
 import markdown.echo.sync
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,10 +17,10 @@ private sealed class GSetEvent<out T> {
 }
 
 private fun <T> gSetProjection() =
-    OneWayProjection<Set<T>, GSetEvent<T>> { event, model ->
-      when (event) {
+    OneWayProjection<Set<T>, EventValue<GSetEvent<T>>> { event, model ->
+      when (val body = event.value) {
         // Add events, and duplicate insertions.
-        is GSetEvent.Add -> model + event.item
+        is GSetEvent.Add -> model + body.item
       }
     }
 
@@ -29,7 +29,11 @@ class GSetTest {
   @Test
   fun `one site can create a set and create new events`() = runBlocking {
     val alice = SiteIdentifier.random()
-    val echo = mutableSite<GSetEvent<Int>>(identifier = alice)
+    val echo = mutableSite(
+      identifier = alice,
+      initial = emptySet<Int>(),
+      projection = gSetProjection(),
+    )
 
     echo.event {
       yield(GSetEvent.Add(1))
@@ -37,7 +41,7 @@ class GSetTest {
       yield(GSetEvent.Add(3))
     }
 
-    val result = echo.projection(emptySet(), gSetProjection()).first { it.size == 3 }
+    val result = echo.value.first { it.size == 3 }
     assertEquals(setOf(1, 2, 3), result)
   }
 
@@ -45,11 +49,19 @@ class GSetTest {
   fun `two sites can create a shared set and eventually sync`() = runBlocking {
     // Create Alice, our first site.
     val alice = SiteIdentifier.random()
-    val aliceEcho = mutableSite<GSetEvent<Int>>(identifier = alice)
+    val aliceEcho = mutableSite(
+      identifier = alice,
+      initial = emptySet<Int>(),
+      projection = gSetProjection(),
+    )
 
     // Create Bob, our second site.
     val bob = SiteIdentifier.random()
-    val bobEcho = mutableSite<GSetEvent<Int>>(identifier = bob)
+    val bobEcho = mutableSite(
+      identifier = bob,
+      initial = emptySet<Int>(),
+      projection = gSetProjection(),
+    )
 
     // Alice adds the elements 1 and 2.
     aliceEcho.event {
@@ -64,8 +76,8 @@ class GSetTest {
       yield(GSetEvent.Add(4))
     }
 
-    val aliceBeforeSync = aliceEcho.projection(emptySet(), gSetProjection()).first { it.size == 2 }
-    val bobBeforeSync = bobEcho.projection(emptySet(), gSetProjection()).first { it.size == 3 }
+    val aliceBeforeSync = aliceEcho.value.first { it.size == 2 }
+    val bobBeforeSync = bobEcho.value.first { it.size == 3 }
 
     // Before sync, both sites have not merged their operations yet.
     assertEquals(setOf(1, 2), aliceBeforeSync)
@@ -78,8 +90,8 @@ class GSetTest {
     } catch (expect: TimeoutCancellationException) {}
 
     // Finally, look at the resulting set of both sites.
-    val aliceAfterSync = aliceEcho.projection(emptySet(), gSetProjection()).first { it.size == 4 }
-    val bobAfterSync = aliceEcho.projection(emptySet(), gSetProjection()).first { it.size == 4 }
+    val aliceAfterSync = aliceEcho.value.first { it.size == 4 }
+    val bobAfterSync = aliceEcho.value.first { it.size == 4 }
 
     // All the events are properly synced.
     val expected = setOf(1, 2, 3, 4)

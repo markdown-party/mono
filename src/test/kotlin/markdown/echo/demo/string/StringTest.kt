@@ -12,7 +12,6 @@ import markdown.echo.causal.SiteIdentifier
 import markdown.echo.demo.string.StringOperation.InsertAfter
 import markdown.echo.events.EventScope
 import markdown.echo.mutableSite
-import markdown.echo.projections.projectWithIdentifiers
 import markdown.echo.sync
 
 class StringTest {
@@ -68,11 +67,7 @@ class StringTest {
     alice.event { appendStart(message) }
 
     // Ensure proper termination.
-    val actual =
-        alice.projectWithIdentifiers(emptyList(), StringProjection()).map { it.asString() }.first {
-          it == message
-        }
-
+    val actual = alice.value.map { it.asString() }.first { it == message }
     assertEquals(message, actual)
   }
 
@@ -80,11 +75,14 @@ class StringTest {
   fun `one site can write then delete some text`(): Unit = runBlocking {
     val alice =
         mutableSite(
-            identifier = SiteIdentifier(0), initial = emptyList(), projection = StringProjection())
+            identifier = SiteIdentifier(0),
+            initial = emptyList(),
+            projection = StringProjection(),
+        )
     alice.event { appendStart("Hello World !") }
     alice.event { deleteRange(it, 0, 6) }
     alice
-        .projectWithIdentifiers(emptyList(), StringProjection())
+        .value
         .map { it.asString() }
         .filter { it == "World !" }
         .first()
@@ -118,12 +116,7 @@ class StringTest {
 
     val expected = "Hello , this is a test ! Hurray !"
 
-    bob.projectWithIdentifiers(emptyList(), StringProjection()).map { it.asString() }.first {
-      it == expected
-    }
-
-    alice.projectWithIdentifiers(emptyList(), StringProjection()).map { it.asString() }.first {
-      it == expected
-    }
+    bob.value.map { it.asString() }.first { it == expected }
+    alice.value.map { it.asString() }.first { it == expected }
   }
 }

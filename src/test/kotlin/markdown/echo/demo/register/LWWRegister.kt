@@ -6,11 +6,11 @@ import kotlin.test.fail
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import markdown.echo.EventLogSite
+import markdown.echo.MutableSite
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.logs.EventValue
 import markdown.echo.mutableSite
 import markdown.echo.projections.OneWayProjection
-import markdown.echo.projections.projection
 import markdown.echo.sync
 
 /**
@@ -25,24 +25,26 @@ private sealed class LWWRegisterEvent<out T> {
   ) : LWWRegisterEvent<T>()
 }
 /** Aggregates the [LWWProjection] events. */
-private class LWWProjection<T> : OneWayProjection<T?, LWWRegisterEvent<T>> {
+private class LWWProjection<T> : OneWayProjection<T?, EventValue<LWWRegisterEvent<T>>> {
 
-  override fun forward(body: LWWRegisterEvent<T>, model: T?): T? =
-      when (body) {
+  override fun forward(body: EventValue<LWWRegisterEvent<T>>, model: T?): T? =
+      when (val event = body.value) {
         // Always pick the latest event value, which has the highest event identifier.
-        is LWWRegisterEvent.Set -> body.value
+        is LWWRegisterEvent.Set -> event.value
       }
 }
 
 /** A class representing a [LWWRegister]. */
-private class LWWRegister<T>(private val echo: EventLogSite<LWWRegisterEvent<T>>) {
+private class LWWRegister<T>(
+    val exchange: MutableSite<LWWRegisterEvent<T>, T?>,
+) {
 
   /** The latest available value from the [LWWRegister]. */
-  val value: Flow<T?> = echo.projection(null, LWWProjection())
+  val value: Flow<T?> = exchange.value
 
   suspend fun set(value: T) {
     // By default, events are added with a highest seqno than whatever they've received until now.
-    echo.event { yield(LWWRegisterEvent.Set(value)) }
+    exchange.event { yield(LWWRegisterEvent.Set(value)) }
   }
 }
 
@@ -51,12 +53,10 @@ class LWWRegisterTest {
   @Test
   fun `two sites eventually converge on a LWW value`(): Unit = runBlocking {
     val alice = SiteIdentifier(123)
-    val aliceExchange = mutableSite<LWWRegisterEvent<Int>>(alice)
-    val aliceRegister = LWWRegister(aliceExchange)
+    val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, LWWProjection()))
 
     val bob = SiteIdentifier(456)
-    val bobExchange = mutableSite<LWWRegisterEvent<Int>>(bob)
-    val bobRegister = LWWRegister(bobExchange)
+    val bobRegister = LWWRegister<Int>(mutableSite(bob, null, LWWProjection()))
 
     aliceRegister.set(123)
     bobRegister.set(456)
@@ -65,7 +65,7 @@ class LWWRegisterTest {
     assertEquals(456, bobRegister.value.filterNotNull().first())
 
     // Sync for a bit.
-    withTimeoutOrNull(1000) { sync(aliceExchange, bobExchange) }
+    withTimeoutOrNull(1000) { sync(aliceRegister.exchange, bobRegister.exchange) }
 
     // Ensure convergence over a non-null value.
     val shared =
@@ -87,7 +87,7 @@ class LWWRegisterTest {
 
     // Set the shared value and sync a bit.
     register.set(789)
-    withTimeoutOrNull(1000) { sync(aliceExchange, bobExchange) }
+    withTimeoutOrNull(1000) { sync(aliceRegister.exchange, bobRegister.exchange) }
 
     // Ensure convergence over a non-null value.
     val result =

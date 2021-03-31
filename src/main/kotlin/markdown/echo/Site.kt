@@ -1,12 +1,12 @@
 package markdown.echo
 
+import kotlinx.coroutines.flow.Flow
 import markdown.echo.Message.V1.Incoming as Inc
 import markdown.echo.Message.V1.Outgoing as Out
-import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
 import markdown.echo.logs.*
-import markdown.echo.logs.internal.OneWayProjectionSite
+import markdown.echo.logs.internal.OrderedOneWayProjectionSite
 import markdown.echo.projections.OneWayProjection
 
 /**
@@ -14,9 +14,11 @@ import markdown.echo.projections.OneWayProjection
  * globally unique [SiteIdentifier].
  *
  * @param T the type of the events managed by this [Site].
+ * @param M the type of the underlying aggregated model for this [Site].
  */
-interface Site<T> : Exchange<Inc<T>, Out<T>> {
+interface Site<T, out M> : Exchange<Inc<T>, Out<T>> {
   val identifier: SiteIdentifier
+  val value: Flow<M>
 }
 
 /**
@@ -26,7 +28,7 @@ interface Site<T> : Exchange<Inc<T>, Out<T>> {
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface MutableSite<T, out M> : Site<T> {
+interface MutableSite<T, out M> : Site<T, M> {
 
   /**
    * Creates some new events, that are generated in the [EventScope]. This function returns once the
@@ -48,7 +50,7 @@ typealias EventLogSite<T> = MutableSite<T, ImmutableEventLog<T>>
  * @param identifier the globally unique identifier for this [Site].
  * @param T the type of the events managed by this [Site].
  */
-fun <T> site(identifier: SiteIdentifier): Site<T> = mutableSite(identifier)
+fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutableSite(identifier)
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -62,7 +64,7 @@ fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
 ): MutableSite<T, ImmutableEventLog<T>> =
-    OneWayProjectionSite(
+    OrderedOneWayProjectionSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
@@ -83,8 +85,8 @@ fun <T> mutableSite(
  */
 fun <M, T> mutableSite(
     identifier: SiteIdentifier,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
     initial: M,
-    projection: OneWayProjection<M, EventValue<T>>
+    projection: OneWayProjection<M, EventValue<T>>,
+    log: ImmutableEventLog<T> = immutableEventLogOf(),
 ): MutableSite<T, M> =
-    OneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
+    OrderedOneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
