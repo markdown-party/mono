@@ -62,46 +62,7 @@ suspend fun <I, O> sync(
     val left = if (index == 0) first else others[index - 1]
     val right = others[index]
 
-    val lIncoming = left.incoming()
-    val lOutgoing = left.outgoing()
-    val rIncoming = right.incoming()
-    val rOutgoing = right.outgoing()
-
-    val lToROutgoing = Channel<O>()
-    val lToRIncoming = Channel<I>()
-    val rToLOutgoing = Channel<O>()
-    val rToLIncoming = Channel<I>()
-
-    launch {
-      lIncoming
-          .talk(rToLOutgoing.consumeAsFlow())
-          .onEach { lToRIncoming.send(it) }
-          .onCompletion { lToRIncoming.close() }
-          .collect()
-    }
-
-    launch {
-      lOutgoing
-          .talk(rToLIncoming.consumeAsFlow())
-          .onEach { lToROutgoing.send(it) }
-          .onCompletion { lToROutgoing.close() }
-          .collect()
-    }
-
-    launch {
-      rIncoming
-          .talk(lToROutgoing.consumeAsFlow())
-          .onEach { rToLIncoming.send(it) }
-          .onCompletion { rToLIncoming.close() }
-          .collect()
-    }
-
-    launch {
-      rOutgoing
-          .talk(lToRIncoming.consumeAsFlow())
-          .onEach { rToLOutgoing.send(it) }
-          .onCompletion { rToLOutgoing.close() }
-          .collect()
-    }
+    launch { sync(left.incoming(), right.outgoing()) }
+    launch { sync(left.outgoing(), right.incoming()) }
   }
 }
