@@ -97,7 +97,7 @@ internal class OneWayProjectionSite<T, M>(
   ) {
     mutex.withLock {
       // TODO : Concurrent modification of log ?
-      val model = log.foldl(initial, projection::forward)
+      val model = log.foldl(initial) { (id, event), m -> projection.forward(id to event, m) }
       var next = log.expected
       // TODO : fun interface when b/KT-40165 is fixed.
       val impl =

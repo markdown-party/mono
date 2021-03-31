@@ -52,13 +52,13 @@ internal constructor(
   override fun events(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Iterable<Pair<EventIdentifier, T>> {
+  ): Iterable<EventValue<T>> {
     return buffer
         .getOrElse(site) { sortedMapOf() }
         .asSequence()
         .filter { it.key >= seqno }
         .asSequence()
-        .map { (seqno, body) -> EventIdentifier(seqno, site) to body }
+        .map { (seqno, body) -> EventValue(EventIdentifier(seqno, site), body) }
         .asIterable()
   }
 
@@ -75,7 +75,7 @@ internal constructor(
   @EchoEventLogPreview
   override fun <R> foldl(
       base: R,
-      step: (Pair<EventIdentifier, T>, R) -> R,
+      step: (EventValue<T>, R) -> R,
   ): R =
       buffer
           .asSequence()
@@ -83,10 +83,10 @@ internal constructor(
             entry.value.asSequence().map {
               val id = EventIdentifier(it.key, entry.key)
               val body = it.value
-              Pair(id, body)
+              EventValue(id, body)
             }
           }
-          .sortedBy { it.first }
+          .sortedBy { it.identifier }
           .fold(base) { m, p -> step(p, m) }
 
   override fun toPersistentEventLog(): PersistentEventLog<T> = this

@@ -83,7 +83,7 @@ private data class IncomingNew<T>(
 // TODO : Optimize with mutable states.
 private data class IncomingSending<T>(
     private val advertisedSites: List<SiteIdentifier>,
-    private val pendingEvents: List<Pair<EventIdentifier, T>>,
+    private val pendingEvents: List<EventValue<T>>,
     private val pendingSites: List<SiteIdentifier>,
     private val receivedAcks: Map<SiteIdentifier, SequenceNumber>,
     private val receivedCredits: Map<SiteIdentifier, Long>,
@@ -128,12 +128,12 @@ private data class IncomingSending<T>(
       // Each exchange can therefore work without interrupting other exchanges.
       val event = pendingEvents.firstOrNull { (id, _) -> receivedCredits[id.site] ?: 0L > 0L }
       if (event != null) {
-        onSend(Inc.Event(site = event.first.site, seqno = event.first.seqno, body = event.second)) {
+        onSend(Inc.Event(site = event.identifier.site, seqno = event.identifier.seqno, body = event.value)) {
           // Diminish credits by one, ack a new operation and update the state.
-          val creditsForSite = receivedCredits[event.first.site] ?: 0L
-          val ackForSite = receivedAcks[event.first.site] ?: event.first.seqno
-          val newCredits = receivedCredits + (event.first.site to creditsForSite - 1)
-          val newAcks = receivedAcks + (event.first.site to maxOf(event.first.seqno, ackForSite))
+          val creditsForSite = receivedCredits[event.identifier.site] ?: 0L
+          val ackForSite = receivedAcks[event.identifier.site] ?: event.identifier.seqno
+          val newCredits = receivedCredits + (event.identifier.site to creditsForSite - 1)
+          val newAcks = receivedAcks + (event.identifier.site to maxOf(event.identifier.seqno, ackForSite))
           val newEvents = pendingEvents - event
           Effect.Move(
               IncomingSending(

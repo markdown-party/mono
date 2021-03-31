@@ -34,6 +34,9 @@ fun <T> persistentEventLogOf(
     vararg events: Pair<EventIdentifier, T>,
 ): PersistentEventLog<T> = PersistentMapEventLog(*events)
 
+/** An alternative to [IndexedValue], identified by a unique [EventIdentifier]. */
+data class EventValue<out T>(val identifier: EventIdentifier, val value: T)
+
 /**
  * An [ImmutableEventLog] is a data structure that contains events of type [T], alongside with their
  * unique identifiers. An [ImmutableEventLog] has no notion of "current site" or whatsoever; it only
@@ -77,20 +80,18 @@ interface ImmutableEventLog<out T> {
    * @param site the site of the event.
    *
    * @return all the events that are equal or higher to this [seqno] for the [site].
-   *
-   * TODO : Use a custom return type ?
    */
   fun events(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Iterable<Pair<EventIdentifier, T>>
+  ): Iterable<EventValue<T>>
 
   // This API is transient and will be removed in the future.
   @Deprecated("This will be removed and the folding behavior will be delegated to projections.")
   @EchoEventLogPreview
   fun <R> foldl(
       base: R,
-      step: (Pair<EventIdentifier, T>, R) -> R,
+      step: (EventValue<T>, R) -> R,
   ): R
 
   /** Transforms this [ImmutableEventLog] to a persistable instance. */

@@ -154,5 +154,5 @@ private fun <M, T> ImmutableEventLog<T>.aggregate(
     model: M,
     transform: OneWayProjection<M, Pair<EventIdentifier, T>>,
 ): M {
-  return foldl(model, transform::forward)
+  return foldl(model) { (id, event), m -> transform.forward(id to event, m)}
 }
