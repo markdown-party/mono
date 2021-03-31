@@ -36,9 +36,12 @@ start by defining the events, as well as a `OneWayProjection` that aggregates th
 
 ```kotlin
 enum class Event { Increment, Decrement }
+typealias State = Int
 
-val counter = OneWayProjection<Int, Event> { op, acc ->
-    when (op) {
+// A simple aggregation function, which increments a value for [Increment] events, and decrements
+// the same value for [Decrement] events.
+val counter = OneWayProjection<Int, EventValue<Event>> { op, acc ->
+    when (op.value) {
         Increment -> acc + 1
         Decrement -> acc - 1
     }
@@ -48,9 +51,23 @@ val counter = OneWayProjection<Int, Event> { op, acc ->
 We can then create a new site, and yield some new events :
 
 ```kotlin
-val site = mutableSite<Event>(SiteIdentifier.random())
+val site = mutableSite<Event, State>(
 
-// This is a suspend fun.
+    // This is the site identifier. It's globally unique, and makes sure multiple sites can't
+    // create identical events.
+    identifier = SiteIdentifier.random(),
+
+    // This is the initial value of the aggregating function. You can see it as the "base state"
+    // of your distributed data structure, or the starting value of the data structure when nobody
+    // has touched it.
+    initial = 0,
+
+    // This is the aggregation function, that aggregates the events in a local state.
+    projection = counter,
+)
+
+// This is a suspend fun, which resumes once the event { ... } block will have been successfully
+// applied to the underlying site.
 site.event {
     yield(Increment)
 }
@@ -59,7 +76,7 @@ site.event {
 It's then possible to observe the values of a site as a cold `Flow` :
 
 ```kotlin
-val total: Flow<Int> = site.projection(initial = 0, counter) // emits [0, 1, ...]
+val total: Flow<State> = site.value // emits [0, 1, ...]
 ```
 
 As new events get `yield` in the `MutableSite`, the cold `Flow` will emit some additional elements
