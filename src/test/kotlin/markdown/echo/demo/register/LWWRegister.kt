@@ -53,10 +53,10 @@ class LWWRegisterTest {
   @Test
   fun `two sites eventually converge on a LWW value`(): Unit = runBlocking {
     val alice = SiteIdentifier(123)
-    val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, LWWProjection()))
+    val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, projection = LWWProjection()))
 
     val bob = SiteIdentifier(456)
-    val bobRegister = LWWRegister<Int>(mutableSite(bob, null, LWWProjection()))
+    val bobRegister = LWWRegister<Int>(mutableSite(bob, null, projection = LWWProjection()))
 
     aliceRegister.set(123)
     bobRegister.set(456)

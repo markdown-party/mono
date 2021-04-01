@@ -69,8 +69,7 @@ fun <T> mutableSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
-        projection = { (id, event), model -> model.apply { set(id.seqno, id.site, event) } },
-    )
+    ) { (id, event), model -> model.apply { set(id.seqno, id.site, event) } }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -88,24 +87,24 @@ fun <T> mutableSite(
 fun <M, T> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    projection: OneWayProjection<M, EventValue<T>>,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-): MutableSite<T, M> = orderedSite(identifier, initial, projection, log)
+    projection: OneWayProjection<M, EventValue<T>>,
+): MutableSite<T, M> = orderedSite(identifier, initial, log, projection)
 
 // INTERNAL BUILDERS
 
 internal fun <M, T> unorderedSite(
     identifier: SiteIdentifier,
     initial: M,
-    projection: OneWayProjection<M, EventValue<T>>,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
+    projection: OneWayProjection<M, EventValue<T>>,
 ): MutableSite<T, M> =
     UnorderedOneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
 
 internal fun <M, T> orderedSite(
     identifier: SiteIdentifier,
     initial: M,
-    projection: OneWayProjection<M, EventValue<T>>,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
+    projection: OneWayProjection<M, EventValue<T>>,
 ): MutableSite<T, M> =
     OrderedOneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
