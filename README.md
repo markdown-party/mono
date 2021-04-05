@@ -17,21 +17,9 @@ editor. Feel free to reach out to me at
 
 ### Installation
 
-The library is made available through
-[GitHub packages](https://github.com/markdown-party/kotlin-echo/packages). Assuming you've properly
-[set up your access credentials](https://docs.github.com/en/packages/guides/configuring-apache-maven-for-use-with-github-packages)
-, you can then add the following dependency in your `build.gradle` file :
+To be announced.
 
-```groovy
-implementation "markdown.party:echo:0.4.0-SNAPSHOT"
-```
-
-`-SNAPSHOT` releases are regularly released. During development, the minor version number is often
-incremented.
-
-When the library becomes stable enough, non- `-SNAPSHOT` builds will be released.
-
-### Using the library
+### Usage example
 
 Let's implement a distributed counter, which lets sites increment and decrement a shared value. We
 start by defining the events, as well as a `OneWayProjection` that aggregates them :
@@ -100,7 +88,7 @@ Additional examples are available in the [demo folder](src/test/kotlin/markdown/
 
 ## Local setup
 
-This project uses Kotlin 1.4.30 and is build with [Gradle](https://gradle.org). To run the unit
+This project uses Kotlin 1.4.32 and is build with [Gradle](https://gradle.org). To run the unit
 tests locally, please proceed as follows :
 
 ```bash
