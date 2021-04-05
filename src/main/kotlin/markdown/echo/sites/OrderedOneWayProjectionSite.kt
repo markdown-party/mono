@@ -1,4 +1,4 @@
-package markdown.echo.logs.internal
+package markdown.echo.sites
 
 import kotlinx.coroutines.flow.map
 import markdown.echo.EchoEventLogPreview

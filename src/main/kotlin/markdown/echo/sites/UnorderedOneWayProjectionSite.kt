@@ -1,4 +1,4 @@
-package markdown.echo.logs.internal
+package markdown.echo.sites
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -15,8 +15,15 @@ import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.channelLink
 import markdown.echo.events.EventScope
-import markdown.echo.logs.*
+import markdown.echo.logs.EventValue
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.logs.PersistentEventLog
+import markdown.echo.logs.persistentEventLogOf
 import markdown.echo.projections.OneWayProjection
+import markdown.echo.protocol.fsm.Effect
+import markdown.echo.protocol.fsm.IncomingState
+import markdown.echo.protocol.fsm.OutgoingState
+import markdown.echo.protocol.fsm.State
 
 /**
  * An implementation of [MutableSite] that delegates the management of data to a

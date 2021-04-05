@@ -1,9 +1,9 @@
-package markdown.echo
+package markdown.echo.protocol
 
-import markdown.echo.Message.V1.Incoming
-import markdown.echo.Message.V1.Outgoing
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.protocol.Message.V1.Incoming
+import markdown.echo.protocol.Message.V1.Outgoing
 
 /**
  * A global namespace for the messages that are supported by the Echo replication protocol. You'll
@@ -25,15 +25,15 @@ object Message {
    * - The sender answers the requests with the right events, and advertises when new events are
    * available that the receiver might not know about.
    *
-   * In a real-world [Exchange], both sites play both roles simultaneously. Because messages and roles
-   * are clearly separated between the server and the receiver, it's possible for sites to perform
-   * as a sender and a receiver simultaneously with a single communication channel.
+   * In a real-world [Exchange], both sites play both roles simultaneously. Because messages and
+   * roles are clearly separated between the server and the receiver, it's possible for sites to
+   * perform as a sender and a receiver simultaneously with a single communication channel.
    *
    * ## Backpressure and termination
    *
-   * This iteration of the protocol introduces a notion of backpressure by the receiver. Instead
-   * of receiving all the events of the sender as they are produced, it becomes the responsibility
-   * of the receiver to clearly indicate how many events they want delivered from the sender.
+   * This iteration of the protocol introduces a notion of backpressure by the receiver. Instead of
+   * receiving all the events of the sender as they are produced, it becomes the responsibility of
+   * the receiver to clearly indicate how many events they want delivered from the sender.
    *
    * This has a few benefits :
    *
@@ -113,9 +113,9 @@ object Message {
       ) : Incoming<T>()
 
       /**
-       * Indicates that the [Incoming] side of the [Link] would like to terminate the
-       * communication. Once the [Done] message is emitted, the [Incoming] side will drain all the
-       * in-flight messages until the other side's [Outgoing.Done] message is received.
+       * Indicates that the [Incoming] side of the [Link] would like to terminate the communication.
+       * Once the [Done] message is emitted, the [Incoming] side will drain all the in-flight
+       * messages until the other side's [Outgoing.Done] message is received.
        *
        * Afterwards, both sites may disconnect.
        */
@@ -151,9 +151,9 @@ object Message {
       ) : Outgoing<Nothing>()
 
       /**
-       * Indicates that the [Outgoing] side of the [Link] would like to terminate the
-       * communication. Once the [Done] message is emitted, the [Outgoing] side will drain all the
-       * in-flight messages until the other's side [Incoming.Done] message is received.
+       * Indicates that the [Outgoing] side of the [Link] would like to terminate the communication.
+       * Once the [Done] message is emitted, the [Outgoing] side will drain all the in-flight
+       * messages until the other's side [Incoming.Done] message is received.
        *
        * Afterwards, both sites may disconnect.
        */

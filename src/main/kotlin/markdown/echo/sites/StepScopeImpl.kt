@@ -1,4 +1,4 @@
-package markdown.echo.logs.internal
+package markdown.echo.sites
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
@@ -6,7 +6,7 @@ import kotlinx.coroutines.selects.SelectClause1
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.logs.ImmutableEventLog
-import markdown.echo.logs.StepScope
+import markdown.echo.protocol.fsm.StepScope
 
 /** An implementation of [StepScope] that delegates behaviors. */
 internal class StepScopeImpl<I, O, T>(

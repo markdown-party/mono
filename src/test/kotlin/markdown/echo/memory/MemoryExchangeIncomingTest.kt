@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import markdown.echo.*
-import markdown.echo.Message.V1.Incoming as I
-import markdown.echo.Message.V1.Outgoing as O
+import markdown.echo.protocol.Message.V1.Incoming as I
+import markdown.echo.protocol.Message.V1.Outgoing as O
 import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier

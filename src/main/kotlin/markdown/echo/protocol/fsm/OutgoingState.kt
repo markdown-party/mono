@@ -1,15 +1,16 @@
 @file:OptIn(InternalCoroutinesApi::class)
 @file:Suppress("SameParameterValue")
 
-package markdown.echo.logs
+package markdown.echo.protocol.fsm
 
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
 import markdown.echo.EchoEventLogPreview
-import markdown.echo.Message.V1.Incoming as Inc
-import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.protocol.Message.V1.Incoming as Inc
+import markdown.echo.protocol.Message.V1.Outgoing as Out
 
 /**
  * A sealed class representing the different states that the finite state machine may be in. Each

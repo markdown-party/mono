@@ -1,14 +1,14 @@
 package markdown.echo
 
 import kotlinx.coroutines.flow.Flow
-import markdown.echo.Message.V1.Incoming as Inc
-import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.SiteIdentifier
 import markdown.echo.events.EventScope
 import markdown.echo.logs.*
-import markdown.echo.logs.internal.OrderedOneWayProjectionSite
-import markdown.echo.logs.internal.UnorderedOneWayProjectionSite
 import markdown.echo.projections.OneWayProjection
+import markdown.echo.protocol.Message.V1.Incoming as Inc
+import markdown.echo.protocol.Message.V1.Outgoing as Out
+import markdown.echo.sites.OrderedOneWayProjectionSite
+import markdown.echo.sites.UnorderedOneWayProjectionSite
 
 /**
  * An interface describing a [Site] in the distributed system. Each [Site] is associated with a

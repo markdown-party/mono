@@ -1,12 +1,13 @@
-package markdown.echo.logs
+package markdown.echo.protocol.fsm
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.SelectClause1
-import markdown.echo.Message.V1.Incoming as Inc
-import markdown.echo.Message.V1.Outgoing as Out
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.protocol.Message.V1.Incoming as Inc
+import markdown.echo.protocol.Message.V1.Outgoing as Out
 
 /**
  * A scope that's available when creating the next FSM step. This provides access to the following
@@ -30,8 +31,10 @@ internal interface StepScope<out I, in O, T> : ReceiveChannel<I>, SendChannel<O>
   suspend fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T)
 }
 
+/** A specific version of [StepScope] that receives [Inc] messages and sends [Out] messages. */
 internal typealias OutgoingStepScope<T> = StepScope<Inc<T>, Out<T>, T>
 
+/** A specific version of [StepScope] that receives [Out] messages and sends [Inc] messages. */
 internal typealias IncomingStepScope<T> = StepScope<Out<T>, Inc<T>, T>
 
 /**
@@ -52,9 +55,27 @@ internal sealed class Effect<out T> {
   object Terminate : Effect<Nothing>()
 }
 
+/**
+ * An interface defining a [State] from a final state machine. When the [step] function is invoked,
+ * the [State] chooses what state to move in in a suspending fashion. It has access to the following
+ * information :
+ *
+ * - Received messages of type [I].
+ * - Sent messages of type [O].
+ * - The current [ImmutableEventLog], with events of type [T].
+ *
+ * At the end of the [step] invocation, an [Effect] is issued, which determines what the next FSM
+ * state will be.
+ *
+ * @param I the type of the received messages.
+ * @param O the type of the sent messages.
+ * @param T the type of the body of the events.
+ * @param S the type of the [Effect] states.
+ */
 // TODO : Make this a fun interface when b/KT-40165 is fixed.
 /* fun */ internal interface State<I, O, T, S : State<I, O, T, S>> {
 
+  /** Performs a suspending step of this FSM. */
   suspend fun StepScope<I, O, T>.step(
       log: ImmutableEventLog<T>,
   ): Effect<S>

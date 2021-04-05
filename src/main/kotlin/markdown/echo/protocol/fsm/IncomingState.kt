@@ -1,15 +1,16 @@
 @file:OptIn(InternalCoroutinesApi::class)
 @file:Suppress("SameParameterValue")
 
-package markdown.echo.logs
+package markdown.echo.protocol.fsm
 
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
-import markdown.echo.Message.V1.Incoming as Inc
-import markdown.echo.Message.V1.Outgoing as Out
-import markdown.echo.causal.EventIdentifier
 import markdown.echo.causal.SequenceNumber
 import markdown.echo.causal.SiteIdentifier
+import markdown.echo.logs.EventValue
+import markdown.echo.logs.ImmutableEventLog
+import markdown.echo.protocol.Message.V1.Incoming as Inc
+import markdown.echo.protocol.Message.V1.Outgoing as Out
 
 /**
  * A sealed class representing the different states that the finite state machine may be in. Each
@@ -128,12 +129,15 @@ private data class IncomingSending<T>(
       // Each exchange can therefore work without interrupting other exchanges.
       val event = pendingEvents.firstOrNull { (id, _) -> receivedCredits[id.site] ?: 0L > 0L }
       if (event != null) {
-        onSend(Inc.Event(site = event.identifier.site, seqno = event.identifier.seqno, body = event.value)) {
+        onSend(
+            Inc.Event(
+                site = event.identifier.site, seqno = event.identifier.seqno, body = event.value)) {
           // Diminish credits by one, ack a new operation and update the state.
           val creditsForSite = receivedCredits[event.identifier.site] ?: 0L
           val ackForSite = receivedAcks[event.identifier.site] ?: event.identifier.seqno
           val newCredits = receivedCredits + (event.identifier.site to creditsForSite - 1)
-          val newAcks = receivedAcks + (event.identifier.site to maxOf(event.identifier.seqno, ackForSite))
+          val newAcks =
+              receivedAcks + (event.identifier.site to maxOf(event.identifier.seqno, ackForSite))
           val newEvents = pendingEvents - event
           Effect.Move(
               IncomingSending(
