@@ -8,8 +8,8 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        implementation(project(":echo"))
-        implementation(Deps.Kotlinx.SerializationJson)
+        api(project(":echo"))
+        api(Deps.Kotlinx.SerializationJson)
       }
     }
   }
