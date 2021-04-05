@@ -1,73 +1,11 @@
-plugins {
-    id "java"
-    id 'org.jetbrains.kotlin.jvm' version '1.4.30'
-
-    id 'maven-publish'
-}
-
-group 'markdown.echo'
-version '0.4.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit5:1.4.30"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
-
-    // Standard library + coroutines.
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
-
-    // Kotlinx Immutable Collections
-    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4"
-}
-
-// TODO : Factorize all Kotlin tasks
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
-        freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
-
-        freeCompilerArgs += ["-Xopt-in=kotlin.ExperimentalUnsignedTypes"] // Unsigned numbers.
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"] // Used to define custom @OptIn.
-        freeCompilerArgs += ["-Xinline-classes"]              // Reaching Beta stability in KT 1.5
-
-        freeCompilerArgs += ["-Xopt-in=kotlin.ExperimentalUnsignedTypes"] // Unsigned numbers.
-    }
-}
-
-
-test {
-    useJUnitPlatform()
-}
-
-publishing {
+buildscript {
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/markdown-party/kotlin-echo")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        mavenCentral()
     }
-    publications {
-        gpr(MavenPublication) {
-            groupId = "markdown.party"
-            artifactId = "echo"
-            from components.java
-        }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
     }
 }
