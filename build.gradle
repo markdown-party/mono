@@ -23,7 +23,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
 
     // Kotlinx Immutable Collections
-    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4"
 }
 
 // TODO : Factorize all Kotlin tasks
