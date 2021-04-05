@@ -9,7 +9,6 @@ group 'markdown.echo'
 version '0.4.0-SNAPSHOT'
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
