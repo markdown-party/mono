@@ -2,12 +2,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins { kotlin("multiplatform") version Versions.Kotlin }
 
-repositories {
-  mavenCentral()
-  jcenter()
-  maven { url = uri("https://dl.bintray.com/kotlin/kotlinx") }
-}
-
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     val options = listOf(

@@ -8,7 +8,7 @@ import kotlin.random.Random
  * TODO : Make sure there is enough entropy.
  */
 inline class SiteIdentifier
-internal constructor(
+constructor(
     internal val unique: Int,
 ) {
 
@@ -20,3 +20,5 @@ internal constructor(
     fun random(): SiteIdentifier = SiteIdentifier(unique = Random.nextInt())
   }
 }
+
+fun SiteIdentifier.toInt(): Int = unique

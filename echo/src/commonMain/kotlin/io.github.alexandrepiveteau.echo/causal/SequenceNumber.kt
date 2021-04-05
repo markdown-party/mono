@@ -10,7 +10,7 @@ import io.github.alexandrepiveteau.echo.util.plusBoundOverflows
  * implies increasing sequence numbers.
  */
 inline class SequenceNumber
-internal constructor(
+constructor(
     internal val index: UInt,
 ) : Comparable<SequenceNumber> {
   operator fun inc(): SequenceNumber = plus(1U)
@@ -31,3 +31,5 @@ internal constructor(
     val Max: SequenceNumber = SequenceNumber(UInt.MAX_VALUE)
   }
 }
+
+fun SequenceNumber.toUInt(): UInt = index

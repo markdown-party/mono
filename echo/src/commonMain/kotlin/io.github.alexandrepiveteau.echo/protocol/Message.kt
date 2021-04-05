@@ -120,6 +120,8 @@ object Message {
        * Afterwards, both sites may disconnect.
        */
       object Done : Incoming<Nothing>()
+
+      companion object
     }
 
     sealed class Outgoing<out T> : V1<T>() {
@@ -158,6 +160,8 @@ object Message {
        * Afterwards, both sites may disconnect.
        */
       object Done : Outgoing<Nothing>()
+
+      companion object
     }
   }
 }
