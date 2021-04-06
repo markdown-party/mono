@@ -16,9 +16,9 @@ import kotlinx.coroutines.flow.map
  * @param outgoing transforms the outgoing messages to the new message type.
  */
 fun <I1, O1, I2, O2> Link<I1, O1>.coding(
-    incoming: suspend (I2) -> I1,
-    outgoing: suspend (O1) -> O2,
-): Link<I2, O2> = Link { this.talk(it.map(incoming)).map(outgoing) }
+    incoming: (I2) -> I1,
+    outgoing: (O1) -> O2,
+): Link<I2, O2> = Link { this.talk(it.map { e -> incoming(e) }).map { e -> outgoing(e) } }
 
 /**
  * A simple bi-directional encoding and decoding mechanism.
@@ -27,15 +27,15 @@ fun <I1, O1, I2, O2> Link<I1, O1>.coding(
  * @param O the type of the encoded content.
  */
 interface Coder<I, O> {
-  suspend fun encode(it: I): O
-  suspend fun decode(it: O): I
+  fun encode(it: I): O
+  fun decode(it: O): I
 }
 
 /** Reverses a [Coder] implementation. */
 fun <I, O> Coder<I, O>.reversed(): Coder<O, I> =
     object : Coder<O, I> {
-      override suspend fun encode(it: O) = this@reversed.decode(it)
-      override suspend fun decode(it: I) = this@reversed.encode(it)
+      override fun encode(it: O) = this@reversed.decode(it)
+      override fun decode(it: I) = this@reversed.encode(it)
     }
 
 /**

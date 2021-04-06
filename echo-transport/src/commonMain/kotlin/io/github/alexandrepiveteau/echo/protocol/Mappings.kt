@@ -10,20 +10,22 @@ import io.github.alexandrepiveteau.echo.causal.toUInt
  *
  * @param T the type of the event body.
  */
-fun <T> Message.V1.Incoming<T>.toTransport(): Transport.V1.Incoming<T> =
+fun <T> Message.V1.Incoming<T>.toTransport(
+    encode: (T) -> String,
+): Transport.V1.Incoming =
     when (this) {
       is Message.V1.Incoming.Advertisement ->
           Transport.V1.Incoming.Advertisement(
               site = this.site.toInt(),
           )
-      is Message.V1.Incoming.Ready -> Transport.V1.Incoming.Ready()
+      is Message.V1.Incoming.Ready -> Transport.V1.Incoming.Ready
       is Message.V1.Incoming.Event ->
           Transport.V1.Incoming.Event(
               seqno = this.seqno.toUInt().toInt(),
               site = this.site.toInt(),
-              body = this.body,
+              body = encode(this.body),
           )
-      is Message.V1.Incoming.Done -> Transport.V1.Incoming.Done()
+      is Message.V1.Incoming.Done -> Transport.V1.Incoming.Done
     }
 
 /**
@@ -31,7 +33,7 @@ fun <T> Message.V1.Incoming<T>.toTransport(): Transport.V1.Incoming<T> =
  *
  * @param T the type the event body.
  */
-fun <T> Message.V1.Outgoing<T>.toTransport(): Transport.V1.Outgoing<T> =
+fun <T> Message.V1.Outgoing<T>.toTransport(): Transport.V1.Outgoing =
     when (this) {
       is Message.V1.Outgoing.Request ->
           Transport.V1.Outgoing.Request(
@@ -40,7 +42,7 @@ fun <T> Message.V1.Outgoing<T>.toTransport(): Transport.V1.Outgoing<T> =
               count = this.count,
               site = this.site.toInt(),
           )
-      is Message.V1.Outgoing.Done -> Transport.V1.Outgoing.Done()
+      is Message.V1.Outgoing.Done -> Transport.V1.Outgoing.Done
     }
 
 /**
@@ -48,7 +50,9 @@ fun <T> Message.V1.Outgoing<T>.toTransport(): Transport.V1.Outgoing<T> =
  *
  * @param T the type of the event body.
  */
-fun <T> Transport.V1.Incoming<T>.toMessage(): Message.V1.Incoming<T> =
+fun <T> Transport.V1.Incoming.toMessage(
+    decode: (String) -> T,
+): Message.V1.Incoming<T> =
     when (this) {
       is Transport.V1.Incoming.Advertisement ->
           Message.V1.Incoming.Advertisement(
@@ -59,7 +63,7 @@ fun <T> Transport.V1.Incoming<T>.toMessage(): Message.V1.Incoming<T> =
           Message.V1.Incoming.Event(
               site = SiteIdentifier(unique = this.site),
               seqno = SequenceNumber(index = this.seqno.toUInt()),
-              body = this.body,
+              body = decode(this.body),
           )
       is Transport.V1.Incoming.Done -> Message.V1.Incoming.Done
     }
@@ -69,7 +73,7 @@ fun <T> Transport.V1.Incoming<T>.toMessage(): Message.V1.Incoming<T> =
  *
  * @param T the type of the event body.
  */
-fun <T> Transport.V1.Outgoing<T>.toMessage(): Message.V1.Outgoing<T> =
+fun <T> Transport.V1.Outgoing.toMessage(): Message.V1.Outgoing<T> =
     when (this) {
       is Transport.V1.Outgoing.Request ->
           Message.V1.Outgoing.Request(

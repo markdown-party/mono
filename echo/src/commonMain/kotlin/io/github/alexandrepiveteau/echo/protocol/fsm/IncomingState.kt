@@ -74,7 +74,7 @@ private data class IncomingNew<T>(
       onReceiveOrClosed { v ->
         when (v.valueOrNull) {
           Out.Done, null -> Effect.Move(IncomingCancelling())
-          else -> Effect.Move(this@IncomingNew) // NoOp. TODO : Handle things differently ?
+          else -> Effect.MoveToError(IllegalStateException(/* TODO */ ))
         }
       }
     }

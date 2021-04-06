@@ -10,10 +10,12 @@ import io.github.alexandrepiveteau.echo.reversed
  *
  * @param T the type of the event body.
  */
-fun <T> Message.V1.Incoming.Companion.coder() =
-    object : Coder<Message.V1.Incoming<T>, Transport.V1.Incoming<T>> {
-      override suspend fun encode(it: Message.V1.Incoming<T>) = it.toTransport()
-      override suspend fun decode(it: Transport.V1.Incoming<T>) = it.toMessage()
+fun <T> Message.V1.Incoming.Companion.coder(
+    coder: Coder<T, String>,
+) =
+    object : Coder<Message.V1.Incoming<T>, Transport.V1.Incoming> {
+      override fun encode(it: Message.V1.Incoming<T>) = it.toTransport(coder::encode)
+      override fun decode(it: Transport.V1.Incoming) = it.toMessage(coder::decode)
     }
 
 /**
@@ -22,9 +24,9 @@ fun <T> Message.V1.Incoming.Companion.coder() =
  * @param T the type of the event body.
  */
 fun <T> Message.V1.Outgoing.Companion.coder() =
-    object : Coder<Message.V1.Outgoing<T>, Transport.V1.Outgoing<T>> {
-      override suspend fun encode(it: Message.V1.Outgoing<T>) = it.toTransport()
-      override suspend fun decode(it: Transport.V1.Outgoing<T>) = it.toMessage()
+    object : Coder<Message.V1.Outgoing<T>, Transport.V1.Outgoing> {
+      override fun encode(it: Message.V1.Outgoing<T>) = it.toTransport()
+      override fun decode(it: Transport.V1.Outgoing) = it.toMessage<T>()
     }
 
 /**
@@ -32,9 +34,11 @@ fun <T> Message.V1.Outgoing.Companion.coder() =
  *
  * @param T the type of the event body.
  */
-fun <T> Exchange<Message.V1.Incoming<T>, Message.V1.Outgoing<T>>.encode() =
+fun <T> Exchange<Message.V1.Incoming<T>, Message.V1.Outgoing<T>>.encode(
+    coder: Coder<T, String>,
+) =
     coding(
-        incoming = Message.V1.Incoming.coder(),
+        incoming = Message.V1.Incoming.coder(coder),
         outgoing = Message.V1.Outgoing.coder(),
     )
 
@@ -43,8 +47,10 @@ fun <T> Exchange<Message.V1.Incoming<T>, Message.V1.Outgoing<T>>.encode() =
  *
  * @param T the type of the event body.
  */
-fun <T> Exchange<Transport.V1.Incoming<T>, Transport.V1.Outgoing<T>>.decode() =
+fun <T> Exchange<Transport.V1.Incoming, Transport.V1.Outgoing>.decode(
+    coder: Coder<T, String>,
+) =
     coding(
-        incoming = Message.V1.Incoming.coder<T>().reversed(),
+        incoming = Message.V1.Incoming.coder(coder).reversed(),
         outgoing = Message.V1.Outgoing.coder<T>().reversed(),
     )

@@ -6,48 +6,48 @@ object Transport {
 
   /** @see Message.V1 */
   @Serializable
-  sealed class V1<out T> {
+  sealed class V1 {
 
     /** @see Message.V1.Incoming */
     @Serializable
-    sealed class Incoming<out T> : V1<T>() {
+    sealed class Incoming : V1() {
 
       /** @see Message.V1.Incoming.Advertisement */
       @Serializable
-      data class Advertisement<out T>(
+      data class Advertisement(
           val site: Int,
-      ) : Incoming<T>()
+      ) : Incoming()
 
       /** @see Message.V1.Incoming.Ready */
-      @Serializable class Ready<out T> : Incoming<T>()
+      @Serializable object Ready : Incoming()
 
       /** @see Message.V1.Incoming.Event */
       @Serializable
-      data class Event<out T>(
+      data class Event(
           val seqno: Int,
           val site: Int,
-          val body: T,
-      ) : Incoming<T>()
+          val body: String,
+      ) : Incoming()
 
       /** @see Message.V1.Incoming.Done */
-      @Serializable class Done<out T> : Incoming<T>()
+      @Serializable object Done : Incoming()
     }
 
     /** @see Message.V1.Outgoing */
     @Serializable
-    sealed class Outgoing<out T> : V1<T>() {
+    sealed class Outgoing : V1() {
 
       /** @see Message.V1.Outgoing.Request */
       @Serializable
-      data class Request<out T>(
+      data class Request(
           val nextForAll: Int,
           val nextForSite: Int,
           val site: Int,
           val count: Long,
-      ) : Outgoing<T>()
+      ) : Outgoing()
 
       /** @see Message.V1.Outgoing.Done */
-      @Serializable class Done<out T> : Outgoing<T>()
+      @Serializable object Done : Outgoing()
     }
   }
 }

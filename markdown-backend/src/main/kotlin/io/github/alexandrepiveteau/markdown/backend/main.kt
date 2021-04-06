@@ -1,26 +1,31 @@
 package io.github.alexandrepiveteau.markdown.backend
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.ktor.exchange
+import io.github.alexandrepiveteau.echo.ktor.server.EchoKtorServerPreview
+import io.github.alexandrepiveteau.echo.ktor.server.receiver
+import io.github.alexandrepiveteau.echo.ktor.server.sender
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.protocol.decode
-import io.github.alexandrepiveteau.echo.sync
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import io.github.alexandrepiveteau.echo.protocol.encode
+import io.github.alexandrepiveteau.markdown.Coder
+import io.github.alexandrepiveteau.markdown.CounterEvent
+import io.ktor.application.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.websocket.*
 
-suspend fun main(): Unit = coroutineScope {
-  val client = HttpClient(CIO)
-  val remote =
-      client
-          .exchange<Int>(
-              incoming = {},
-              outgoing = {},
-          )
-          .decode()
-
-  val alice = mutableSite<Int>(SiteIdentifier.random())
-
-  launch { sync(alice, remote) }
+@OptIn(EchoKtorServerPreview::class)
+fun main() {
+  val site = mutableSite<CounterEvent>(SiteIdentifier.random())
+  val server =
+      embeddedServer(Netty, port = 8080) {
+        install(WebSockets)
+        routing {
+          route("/hello") { get { call.respondText("Hello world.") } }
+          route("/sender") { sender(site.encode(Coder)) }
+          route("/receiver") { receiver(site.encode(Coder)) }
+        }
+      }
+  server.start(wait = true)
 }

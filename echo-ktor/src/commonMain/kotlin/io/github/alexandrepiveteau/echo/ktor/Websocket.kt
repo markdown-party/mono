@@ -2,7 +2,6 @@ package io.github.alexandrepiveteau.echo.ktor
 
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.channelLink
-import io.github.alexandrepiveteau.echo.protocol.Transport
 import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Outgoing as Out
 import io.ktor.client.*
@@ -14,8 +13,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /** Pipes an [ReceiveChannel] into a [SendChannel]. */
@@ -23,65 +20,69 @@ private fun <T> CoroutineScope.pipe(
     incoming: ReceiveChannel<T>,
     outgoing: SendChannel<T>,
 ): Job = launch {
-  incoming.consumeAsFlow().onEach { outgoing.send(it) }.onCompletion { outgoing.close() }
+  incoming.consumeAsFlow().onEach { outgoing.send(it) }.onCompletion { outgoing.close() }.collect()
 }
 
 @EchoKtorPreview
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-fun <T> HttpClient.exchange(
+fun HttpClient.exchange(
     incoming: HttpRequestBuilder.() -> Unit,
     outgoing: HttpRequestBuilder.() -> Unit,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) =
-    object : Exchange<Inc<T>, Out<T>> {
+    object : Exchange<Inc, Out> {
 
       override fun incoming() =
-          channelLink<Out<T>, Inc<T>> { inc ->
-            this@exchange.wss(incoming) {
+          channelLink<Out, Inc> { inc ->
+            this@exchange.ws(incoming) {
               val rcv =
                   this.incoming
                       .consumeAsFlow()
                       .filterIsInstance<Frame.Text>()
                       .map { it.readText() }
-                      .map { Json.decodeFromString<Transport.V1.Incoming<T>>(it) }
+                      .map { Json.decodeFromString(Inc.serializer(), it) }
                       .flowOn(dispatcher)
                       .produceIn(this)
 
               val snd =
                   inc.consumeAsFlow()
-                      .map { Json.encodeToString(it) }
+                      .map { Json.encodeToString(Out.serializer(), it) }
                       .map { Frame.Text(it) }
                       .flowOn(dispatcher)
                       .produceIn(this)
 
               // Create the required pipes.
-              pipe(rcv, this@channelLink)
-              pipe(snd, this.outgoing)
+              joinAll(
+                  pipe(rcv, this@channelLink),
+                  pipe(snd, this.outgoing),
+              )
             }
           }
 
       override fun outgoing() =
-          channelLink<Inc<T>, Out<T>> { inc ->
-            wss(outgoing) {
+          channelLink<Inc, Out> { inc ->
+            ws(outgoing) {
               val rcv =
                   this.incoming
                       .consumeAsFlow()
                       .filterIsInstance<Frame.Text>()
                       .map { it.readText() }
-                      .map { Json.decodeFromString<Transport.V1.Outgoing<T>>(it) }
+                      .map { Json.decodeFromString(Out.serializer(), it) }
                       .flowOn(dispatcher)
                       .produceIn(this)
 
               val snd =
                   inc.consumeAsFlow()
-                      .map { Json.encodeToString(it) }
+                      .map { Json.encodeToString(Inc.serializer(), it) }
                       .map { Frame.Text(it) }
                       .flowOn(dispatcher)
                       .produceIn(this)
 
               // Create the required pipes.
-              pipe(rcv, this@channelLink)
-              pipe(snd, this.outgoing)
+              joinAll(
+                  pipe(rcv, this@channelLink),
+                  pipe(snd, this.outgoing),
+              )
             }
           }
     }
