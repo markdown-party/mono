@@ -5,8 +5,7 @@ import io.github.alexandrepiveteau.echo.ktor.exchange
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.protocol.decode
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.markdown.Coder
-import io.github.alexandrepiveteau.markdown.CounterEvent
+import io.github.alexandrepiveteau.markdown.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.websocket.*
@@ -20,19 +19,13 @@ suspend fun main(): Unit = coroutineScope {
   val remote =
       client
           .exchange(
-              incoming = {
-                port = 8080
-                url {
-                  host = "localhost"
-                  path("receiver")
-                }
+              receiver = {
+                port = ServerPort
+                url { path(ServerReceiverPath) }
               },
-              outgoing = {
+              sender = {
                 port = 8080
-                url {
-                  host = "localhost"
-                  path("sender")
-                }
+                url { path(ServerSenderPath) }
               },
           )
           .decode(Coder)

@@ -8,6 +8,8 @@ import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.protocol.encode
 import io.github.alexandrepiveteau.markdown.Coder
 import io.github.alexandrepiveteau.markdown.CounterEvent
+import io.github.alexandrepiveteau.markdown.ServerReceiverPath
+import io.github.alexandrepiveteau.markdown.ServerSenderPath
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -23,8 +25,8 @@ fun main() {
         install(WebSockets)
         routing {
           route("/hello") { get { call.respondText("Hello world.") } }
-          route("/sender") { sender(site.encode(Coder)) }
-          route("/receiver") { receiver(site.encode(Coder)) }
+          route("/$ServerSenderPath") { sender(site.encode(Coder)) }
+          route("/$ServerReceiverPath") { receiver(site.encode(Coder)) }
         }
       }
   server.start(wait = true)

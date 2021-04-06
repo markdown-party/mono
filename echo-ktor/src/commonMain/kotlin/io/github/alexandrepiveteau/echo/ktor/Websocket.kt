@@ -26,15 +26,15 @@ private fun <T> CoroutineScope.pipe(
 @EchoKtorPreview
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun HttpClient.exchange(
-    incoming: HttpRequestBuilder.() -> Unit,
-    outgoing: HttpRequestBuilder.() -> Unit,
+    receiver: HttpRequestBuilder.() -> Unit,
+    sender: HttpRequestBuilder.() -> Unit,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) =
     object : Exchange<Inc, Out> {
 
       override fun incoming() =
           channelLink<Out, Inc> { inc ->
-            this@exchange.ws(incoming) {
+            this@exchange.ws(receiver) {
               val rcv =
                   this.incoming
                       .consumeAsFlow()
@@ -61,7 +61,7 @@ fun HttpClient.exchange(
 
       override fun outgoing() =
           channelLink<Inc, Out> { inc ->
-            ws(outgoing) {
+            ws(sender) {
               val rcv =
                   this.incoming
                       .consumeAsFlow()
