@@ -2,7 +2,9 @@ package io.github.alexandrepiveteau.echo.samples.drawing.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Surface
@@ -19,6 +21,7 @@ import io.github.alexandrepiveteau.echo.samples.drawing.data.model.Figure
 @Composable
 fun Board(
     figures: Set<Figure>,
+    onFigureClick: (Figure) -> Unit,
     modifier: Modifier = Modifier,
 ) {
   Box(modifier, Alignment.Center) {
@@ -30,7 +33,7 @@ fun Board(
 
         Figure(
             color = color,
-            onClick = {},
+            onClick = { onFigureClick(figure) },
             modifier = Modifier.offset { IntOffset(x.roundToPx(), y.roundToPx()) },
         )
       }
@@ -45,8 +48,8 @@ fun Figure(
     modifier: Modifier = Modifier,
 ) {
   Surface(
-      modifier = modifier.size(72.dp),
+      modifier = modifier.size(96.dp),
       color = color,
       elevation = 2.dp,
-  ) {}
+  ) { Box(Modifier.fillMaxSize().clickable { onClick() }) }
 }

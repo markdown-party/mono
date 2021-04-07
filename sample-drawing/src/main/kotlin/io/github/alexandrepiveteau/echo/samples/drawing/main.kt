@@ -2,7 +2,9 @@ package io.github.alexandrepiveteau.echo.samples.drawing
 
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -19,10 +21,12 @@ import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingBoardP
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.persistentDrawingBoardOf
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.Board
+import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.board.dashed
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.stateful.StatefulDashboard
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 fun main() {
 
@@ -38,17 +42,37 @@ fun main() {
 
   Window(title = "Echo - Drawing") {
     MaterialTheme {
-      Row {
+      Box(Modifier.fillMaxSize().dashed()) {
         val current by figures.collectAsState(persistentSetOf())
         val scope = rememberCoroutineScope()
-        Button(
-            onClick = { scope.launch { site.event { yield(DrawingEvent.AddFigure) } } },
-        ) { Text("${current.size} figures") }
-        StatefulDashboard(
-            site = site,
-            modifier = Modifier.width(300.dp).background(Color.LightGray),
+
+        // Display the figure board.
+        Board(
+            figures = current,
+            onFigureClick = {
+              scope.launch {
+                val event =
+                    DrawingEvent.Move(
+                        it.id,
+                        toX = Random.nextInt(from = -300, until = 300).dp,
+                        toY = Random.nextInt(from = -300, until = 300).dp,
+                    )
+                site.event { yield(event) }
+              }
+            },
+            modifier = Modifier.fillMaxSize(),
         )
-        Board(current)
+
+        // Display the debug inputs.
+        Row {
+          Button(
+              onClick = { scope.launch { site.event { yield(DrawingEvent.AddFigure) } } },
+          ) { Text("${current.size} figures") }
+          StatefulDashboard(
+              site = site,
+              modifier = Modifier.width(300.dp).background(Color.LightGray),
+          )
+        }
       }
     }
   }
