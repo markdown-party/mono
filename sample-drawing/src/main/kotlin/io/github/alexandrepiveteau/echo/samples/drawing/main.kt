@@ -2,16 +2,14 @@ package io.github.alexandrepiveteau.echo.samples.drawing
 
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -22,11 +20,12 @@ import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.persistentDrawingBoardOf
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.Board
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.board.dashed
+import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.network.FakeParticipants
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.stateful.StatefulDashboard
+import kotlin.random.Random
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 fun main() {
 
@@ -45,6 +44,8 @@ fun main() {
       Box(Modifier.fillMaxSize().dashed()) {
         val current by figures.collectAsState(persistentSetOf())
         val scope = rememberCoroutineScope()
+
+        FakeParticipants(Modifier.align(Alignment.TopEnd).padding(16.dp))
 
         // Display the figure board.
         Board(

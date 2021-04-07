@@ -7,6 +7,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -21,10 +22,10 @@ import kotlin.math.roundToInt
  */
 fun Modifier.dashed(
     radius: Dp = 2.dp,
-    color: Color? = null,
+    color: Color = Color.Unspecified,
     grid: Dp = 48.dp,
 ) = composed {
-  val requiredColor = color ?: LocalContentColor.current
+  val requiredColor = color.takeOrElse { LocalContentColor.current }
   val alpha = ContentAlpha.disabled
   drawBehind {
     val origin = Offset(center.x.rem(grid.toPx()), center.y.rem(grid.toPx()))
