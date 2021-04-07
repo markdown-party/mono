@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.ktor
 
 import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.ReceiveExchange
+import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.channelLink
 import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Outgoing as Out
@@ -25,64 +27,78 @@ private fun <T> CoroutineScope.pipe(
 
 @EchoKtorPreview
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+fun HttpClient.sender(
+    sender: HttpRequestBuilder.() -> Unit,
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) = SendExchange {
+  channelLink<Inc, Out> { inc ->
+    ws(sender) {
+      val rcv =
+          this.incoming
+              .consumeAsFlow()
+              .filterIsInstance<Frame.Text>()
+              .map { it.readText() }
+              .map { Json.decodeFromString(Out.serializer(), it) }
+              .flowOn(dispatcher)
+              .produceIn(this)
+
+      val snd =
+          inc.consumeAsFlow()
+              .map { Json.encodeToString(Inc.serializer(), it) }
+              .map { Frame.Text(it) }
+              .flowOn(dispatcher)
+              .produceIn(this)
+
+      // Create the required pipes.
+      joinAll(
+          pipe(rcv, this@channelLink),
+          pipe(snd, this.outgoing),
+      )
+    }
+  }
+}
+
+@EchoKtorPreview
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+fun HttpClient.receiver(
+    receiver: HttpRequestBuilder.() -> Unit,
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) = ReceiveExchange {
+  channelLink<Out, Inc> { inc ->
+    ws(receiver) {
+      val rcv =
+          this.incoming
+              .consumeAsFlow()
+              .filterIsInstance<Frame.Text>()
+              .map { it.readText() }
+              .map { Json.decodeFromString(Inc.serializer(), it) }
+              .flowOn(dispatcher)
+              .produceIn(this)
+
+      val snd =
+          inc.consumeAsFlow()
+              .map { Json.encodeToString(Out.serializer(), it) }
+              .map { Frame.Text(it) }
+              .flowOn(dispatcher)
+              .produceIn(this)
+
+      // Create the required pipes.
+      joinAll(
+          pipe(rcv, this@channelLink),
+          pipe(snd, this.outgoing),
+      )
+    }
+  }
+}
+
+@EchoKtorPreview
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun HttpClient.exchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-) =
-    object : Exchange<Inc, Out> {
-
-      override fun incoming() =
-          channelLink<Out, Inc> { inc ->
-            this@exchange.ws(receiver) {
-              val rcv =
-                  this.incoming
-                      .consumeAsFlow()
-                      .filterIsInstance<Frame.Text>()
-                      .map { it.readText() }
-                      .map { Json.decodeFromString(Inc.serializer(), it) }
-                      .flowOn(dispatcher)
-                      .produceIn(this)
-
-              val snd =
-                  inc.consumeAsFlow()
-                      .map { Json.encodeToString(Out.serializer(), it) }
-                      .map { Frame.Text(it) }
-                      .flowOn(dispatcher)
-                      .produceIn(this)
-
-              // Create the required pipes.
-              joinAll(
-                  pipe(rcv, this@channelLink),
-                  pipe(snd, this.outgoing),
-              )
-            }
-          }
-
-      override fun outgoing() =
-          channelLink<Inc, Out> { inc ->
-            ws(sender) {
-              val rcv =
-                  this.incoming
-                      .consumeAsFlow()
-                      .filterIsInstance<Frame.Text>()
-                      .map { it.readText() }
-                      .map { Json.decodeFromString(Out.serializer(), it) }
-                      .flowOn(dispatcher)
-                      .produceIn(this)
-
-              val snd =
-                  inc.consumeAsFlow()
-                      .map { Json.encodeToString(Inc.serializer(), it) }
-                      .map { Frame.Text(it) }
-                      .flowOn(dispatcher)
-                      .produceIn(this)
-
-              // Create the required pipes.
-              joinAll(
-                  pipe(rcv, this@channelLink),
-                  pipe(snd, this.outgoing),
-              )
-            }
-          }
-    }
+): Exchange<Inc, Out> =
+    object :
+        Exchange<Inc, Out>,
+        ReceiveExchange<Inc, Out> by receiver(receiver, dispatcher),
+        SendExchange<Inc, Out> by sender(sender, dispatcher) {}

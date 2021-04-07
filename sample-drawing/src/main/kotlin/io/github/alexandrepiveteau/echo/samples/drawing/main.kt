@@ -15,19 +15,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
+import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Config
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingBoardProjection
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.persistentDrawingBoardOf
+import io.github.alexandrepiveteau.echo.samples.drawing.data.runServer
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.Board
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.board.dashed
-import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.network.FakeParticipants
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.stateful.StatefulDashboard
+import io.github.alexandrepiveteau.echo.samples.drawing.ui.stateful.StatefulParticipants
 import kotlin.random.Random
+import kotlin.system.exitProcess
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-fun main() {
+fun main(args: Array<String>) = runBlocking {
 
   // The single source of truth for the local site.
   val site =
@@ -37,15 +41,26 @@ fun main() {
           projection = DrawingBoardProjection,
       )
 
-  val figures = site.value.map { it.figures }
+  // Parse the launch configuration.
+  val config = Config.parse(args) ?: exitProcess(1)
 
-  Window(title = "Echo - Drawing") {
+  // Start a server.
+  runServer(site, config)
+
+  // Run the GUI.
+  val figures = site.value.map { it.figures }
+  Window(title = "Echo - Drawing (${config.me.name})") {
     MaterialTheme {
       Box(Modifier.fillMaxSize().dashed()) {
         val current by figures.collectAsState(persistentSetOf())
         val scope = rememberCoroutineScope()
 
-        FakeParticipants(Modifier.align(Alignment.TopEnd).padding(16.dp))
+        // Display the participants board.
+        StatefulParticipants(
+            site = site,
+            participants = config.participant,
+            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+        )
 
         // Display the figure board.
         Board(
