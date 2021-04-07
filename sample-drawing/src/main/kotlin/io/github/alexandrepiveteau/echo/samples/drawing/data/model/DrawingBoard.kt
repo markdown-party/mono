@@ -2,6 +2,9 @@ package io.github.alexandrepiveteau.echo.samples.drawing.data.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import kotlinx.collections.immutable.*
 
@@ -20,15 +23,13 @@ typealias FigureId = EventIdentifier
  *
  * @param id the unique id for this [Figure].
  * @param color the current color of the [Figure].
- * @param x the x offset for the [Figure].
- * @param y the y offset for the [Figure].
+ * @param offset the offset for the [Figure].
  */
 @Immutable
 data class Figure(
     val id: FigureId,
-    val color: Int,
-    val x: Int,
-    val y: Int,
+    val color: Color,
+    val offset: DpOffset,
 )
 
 /**
@@ -72,7 +73,7 @@ interface PersistentDrawingBoard : ImmutableDrawingBoard {
    */
   fun color(
       figure: FigureId,
-      color: Int,
+      color: Color,
   ): PersistentDrawingBoard
 
   /**
@@ -87,8 +88,8 @@ interface PersistentDrawingBoard : ImmutableDrawingBoard {
    */
   fun move(
       figure: FigureId,
-      toX: Int,
-      toY: Int,
+      toX: Dp,
+      toY: Dp,
   ): PersistentDrawingBoard
 
   /**
@@ -123,22 +124,22 @@ private data class ActualPersistentDrawingBoard(
   override fun add(figureId: FigureId): PersistentDrawingBoard {
     val shouldAdd = !available.containsKey(figureId) && !tombstones.contains(figureId)
     return if (shouldAdd) {
-      val figure = Figure(id = figureId, x = 0, y = 0, color = 0xFFFFFF)
+      val figure = Figure(id = figureId, offset = DpOffset.Zero, color = Color.White)
       copy(available = available.put(figureId, figure))
     } else {
       this
     }
   }
 
-  override fun color(figure: FigureId, color: Int): PersistentDrawingBoard {
+  override fun color(figure: FigureId, color: Color): PersistentDrawingBoard {
     val existing = available[figure] ?: return this // Ignored mutation.
     val updated = existing.copy(color = color)
     return copy(available = available.put(figure, updated))
   }
 
-  override fun move(figure: FigureId, toX: Int, toY: Int): PersistentDrawingBoard {
+  override fun move(figure: FigureId, toX: Dp, toY: Dp): PersistentDrawingBoard {
     val existing = available[figure] ?: return this // Ignored mutation.
-    val updated = existing.copy(x = toX, y = toY)
+    val updated = existing.copy(offset = DpOffset(toX, toY))
     return copy(available = available.put(figure, updated))
   }
 

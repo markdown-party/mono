@@ -1,19 +1,27 @@
-@file:UseSerializers(EventIdentifierSerializer::class)
+@file:OptIn(
+    ExperimentalSerializationApi::class,
+    ExperimentalUnsignedTypes::class,
+)
+@file:UseSerializers(
+    ColorSerializer::class,
+    DpSerializer::class,
+    EventIdentifierSerializer::class,
+)
 
 package io.github.alexandrepiveteau.echo.samples.drawing.data.model
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
 import io.github.alexandrepiveteau.echo.causal.*
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
+import kotlinx.serialization.json.Json
 
 /**
  * A sealed class representing the different events which are supported in the drawing app, and
@@ -41,8 +49,8 @@ sealed class DrawingEvent {
   @Serializable
   data class Move(
       val figure: FigureId,
-      val toX: Int,
-      val toY: Int,
+      val toX: Dp,
+      val toY: Dp,
   ) : DrawingEvent()
 
   /**
@@ -53,7 +61,7 @@ sealed class DrawingEvent {
   @Serializable
   data class SetColor(
       val figure: FigureId,
-      val color: Int,
+      val color: Color,
   ) : DrawingEvent()
 
   /** Removes the figure. Additional calls to [Move] and [SetColor] will not have any effect. */
@@ -61,9 +69,29 @@ sealed class DrawingEvent {
   data class Delete(
       val figure: FigureId,
   ) : DrawingEvent()
+
+  /** The [io.github.alexandrepiveteau.echo.Coder] implementation for [DrawingEvent]. */
+  companion object Coder : io.github.alexandrepiveteau.echo.Coder<DrawingEvent, String> {
+    override fun decode(it: String) = Json.decodeFromString(serializer(), it)
+    override fun encode(it: DrawingEvent) = Json.encodeToString(serializer(), it)
+  }
 }
 
 // CUSTOM SERIALIZERS
+
+@Serializer(forClass = Color::class)
+private object ColorSerializer : KSerializer<Color> {
+  override val descriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.INT)
+  override fun deserialize(decoder: Decoder) = Color(decoder.decodeInt())
+  override fun serialize(encoder: Encoder, value: Color) = encoder.encodeInt(value.toArgb())
+}
+
+@Serializer(forClass = Dp::class)
+private object DpSerializer : KSerializer<Dp> {
+  override val descriptor = PrimitiveSerialDescriptor("Dp", PrimitiveKind.FLOAT)
+  override fun deserialize(decoder: Decoder) = Dp(decoder.decodeFloat())
+  override fun serialize(encoder: Encoder, value: Dp) = encoder.encodeFloat(value.value)
+}
 
 @Serializer(forClass = EventIdentifier::class)
 private object EventIdentifierSerializer : KSerializer<EventIdentifier> {
