@@ -4,41 +4,21 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
-@Composable
-fun FakeParticipants(
-    modifier: Modifier = Modifier,
-) {
-  Column(modifier, Arrangement.spacedBy(8.dp), Alignment.End) {
-    FakeParticipant("Alice")
-    FakeParticipant("Bob")
-    FakeParticipant("Charlie")
-  }
-}
-
-@Composable
-fun FakeParticipant(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-  var connected by remember { mutableStateOf(true) }
-  Participant(
-      name = name,
-      connected = connected,
-      onClick = { connected = !connected },
-      modifier = modifier,
-  )
-}
 
 /**
  * A pill displaying some information related to a participant, and provides a way to toggle it
