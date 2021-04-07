@@ -116,4 +116,16 @@ interface PersistentEventLog<out T> : ImmutableEventLog<T> {
       site: SiteIdentifier,
       body: @UnsafeVariance T,
   ): PersistentEventLog<T>
+
+  /**
+   * Removes the event with a given [seqno] and [site]. If the event is not present, the data
+   * structure remains unmodified.
+   *
+   * @param seqno the sequence number of the event.
+   * @param site the site of the event.
+   */
+  fun remove(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): PersistentEventLog<T>
 }

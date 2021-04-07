@@ -72,6 +72,15 @@ internal constructor(
     return PersistentMapEventLog(buffer.put(site, updated))
   }
 
+  override fun remove(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): PersistentEventLog<T> {
+    val existing = buffer[site] ?: return this
+    val updated = existing.remove(seqno)
+    return PersistentMapEventLog(buffer.put(site, updated))
+  }
+
   @EchoEventLogPreview
   override fun <R> foldl(
       base: R,
