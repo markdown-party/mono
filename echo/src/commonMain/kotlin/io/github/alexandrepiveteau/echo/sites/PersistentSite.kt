@@ -43,7 +43,7 @@ import kotlinx.coroutines.sync.withLock
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
 )
-internal class UnorderedOneWayProjectionSite<T, M>(
+internal class PersistentSite<T, M>(
     override val identifier: SiteIdentifier,
     private var log: PersistentEventLog<T> = persistentEventLogOf(),
     private val initial: M,

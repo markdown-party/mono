@@ -12,7 +12,7 @@ import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
-import io.github.alexandrepiveteau.echo.sites.UnorderedOneWayProjectionSite
+import io.github.alexandrepiveteau.echo.sites.PersistentSite
 import io.github.alexandrepiveteau.echo.sites.map
 import kotlinx.coroutines.flow.Flow
 
@@ -133,4 +133,4 @@ internal fun <M, T> unorderedSite(
     log: ImmutableEventLog<T> = immutableEventLogOf(),
     projection: OneWayProjection<M, EventValue<T>>,
 ): MutableSite<T, M> =
-    UnorderedOneWayProjectionSite(identifier, log.toPersistentEventLog(), initial, projection)
+    PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)
