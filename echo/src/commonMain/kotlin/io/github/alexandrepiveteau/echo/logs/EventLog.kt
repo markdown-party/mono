@@ -86,14 +86,6 @@ interface ImmutableEventLog<out T> {
       site: SiteIdentifier,
   ): Iterable<EventValue<T>>
 
-  // This API is transient and will be removed in the future.
-  @Deprecated("This will be removed and the folding behavior will be delegated to projections.")
-  @EchoEventLogPreview
-  fun <R> foldl(
-      base: R,
-      step: (EventValue<T>, R) -> R,
-  ): R
-
   /** Transforms this [ImmutableEventLog] to a persistable instance. */
   fun toPersistentEventLog(): PersistentEventLog<T>
 }

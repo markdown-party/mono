@@ -140,9 +140,6 @@ internal class HistoryProjection<M, T, C>(
           }
 
       val (past, present, future) = rewind(past, current)
-
-      println("Replaying ${future.size} events.")
-
       val (next, change) = projection.forward(event, present)
 
       return replay(past.add(LogStep(event, change)), next, future)

@@ -21,10 +21,4 @@ internal object EmptyEventLog : ImmutableEventLog<Nothing> {
   ) = emptyList<EventValue<Nothing>>()
 
   override fun toPersistentEventLog(): PersistentEventLog<Nothing> = persistentEventLogOf()
-
-  @EchoEventLogPreview
-  override fun <R> foldl(
-      base: R,
-      step: (EventValue<Nothing>, R) -> R,
-  ): R = base
 }

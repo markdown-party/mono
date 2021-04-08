@@ -81,23 +81,6 @@ internal constructor(
     return PersistentMapEventLog(buffer.put(site, updated))
   }
 
-  @EchoEventLogPreview
-  override fun <R> foldl(
-      base: R,
-      step: (EventValue<T>, R) -> R,
-  ): R =
-      buffer
-          .asSequence()
-          .flatMap { entry ->
-            entry.value.asSequence().map {
-              val id = EventIdentifier(it.key, entry.key)
-              val body = it.value
-              EventValue(id, body)
-            }
-          }
-          .sortedBy { it.identifier }
-          .fold(base) { m, p -> step(p, m) }
-
   override fun toPersistentEventLog(): PersistentEventLog<T> = this
 
   override fun toString(): String {
