@@ -12,7 +12,7 @@ repositories {
 kotlin {
   dependencies {
     implementation(project(":echo"))
-    implementation(project(":echo-ktor"))
+    implementation(project(":echo-ktor-client"))
     implementation(project(":echo-ktor-server"))
     implementation(project(":echo-transport"))
 
