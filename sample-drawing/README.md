@@ -1,5 +1,12 @@
 # sample-drawing
 
+- [sample-drawing](#sample-drawing)
+  - [Installation](#installation)
+  - [How it works](#how-it-works)
+    - [User interface](#user-interface)
+    - [Data model](#data-model)
+  - [Known issues and limitations](#known-issues-and-limitations)
+
 The `sample-drawing` module showcases usage of the `echo` library for a simple collaborative drawing
 desktop app. The app lets users create stickers, move them to a random position by clicking them,
 change their color and delete them.
