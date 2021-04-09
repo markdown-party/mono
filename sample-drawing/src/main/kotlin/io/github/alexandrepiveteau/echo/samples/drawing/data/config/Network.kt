@@ -44,10 +44,10 @@ data class Config(
     /** Parses a [Config] from some command-line arguments. */
     fun parse(args: Array<String>): Config? {
       // TODO : extract config from CLI arguments instead ?
+      if (args.isEmpty()) return null
       if (args[0].toLowerCase() == "alice") return AliceConfig
       if (args[0].toLowerCase() == "bob") return BobConfig
       if (args[0].toLowerCase() == "charlie") return CharlieConfig
-      println(args[0])
       return null
     }
   }

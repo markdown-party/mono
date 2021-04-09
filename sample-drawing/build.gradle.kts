@@ -2,7 +2,6 @@ plugins {
   kotlin("jvm") version Versions.Kotlin
   kotlin("plugin.serialization") version Versions.KotlinxSerialization
   id("org.jetbrains.compose") version "0.4.0-build179"
-  application
 }
 
 repositories {
@@ -34,4 +33,8 @@ kotlin {
     implementation(compose.material)
     implementation(compose.materialIconsExtended)
   }
+}
+
+compose.desktop {
+  application { mainClass = "io.github.alexandrepiveteau.echo.samples.drawing.Main" }
 }

@@ -1,3 +1,5 @@
+@file:JvmName("Main")
+
 package io.github.alexandrepiveteau.echo.samples.drawing
 
 import androidx.compose.desktop.Window
