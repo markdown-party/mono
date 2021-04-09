@@ -26,7 +26,6 @@ private fun <T> CoroutineScope.pipe(
 }
 
 @EchoKtorPreview
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun HttpClient.sender(
     sender: HttpRequestBuilder.() -> Unit,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -59,7 +58,6 @@ fun HttpClient.sender(
 }
 
 @EchoKtorPreview
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun HttpClient.receiver(
     receiver: HttpRequestBuilder.() -> Unit,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -92,7 +90,6 @@ fun HttpClient.receiver(
 }
 
 @EchoKtorPreview
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun HttpClient.exchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,

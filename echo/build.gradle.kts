@@ -1,17 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins { kotlin("multiplatform") version Versions.Kotlin }
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    val options = listOf(
-      "-Xopt-in=kotlin.RequiresOptIn",            // Used to define custom @OptIn.
-      "-Xinline-classes",                         // Reaching Beta stability in KT 1.5
-      "-Xopt-in=kotlin.ExperimentalUnsignedTypes" // Unsigned numbers.
-    )
-    freeCompilerArgs = freeCompilerArgs + options
-  }
-}
 
 kotlin {
   jvm {
@@ -19,6 +6,8 @@ kotlin {
     testRuns["test"].executionTask.configure { useJUnit() }
     withJava()
   }
+
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   sourceSets {
     val commonMain by getting {
@@ -40,6 +29,13 @@ kotlin {
         implementation(kotlin("test-junit"))
         implementation(Deps.Kotlinx.CoroutinesTest)
       }
+    }
+    all {
+      languageSettings.enableLanguageFeature("InlineClasses")
+      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+      languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
     }
   }
 }

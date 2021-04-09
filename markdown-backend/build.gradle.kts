@@ -12,8 +12,9 @@ kotlin {
     implementation(project(":echo-transport"))
 
     // Ktor
+    implementation("io.ktor:ktor-client-cio:1.5.3")
     implementation("io.ktor:ktor-server-netty:1.5.3")
-    testImplementation("io.ktor:ktor-server-test-host:1.4.3")
+    testImplementation("io.ktor:ktor-server-test-host:1.5.3")
 
     // SL4J
     implementation("org.slf4j:slf4j-simple:1.7.21")

@@ -5,6 +5,9 @@ plugins {
 
 kotlin {
   jvm()
+
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
+
   sourceSets {
     val commonMain by getting {
       dependencies {
@@ -12,5 +15,7 @@ kotlin {
         api(Deps.Kotlinx.SerializationJson)
       }
     }
+
+    all { languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes") }
   }
 }
