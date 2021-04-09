@@ -1,11 +1,14 @@
-# sample-drawing
+# 1. Table of Contents
 
-- [sample-drawing](#sample-drawing)
-  - [Installation](#installation)
-  - [How it works](#how-it-works)
-    - [User interface](#user-interface)
-    - [Data model](#data-model)
-  - [Known issues and limitations](#known-issues-and-limitations)
+- [1. Table of Contents](#1-table-of-contents)
+- [2. About](#2-about)
+- [3. Installation](#3-installation)
+- [4. How it works](#4-how-it-works)
+  - [4.1. User interface](#41-user-interface)
+  - [4.2. Data model](#42-data-model)
+- [5. Known issues and limitations](#5-known-issues-and-limitations)
+
+# 2. About
 
 The `sample-drawing` module showcases usage of the `echo` library for a simple collaborative drawing
 desktop app. The app lets users create stickers, move them to a random position by clicking them,
@@ -16,7 +19,7 @@ connect to, and each serve a websocket that will let other sites subscribe to th
 
 ![Usage demonstration](../assets/sample-drawing.gif)
 
-## Installation
+# 3. Installation
 
 Clone the repository locally, and launch the three clients as follows :
 
@@ -33,9 +36,9 @@ cd ./kotlin-echo
 
 This will launch three servers on ports `8080`, `8081` and `8082`.
 
-## How it works
+# 4. How it works
 
-### User interface
+## 4.1. User interface
 
 The user interface is implemented on top
 of [Compose for Desktop](https://github.com/JetBrains/compose-jb). Individual card `@Composable` are
@@ -46,7 +49,7 @@ site "on" is equivalent to receiving data from it. Because communication is asym
 to get bi-directional communication between two sites, they are required to be toggled "on"
 simultaneously.
 
-### Data model
+## 4.2. Data model
 
 The application defines the
 following [events](src/main/kotlin/io/github/alexandrepiveteau/echo/samples/drawing/data/model/DrawingEvent.kt) :
@@ -160,7 +163,7 @@ figures.collect { figures: List<Figure> ->
 }
 ```
 
-## Known issues and limitations
+# 5. Known issues and limitations
 
 - [[#23]](https://github.com/markdown-party/kotlin-echo/issues/23) The event log is not compacted,
   even though the data model could implement some compaction for LWW operations (such as move and
