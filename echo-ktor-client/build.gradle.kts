@@ -12,8 +12,8 @@ kotlin {
         api(project(":echo-transport"))
 
         // Ktor.
-        api("io.ktor:ktor-client-core:1.5.3")
-        api("io.ktor:ktor-client-websockets:1.5.3")
+        api(Deps.Ktor.ClientCore)
+        api(Deps.Ktor.ClientWebsockets)
       }
     }
 

@@ -7,8 +7,8 @@ import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Config
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.ktor.application.*
 import io.ktor.routing.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ fun CoroutineScope.runServer(
 ) =
     launch(Dispatchers.IO) {
       val server =
-          embeddedServer(Netty, port = config.me.port) {
+          embeddedServer(CIO, port = config.me.port) {
             install(WebSockets)
             routing { route("/sync") { receiver(site.encode(DrawingEvent)) } }
           }

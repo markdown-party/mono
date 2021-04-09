@@ -4,6 +4,9 @@ object Versions {
   const val KotlinxImmutableCollections = "0.3.4"
   const val KotlinxSerialization = "1.4.30"
   const val KotlinxSerializationJson = "1.1.0"
+  const val Ktor = "1.5.3"
+
+  const val Slf4j = "1.7.21"
 }
 
 object Deps {
@@ -20,5 +23,22 @@ object Deps {
 
     const val SerializationJson =
         "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinxSerializationJson}"
+  }
+
+  object Ktor {
+    const val ClientCore = "io.ktor:ktor-client-core:${Versions.Ktor}"
+    const val ClientWebsockets = "io.ktor:ktor-client-websockets:${Versions.Ktor}"
+    const val ClientEngineCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
+
+    const val ServerCore = "io.ktor:ktor-server-core:${Versions.Ktor}"
+    const val ServerWebsockets = "io.ktor:ktor-websockets:${Versions.Ktor}"
+    const val ServerEngineCIO = "io.ktor:ktor-server-cio:${Versions.Ktor}"
+    const val ServerEngineNetty = "io.ktor:ktor-server-netty:${Versions.Ktor}"
+
+    const val ServerEngineTest = "io.ktor:ktor-server-test-host:${Versions.Ktor}"
+  }
+
+  object Slf4f {
+    const val Simple = "org.slf4j:slf4j-simple:${Versions.Slf4j}"
   }
 }
