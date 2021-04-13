@@ -19,6 +19,17 @@ interface EventLog<out T> {
   val sites: Set<SiteIdentifier>
 
   /**
+   * Returns true if the log contains an event with the given site and sequence number.
+   *
+   * @param site the [SiteIdentifier] to search for.
+   * @param seqno the [SequenceNumber] to search for.
+   */
+  fun contains(
+      site: SiteIdentifier,
+      seqno: SequenceNumber,
+  ): Boolean
+
+  /**
    * Returns the [SequenceNumber] that is expected for the next event, such that this
    * [SequenceNumber] is higher than any [SequenceNumber] from the [EventLog].
    */
