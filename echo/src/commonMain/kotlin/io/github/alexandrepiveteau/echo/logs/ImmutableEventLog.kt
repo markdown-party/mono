@@ -1,41 +1,8 @@
 package io.github.alexandrepiveteau.echo.logs
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
-import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-
-/**
- * Creates an empty [ImmutableEventLog].
- *
- * @param T the type of the events in the log.
- */
-fun <T> immutableEventLogOf(): ImmutableEventLog<T> = EmptyEventLog
-
-/**
- * Creates a new instance of [ImmutableEventLog],
- *
- * @param events the pairs of event identifiers and event bodies to include in the log.
- *
- * @param T the type of events in the log.
- */
-fun <T> immutableEventLogOf(
-    vararg events: Pair<EventIdentifier, T>,
-): ImmutableEventLog<T> = persistentEventLogOf(*events)
-
-/**
- * Creates a new instance of [PersistentEventLog].
- *
- * @param events the pairs of event identifiers and event bodies to include in the log.
- *
- * @param T the type of events in the log.
- */
-fun <T> persistentEventLogOf(
-    vararg events: Pair<EventIdentifier, T>,
-): PersistentEventLog<T> = PersistentMapEventLog(*events)
-
-/** An alternative to [IndexedValue], identified by a unique [EventIdentifier]. */
-data class EventValue<out T>(val identifier: EventIdentifier, val value: T)
 
 /**
  * An [ImmutableEventLog] is a data structure that contains events of type [T], alongside with their
@@ -88,36 +55,4 @@ interface ImmutableEventLog<out T> {
 
   /** Transforms this [ImmutableEventLog] to a persistable instance. */
   fun toPersistentEventLog(): PersistentEventLog<T>
-}
-
-/**
- * A [PersistentEventLog] is an [ImmutableEventLog] which supports the insertion of events. It is an
- * immutable collection.
- */
-interface PersistentEventLog<out T> : ImmutableEventLog<T> {
-
-  /**
-   * Sets the body of the event with a given [seqno] and [site].
-   *
-   * @param seqno the sequence number of the event.
-   * @param site the site of the event.
-   * @param body the body of the event.
-   */
-  fun set(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-      body: @UnsafeVariance T,
-  ): PersistentEventLog<T>
-
-  /**
-   * Removes the event with a given [seqno] and [site]. If the event is not present, the data
-   * structure remains unmodified.
-   *
-   * @param seqno the sequence number of the event.
-   * @param site the site of the event.
-   */
-  fun remove(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): PersistentEventLog<T>
 }
