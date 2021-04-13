@@ -67,9 +67,9 @@ internal class PersistentSite<T, M>(
   ) =
       // Update the log, and issue an update to all sites if relevant.
       mutex.withLock {
-        val update = log[seqno, site] == null
+        val update = log[site, seqno] == null
         if (update) {
-          log = log.set(seqno, site, event)
+          log = log.set(site, seqno, event)
           current.value =
               projection.forward(
                   EventValueEntry(EventIdentifier(seqno, site), event),
@@ -129,7 +129,7 @@ internal class PersistentSite<T, M>(
             override suspend fun yield(event: T): EventIdentifier {
 
               // Update the log and the projection.
-              log = log.set(next, identifier, event)
+              log = log.set(identifier, next, event)
               current.value =
                   projection.forward(
                       EventValueEntry(EventIdentifier(next, identifier), event),

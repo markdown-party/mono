@@ -45,14 +45,14 @@ internal constructor(
   ) = buffer[site]?.maxOfOrNull { it.key }?.inc() ?: Zero
 
   override fun get(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): EventLog.Entry<T>? =
       buffer[site]?.get(seqno)?.let { body -> EventValueEntry(EventIdentifier(seqno, site), body) }
 
   override fun events(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): Iterable<EventLog.Entry<T>> {
     return buffer
         .getOrElse(site) { emptyMap() }
@@ -64,8 +64,8 @@ internal constructor(
   }
 
   override operator fun set(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
       body: T,
   ): PersistentEventLog<T> {
     val existing = buffer.getOrElse(site, ::persistentMapOf)
@@ -74,8 +74,8 @@ internal constructor(
   }
 
   override fun remove(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): PersistentEventLog<T> {
     val existing = buffer[site] ?: return this
     val updated = existing.remove(seqno)

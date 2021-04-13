@@ -12,13 +12,13 @@ interface PersistentEventLog<out T> : ImmutableEventLog<T> {
   /**
    * Sets the body of the event with a given [seqno] and [site].
    *
-   * @param seqno the sequence number of the event.
    * @param site the site of the event.
+   * @param seqno the sequence number of the event.
    * @param body the body of the event.
    */
   fun set(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
       body: @UnsafeVariance T,
   ): PersistentEventLog<T>
 
@@ -26,11 +26,11 @@ interface PersistentEventLog<out T> : ImmutableEventLog<T> {
    * Removes the event with a given [seqno] and [site]. If the event is not present, the data
    * structure remains unmodified.
    *
-   * @param seqno the sequence number of the event.
    * @param site the site of the event.
+   * @param seqno the sequence number of the event.
    */
   fun remove(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): PersistentEventLog<T>
 }

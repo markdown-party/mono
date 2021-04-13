@@ -69,7 +69,7 @@ fun <T> mutableSite(
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
     ) { entry, model ->
-      model.apply { set(entry.identifier.seqno, entry.identifier.site, entry.body) }
+      model.apply { set(entry.identifier.site, entry.identifier.seqno, entry.body) }
     }
 
 /**

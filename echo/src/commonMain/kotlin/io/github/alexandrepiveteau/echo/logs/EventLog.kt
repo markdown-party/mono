@@ -41,26 +41,26 @@ interface EventLog<out T> {
   /**
    * Gets the event with a given [seqno] and [site], if it exists.
    *
-   * @param seqno the sequence number of the event.
    * @param site the site of the event.
+   * @param seqno the sequence number of the event.
    */
   operator fun get(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): Entry<T>?
 
   /**
    * Returns all the events greater or equal to the provided [SequenceNumber] for the given
    * [SiteIdentifier].
    *
-   * @param seqno the lowest sequence number of the expected events.
    * @param site the site of the event.
+   * @param seqno the lowest sequence number of the expected events.
    *
    * @return all the events that are equal or higher to this [seqno] for the [site].
    */
   fun events(
-      seqno: SequenceNumber,
       site: SiteIdentifier,
+      seqno: SequenceNumber,
   ): Iterable<Entry<T>>
 
   /**

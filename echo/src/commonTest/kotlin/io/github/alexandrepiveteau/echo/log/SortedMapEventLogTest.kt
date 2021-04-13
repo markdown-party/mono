@@ -14,7 +14,7 @@ class SortedMapEventLogTest {
   @Test
   fun `Non empty log is actually non empty`() {
     val log = persistentEventLogOf(EventIdentifier(SequenceNumber(0u), SiteIdentifier(1)) to 123)
-    assertEquals(123, log[SequenceNumber(0u), SiteIdentifier(1)]?.body)
+    assertEquals(123, log[SiteIdentifier(1), SequenceNumber(0u)]?.body)
   }
 
   @Test
@@ -23,7 +23,7 @@ class SortedMapEventLogTest {
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(123U)
 
-    log = log.set(seqno, site, Unit)
+    log = log.set(site, seqno, Unit)
 
     assertEquals(seqno.inc(), log.expected(site))
   }
@@ -36,8 +36,8 @@ class SortedMapEventLogTest {
     val high = SequenceNumber(2U)
 
     // Insert the highest first.
-    log = log.set(high, site, Unit)
-    log = log.set(low, site, Unit)
+    log = log.set(site, high, Unit)
+    log = log.set(site, low, Unit)
 
     assertEquals(high.inc(), log.expected(site))
   }
@@ -56,8 +56,8 @@ class SortedMapEventLogTest {
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(1U)
 
-    log = log.set(seqno, site, 42)
+    log = log.set(site, seqno, 42)
 
-    assertEquals(42, log[seqno, site]?.body)
+    assertEquals(42, log[site, seqno]?.body)
   }
 }
