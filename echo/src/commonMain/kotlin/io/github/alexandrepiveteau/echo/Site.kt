@@ -2,7 +2,7 @@ package io.github.alexandrepiveteau.echo
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.events.EventScope
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog.Entry
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.logs.immutableEventLogOf
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
@@ -69,7 +69,9 @@ fun <T> mutableSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
-    ) { (id, event), model -> model.apply { set(id.seqno, id.site, event) } }
+    ) { entry, model ->
+      model.apply { set(entry.identifier.seqno, entry.identifier.site, entry.body) }
+    }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -88,7 +90,7 @@ fun <M, T> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-    projection: OneWayProjection<M, EventValue<T>>,
+    projection: OneWayProjection<M, Entry<T>>,
 ): MutableSite<T, M> =
     unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
       it.current
@@ -112,7 +114,7 @@ fun <M, T, C> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-    projection: TwoWayProjection<M, EventValue<T>, C>,
+    projection: TwoWayProjection<M, Entry<T>, C>,
 ): MutableSite<T, M> =
     unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
       it.current
@@ -124,5 +126,5 @@ internal fun <M, T> unorderedSite(
     identifier: SiteIdentifier,
     initial: M,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-    projection: OneWayProjection<M, EventValue<T>>,
+    projection: OneWayProjection<M, Entry<T>>,
 ): MutableSite<T, M> = PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)

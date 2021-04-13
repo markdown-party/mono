@@ -2,7 +2,7 @@
 
 package io.github.alexandrepiveteau.echo.projections
 
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog.Entry
 import io.github.alexandrepiveteau.echo.projections.HistoryProjection.History
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -18,12 +18,12 @@ import kotlinx.collections.immutable.persistentListOf
  * @param T the type of the events.
  */
 internal fun <M, T> HistoryProjection(
-    projection: OneWayProjection<M, EventValue<T>>
+    projection: OneWayProjection<M, Entry<T>>
 ): HistoryProjection<M, T, M> =
     HistoryProjection(
-        object : TwoWayProjection<M, EventValue<T>, M> {
+        object : TwoWayProjection<M, Entry<T>, M> {
           override fun forward(
-              body: EventValue<T>,
+              body: Entry<T>,
               model: M,
           ): Step<M, M> {
             return Step(
@@ -48,8 +48,8 @@ internal fun <M, T> HistoryProjection(
  * @param C the type of the changes.
  */
 internal class HistoryProjection<M, T, C>(
-    private val projection: TwoWayProjection<M, EventValue<T>, C>,
-) : OneWayProjection<History<M, T, C>, EventValue<T>> {
+    private val projection: TwoWayProjection<M, Entry<T>, C>,
+) : OneWayProjection<History<M, T, C>, Entry<T>> {
 
   /**
    * A step that was executed in the log. Generally, it has been ordered totally, and may be
@@ -59,7 +59,7 @@ internal class HistoryProjection<M, T, C>(
    * @param C the type of the changes.
    */
   internal data class LogStep<out T, out C>(
-      val event: EventValue<T>,
+      val event: Entry<T>,
       val change: C,
   )
 
@@ -75,15 +75,15 @@ internal class HistoryProjection<M, T, C>(
   ) {
 
     /**
-     * Inserts an [EventValue] into the [History], recomputing the [past] and [current] values as
+     * Inserts an [Entry] into the [History], recomputing the [past] and [current] values as
      * needed.
      *
-     * @param event the inserted [EventValue].
+     * @param event the inserted [Entry].
      * @param projection the [TwoWayProjection] used.
      */
     fun insert(
-        event: EventValue<T>,
-        projection: TwoWayProjection<M, EventValue<T>, C>,
+        event: Entry<T>,
+        projection: TwoWayProjection<M, Entry<T>, C>,
     ): History<M, T, C> {
 
       /**
@@ -92,7 +92,7 @@ internal class HistoryProjection<M, T, C>(
        *
        * @param current the start model.
        * @param past the [LogStep] that have already been performed.
-       * @param future the [EventValue] that will have to be replayed.
+       * @param future the [Entry] that will have to be replayed.
        *
        * @return a [Triple] with the split history. The future log is reversed and should be
        * consumed from the end.
@@ -100,8 +100,8 @@ internal class HistoryProjection<M, T, C>(
       tailrec fun rewind(
           past: PersistentList<LogStep<T, C>>,
           current: M,
-          future: PersistentList<EventValue<T>> = persistentListOf(),
-      ): Triple<PersistentList<LogStep<T, C>>, M, PersistentList<EventValue<T>>> =
+          future: PersistentList<Entry<T>> = persistentListOf(),
+      ): Triple<PersistentList<LogStep<T, C>>, M, PersistentList<Entry<T>>> =
           when (val last = past.lastOrNull()) {
             null -> Triple(past, current, future)
             else ->
@@ -129,7 +129,7 @@ internal class HistoryProjection<M, T, C>(
       tailrec fun replay(
           past: PersistentList<LogStep<T, C>>,
           current: M,
-          future: PersistentList<EventValue<T>>,
+          future: PersistentList<Entry<T>>,
       ): History<M, T, C> =
           when (val step = future.lastOrNull()) {
             null -> History(current, past)
@@ -147,7 +147,7 @@ internal class HistoryProjection<M, T, C>(
   }
 
   override fun forward(
-      body: EventValue<T>,
+      body: Entry<T>,
       model: History<M, T, C>,
   ): History<M, T, C> {
     return model.insert(body, projection)

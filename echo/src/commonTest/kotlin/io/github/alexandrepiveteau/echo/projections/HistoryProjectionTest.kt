@@ -3,7 +3,8 @@ package io.github.alexandrepiveteau.echo.projections
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog
+import io.github.alexandrepiveteau.echo.logs.EventValueEntry
 import io.github.alexandrepiveteau.echo.projections.HistoryProjection.History
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +18,7 @@ class HistoryProjectionTest {
 
     val result =
         projection.forward(
-            EventValue(EventIdentifier(SequenceNumber.Zero, SiteIdentifier(1)), 1),
+            EventValueEntry(EventIdentifier(SequenceNumber.Zero, SiteIdentifier(1)), 1),
             ListHistory(emptyList()),
         )
 
@@ -84,13 +85,13 @@ private fun ListHistory.step(
 ): ListHistory =
     projection.forward(
         body =
-            EventValue(
+            EventValueEntry(
                 identifier =
                     EventIdentifier(
                         SequenceNumber(seqno.toUInt()),
                         SiteIdentifier(site),
                     ),
-                value = event,
+                body = event,
             ),
         model = this,
     )
@@ -103,15 +104,15 @@ private fun ListHistory.step(
  * is indeed present at the end of the list.
  */
 private val ListProjection =
-    object : TwoWayProjection<List<Int>, EventValue<Int>, Int> {
+    object : TwoWayProjection<List<Int>, EventLog.Entry<Int>, Int> {
 
       override fun forward(
-          body: EventValue<Int>,
+          body: EventLog.Entry<Int>,
           model: List<Int>,
       ): Step<List<Int>, Int> {
         return Step(
-            data = model + body.value,
-            change = body.value,
+            data = model + body.body,
+            change = body.body,
         )
       }
 

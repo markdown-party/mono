@@ -34,7 +34,7 @@ suspend fun main(): Unit = coroutineScope {
       mutableSite<Int, CounterEvent>(
           identifier = SiteIdentifier.random(),
           initial = 0,
-      ) { event, agg -> event.value.plus + agg }
+      ) { event, agg -> event.body.plus + agg }
 
   launch {
     try {

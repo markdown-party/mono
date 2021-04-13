@@ -3,6 +3,7 @@ package io.github.alexandrepiveteau.echo.logs
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.logs.EventLog.Entry
 
 /** An implementation of [ImmutableEventLog] that's empty. */
 internal object EmptyEventLog : ImmutableEventLog<Nothing>, AbstractEventLog<Nothing>() {
@@ -18,7 +19,7 @@ internal object EmptyEventLog : ImmutableEventLog<Nothing>, AbstractEventLog<Not
   override fun events(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ) = emptyList<EventValue<Nothing>>()
+  ) = emptyList<Entry<Nothing>>()
 
   override fun toPersistentEventLog(): PersistentEventLog<Nothing> = persistentEventLogOf()
 }

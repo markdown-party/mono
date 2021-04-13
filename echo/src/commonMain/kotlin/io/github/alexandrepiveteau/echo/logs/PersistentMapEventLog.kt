@@ -52,13 +52,13 @@ internal constructor(
   override fun events(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Iterable<EventValue<T>> {
+  ): Iterable<EventLog.Entry<T>> {
     return buffer
         .getOrElse(site) { emptyMap() }
         .asSequence()
         .filter { it.key >= seqno }
         .asSequence()
-        .map { (seqno, body) -> EventValue(EventIdentifier(seqno, site), body) }
+        .map { (seqno, body) -> EventValueEntry(EventIdentifier(seqno, site), body) }
         .asIterable()
   }
 

@@ -2,7 +2,7 @@ package io.github.alexandrepiveteau.echo.demo.register
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.sync
@@ -25,10 +25,10 @@ private sealed class LWWRegisterEvent<out T> {
   ) : LWWRegisterEvent<T>()
 }
 /** Aggregates the [LWWProjection] events. */
-private class LWWProjection<T> : OneWayProjection<T?, EventValue<LWWRegisterEvent<T>>> {
+private class LWWProjection<T> : OneWayProjection<T?, EventLog.Entry<LWWRegisterEvent<T>>> {
 
-  override fun forward(body: EventValue<LWWRegisterEvent<T>>, model: T?): T? =
-      when (val event = body.value) {
+  override fun forward(body: EventLog.Entry<LWWRegisterEvent<T>>, model: T?): T? =
+      when (val event = body.body) {
         // Always pick the latest event value, which has the highest event identifier.
         is LWWRegisterEvent.Set -> event.value
       }

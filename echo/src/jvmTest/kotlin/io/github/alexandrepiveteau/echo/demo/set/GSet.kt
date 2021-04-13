@@ -1,24 +1,24 @@
 package io.github.alexandrepiveteau.echo.demo.set
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.sync
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 private sealed class GSetEvent<out T> {
   data class Add<out T>(val item: T) : GSetEvent<T>()
 }
 
 private fun <T> gSetProjection() =
-    OneWayProjection<Set<T>, EventValue<GSetEvent<T>>> { event, model ->
-      when (val body = event.value) {
+    OneWayProjection<Set<T>, EventLog.Entry<GSetEvent<T>>> { event, model ->
+      when (val body = event.body) {
         // Add events, and duplicate insertions.
         is GSetEvent.Add -> model + body.item
       }

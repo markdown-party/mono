@@ -3,7 +3,7 @@ package io.github.alexandrepiveteau.echo.demo.counter
 import io.github.alexandrepiveteau.echo.demo.Site
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Decrement
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Increment
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.Test
@@ -22,8 +22,8 @@ private sealed class PNCounterEvent {
 }
 
 private val PNProjection =
-    OneWayProjection<Int, EventValue<PNCounterEvent>> { event, sum ->
-      when (event.value) {
+    OneWayProjection<Int, EventLog.Entry<PNCounterEvent>> { event, sum ->
+      when (event.body) {
         is Increment -> sum + 1
         is Decrement -> sum - 1
       }

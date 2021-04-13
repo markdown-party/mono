@@ -5,7 +5,7 @@ package io.github.alexandrepiveteau.echo.protocol.fsm
 
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventValue
+import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
@@ -84,7 +84,7 @@ private data class IncomingNew<T>(
 // TODO : Optimize with mutable states.
 private data class IncomingSending<T>(
     private val advertisedSites: List<SiteIdentifier>,
-    private val pendingEvents: List<EventValue<T>>,
+    private val pendingEvents: List<EventLog.Entry<T>>,
     private val pendingSites: List<SiteIdentifier>,
     private val receivedAcks: Map<SiteIdentifier, SequenceNumber>,
     private val receivedCredits: Map<SiteIdentifier, Long>,
@@ -127,11 +127,12 @@ private data class IncomingSending<T>(
       // Highest priority, generally, is sending events that we may have in the
       // queue.
       // Each exchange can therefore work without interrupting other exchanges.
-      val event = pendingEvents.firstOrNull { (id, _) -> receivedCredits[id.site] ?: 0L > 0L }
+      val event =
+          pendingEvents.firstOrNull { entry -> receivedCredits[entry.identifier.site] ?: 0L > 0L }
       if (event != null) {
         onSend(
             Inc.Event(
-                site = event.identifier.site, seqno = event.identifier.seqno, body = event.value)) {
+                site = event.identifier.site, seqno = event.identifier.seqno, body = event.body)) {
           // Diminish credits by one, ack a new operation and update the state.
           val creditsForSite = receivedCredits[event.identifier.site] ?: 0L
           val ackForSite = receivedAcks[event.identifier.site] ?: event.identifier.seqno

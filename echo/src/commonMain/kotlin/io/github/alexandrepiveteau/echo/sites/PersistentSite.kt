@@ -7,10 +7,7 @@ import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.channelLink
 import io.github.alexandrepiveteau.echo.events.EventScope
-import io.github.alexandrepiveteau.echo.logs.EventValue
-import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
-import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
-import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
+import io.github.alexandrepiveteau.echo.logs.*
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.protocol.fsm.Effect
 import io.github.alexandrepiveteau.echo.protocol.fsm.IncomingState
@@ -47,7 +44,7 @@ internal class PersistentSite<T, M>(
     override val identifier: SiteIdentifier,
     private var log: PersistentEventLog<T> = persistentEventLogOf(),
     private val initial: M,
-    private val projection: OneWayProjection<M, EventValue<T>>,
+    private val projection: OneWayProjection<M, EventLog.Entry<T>>,
 ) : MutableSite<T, M> {
 
   /** A [Mutex] which ensures serial access to the [log] and the [inserted] value. */
@@ -75,7 +72,7 @@ internal class PersistentSite<T, M>(
           log = log.set(seqno, site, event)
           current.value =
               projection.forward(
-                  EventValue(EventIdentifier(seqno, site), event),
+                  EventValueEntry(EventIdentifier(seqno, site), event),
                   current.value,
               )
           inserted.value = EventIdentifier(seqno, site)
@@ -135,7 +132,7 @@ internal class PersistentSite<T, M>(
               log = log.set(next, identifier, event)
               current.value =
                   projection.forward(
-                      EventValue(EventIdentifier(next, identifier), event),
+                      EventValueEntry(EventIdentifier(next, identifier), event),
                       current.value,
                   )
 

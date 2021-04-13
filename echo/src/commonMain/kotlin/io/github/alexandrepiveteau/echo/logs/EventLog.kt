@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.logs
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
+import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 
@@ -49,5 +50,19 @@ interface EventLog<out T> {
   fun events(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Iterable<EventValue<T>>
+  ): Iterable<Entry<T>>
+
+  /**
+   * An [Entry] in the event log, consisting of an event, and a unique identifier for the event.
+   *
+   * @param T the type of the events.
+   */
+  interface Entry<out T> {
+
+    /** The unique identifier for this event. */
+    val identifier: EventIdentifier
+
+    /** The actual body of the event. */
+    val body: T
+  }
 }
