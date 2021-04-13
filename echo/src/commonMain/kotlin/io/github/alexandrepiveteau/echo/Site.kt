@@ -45,13 +45,6 @@ interface MutableSite<T, out M> : Site<T, M> {
 }
 
 /**
- * A typealias for [MutableSite] that simply expose the underlying [ImmutableEventLog].
- *
- * @param T the type of the events managed by this [MutableSite].
- */
-typealias EventLogSite<T> = MutableSite<T, ImmutableEventLog<T>>
-
-/**
  * Creates a new [Site] for the provided [SiteIdentifier], which can not be manually mutated.
  *
  * @param identifier the globally unique identifier for this [Site].
@@ -71,7 +64,7 @@ fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutabl
 fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
-): EventLogSite<T> =
+): MutableSite<T, ImmutableEventLog<T>> =
     unorderedSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
@@ -132,5 +125,4 @@ internal fun <M, T> unorderedSite(
     initial: M,
     log: ImmutableEventLog<T> = immutableEventLogOf(),
     projection: OneWayProjection<M, EventValue<T>>,
-): MutableSite<T, M> =
-    PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)
+): MutableSite<T, M> = PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)
