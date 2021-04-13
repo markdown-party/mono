@@ -47,7 +47,8 @@ internal constructor(
   override fun get(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): T? = buffer[site]?.get(seqno)
+  ): EventLog.Entry<T>? =
+      buffer[site]?.get(seqno)?.let { body -> EventValueEntry(EventIdentifier(seqno, site), body) }
 
   override fun events(
       seqno: SequenceNumber,

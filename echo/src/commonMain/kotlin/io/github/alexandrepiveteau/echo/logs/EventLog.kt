@@ -28,7 +28,7 @@ interface EventLog<out T> {
   fun expected(site: SiteIdentifier): SequenceNumber
 
   /**
-   * Gets the body of the event with a given [seqno] and [site], if it exists.
+   * Gets the event with a given [seqno] and [site], if it exists.
    *
    * @param seqno the sequence number of the event.
    * @param site the site of the event.
@@ -36,7 +36,7 @@ interface EventLog<out T> {
   operator fun get(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): T?
+  ): Entry<T>?
 
   /**
    * Returns all the events greater or equal to the provided [SequenceNumber] for the given
