@@ -4,7 +4,6 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.logs.EventLog.Entry
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
-import io.github.alexandrepiveteau.echo.logs.immutableEventLogOf
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import io.github.alexandrepiveteau.echo.projections.HistoryProjection
 import io.github.alexandrepiveteau.echo.projections.HistoryProjection.History
@@ -63,7 +62,7 @@ fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutabl
  */
 fun <T> mutableSite(
     identifier: SiteIdentifier,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
+    log: ImmutableEventLog<T> = persistentEventLogOf(),
 ): MutableSite<T, ImmutableEventLog<T>> =
     unorderedSite(
         identifier = identifier,
@@ -89,7 +88,7 @@ fun <T> mutableSite(
 fun <M, T> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
+    log: ImmutableEventLog<T> = persistentEventLogOf(),
     projection: OneWayProjection<M, Entry<T>>,
 ): MutableSite<T, M> =
     unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
@@ -113,7 +112,7 @@ fun <M, T> mutableSite(
 fun <M, T, C> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
+    log: ImmutableEventLog<T> = persistentEventLogOf(),
     projection: TwoWayProjection<M, Entry<T>, C>,
 ): MutableSite<T, M> =
     unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
@@ -125,6 +124,6 @@ fun <M, T, C> mutableSite(
 internal fun <M, T> unorderedSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = immutableEventLogOf(),
+    log: ImmutableEventLog<T> = persistentEventLogOf(),
     projection: OneWayProjection<M, Entry<T>>,
 ): MutableSite<T, M> = PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)
