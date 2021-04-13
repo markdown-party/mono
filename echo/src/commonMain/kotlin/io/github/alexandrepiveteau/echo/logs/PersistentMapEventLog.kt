@@ -18,7 +18,7 @@ import kotlinx.collections.immutable.persistentMapOf
 internal data class PersistentMapEventLog<T>
 internal constructor(
     private val buffer: PersistentMap<SiteIdentifier, PersistentMap<SequenceNumber, T>>,
-) : PersistentEventLog<T> {
+) : PersistentEventLog<T>, AbstractEventLog<T>() {
 
   constructor(
       vararg events: Pair<EventIdentifier, T>,

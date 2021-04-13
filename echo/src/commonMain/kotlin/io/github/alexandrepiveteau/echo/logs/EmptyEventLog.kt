@@ -5,7 +5,7 @@ import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 
 /** An implementation of [ImmutableEventLog] that's empty. */
-internal object EmptyEventLog : ImmutableEventLog<Nothing> {
+internal object EmptyEventLog : ImmutableEventLog<Nothing>, AbstractEventLog<Nothing>() {
 
   override val sites = emptySet<SiteIdentifier>()
 
