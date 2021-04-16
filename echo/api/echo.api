@@ -36,12 +36,12 @@ public abstract interface class io/github/alexandrepiveteau/echo/Site : io/githu
 }
 
 public final class io/github/alexandrepiveteau/echo/SiteKt {
-	public static final fun mutableSite-hoqhmwc (ILio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static synthetic fun mutableSite-hoqhmwc$default (ILio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mutableSite-hoqhmwc (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-hoqhmwc$default (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static final fun site-BJWj3EQ (I)Lio/github/alexandrepiveteau/echo/Site;
 }
 
@@ -200,9 +200,14 @@ public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog {
 	public abstract fun getExpected-o38t-jg ()I
 	public abstract fun getSites ()Ljava/util/Set;
 	public abstract fun iterator ()Ljava/util/Iterator;
+	public abstract fun lastOrNull ()Lio/github/alexandrepiveteau/echo/logs/EventLog$Entry;
 }
 
-public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog$Entry {
+public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog$Entry : io/github/alexandrepiveteau/echo/logs/EventLog$IndexedEvent {
+	public abstract fun getChange-_f-E67s ()Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog$IndexedEvent {
 	public abstract fun getBody ()Ljava/lang/Object;
 	public abstract fun getIdentifier-Fr_gKlU ()J
 }
@@ -213,7 +218,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/logs/ImmutableE
 
 public abstract interface class io/github/alexandrepiveteau/echo/logs/PersistentEventLog : io/github/alexandrepiveteau/echo/logs/ImmutableEventLog {
 	public abstract fun remove-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
-	public abstract fun set-oalcO7s (IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
+	public abstract fun set-9a0DSnI (IILjava/lang/Object;Ljava/lang/Object;)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/OneWayProjection {
