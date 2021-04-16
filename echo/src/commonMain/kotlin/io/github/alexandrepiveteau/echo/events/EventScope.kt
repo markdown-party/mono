@@ -17,6 +17,10 @@ import io.github.alexandrepiveteau.echo.causal.EventIdentifier
    * established with (at least) all the preceding events on this site; therefore, two subsequent
    * calls to [yield] guarantee that the order of the operations will be preserved.
    *
+   * Please note that some events might be concurrently inserted to other sites of the log, and it's
+   * therefore not possible to predict the [EventIdentifier] for this event before it will have been
+   * [yield].
+   *
    * @param event The event that will be added to the log.
    *
    * @return the [EventIdentifier] that's issued for this new event.
