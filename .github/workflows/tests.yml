@@ -11,4 +11,4 @@ jobs:
         with:
           java-version: 1.11
       - name: ✅ Test app
-        run: ./gradlew test
+        run: ./gradlew check
