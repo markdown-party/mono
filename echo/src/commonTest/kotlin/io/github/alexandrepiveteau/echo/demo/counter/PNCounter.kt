@@ -3,7 +3,7 @@ package io.github.alexandrepiveteau.echo.demo.counter
 import io.github.alexandrepiveteau.echo.demo.Site
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Decrement
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Increment
-import io.github.alexandrepiveteau.echo.logs.EventLog
+import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
@@ -22,7 +22,7 @@ private sealed class PNCounterEvent {
 }
 
 private val PNProjection =
-    OneWayProjection<Int, EventLog.Entry<PNCounterEvent>> { event, sum ->
+    OneWayProjection<Int, IndexedEvent<PNCounterEvent>> { event, sum ->
       when (event.body) {
         is Increment -> sum + 1
         is Decrement -> sum - 1

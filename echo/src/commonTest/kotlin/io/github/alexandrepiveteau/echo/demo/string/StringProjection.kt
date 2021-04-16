@@ -15,9 +15,12 @@ fun StringModel.asString() =
         .toCharArray()
         .concatToString()
 
-class StringProjection : OneWayProjection<StringModel, EventLog.Entry<StringOperation>> {
+class StringProjection : OneWayProjection<StringModel, EventLog.IndexedEvent<StringOperation>> {
 
-  override fun forward(body: EventLog.Entry<StringOperation>, model: StringModel): StringModel {
+  override fun forward(
+      body: EventLog.IndexedEvent<StringOperation>,
+      model: StringModel
+  ): StringModel {
     return when (val op = body.body) {
       is StringOperation.InsertAfter -> {
         model.toMutableList().apply {

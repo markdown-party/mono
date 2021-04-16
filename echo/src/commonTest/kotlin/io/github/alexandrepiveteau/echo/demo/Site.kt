@@ -2,8 +2,8 @@ package io.github.alexandrepiveteau.echo.demo
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventLog
-import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
+import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
+import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
@@ -14,7 +14,7 @@ class Site private constructor() {
 
     class Factory<T, M>(
         private val initial: M,
-        private val projection: OneWayProjection<M, EventLog.Entry<T>>
+        private val projection: OneWayProjection<M, IndexedEvent<T>>
     ) {
 
       // Incrementing identifiers, so assumptions about operation ordering can be made in tests.
@@ -28,7 +28,7 @@ class Site private constructor() {
     /** Convenient way to create multiple multiple sites, which may be used in testing. */
     fun <T, M> createMemoryEchos(
         initial: M,
-        projection: OneWayProjection<M, EventLog.Entry<T>>,
+        projection: OneWayProjection<M, IndexedEvent<T>>,
     ) = Factory(initial, projection)
 
     /**
@@ -39,8 +39,8 @@ class Site private constructor() {
     fun <T, M> create(
         identifier: SiteIdentifier,
         initial: M,
-        log: ImmutableEventLog<T> = persistentEventLogOf(),
-        projection: OneWayProjection<M, EventLog.Entry<T>>
+        log: PersistentEventLog<T, M> = persistentEventLogOf(),
+        projection: OneWayProjection<M, IndexedEvent<T>>
     ): MutableSite<T, M> =
         mutableSite(
             identifier = identifier,

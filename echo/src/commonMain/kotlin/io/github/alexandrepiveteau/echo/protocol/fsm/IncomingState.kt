@@ -4,13 +4,16 @@
 package io.github.alexandrepiveteau.echo.protocol.fsm
 
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
+import io.github.alexandrepiveteau.echo.causal.SequenceNumber.Companion.Zero
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
+import io.github.alexandrepiveteau.echo.protocol.fsm.Effect.Move
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.selects.selectUnbiased
 
 /**
  * A sealed class representing the different states that the finite state machine may be in. Each
@@ -20,15 +23,15 @@ import kotlinx.coroutines.selects.select
  * @param T the type of the events.
  */
 // TODO : Update the documentation.
-internal sealed class IncomingState<T> : State<Out<T>, Inc<T>, T, IncomingState<T>> {
+internal sealed class IncomingState<T, C> : State<Out<T>, Inc<T>, T, C, IncomingState<T, C>> {
 
   companion object {
 
     /** Creates a new [IncomingState] that's the beginning of the FSM. */
-    operator fun <T> invoke(pending: Iterable<SiteIdentifier>): IncomingState<T> =
+    operator fun <T, C> invoke(pending: Iterable<SiteIdentifier>): IncomingState<T, C> =
         IncomingNew(
-            advertisedSites = mutableListOf(),
-            pendingSites = pending.toMutableList(),
+            alreadySent = persistentListOf(),
+            remainingToSend = pending.toPersistentList(),
         )
   }
 }
@@ -42,38 +45,30 @@ internal sealed class IncomingState<T> : State<Out<T>, Inc<T>, T, IncomingState<
 //    move to the Sending state.
 // 3. We receive a Done event, so we move to Cancelling.
 // 4. We receive an unsupported message, which we just ignore. // TODO : Fail fast instead ?
-private data class IncomingNew<T>(
-    private val advertisedSites: MutableList<SiteIdentifier>,
-    private val pendingSites: MutableList<SiteIdentifier>,
-) : IncomingState<T>() {
+private data class IncomingNew<T, C>(
+    private val alreadySent: PersistentList<SiteIdentifier>,
+    private val remainingToSend: PersistentList<SiteIdentifier>,
+) : IncomingState<T, C>() {
 
-  override suspend fun IncomingStepScope<T>.step(
-      log: ImmutableEventLog<T>
-  ): Effect<IncomingState<T>> {
+  override suspend fun IncomingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>
+  ): Effect<IncomingState<T, C>> {
     return select {
-      val pending = pendingSites.lastOrNull()
+      val pending = remainingToSend.lastOrNull()
       if (pending != null) {
         onSend(Inc.Advertisement(pending)) {
-          advertisedSites.add(pending)
-          pendingSites.removeLast()
-          Effect.Move(this@IncomingNew) // mutable state updated.
+          Move(
+              copy(
+                  alreadySent = alreadySent.add(pending),
+                  remainingToSend = remainingToSend.removeAt(remainingToSend.lastIndex),
+              ))
         }
       } else {
-        onSend(Inc.Ready) {
-          Effect.Move(
-              IncomingSending<T>(
-                      advertisedSites = advertisedSites,
-                      pendingEvents = emptyList(),
-                      pendingSites = emptyList(),
-                      receivedAcks = emptyMap(),
-                      receivedCredits = emptyMap(),
-                  )
-                  .update(log))
-        }
+        onSend(Inc.Ready) { Move(IncomingSending(advertised = alreadySent)) }
       }
       onReceiveOrClosed { v ->
         when (v.valueOrNull) {
-          Out.Done, null -> Effect.Move(IncomingCancelling())
+          Out.Done, null -> Move(IncomingCancelling())
           else -> Effect.MoveToError(IllegalStateException(/* TODO */ ))
         }
       }
@@ -81,116 +76,111 @@ private data class IncomingNew<T>(
   }
 }
 
-// TODO : Optimize with mutable states.
-private data class IncomingSending<T>(
-    private val advertisedSites: List<SiteIdentifier>,
-    private val pendingEvents: List<EventLog.Entry<T>>,
-    private val pendingSites: List<SiteIdentifier>,
-    private val receivedAcks: Map<SiteIdentifier, SequenceNumber>,
-    private val receivedCredits: Map<SiteIdentifier, Long>,
-) : IncomingState<T>() {
+private data class IncomingSending<T, C>(
+    // private val sitesAdvertisementsToSend: PersistentList<SiteIdentifier> = persistentListOf(),
+    private val nextSequenceNumberPerSite: PersistentMap<SiteIdentifier, SequenceNumber> =
+        persistentMapOf(),
+    private val receivedCredits: PersistentMap<SiteIdentifier, Long> = persistentMapOf(),
+) : IncomingState<T, C>() {
 
   /**
-   * Uses the [EventLog] to update the [Sending] state with missing pending sites and missing
-   * pending events.
-   *
-   * @param log the [EventLog] that's used to update the [Sending] state.
+   * A constructor which lets the user specify the already [advertised] site. Each advertised site
+   * gets zero credits, and gets added to the [receivedCredits] map.
    */
-  fun update(
-      log: ImmutableEventLog<T>,
-  ): IncomingSending<T> {
-    val newSites = log.sites - advertisedSites
-    val newEvents =
-        advertisedSites
-            .asSequence()
-            .flatMap { site ->
-              log.events(
-                  seqno = receivedAcks[site] ?: SequenceNumber.Zero,
-                  site = site,
-              )
-            }
-            .toList()
+  constructor(
+      advertised: PersistentList<SiteIdentifier>
+  ) : this(receivedCredits = advertised.fold(persistentMapOf()) { map, site -> map.put(site, 0L) })
 
-    return IncomingSending(
-        advertisedSites = advertisedSites,
-        pendingEvents = newEvents,
-        pendingSites = newSites.toList(),
-        receivedAcks = receivedAcks,
-        receivedCredits = receivedCredits,
+  /** Returns the next [Inc.Advertisement] message to send, if there's any. */
+  fun nextAdvertisementOrNull(log: ImmutableEventLog<T, C>): Inc.Advertisement? {
+    val missing = log.sites - receivedCredits.keys
+    val site = missing.firstOrNull() ?: return null
+    return Inc.Advertisement(site)
+  }
+
+  /**
+   * Returns the [IncomingState] if the [Inc.Advertisement] for the given [msg] was successfully
+   * processed.
+   */
+  fun handleAdvSent(msg: Inc.Advertisement): IncomingState<T, C> {
+    return copy(receivedCredits = receivedCredits.put(msg.site, 0L))
+  }
+
+  /**
+   * Returns the next [Inc.Event] message to send, if there's any.
+   *
+   * @param log the [ImmutableEventLog] that is in charge of generating the events.
+   */
+  @Suppress("DEPRECATION")
+  fun nextEventOrNull(log: ImmutableEventLog<T, C>): Inc.Event<T>? {
+    val event =
+        receivedCredits
+            .asSequence()
+            .filter { (_, credits) -> credits > 0L }
+            .map { (site, _) -> site to (nextSequenceNumberPerSite[site] ?: Zero) }
+            .flatMap { (site, seqno) -> log.events(site, seqno) }
+            .firstOrNull()
+            ?: return null
+
+    return Inc.Event(
+        seqno = event.identifier.seqno,
+        site = event.identifier.site,
+        body = event.body,
     )
   }
 
-  override suspend fun IncomingStepScope<T>.step(
-      log: ImmutableEventLog<T>
-  ): Effect<IncomingState<T>> {
-    return select {
-      // Highest priority, generally, is sending events that we may have in the
-      // queue.
-      // Each exchange can therefore work without interrupting other exchanges.
-      val event =
-          pendingEvents.firstOrNull { entry -> receivedCredits[entry.identifier.site] ?: 0L > 0L }
-      if (event != null) {
-        onSend(
-            Inc.Event(
-                site = event.identifier.site, seqno = event.identifier.seqno, body = event.body)) {
-          // Diminish credits by one, ack a new operation and update the state.
-          val creditsForSite = receivedCredits[event.identifier.site] ?: 0L
-          val ackForSite = receivedAcks[event.identifier.site] ?: event.identifier.seqno
-          val newCredits = receivedCredits + (event.identifier.site to creditsForSite - 1)
-          val newAcks =
-              receivedAcks + (event.identifier.site to maxOf(event.identifier.seqno, ackForSite))
-          val newEvents = pendingEvents - event
-          Effect.Move(
-              IncomingSending(
-                  advertisedSites = advertisedSites,
-                  pendingEvents = newEvents,
-                  pendingSites = pendingSites,
-                  receivedAcks = newAcks,
-                  receivedCredits = newCredits,
-              ))
-        }
-      }
-      val firstSite = pendingSites.firstOrNull()
-      if (firstSite != null) {
-        onSend(Inc.Advertisement(firstSite)) {
-          Effect.Move(
-              IncomingSending(
-                      advertisedSites = advertisedSites.plus(firstSite),
-                      pendingEvents = pendingEvents,
-                      pendingSites = pendingSites.drop(1),
-                      receivedAcks = receivedAcks,
-                      receivedCredits = receivedCredits,
-                  )
-                  .update(log))
-        }
-      }
+  /**
+   * Returns the [IncomingState] if the [Inc.Event] for the given [msg] was successfully processed.
+   */
+  fun handleEventSent(msg: Inc.Event<T>): IncomingState<T, C> {
+    val remainingCredits = receivedCredits[msg.site]?.minus(1) ?: 0
+    val nextSequenceNumber = nextSequenceNumberPerSite[msg.site]?.inc() ?: Zero
+    return copy(
+        nextSequenceNumberPerSite = nextSequenceNumberPerSite.put(msg.site, nextSequenceNumber),
+        receivedCredits = receivedCredits.put(msg.site, remainingCredits),
+    )
+  }
+
+  /** Returns the [IncomingState] if the [Out.Request] [msg] is received. */
+  fun handleRequestReceived(msg: Out.Request): IncomingState<T, C> {
+    // TODO : Check for overflows ?
+    val remainingCredits = (receivedCredits[msg.site] ?: 0) + msg.count
+    val nextSequenceNumber = maxOf(msg.nextForSite, nextSequenceNumberPerSite[msg.site] ?: Zero)
+    return copy(
+        nextSequenceNumberPerSite = nextSequenceNumberPerSite.put(msg.site, nextSequenceNumber),
+        receivedCredits = receivedCredits.put(msg.site, remainingCredits),
+    )
+  }
+
+  override suspend fun IncomingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>
+  ): Effect<IncomingState<T, C>> {
+    return selectUnbiased {
+      val event = nextEventOrNull(log)
+      if (event != null) onSend(event) { Move(handleEventSent(event)) }
+
+      val advertisement = nextAdvertisementOrNull(log)
+      if (advertisement != null) onSend(advertisement) { Move(handleAdvSent(advertisement)) }
+
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
-          is Out.Request -> {
-            // Ack based on request, and set credits for the given site.
-            val ackForSite = maxOf(receivedAcks[msg.site] ?: msg.nextForSite, msg.nextForSite)
-            val newAcks = receivedAcks + (msg.site to ackForSite)
-            val newCredits = receivedCredits + (msg.site to msg.count)
-            Effect.Move(
-                copy(
-                    receivedAcks = newAcks,
-                    receivedCredits = newCredits,
-                ))
-          }
-          is Out.Done, null -> Effect.Move(IncomingCancelling())
+          is Out.Request -> Move(handleRequestReceived(msg))
+          is Out.Done, null -> Move(IncomingCancelling())
         }
       }
-      onInsert { new -> Effect.Move(update(new)) }
+
+      // On new events, request another pass of the step.
+      onInsert { Move(this@IncomingSending) }
     }
   }
 }
 
 // 1. We can send a Done message, and move to Completed.
-private class IncomingCancelling<T> : IncomingState<T>() {
+private class IncomingCancelling<T, C> : IncomingState<T, C>() {
 
-  override suspend fun IncomingStepScope<T>.step(
-      log: ImmutableEventLog<T>
-  ): Effect<IncomingState<T>> {
+  override suspend fun IncomingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>
+  ): Effect<IncomingState<T, C>> {
     return select { onSend(Inc.Done) { Effect.Terminate } }
   }
 }

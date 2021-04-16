@@ -3,6 +3,8 @@ package io.github.alexandrepiveteau.echo.log
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.logs.Change
+import io.github.alexandrepiveteau.echo.logs.Change.Companion.skipped
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,7 +23,7 @@ class SortedMapEventLogTest {
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(123U)
 
-    log = log.set(site, seqno, Unit)
+    log = log.set(site, seqno, Unit, skipped())
 
     assertEquals(seqno.inc(), log.expected(site))
   }
@@ -34,8 +36,8 @@ class SortedMapEventLogTest {
     val high = SequenceNumber(2U)
 
     // Insert the highest first.
-    log = log.set(site, high, Unit)
-    log = log.set(site, low, Unit)
+    log = log.set(site, high, Unit, skipped())
+    log = log.set(site, low, Unit, skipped())
 
     assertEquals(high.inc(), log.expected(site))
   }
@@ -54,7 +56,7 @@ class SortedMapEventLogTest {
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(1U)
 
-    log = log.set(site, seqno, 42)
+    log = log.set(site, seqno, 42, skipped())
 
     assertEquals(42, log[site, seqno]?.body)
   }

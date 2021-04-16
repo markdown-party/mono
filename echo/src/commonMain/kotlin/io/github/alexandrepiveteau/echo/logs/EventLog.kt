@@ -12,8 +12,9 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
  * fashion.
  *
  * @param T the type of of the body of one event.
+ * @param C the type of the change of one event.
  */
-interface EventLog<out T> {
+interface EventLog<out T, out C> {
 
   /** Returns an [Iterable] of all the [SiteIdentifier] that are known to this [EventLog]. */
   val sites: Set<SiteIdentifier>
@@ -47,7 +48,9 @@ interface EventLog<out T> {
   operator fun get(
       site: SiteIdentifier,
       seqno: SequenceNumber,
-  ): Entry<T>?
+  ): Entry<T, C>?
+
+  @EchoEventLogPreview fun lastOrNull(): Entry<T, C>?
 
   /**
    * Returns all the events greater or equal to the provided [SequenceNumber] for the given
@@ -58,22 +61,23 @@ interface EventLog<out T> {
    *
    * @return all the events that are equal or higher to this [seqno] for the [site].
    */
+  @Deprecated(message = "This API is not very understandable.")
   fun events(
       site: SiteIdentifier,
       seqno: SequenceNumber,
-  ): Iterable<Entry<T>>
+  ): Iterable<Entry<T, C>>
 
   /**
    * Returns an [Iterator] with all the entries from the [EventLog], starting at the beginning of
    * the event log.
    */
-  operator fun iterator(): Iterator<Entry<T>>
+  operator fun iterator(): Iterator<Entry<T, C>>
 
   /**
    * Returns an [EventIterator] with all the entries from the [EventLog], starting at the beginning
    * of the event log.
    */
-  fun eventIterator(): EventIterator<Entry<T>>
+  fun eventIterator(): EventIterator<Entry<T, C>>
 
   /**
    * Returns an [EventIterator] with all the entries from the [EventLog], starting at the provided
@@ -84,19 +88,31 @@ interface EventLog<out T> {
   fun eventIterator(
       site: SiteIdentifier,
       seqno: SequenceNumber,
-  ): EventIterator<Entry<T>>
+  ): EventIterator<Entry<T, C>>
 
   /**
-   * An [Entry] in the event log, consisting of an event, and a unique identifier for the event.
+   * An [IndexedEvent] is similar to an [Entry], but without an associated change.
    *
    * @param T the type of the events.
    */
-  interface Entry<out T> {
+  interface IndexedEvent<out T> {
 
     /** The unique identifier for this event. */
     val identifier: EventIdentifier
 
     /** The actual body of the event. */
     val body: T
+  }
+
+  /**
+   * An [Entry] in the event log, consisting of an event, and a unique identifier for the event.
+   *
+   * @param T the type of the events.
+   * @param C the type of the changes.
+   */
+  interface Entry<out T, out C> : IndexedEvent<T> {
+
+    /** The actual change of the event. */
+    val change: Change<C>
   }
 }

@@ -20,12 +20,12 @@ import kotlinx.coroutines.selects.select
  * @param T the type of the events.
  */
 // TODO : Update the documentation.
-internal sealed class OutgoingState<T> : State<Inc<T>, Out<T>, T, OutgoingState<T>> {
+internal sealed class OutgoingState<T, C> : State<Inc<T>, Out<T>, T, C, OutgoingState<T, C>> {
 
   companion object {
 
     /** Creates a new [OutgoingState] that's the beginning of the FSM. */
-    operator fun <T> invoke(): OutgoingState<T> = OutgoingAdvertising(mutableListOf())
+    operator fun <T, C> invoke(): OutgoingState<T, C> = OutgoingAdvertising(mutableListOf())
   }
 }
 
@@ -40,13 +40,13 @@ private fun notReachable(name: String? = null): Throwable {
 
 // FINITE STATE MACHINE
 
-private data class OutgoingAdvertising<T>(
+private data class OutgoingAdvertising<T, C>(
     private val available: MutableList<SiteIdentifier>,
-) : OutgoingState<T>() {
+) : OutgoingState<T, C>() {
 
   @OptIn(InternalCoroutinesApi::class)
-  override suspend fun OutgoingStepScope<T>.step(log: ImmutableEventLog<T>) =
-      select<Effect<OutgoingState<T>>> {
+  override suspend fun OutgoingStepScope<T, C>.step(log: ImmutableEventLog<T, C>) =
+      select<Effect<OutgoingState<T, C>>> {
         onReceiveOrClosed { v ->
           when (val msg = v.valueOrNull) {
             is Inc.Advertisement -> {
@@ -68,14 +68,14 @@ private data class OutgoingAdvertising<T>(
 }
 
 @OptIn(EchoEventLogPreview::class)
-private data class OutgoingListening<T>(
+private data class OutgoingListening<T, C>(
     private val pendingRequests: MutableList<SiteIdentifier>,
     private val requested: MutableList<SiteIdentifier>,
-) : OutgoingState<T>() {
+) : OutgoingState<T, C>() {
 
-  override suspend fun OutgoingStepScope<T>.step(
-      log: ImmutableEventLog<T>
-  ): Effect<OutgoingState<T>> {
+  override suspend fun OutgoingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>
+  ): Effect<OutgoingState<T, C>> {
     val request = pendingRequests.lastOrNull()
     val expected = request?.let(log::expected) ?: SequenceNumber.Zero
     val max = log.expected
@@ -114,9 +114,9 @@ private data class OutgoingListening<T>(
 }
 
 // 1. We can send a Done message, and move to Completed.
-private class OutgoingCancelling<T> : OutgoingState<T>() {
+private class OutgoingCancelling<T, C> : OutgoingState<T, C>() {
 
-  override suspend fun OutgoingStepScope<T>.step(
-      log: ImmutableEventLog<T>,
-  ) = select<Effect<OutgoingState<T>>> { onSend(Out.Done) { Effect.Terminate } }
+  override suspend fun OutgoingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>,
+  ) = select<Effect<OutgoingState<T, C>>> { onSend(Out.Done) { Effect.Terminate } }
 }

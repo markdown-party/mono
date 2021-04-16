@@ -12,6 +12,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withTimeoutOrNull
 
 class StringTest {
@@ -103,7 +104,12 @@ class StringTest {
 
     alice.event { appendStart(message) }
 
+      println(alice.value.first().asString())
+
     withTimeoutOrNull(1000) { sync(alice, bob) }
+
+      println(alice.value.first().asString())
+      println(bob.value.first().asString())
 
     alice.event { model -> appendEnd(model, " Hurray !") }
     bob.event { model -> deleteRange(model, 6, 6 + "world".length) }
@@ -112,7 +118,7 @@ class StringTest {
 
     val expected = "Hello , this is a test ! Hurray !"
 
-    bob.value.map { it.asString() }.first { it == expected }
-    alice.value.map { it.asString() }.first { it == expected }
+    bob.value.map { it.asString() }.onEach { println(it) }.first { it == expected }
+    alice.value.map { it.asString() }.onEach { println(it) }.first { it == expected }
   }
 }

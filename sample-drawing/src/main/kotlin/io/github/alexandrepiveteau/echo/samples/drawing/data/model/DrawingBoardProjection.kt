@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.samples.drawing.data.model
 
 import io.github.alexandrepiveteau.echo.logs.EventLog
+import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 
 /**
@@ -8,10 +9,10 @@ import io.github.alexandrepiveteau.echo.projections.OneWayProjection
  * sequence of [EventLog.Entry].
  */
 object DrawingBoardProjection :
-    OneWayProjection<PersistentDrawingBoard, EventLog.Entry<DrawingEvent>> {
+    OneWayProjection<PersistentDrawingBoard, IndexedEvent<DrawingEvent>> {
 
   override fun forward(
-      body: EventLog.Entry<DrawingEvent>,
+      body: IndexedEvent<DrawingEvent>,
       model: PersistentDrawingBoard,
   ): PersistentDrawingBoard {
 

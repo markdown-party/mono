@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.demo.set
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.EventLog
+import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
@@ -17,7 +18,7 @@ private sealed class GSetEvent<out T> {
 }
 
 private fun <T> gSetProjection() =
-    OneWayProjection<Set<T>, EventLog.Entry<GSetEvent<T>>> { event, model ->
+    OneWayProjection<Set<T>, IndexedEvent<GSetEvent<T>>> { event, model ->
       when (val body = event.body) {
         // Add events, and duplicate insertions.
         is GSetEvent.Add -> model + body.item

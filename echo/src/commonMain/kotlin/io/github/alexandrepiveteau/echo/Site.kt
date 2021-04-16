@@ -2,17 +2,17 @@ package io.github.alexandrepiveteau.echo
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.events.EventScope
-import io.github.alexandrepiveteau.echo.logs.EventLog.Entry
+import io.github.alexandrepiveteau.echo.internal.history.ActualPersistentHistory
+import io.github.alexandrepiveteau.echo.internal.history.PersistentHistorySite
+import io.github.alexandrepiveteau.echo.logs.Change.Companion.skipped
+import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
+import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
-import io.github.alexandrepiveteau.echo.projections.HistoryProjection
-import io.github.alexandrepiveteau.echo.projections.HistoryProjection.History
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
-import io.github.alexandrepiveteau.echo.sites.PersistentSite
-import io.github.alexandrepiveteau.echo.sites.map
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -49,7 +49,9 @@ interface MutableSite<T, out M> : Site<T, M> {
  * @param identifier the globally unique identifier for this [Site].
  * @param T the type of the events managed by this [Site].
  */
-fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutableSite(identifier)
+fun <T> site(
+    identifier: SiteIdentifier,
+): Site<T, ImmutableEventLog<T, Nothing>> = mutableSite(identifier)
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -62,14 +64,16 @@ fun <T> site(identifier: SiteIdentifier): Site<T, ImmutableEventLog<T>> = mutabl
  */
 fun <T> mutableSite(
     identifier: SiteIdentifier,
-    log: ImmutableEventLog<T> = persistentEventLogOf(),
-): MutableSite<T, ImmutableEventLog<T>> =
+    log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
+): MutableSite<T, PersistentEventLog<T, Nothing>> =
     unorderedSite(
         identifier = identifier,
         log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
     ) { entry, model ->
-      model.apply { set(entry.identifier.site, entry.identifier.seqno, entry.body) }
+      model.apply {
+        set(entry.identifier.site, entry.identifier.seqno, entry.body, change = skipped())
+      }
     }
 
 /**
@@ -78,7 +82,7 @@ fun <T> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [ImmutableEventLog] for this [MutableSite].
+ * @param log the underlying [PersistentEventLog] for this [MutableSite].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  *
@@ -88,12 +92,9 @@ fun <T> mutableSite(
 fun <M, T> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = persistentEventLogOf(),
-    projection: OneWayProjection<M, Entry<T>>,
-): MutableSite<T, M> =
-    unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
-      it.current
-    }
+    log: PersistentEventLog<T, M> = persistentEventLogOf(),
+    projection: OneWayProjection<M, IndexedEvent<T>>,
+): MutableSite<T, M> = unorderedSite(identifier, initial, log, projection)
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -101,7 +102,7 @@ fun <M, T> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [ImmutableEventLog] for this [MutableSite].
+ * @param log the underlying [PersistentEventLog] for this [MutableSite].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [TwoWayProjection] for this [Site].
  *
@@ -112,18 +113,30 @@ fun <M, T> mutableSite(
 fun <M, T, C> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = persistentEventLogOf(),
-    projection: TwoWayProjection<M, Entry<T>, C>,
-): MutableSite<T, M> =
-    unorderedSite(identifier, History(initial), log, HistoryProjection(projection)).map {
-      it.current
-    }
+    log: PersistentEventLog<T, C> = persistentEventLogOf(),
+    projection: TwoWayProjection<M, IndexedEvent<T>, C>,
+): MutableSite<T, M> = unorderedSite(identifier, initial, log, projection)
 
 // INTERNAL BUILDERS
 
 internal fun <M, T> unorderedSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: ImmutableEventLog<T> = persistentEventLogOf(),
-    projection: OneWayProjection<M, Entry<T>>,
-): MutableSite<T, M> = PersistentSite(identifier, log.toPersistentEventLog(), initial, projection)
+    log: PersistentEventLog<T, M> = persistentEventLogOf(),
+    projection: OneWayProjection<M, IndexedEvent<T>>,
+): MutableSite<T, M> =
+    PersistentHistorySite(
+        identifier,
+        ActualPersistentHistory(initial, log, projection),
+    )
+
+internal fun <M, T, C> unorderedSite(
+    identifier: SiteIdentifier,
+    initial: M,
+    log: PersistentEventLog<T, C> = persistentEventLogOf(),
+    projection: TwoWayProjection<M, IndexedEvent<T>, C>,
+): MutableSite<T, M> =
+    PersistentHistorySite(
+        identifier,
+        ActualPersistentHistory(initial, log, projection),
+    )
