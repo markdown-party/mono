@@ -1,4 +1,8 @@
-plugins { kotlin("multiplatform") version Versions.Kotlin }
+plugins {
+  kotlin("multiplatform") version Versions.Kotlin
+  id("org.jetbrains.kotlinx.binary-compatibility-validator") version
+      Versions.KotlinBinaryCompatibility
+}
 
 kotlin {
   jvm {

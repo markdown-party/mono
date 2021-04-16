@@ -1,0 +1,307 @@
+public abstract interface class io/github/alexandrepiveteau/echo/Coder {
+	public abstract fun decode (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun encode (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class io/github/alexandrepiveteau/echo/EchoEventLogPreview : java/lang/annotation/Annotation {
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/Exchange : io/github/alexandrepiveteau/echo/ReceiveExchange, io/github/alexandrepiveteau/echo/SendExchange {
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/Link {
+	public abstract fun talk (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/alexandrepiveteau/echo/LinkKt {
+	public static final fun channelLink (Lkotlin/jvm/functions/Function3;)Lio/github/alexandrepiveteau/echo/Link;
+	public static final fun link (Lkotlin/jvm/functions/Function3;)Lio/github/alexandrepiveteau/echo/Link;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/MutableSite : io/github/alexandrepiveteau/echo/Site {
+	public abstract fun event (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/ReceiveExchange {
+	public abstract fun incoming ()Lio/github/alexandrepiveteau/echo/Link;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/SendExchange {
+	public abstract fun outgoing ()Lio/github/alexandrepiveteau/echo/Link;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/Site : io/github/alexandrepiveteau/echo/Exchange {
+	public abstract fun getIdentifier--e_yCgk ()I
+	public abstract fun getValue ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/alexandrepiveteau/echo/SiteKt {
+	public static final fun mutableSite-hoqhmwc (ILio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-hoqhmwc$default (ILio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/ImmutableEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun site-BJWj3EQ (I)Lio/github/alexandrepiveteau/echo/Site;
+}
+
+public final class io/github/alexandrepiveteau/echo/SyncKt {
+	public static final fun sync (Lio/github/alexandrepiveteau/echo/Exchange;[Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sync (Lio/github/alexandrepiveteau/echo/Link;Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/TransformsKt {
+	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Exchange;I)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Link;I)Lio/github/alexandrepiveteau/echo/Link;
+	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Exchange;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Link;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Link;
+	public static final fun coding (Lio/github/alexandrepiveteau/echo/Exchange;Lio/github/alexandrepiveteau/echo/Coder;Lio/github/alexandrepiveteau/echo/Coder;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun coding (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Link;
+	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Link;
+	public static final fun reversed (Lio/github/alexandrepiveteau/echo/Coder;)Lio/github/alexandrepiveteau/echo/Coder;
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/EventIdentifier : java/lang/Comparable {
+	public static final synthetic fun box-impl (J)Lio/github/alexandrepiveteau/echo/causal/EventIdentifier;
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo--8-nnDo (J)I
+	public static fun compareTo--8-nnDo (JJ)I
+	public static final fun component1-o38t-jg (J)I
+	public static final fun component2--e_yCgk (J)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public static final fun getSeqno-o38t-jg (J)I
+	public static final fun getSite--e_yCgk (J)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/EventIdentifierKt {
+	public static final fun EventIdentifier-DXomJXM (II)J
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SequenceNumber : java/lang/Comparable {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/causal/SequenceNumber$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/alexandrepiveteau/echo/causal/SequenceNumber;
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo-fsPE6Dk (I)I
+	public static fun compareTo-fsPE6Dk (II)I
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public static final fun inc-o38t-jg (I)I
+	public static final fun plus-fkidLm8 (II)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SequenceNumber$Companion {
+	public final fun getMax-o38t-jg ()I
+	public final fun getZero-o38t-jg ()I
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SequenceNumberKt {
+	public static final fun toUInt-fsPE6Dk (I)I
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifier {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/causal/SiteIdentifier$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/alexandrepiveteau/echo/causal/SiteIdentifier;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifier$Companion {
+	public final fun random--e_yCgk ()I
+}
+
+public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifierKt {
+	public static final fun toInt-BJWj3EQ (I)I
+}
+
+public abstract interface annotation class io/github/alexandrepiveteau/echo/events/EventDsl : java/lang/annotation/Annotation {
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/events/EventScope {
+	public abstract fun yield-YGnJYVM (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun yieldAll (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun yieldAll (Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/events/EventScope$DefaultImpls {
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/logs/AbstractEventLog : io/github/alexandrepiveteau/echo/logs/EventLog {
+	public fun <init> ()V
+	public fun contains-9IG4cKU (II)Z
+}
+
+public final class io/github/alexandrepiveteau/echo/logs/BuildersKt {
+	public static final fun persistentEventLogOf ([Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
+}
+
+public final class io/github/alexandrepiveteau/echo/logs/Change {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/logs/Change$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/Object;)Lio/github/alexandrepiveteau/echo/logs/Change;
+	public static final fun deltaOrNull-impl (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/Object;)I
+	public static final fun isDelta-impl (Ljava/lang/Object;)Z
+	public static final fun isSkipped-impl (Ljava/lang/Object;)Z
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/Object;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/logs/Change$Companion {
+	public final fun delta-d_Zn1m4 (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun skipped-_f-E67s ()Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog {
+	public abstract fun contains-9IG4cKU (II)Z
+	public abstract fun events-9IG4cKU (II)Ljava/lang/Iterable;
+	public abstract fun expected-JH5cEjc (I)I
+	public abstract fun get-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/logs/EventLog$Entry;
+	public abstract fun getExpected-o38t-jg ()I
+	public abstract fun getSites ()Ljava/util/Set;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog$Entry {
+	public abstract fun getBody ()Ljava/lang/Object;
+	public abstract fun getIdentifier-Fr_gKlU ()J
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/logs/ImmutableEventLog : io/github/alexandrepiveteau/echo/logs/EventLog {
+	public abstract fun toPersistentEventLog ()Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/logs/PersistentEventLog : io/github/alexandrepiveteau/echo/logs/ImmutableEventLog {
+	public abstract fun remove-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
+	public abstract fun set-oalcO7s (IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/projections/OneWayProjection {
+	public abstract fun forward (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/projections/Step {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Object;)Lio/github/alexandrepiveteau/echo/projections/Step;
+	public static synthetic fun copy$default (Lio/github/alexandrepiveteau/echo/projections/Step;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/projections/Step;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChange ()Ljava/lang/Object;
+	public final fun getData ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
+	public abstract fun backward (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun forward (Ljava/lang/Object;Ljava/lang/Object;)Lio/github/alexandrepiveteau/echo/projections/Step;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message$V1 {
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming : io/github/alexandrepiveteau/echo/protocol/Message$V1 {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Companion;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Advertisement : io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming {
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1--e_yCgk ()I
+	public final fun copy-BJWj3EQ (I)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Advertisement;
+	public static synthetic fun copy-BJWj3EQ$default (Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Advertisement;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Advertisement;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSite--e_yCgk ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Companion {
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Done : io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Done;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Event : io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming {
+	public synthetic fun <init> (IILjava/lang/Object;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-o38t-jg ()I
+	public final fun component2--e_yCgk ()I
+	public final fun component3 ()Ljava/lang/Object;
+	public final fun copy-F9woSY0 (IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Event;
+	public static synthetic fun copy-F9woSY0$default (Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Event;IILjava/lang/Object;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Event;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Ljava/lang/Object;
+	public final fun getSeqno-o38t-jg ()I
+	public final fun getSite--e_yCgk ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Ready : io/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Incoming$Ready;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing : io/github/alexandrepiveteau/echo/protocol/Message$V1 {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Companion;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Companion {
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Done : io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Done;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Request : io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing {
+	public synthetic fun <init> (IIIJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (IIIJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-o38t-jg ()I
+	public final fun component2-o38t-jg ()I
+	public final fun component3--e_yCgk ()I
+	public final fun component4 ()J
+	public final fun copy-v_Wa35U (IIIJ)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Request;
+	public static synthetic fun copy-v_Wa35U$default (Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Request;IIIJILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing$Request;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCount ()J
+	public final fun getNextForAll-o38t-jg ()I
+	public final fun getNextForSite-o38t-jg ()I
+	public final fun getSite--e_yCgk ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/sites/TransformsKt {
+	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function2;)Lio/github/alexandrepiveteau/echo/MutableSite;
+}
+
