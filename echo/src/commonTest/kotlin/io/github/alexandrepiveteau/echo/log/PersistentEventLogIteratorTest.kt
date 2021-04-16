@@ -29,9 +29,7 @@ class PersistentEventLogIteratorTest {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)
-
     val iterator = log.iterator()
-    // val eventIteratorFromSelf = log.eventIterator(id.site, id.seqno)
 
     // iterator
     assertTrue(iterator.hasNext())
