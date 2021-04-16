@@ -1,0 +1,122 @@
+@file:Suppress("FunctionName")
+
+package io.github.alexandrepiveteau.echo.logs
+
+import io.github.alexandrepiveteau.echo.EchoEventLogPreview
+import io.github.alexandrepiveteau.echo.causal.EventIdentifier
+import io.github.alexandrepiveteau.echo.causal.SequenceNumber
+import io.github.alexandrepiveteau.echo.causal.SequenceNumber.Companion.Zero
+import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import kotlinx.collections.immutable.*
+
+// TODO : Test this function.
+internal fun <T> ActualPersistentLog(
+    vararg events: Pair<EventIdentifier, T>
+): ActualPersistentLog<T> =
+    events.fold(ActualPersistentLog()) { acc, (id, event) -> acc.set(id.site, id.seqno, event) }
+
+/**
+ * An implementation of [AbstractEventLog] and [PersistentEventLog] that is backed by some
+ * persistent data structures, and optimized for lookups.
+ *
+ * @param T the type of the stored events.
+ */
+// TODO : Thoroughly test this class.
+internal class ActualPersistentLog<T>
+private constructor(
+    private val all: PersistentList<EventLog.Entry<T>>,
+    private val bySite: PersistentMap<SiteIdentifier, PersistentMap<SequenceNumber, T>>,
+) : AbstractEventLog<T>(), PersistentEventLog<T> {
+
+  /** Creates a new [ActualPersistentLog] with no initial content. */
+  internal constructor() : this(persistentListOf(), persistentHashMapOf())
+
+  override val sites: Set<SiteIdentifier> = bySite.keys
+
+  @EchoEventLogPreview
+  override val expected: SequenceNumber = all.lastOrNull()?.identifier?.seqno?.inc() ?: Zero
+
+  override fun expected(site: SiteIdentifier): SequenceNumber {
+    return bySite[site]?.maxOfOrNull { it.key }?.inc() ?: Zero
+  }
+
+  override fun get(site: SiteIdentifier, seqno: SequenceNumber): EventLog.Entry<T>? {
+    return bySite[site]?.get(seqno)?.let {
+      EventValueEntry(identifier = EventIdentifier(seqno, site), body = it)
+    }
+  }
+
+  override fun events(
+      site: SiteIdentifier,
+      seqno: SequenceNumber,
+  ): Iterable<EventLog.Entry<T>> {
+    return Iterable { eventIterator(site, seqno) }
+  }
+
+  override fun eventIterator(
+      site: SiteIdentifier,
+      seqno: SequenceNumber
+  ): EventIterator<EventLog.Entry<T>> {
+    val identifier = EventIdentifier(seqno, site)
+    val startIndex = all.binarySearch { entry -> entry.identifier.compareTo(identifier) }
+    val actualIndex = if (startIndex >= 0) startIndex else -(startIndex + 1)
+    return Iterator(all.listIterator(actualIndex))
+  }
+
+  private inner class Iterator(
+      private val backing: ListIterator<EventLog.Entry<T>>,
+  ) : EventIterator<EventLog.Entry<T>> {
+    override fun hasPrevious() = backing.hasPrevious()
+    override fun previousIndex() = all[backing.previousIndex()].identifier
+    override fun previous() = backing.previous()
+    override fun hasNext() = backing.hasNext()
+    override fun nextIndex() = all[backing.nextIndex()].identifier
+    override fun next() = backing.next()
+  }
+
+  override fun toPersistentEventLog(): PersistentEventLog<T> {
+    return this
+  }
+
+  override fun set(
+      site: SiteIdentifier,
+      seqno: SequenceNumber,
+      body: T,
+  ): ActualPersistentLog<T> {
+    val identifier = EventIdentifier(seqno, site)
+    val startIndex = all.binarySearch { entry -> entry.identifier.compareTo(identifier) }
+    // Duplicate insertions are not supported.
+    val actualIndex = if (startIndex < 0) -(startIndex + 1) else return this
+
+    val newAll = all.mutate { it.add(actualIndex, EventValueEntry(identifier, body)) }
+    val newBySite =
+        bySite.mutate {
+          val siteMap = it.getOrPut(site) { persistentHashMapOf() }
+          it[site] = siteMap.mutate { map -> map[seqno] = body }
+        }
+
+    return ActualPersistentLog(
+        all = newAll,
+        bySite = newBySite,
+    )
+  }
+
+  override fun remove(
+      site: SiteIdentifier,
+      seqno: SequenceNumber,
+  ): ActualPersistentLog<T> {
+    val newAll = all.mutate { it.removeAll { e -> e.identifier == EventIdentifier(seqno, site) } }
+    val newBySite =
+        bySite.mutate {
+          val siteMap = it.getOrPut(site) { persistentHashMapOf() }
+          it[site] = siteMap.mutate { map -> map.remove(seqno) }
+        }
+
+    return ActualPersistentLog(
+        all = newAll,
+        bySite = newBySite,
+    )
+  }
+
+  // TODO : Implement equals() and hashcode()
+}

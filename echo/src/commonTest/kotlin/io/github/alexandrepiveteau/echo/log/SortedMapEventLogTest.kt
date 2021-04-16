@@ -3,8 +3,6 @@ package io.github.alexandrepiveteau.echo.log
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
-import io.github.alexandrepiveteau.echo.logs.PersistentMapEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,7 +42,7 @@ class SortedMapEventLogTest {
 
   @Test
   fun `Expected is zero for un-acked event`() {
-    val log: PersistentEventLog<Unit> = PersistentMapEventLog()
+    val log = persistentEventLogOf<Unit>()
     val site = SiteIdentifier(456)
 
     assertEquals(SequenceNumber.Zero, log.expected(site))

@@ -64,6 +64,29 @@ interface EventLog<out T> {
   ): Iterable<Entry<T>>
 
   /**
+   * Returns an [Iterator] with all the entries from the [EventLog], starting at the beginning of
+   * the event log.
+   */
+  operator fun iterator(): Iterator<Entry<T>>
+
+  /**
+   * Returns an [EventIterator] with all the entries from the [EventLog], starting at the beginning
+   * of the event log.
+   */
+  fun eventIterator(): EventIterator<Entry<T>>
+
+  /**
+   * Returns an [EventIterator] with all the entries from the [EventLog], starting at the provided
+   * [site] and [seqno].
+   *
+   * @throws IndexOutOfBoundsException if the provided index is not in the [EventLog].
+   */
+  fun eventIterator(
+      site: SiteIdentifier,
+      seqno: SequenceNumber,
+  ): EventIterator<Entry<T>>
+
+  /**
    * An [Entry] in the event log, consisting of an event, and a unique identifier for the event.
    *
    * @param T the type of the events.

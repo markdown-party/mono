@@ -152,6 +152,8 @@ public final class io/github/alexandrepiveteau/echo/events/EventScope$DefaultImp
 public abstract class io/github/alexandrepiveteau/echo/logs/AbstractEventLog : io/github/alexandrepiveteau/echo/logs/EventLog {
 	public fun <init> ()V
 	public fun contains-9IG4cKU (II)Z
+	public fun eventIterator ()Lio/github/alexandrepiveteau/echo/logs/EventIterator;
+	public fun iterator ()Ljava/util/Iterator;
 }
 
 public final class io/github/alexandrepiveteau/echo/logs/BuildersKt {
@@ -179,13 +181,25 @@ public final class io/github/alexandrepiveteau/echo/logs/Change$Companion {
 	public final fun skipped-_f-E67s ()Ljava/lang/Object;
 }
 
+public abstract interface class io/github/alexandrepiveteau/echo/logs/EventIterator : java/util/Iterator, kotlin/jvm/internal/markers/KMappedMarker {
+	public abstract fun hasNext ()Z
+	public abstract fun hasPrevious ()Z
+	public abstract fun next ()Ljava/lang/Object;
+	public abstract fun nextIndex-Fr_gKlU ()J
+	public abstract fun previous ()Ljava/lang/Object;
+	public abstract fun previousIndex-Fr_gKlU ()J
+}
+
 public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog {
 	public abstract fun contains-9IG4cKU (II)Z
+	public abstract fun eventIterator ()Lio/github/alexandrepiveteau/echo/logs/EventIterator;
+	public abstract fun eventIterator-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/logs/EventIterator;
 	public abstract fun events-9IG4cKU (II)Ljava/lang/Iterable;
 	public abstract fun expected-JH5cEjc (I)I
 	public abstract fun get-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/logs/EventLog$Entry;
 	public abstract fun getExpected-o38t-jg ()I
 	public abstract fun getSites ()Ljava/util/Set;
+	public abstract fun iterator ()Ljava/util/Iterator;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/logs/EventLog$Entry {

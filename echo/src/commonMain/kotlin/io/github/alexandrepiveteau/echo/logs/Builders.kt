@@ -11,4 +11,4 @@ import io.github.alexandrepiveteau.echo.causal.EventIdentifier
  */
 fun <T> persistentEventLogOf(
     vararg events: Pair<EventIdentifier, T>,
-): PersistentEventLog<T> = PersistentMapEventLog(*events)
+): PersistentEventLog<T> = ActualPersistentLog(*events)
