@@ -7,6 +7,7 @@ object Versions {
   const val KotlinxSerializationJson = "1.1.0"
   const val Ktor = "1.5.3"
 
+  const val CashAppTurbine = "0.4.1"
   const val Slf4j = "1.7.21"
 }
 
@@ -41,5 +42,9 @@ object Deps {
 
   object Slf4f {
     const val Simple = "org.slf4j:slf4j-simple:${Versions.Slf4j}"
+  }
+
+  object CashApp {
+    const val Turbine = "app.cash.turbine:turbine:${Versions.CashAppTurbine}"
   }
 }

@@ -5,11 +5,11 @@ import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Decrement
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Increment
 import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.Test
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 
 private sealed class PNCounterEvent {
@@ -32,7 +32,7 @@ private val PNProjection =
 class PNCounterTest {
 
   @Test
-  fun `two sites can create a shared counter and eventually sync`(): Unit = runBlocking {
+  fun `two sites can create a shared counter and eventually sync`(): Unit = suspendTest {
     val (alice, bob) = Site.createMemoryEchos(0, PNProjection)
 
     alice.event {

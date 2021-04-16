@@ -5,12 +5,12 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
@@ -51,7 +51,7 @@ private class LWWRegister<T>(
 class LWWRegisterTest {
 
   @Test
-  fun `two sites eventually converge on a LWW value`(): Unit = runBlocking {
+  fun `two sites eventually converge on a LWW value`(): Unit = suspendTest {
     val alice = SiteIdentifier(123)
     val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, projection = LWWProjection()))
 

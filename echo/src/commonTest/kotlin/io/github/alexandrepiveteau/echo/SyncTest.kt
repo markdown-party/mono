@@ -1,12 +1,11 @@
 package io.github.alexandrepiveteau.echo
 
 import kotlin.test.Test
-import kotlinx.coroutines.runBlocking
 
 class SyncTest {
 
   @Test
-  fun `NoOp simple sync eventually terminates`() = runBlocking {
+  fun `NoOp simple sync eventually terminates`() = suspendTest {
     val alice = NoOpExchange
     val bob = NoOpExchange
 
@@ -14,7 +13,7 @@ class SyncTest {
   }
 
   @Test
-  fun `NoOp chain sync eventually terminates`() = runBlocking {
+  fun `NoOp chain sync eventually terminates`() = suspendTest {
     val head = NoOpExchange
     val tail = Array(10) { NoOpExchange }
 

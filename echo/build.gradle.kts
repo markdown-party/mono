@@ -25,6 +25,8 @@ kotlin {
       dependencies {
         implementation(kotlin("test-common"))
         implementation(kotlin("test-annotations-common"))
+
+        implementation(Deps.CashApp.Turbine)
       }
     }
     val jvmMain by getting
@@ -38,6 +40,7 @@ kotlin {
       languageSettings.enableLanguageFeature("InlineClasses")
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
       languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+      languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
       languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
       languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
     }

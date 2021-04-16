@@ -5,13 +5,13 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.demo.string.StringOperation.InsertAfter
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.mutableSite
+import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 
 class StringTest {
@@ -55,7 +55,7 @@ class StringTest {
   // TESTS
 
   @Test
-  fun `one site is able to write a simple text`(): Unit = runBlocking {
+  fun `one site is able to write a simple text`(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier.random(),
@@ -72,7 +72,7 @@ class StringTest {
   }
 
   @Test
-  fun `one site can write then delete some text`(): Unit = runBlocking {
+  fun `one site can write then delete some text`(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier(0),
@@ -85,7 +85,7 @@ class StringTest {
   }
 
   @Test
-  fun `two sites are able to edit each other's text`(): Unit = runBlocking {
+  fun `two sites are able to edit each other's text`(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier(0),

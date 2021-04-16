@@ -2,49 +2,48 @@
 
 package io.github.alexandrepiveteau.echo.memory
 
-import io.github.alexandrepiveteau.echo.buffer
+import app.cash.turbine.test
+import io.github.alexandrepiveteau.echo.*
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.channelLink
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
-import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as O
-import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 
 class MemoryExchangeIncomingTest {
 
   @Test
-  fun `Only Done works on buffered incoming`() = runBlocking {
+  fun `Only Done works on buffered incoming`() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
-        channelLink<I<Nothing>, O<Nothing>> { incoming ->
-          assertTrue(incoming.receive() is I.Ready)
-          send(O.Done)
-          assertTrue(incoming.receive() is I.Done)
-          assertNull(incoming.receiveOrNull())
+        link<I<Nothing>, O<Nothing>> { incoming ->
+          incoming.test {
+            assertEquals(I.Ready, expectItem())
+            emit(O.Done)
+            assertEquals(I.Done, expectItem())
+            expectComplete()
+          }
         }
     sync(echo.incoming(), exchange)
   }
 
   @Test
-  fun `No messages to incoming works`() = runBlocking {
+  fun `No messages to incoming works`() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val received = echo.incoming().talk(emptyFlow()).toList()
     assertEquals(listOf(I.Ready, I.Done), received)
   }
 
   @Test
-  fun `Only Done works on 1-buffer incoming`() = runBlocking {
+  fun `Only Done works on 1-buffer incoming`() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Nothing>, O<Nothing>> { incoming ->
@@ -58,7 +57,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Advertises one event and cancels if rendezvous and not empty`() = runBlocking {
+  fun `Advertises one event and cancels if rendezvous and not empty`() = suspendTest {
     val seqno = SequenceNumber(123U)
     val site = SiteIdentifier(456)
     val log = persistentEventLogOf(EventIdentifier(seqno, site) to 42)
@@ -76,7 +75,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Advertises all sites in incoming`() = runBlocking {
+  fun `Advertises all sites in incoming`() = suspendTest {
     val count = 100
     val sites = List(count) { SiteIdentifier.random() }
     val seqno = SequenceNumber.Zero
@@ -103,7 +102,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Issues one event on request`() = runBlocking {
+  fun `Issues one event on request`() = suspendTest {
     val site = SiteIdentifier(10)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
@@ -123,7 +122,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `No event is sent if request size is zero`() = runBlocking {
+  fun `No event is sent if request size is zero`() = suspendTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
@@ -141,7 +140,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `An event is sent if first request size is zero and second is non-zero`() = runBlocking {
+  fun `An event is sent if first request size is zero and second is non-zero`() = suspendTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)

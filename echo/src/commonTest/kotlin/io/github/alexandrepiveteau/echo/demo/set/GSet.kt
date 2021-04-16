@@ -4,10 +4,10 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,7 +27,7 @@ private fun <T> gSetProjection() =
 class GSetTest {
 
   @Test
-  fun `one site can create a set and create new events`() = runBlocking {
+  fun `one site can create a set and create new events`() = suspendTest {
     val alice = SiteIdentifier.random()
     val echo =
         mutableSite(
@@ -47,7 +47,7 @@ class GSetTest {
   }
 
   @Test
-  fun `two sites can create a shared set and eventually sync`() = runBlocking {
+  fun `two sites can create a shared set and eventually sync`() = suspendTest {
     // Create Alice, our first site.
     val alice = SiteIdentifier.random()
     val aliceEcho =

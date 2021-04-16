@@ -12,18 +12,17 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class LinkTest {
 
   @Test
-  fun `Empty channelLink properly terminates`() = runBlocking {
+  fun `Empty channelLink properly terminates`() = suspendTest {
     val exchange = channelLink<Unit, Unit> {}
     assertEquals(emptyList(), exchange.talk(emptyFlow()).toList())
   }
 
   @Test
-  fun `channelLink emits proper messages then terminates`() = runBlocking {
+  fun `channelLink emits proper messages then terminates`() = suspendTest {
     val exchange =
         channelLink<Int, Int> {
           send(1)
@@ -35,7 +34,7 @@ class LinkTest {
   }
 
   @Test
-  fun `reversing channelLink works properly`() = runBlocking {
+  fun `reversing channelLink works properly`() = suspendTest {
     val exchange =
         channelLink<Int, Int> { incoming ->
           val elements = incoming.toList().asReversed()
@@ -46,7 +45,7 @@ class LinkTest {
   }
 
   @Test
-  fun `channelLink waits inner coroutines`() = runBlocking {
+  fun `channelLink waits inner coroutines`() = suspendTest {
     val exchange =
         channelLink<Int, Int> {
           launch {
