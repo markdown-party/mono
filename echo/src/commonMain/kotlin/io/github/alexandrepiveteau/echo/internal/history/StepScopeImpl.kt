@@ -9,14 +9,14 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.SelectClause1
 
 /** An implementation of [StepScope] that delegates behaviors. */
-internal class StepScopeImpl<I, O, T, C>(
+internal class StepScopeImpl<I, O, T>(
     inc: ReceiveChannel<I>,
     out: SendChannel<O>,
-    insertions: ReceiveChannel<ImmutableEventLog<T, C>>,
+    insertions: ReceiveChannel<ImmutableEventLog<T, *>>,
     private val update: suspend (SequenceNumber, SiteIdentifier, T) -> Unit,
-) : StepScope<I, O, T, C>, ReceiveChannel<I> by inc, SendChannel<O> by out {
+) : StepScope<I, O, T>, ReceiveChannel<I> by inc, SendChannel<O> by out {
 
-  override val onInsert: SelectClause1<ImmutableEventLog<T, C>> = insertions.onReceive
+  override val onInsert: SelectClause1<ImmutableEventLog<T, *>> = insertions.onReceive
 
   override suspend fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T) {
     update(seqno, site, event)

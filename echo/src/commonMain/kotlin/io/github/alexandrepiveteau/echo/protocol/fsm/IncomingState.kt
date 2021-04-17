@@ -23,12 +23,12 @@ import kotlinx.coroutines.selects.selectUnbiased
  * @param T the type of the events.
  */
 // TODO : Update the documentation.
-internal sealed class IncomingState<T, C> : State<Out<T>, Inc<T>, T, C, IncomingState<T, C>> {
+internal sealed class IncomingState<T> : State<Out<T>, Inc<T>, T, IncomingState<T>> {
 
   companion object {
 
     /** Creates a new [IncomingState] that's the beginning of the FSM. */
-    operator fun <T, C> invoke(pending: Iterable<SiteIdentifier>): IncomingState<T, C> =
+    operator fun <T, C> invoke(pending: Iterable<SiteIdentifier>): IncomingState<T> =
         IncomingNew(
             alreadySent = persistentListOf(),
             remainingToSend = pending.toPersistentList(),
@@ -45,14 +45,14 @@ internal sealed class IncomingState<T, C> : State<Out<T>, Inc<T>, T, C, Incoming
 //    move to the Sending state.
 // 3. We receive a Done event, so we move to Cancelling.
 // 4. We receive an unsupported message, which we just ignore. // TODO : Fail fast instead ?
-private data class IncomingNew<T, C>(
+private data class IncomingNew<T>(
     private val alreadySent: PersistentList<SiteIdentifier>,
     private val remainingToSend: PersistentList<SiteIdentifier>,
-) : IncomingState<T, C>() {
+) : IncomingState<T>() {
 
-  override suspend fun IncomingStepScope<T, C>.step(
-      log: ImmutableEventLog<T, C>
-  ): Effect<IncomingState<T, C>> {
+  override suspend fun IncomingStepScope<T>.step(
+      log: ImmutableEventLog<T, *>
+  ): Effect<IncomingState<T>> {
     return select {
       val pending = remainingToSend.lastOrNull()
       if (pending != null) {
@@ -76,12 +76,12 @@ private data class IncomingNew<T, C>(
   }
 }
 
-private data class IncomingSending<T, C>(
+private data class IncomingSending<T>(
     // private val sitesAdvertisementsToSend: PersistentList<SiteIdentifier> = persistentListOf(),
     private val nextSequenceNumberPerSite: PersistentMap<SiteIdentifier, SequenceNumber> =
         persistentMapOf(),
     private val receivedCredits: PersistentMap<SiteIdentifier, Long> = persistentMapOf(),
-) : IncomingState<T, C>() {
+) : IncomingState<T>() {
 
   /**
    * A constructor which lets the user specify the already [advertised] site. Each advertised site
@@ -92,7 +92,7 @@ private data class IncomingSending<T, C>(
   ) : this(receivedCredits = advertised.fold(persistentMapOf()) { map, site -> map.put(site, 0L) })
 
   /** Returns the next [Inc.Advertisement] message to send, if there's any. */
-  fun nextAdvertisementOrNull(log: ImmutableEventLog<T, C>): Inc.Advertisement? {
+  fun nextAdvertisementOrNull(log: ImmutableEventLog<T, *>): Inc.Advertisement? {
     val missing = log.sites - receivedCredits.keys
     val site = missing.firstOrNull() ?: return null
     return Inc.Advertisement(site)
@@ -102,7 +102,7 @@ private data class IncomingSending<T, C>(
    * Returns the [IncomingState] if the [Inc.Advertisement] for the given [msg] was successfully
    * processed.
    */
-  fun handleAdvSent(msg: Inc.Advertisement): IncomingState<T, C> {
+  fun handleAdvSent(msg: Inc.Advertisement): IncomingState<T> {
     return copy(receivedCredits = receivedCredits.put(msg.site, 0L))
   }
 
@@ -112,7 +112,7 @@ private data class IncomingSending<T, C>(
    * @param log the [ImmutableEventLog] that is in charge of generating the events.
    */
   @Suppress("DEPRECATION")
-  fun nextEventOrNull(log: ImmutableEventLog<T, C>): Inc.Event<T>? {
+  fun nextEventOrNull(log: ImmutableEventLog<T, *>): Inc.Event<T>? {
     val event =
         receivedCredits
             .asSequence()
@@ -132,7 +132,7 @@ private data class IncomingSending<T, C>(
   /**
    * Returns the [IncomingState] if the [Inc.Event] for the given [msg] was successfully processed.
    */
-  fun handleEventSent(msg: Inc.Event<T>): IncomingState<T, C> {
+  fun handleEventSent(msg: Inc.Event<T>): IncomingState<T> {
     val remainingCredits = receivedCredits[msg.site]?.minus(1) ?: 0
     val nextSequenceNumber = nextSequenceNumberPerSite[msg.site]?.inc() ?: Zero
     return copy(
@@ -142,7 +142,7 @@ private data class IncomingSending<T, C>(
   }
 
   /** Returns the [IncomingState] if the [Out.Request] [msg] is received. */
-  fun handleRequestReceived(msg: Out.Request): IncomingState<T, C> {
+  fun handleRequestReceived(msg: Out.Request): IncomingState<T> {
     // TODO : Check for overflows ?
     val remainingCredits = (receivedCredits[msg.site] ?: 0) + msg.count
     val nextSequenceNumber = maxOf(msg.nextForSite, nextSequenceNumberPerSite[msg.site] ?: Zero)
@@ -152,9 +152,9 @@ private data class IncomingSending<T, C>(
     )
   }
 
-  override suspend fun IncomingStepScope<T, C>.step(
-      log: ImmutableEventLog<T, C>
-  ): Effect<IncomingState<T, C>> {
+  override suspend fun IncomingStepScope<T>.step(
+      log: ImmutableEventLog<T, *>
+  ): Effect<IncomingState<T>> {
     return selectUnbiased {
       val event = nextEventOrNull(log)
       if (event != null) onSend(event) { Move(handleEventSent(event)) }
@@ -176,11 +176,11 @@ private data class IncomingSending<T, C>(
 }
 
 // 1. We can send a Done message, and move to Completed.
-private class IncomingCancelling<T, C> : IncomingState<T, C>() {
+private class IncomingCancelling<T> : IncomingState<T>() {
 
-  override suspend fun IncomingStepScope<T, C>.step(
-      log: ImmutableEventLog<T, C>
-  ): Effect<IncomingState<T, C>> {
+  override suspend fun IncomingStepScope<T>.step(
+      log: ImmutableEventLog<T, *>
+  ): Effect<IncomingState<T>> {
     return select { onSend(Inc.Done) { Effect.Terminate } }
   }
 }

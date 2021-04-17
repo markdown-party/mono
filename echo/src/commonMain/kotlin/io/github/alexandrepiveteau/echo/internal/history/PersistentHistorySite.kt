@@ -83,7 +83,7 @@ internal class PersistentHistorySite<T, M, C>(
    * @param O the type of the output messages.
    * @param S the type of the FSM states.
    */
-  private fun <I, O, S : State<I, O, T, C, S>> exchange(
+  private fun <I, O, S : State<I, O, T, S>> exchange(
       initial: suspend () -> S,
   ) =
       channelLink<I, O> { inc ->

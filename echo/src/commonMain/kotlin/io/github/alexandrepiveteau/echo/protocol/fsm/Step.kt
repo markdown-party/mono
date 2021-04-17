@@ -18,12 +18,11 @@ import kotlinx.coroutines.selects.SelectClause1
  *
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
- * @param C the type of the changes.
  */
-internal interface StepScope<out I, in O, T, C> : ReceiveChannel<I>, SendChannel<O> {
+internal interface StepScope<out I, in O, T> : ReceiveChannel<I>, SendChannel<O> {
 
   /** A [SelectClause1] that's made available when a new value is inserted in the log. */
-  val onInsert: SelectClause1<ImmutableEventLog<T, C>>
+  val onInsert: SelectClause1<ImmutableEventLog<T, *>>
 
   /**
    * Sets the [event] for a certain [seqno] and a given [site]. This will mutate the current site,
@@ -33,10 +32,10 @@ internal interface StepScope<out I, in O, T, C> : ReceiveChannel<I>, SendChannel
 }
 
 /** A specific version of [StepScope] that receives [Inc] messages and sends [Out] messages. */
-internal typealias OutgoingStepScope<T, C> = StepScope<Inc<T>, Out<T>, T, C>
+internal typealias OutgoingStepScope<T> = StepScope<Inc<T>, Out<T>, T>
 
 /** A specific version of [StepScope] that receives [Out] messages and sends [Inc] messages. */
-internal typealias IncomingStepScope<T, C> = StepScope<Out<T>, Inc<T>, T, C>
+internal typealias IncomingStepScope<T> = StepScope<Out<T>, Inc<T>, T>
 
 /**
  * An [Effect] is a sealed class that is used to indicate what the next step of a finite state
@@ -75,10 +74,10 @@ internal sealed class Effect<out T> {
  * @param S the type of the [Effect] states.
  */
 // TODO : Make this a fun interface when b/KT-40165 is fixed.
-/* fun */ internal interface State<I, O, T, C, S : State<I, O, T, C, S>> {
+/* fun */ internal interface State<in I, out O, T, out S : State<I, O, T, S>> {
 
   /** Performs a suspending step of this FSM. */
-  suspend fun StepScope<I, O, T, C>.step(
-      log: ImmutableEventLog<T, C>,
+  suspend fun StepScope<I, O, T>.step(
+      log: ImmutableEventLog<T, *>,
   ): Effect<S>
 }
