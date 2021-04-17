@@ -12,7 +12,7 @@ class ActualPersistentHistoryTest {
 
   /** A test that verifies that inserting a new event works well. */
   @Test
-  fun `empty history supports addition`() {
+  fun emptyHistory_supportsAddition() {
     val projection = ActualPersistentHistory(initial = emptyList(), projection = ListProjection)
 
     val result = projection.forward(HistoryEvent(SiteIdentifier(1), SequenceNumber.Zero, 1))
@@ -21,7 +21,7 @@ class ActualPersistentHistoryTest {
   }
 
   @Test
-  fun `empty history supports multiple forward`() {
+  fun emptyHistory_supportsForward() {
     var projection: PersistentLogHistory<Int, List<Int>, Int> =
         ActualPersistentHistory(
             initial = emptyList(),
@@ -42,7 +42,7 @@ class ActualPersistentHistoryTest {
   }
 
   @Test
-  fun `out of order events are reordered`() {
+  fun outOfOrderEvents_areReordered() {
     var projection: PersistentLogHistory<Int, List<Int>, Int> =
         ActualPersistentHistory(
             initial = emptyList(),
@@ -71,7 +71,7 @@ class ActualPersistentHistoryTest {
   }
 
   @Test
-  fun `add to start works reordering`() {
+  fun addToBeginning_successfullyReorders() {
     var projection: PersistentLogHistory<Int, List<Int>, Int> =
         ActualPersistentHistory(
             initial = emptyList(),

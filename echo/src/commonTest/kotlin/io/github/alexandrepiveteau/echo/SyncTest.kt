@@ -5,7 +5,7 @@ import kotlin.test.Test
 class SyncTest {
 
   @Test
-  fun `NoOp simple sync eventually terminates`() = suspendTest {
+  fun noOpSync_Terminates() = suspendTest {
     val alice = NoOpExchange
     val bob = NoOpExchange
 
@@ -13,7 +13,7 @@ class SyncTest {
   }
 
   @Test
-  fun `NoOp chain sync eventually terminates`() = suspendTest {
+  fun noOpChainSync_Terminates() = suspendTest {
     val head = NoOpExchange
     val tail = Array(10) { NoOpExchange }
 

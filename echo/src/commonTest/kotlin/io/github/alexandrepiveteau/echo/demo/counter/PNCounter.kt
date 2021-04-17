@@ -32,7 +32,7 @@ private val PNProjection =
 class PNCounterTest {
 
   @Test
-  fun `two sites can create a shared counter and eventually sync`(): Unit = suspendTest {
+  fun twoSitesCanCreateASharedCounter_andSync(): Unit = suspendTest {
     val (alice, bob) = Site.createMemoryEchos(0, PNProjection)
 
     alice.event {

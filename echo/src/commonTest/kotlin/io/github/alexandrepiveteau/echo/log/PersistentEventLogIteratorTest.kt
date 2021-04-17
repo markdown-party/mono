@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 class PersistentEventLogIteratorTest {
 
   @Test
-  fun `test empty log has empty iterators`() {
+  fun emptyLog_hasEmptyIterators() {
     val log = persistentEventLogOf<Unit>()
 
     assertFalse(log.iterator().hasNext())
@@ -25,7 +25,7 @@ class PersistentEventLogIteratorTest {
   }
 
   @Test
-  fun `test non empty log is read with iterator`() {
+  fun log_hasNonEmptyIterator() {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)
@@ -38,7 +38,7 @@ class PersistentEventLogIteratorTest {
   }
 
   @Test
-  fun `test non empty log is read with eventIterator and no start`() {
+  fun log_hasGood_eventIterator() {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)
@@ -56,7 +56,7 @@ class PersistentEventLogIteratorTest {
   }
 
   @Test
-  fun `test non empty log is read with eventIteratorStartingFromZero`() {
+  fun log_hasGood_eventIteratorStartingFromZero() {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)
@@ -74,7 +74,7 @@ class PersistentEventLogIteratorTest {
   }
 
   @Test
-  fun `test non empty log is read with eventIteratorStartingFromEnd`() {
+  fun log_hasGood_eventIteratorStartingFromEnd() {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)
@@ -95,7 +95,7 @@ class PersistentEventLogIteratorTest {
   }
 
   @Test
-  fun `test non empty log is read from self`() {
+  fun log_hasGood_eventIteratorFromSpecificEvent() {
     val id = EventIdentifier(SequenceNumber(4u), SiteIdentifier(4))
     val body = "Hello"
     val log = persistentEventLogOf(id to body)

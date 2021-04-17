@@ -6,7 +6,7 @@ import kotlin.test.assertNotEquals
 class SiteIdentifierTest {
 
   @Test
-  fun `Random site identifiers are different`() {
+  fun randomSites_AreNotEqual() {
     assertNotEquals(SiteIdentifier.random(), SiteIdentifier.random())
   }
 }

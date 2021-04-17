@@ -56,7 +56,7 @@ class StringTest {
   // TESTS
 
   @Test
-  fun `one site is able to write a simple text`(): Unit = suspendTest {
+  fun oneSite_canAppendStart(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier.random(),
@@ -73,7 +73,7 @@ class StringTest {
   }
 
   @Test
-  fun `one site can write then delete some text`(): Unit = suspendTest {
+  fun oneSite_canAppendStart_andDeleteStart(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier(0),
@@ -86,7 +86,7 @@ class StringTest {
   }
 
   @Test
-  fun `two sites are able to edit each other's text`(): Unit = suspendTest {
+  fun twoSites_converge(): Unit = suspendTest {
     val alice =
         mutableSite(
             identifier = SiteIdentifier(0),

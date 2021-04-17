@@ -16,13 +16,13 @@ import kotlinx.coroutines.launch
 class LinkTest {
 
   @Test
-  fun `Empty channelLink properly terminates`() = suspendTest {
+  fun emptyChannelLink_terminates() = suspendTest {
     val exchange = channelLink<Unit, Unit> {}
     assertEquals(emptyList(), exchange.talk(emptyFlow()).toList())
   }
 
   @Test
-  fun `channelLink emits proper messages then terminates`() = suspendTest {
+  fun channelLink_emitsMessages_ThenTerminates() = suspendTest {
     val exchange =
         channelLink<Int, Int> {
           send(1)
@@ -34,7 +34,7 @@ class LinkTest {
   }
 
   @Test
-  fun `reversing channelLink works properly`() = suspendTest {
+  fun reversedChannelLink_emitsMessages_ThenTerminates() = suspendTest {
     val exchange =
         channelLink<Int, Int> { incoming ->
           val elements = incoming.toList().asReversed()
@@ -45,7 +45,7 @@ class LinkTest {
   }
 
   @Test
-  fun `channelLink waits inner coroutines`() = suspendTest {
+  fun channelLink_awaitsInnerJobs() = suspendTest {
     val exchange =
         channelLink<Int, Int> {
           launch {

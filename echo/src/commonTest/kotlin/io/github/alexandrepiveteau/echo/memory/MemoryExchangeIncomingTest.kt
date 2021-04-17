@@ -21,7 +21,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 class MemoryExchangeIncomingTest {
 
   @Test
-  fun `Only Done works on buffered incoming`() = suspendTest {
+  fun only_Done_worksOnBufferedLink() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
         link<I<Nothing>, O<Nothing>> { incoming ->
@@ -36,14 +36,14 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `No messages to incoming works`() = suspendTest {
+  fun noMessagesToIncomingWorks() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val received = echo.incoming().talk(emptyFlow()).toList()
     assertEquals(listOf(I.Ready, I.Done), received)
   }
 
   @Test
-  fun `Only Done works on 1-buffer incoming`() = suspendTest {
+  fun onlyDoneWorksOnOneBufferIncoming() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Nothing>, O<Nothing>> { incoming ->
@@ -57,7 +57,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Advertises one event and cancels if rendezvous and not empty`() = suspendTest {
+  fun advertisesOneEventAndCancelsIfRendezvousAndNotEmpty() = suspendTest {
     val seqno = SequenceNumber(123U)
     val site = SiteIdentifier(456)
     val log = persistentEventLogOf(EventIdentifier(seqno, site) to 42)
@@ -75,7 +75,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Advertises all sites in incoming`() = suspendTest {
+  fun advertisesAllSitesInIncoming() = suspendTest {
     val count = 100
     val sites = List(count) { SiteIdentifier.random() }
     val seqno = SequenceNumber.Zero
@@ -102,7 +102,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `Issues one event on request`() = suspendTest {
+  fun issuesOneEventOnRequest() = suspendTest {
     val site = SiteIdentifier(10)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
@@ -122,7 +122,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `No event is sent if request size is zero`() = suspendTest {
+  fun noEventIsSentIfRequestSizeIsZero() = suspendTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
@@ -140,7 +140,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun `An event is sent if first request size is zero and second is non-zero`() = suspendTest {
+  fun anEventIsSentIfFirstRequestSizeIsZeroAndSecondIsNonZero() = suspendTest {
     val site = SiteIdentifier(123)
     val seqno = SequenceNumber(150U)
     val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)

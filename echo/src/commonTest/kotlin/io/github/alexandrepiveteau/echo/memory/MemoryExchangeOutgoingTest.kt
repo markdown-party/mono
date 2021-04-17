@@ -15,7 +15,7 @@ import kotlinx.coroutines.channels.receiveOrNull
 class MemoryExchangeOutgoingTest {
 
   @Test
-  fun `Only Done works on buffered outgoing`() = suspendTest {
+  fun onlyDoneWorksOnBufferedOutgoing() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
         channelLink<O<Nothing>, I<Nothing>> { incoming ->

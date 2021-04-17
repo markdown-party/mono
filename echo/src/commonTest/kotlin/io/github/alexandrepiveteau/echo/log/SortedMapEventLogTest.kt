@@ -12,13 +12,13 @@ import kotlin.test.assertEquals
 class SortedMapEventLogTest {
 
   @Test
-  fun `Non empty log is actually non empty`() {
+  fun nonEmptyLog_isNotEmpty() {
     val log = persistentEventLogOf(EventIdentifier(SequenceNumber(0u), SiteIdentifier(1)) to 123)
     assertEquals(123, log[SiteIdentifier(1), SequenceNumber(0u)]?.body)
   }
 
   @Test
-  fun `Inserted event is properly acked`() {
+  fun insertedEvent_isAcked() {
     var log = persistentEventLogOf<Unit>()
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(123U)
@@ -29,7 +29,7 @@ class SortedMapEventLogTest {
   }
 
   @Test
-  fun `Maximum seqno is acked`() {
+  fun maximumSeqno_isAcked() {
     var log = persistentEventLogOf<Unit>()
     val site = SiteIdentifier(123)
     val low = SequenceNumber(1U)
@@ -43,7 +43,7 @@ class SortedMapEventLogTest {
   }
 
   @Test
-  fun `Expected is zero for un-acked event`() {
+  fun nonAckedEvent_hasZeroSeqno() {
     val log = persistentEventLogOf<Unit>()
     val site = SiteIdentifier(456)
 
@@ -51,7 +51,7 @@ class SortedMapEventLogTest {
   }
 
   @Test
-  fun `Inserted event can be read`() {
+  fun insertedEvent_isPresent() {
     var log = persistentEventLogOf<Int>()
     val site = SiteIdentifier(456)
     val seqno = SequenceNumber(1U)

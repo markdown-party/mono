@@ -51,7 +51,7 @@ private class LWWRegister<T>(
 class LWWRegisterTest {
 
   @Test
-  fun `two sites eventually converge on a LWW value`(): Unit = suspendTest {
+  fun twoSites_converge(): Unit = suspendTest {
     val alice = SiteIdentifier(123)
     val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, projection = LWWProjection()))
 

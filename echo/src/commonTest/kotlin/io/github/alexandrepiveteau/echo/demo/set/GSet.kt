@@ -28,7 +28,7 @@ private fun <T> gSetProjection() =
 class GSetTest {
 
   @Test
-  fun `one site can create a set and create new events`() = suspendTest {
+  fun oneSite_canYieldEvents() = suspendTest {
     val alice = SiteIdentifier.random()
     val echo =
         mutableSite(
@@ -48,7 +48,7 @@ class GSetTest {
   }
 
   @Test
-  fun `two sites can create a shared set and eventually sync`() = suspendTest {
+  fun twoSites_converge() = suspendTest {
     // Create Alice, our first site.
     val alice = SiteIdentifier.random()
     val aliceEcho =

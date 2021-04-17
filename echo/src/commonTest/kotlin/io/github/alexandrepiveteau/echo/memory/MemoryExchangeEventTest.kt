@@ -11,26 +11,26 @@ import kotlin.test.assertEquals
 class MemoryExchangeEventTest {
 
   @Test
-  fun `mutable site terminates on empty event {} call`() = suspendTest {
+  fun mutableSite_emptyEvent_terminates() = suspendTest {
     val alice = mutableSite<Int>(SiteIdentifier(123))
     alice.event {}
   }
 
   @Test
-  fun `MemoryExchange terminates on plenty empty event {} calls`() = suspendTest {
+  fun mutableSite_manyEmptyEvent_terminates() = suspendTest {
     val echo = mutableSite<Int>(SiteIdentifier(456))
     repeat(1000) { echo.event {} }
   }
 
   @Test
-  fun `MutableSite terminates on plenty non-empty event {} calls`() = suspendTest {
+  fun mutableSite_manyNonEmptyEvent_terminates() = suspendTest {
     val site = mutableSite<Int>(SiteIdentifier(456))
     val count = 1000
     repeat(count) { iteration -> site.event { yield(iteration) } }
   }
 
   @Test
-  fun `MemoryExchange terminates on single event {} yield`() = suspendTest {
+  fun mutableSite_singleYield_terminates() = suspendTest {
     val site = SiteIdentifier(145)
     with(mutableSite<Int>(site)) {
       event { assertEquals(EventIdentifier(SequenceNumber(0U), site), yield(123)) }
@@ -38,7 +38,7 @@ class MemoryExchangeEventTest {
   }
 
   @Test
-  fun `MemoryExchange terminates on multiple event {} yields`() = suspendTest {
+  fun mutableSite_manyYield_terminates() = suspendTest {
     val site = SiteIdentifier(145)
     with(mutableSite<Int>(site)) {
       event {

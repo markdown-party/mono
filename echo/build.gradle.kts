@@ -11,6 +11,8 @@ kotlin {
     withJava()
   }
 
+  js { browser() }
+
   targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   sourceSets {
@@ -36,6 +38,8 @@ kotlin {
         implementation(Deps.Kotlinx.CoroutinesTest)
       }
     }
+    val jsMain by getting
+    val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
       languageSettings.enableLanguageFeature("InlineClasses")
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")

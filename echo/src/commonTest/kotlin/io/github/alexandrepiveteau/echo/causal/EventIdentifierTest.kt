@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 class EventIdentifierTest {
 
   @Test
-  fun `single site respects ordering`() {
+  fun singleSite_respectsOrdering() {
     val site = SiteIdentifier(1)
 
     val a = EventIdentifier(SequenceNumber(1U), site)
@@ -20,7 +20,7 @@ class EventIdentifierTest {
   }
 
   @Test
-  fun `multiple sites respect sequence number ordering`() {
+  fun multipleSites_respectSequenceNumberOrdering() {
     val alice = SiteIdentifier(1)
     val bob = SiteIdentifier(2)
 
@@ -34,7 +34,7 @@ class EventIdentifierTest {
   }
 
   @Test
-  fun `concurrent updates define a total ordering`() {
+  fun concurrentUpdates_makeTotalOrdering() {
     val alice = SiteIdentifier(1)
     val bob = SiteIdentifier(2)
     val charlie = SiteIdentifier(3)
