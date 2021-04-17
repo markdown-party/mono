@@ -126,7 +126,7 @@ internal class PersistentHistorySite<T, M, C>(
     val impl =
         object : EventScope<T> {
           override suspend fun yield(event: T) =
-              mutate(extract = { it.first }) { history: PersistentLogHistory<T, M, C> ->
+              mutate(extract = { it.first }) { history ->
                     history.forward(
                         HistoryEvent(
                             site = identifier,
