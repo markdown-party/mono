@@ -42,7 +42,8 @@ public final class io/github/alexandrepiveteau/echo/SiteKt {
 	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun site-BJWj3EQ (I)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun site-hoqhmwc (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;)Lio/github/alexandrepiveteau/echo/Site;
+	public static synthetic fun site-hoqhmwc$default (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Site;
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {

@@ -47,11 +47,13 @@ interface MutableSite<T, out M> : Site<T, M> {
  * Creates a new [Site] for the provided [SiteIdentifier], which can not be manually mutated.
  *
  * @param identifier the globally unique identifier for this [Site].
+ * @param log the underlying [PersistentEventLog] for this [site].
  * @param T the type of the events managed by this [Site].
  */
 fun <T> site(
     identifier: SiteIdentifier,
-): Site<T, ImmutableEventLog<T, Nothing>> = mutableSite(identifier)
+    log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
+): Site<T, ImmutableEventLog<T, Nothing>> = mutableSite(identifier, log)
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
