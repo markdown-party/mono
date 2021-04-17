@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package io.github.alexandrepiveteau.echo.internal.history
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
