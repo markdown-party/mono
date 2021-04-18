@@ -6,8 +6,8 @@ import kotlinx.html.js.onClickFunction
 import party.markdown.MarkdownEvent.Decrement
 import party.markdown.MarkdownEvent.Increment
 import party.markdown.MarkdownProjection
-import party.markdown.react.state.collectAsState
-import party.markdown.react.state.rememberCoroutineScope
+import party.markdown.react.useCoroutineScope
+import party.markdown.react.useFlow
 import react.RProps
 import react.child
 import react.dom.button
@@ -15,6 +15,7 @@ import react.dom.h1
 import react.dom.p
 import react.dom.render
 import react.functionalComponent
+import react.useEffect
 
 private val State =
     mutableSite(
@@ -25,8 +26,10 @@ private val State =
 
 private val App =
     functionalComponent<RProps> {
-      val state = State.value.collectAsState(0)
-      val scope = rememberCoroutineScope()
+      val state = useFlow(0, State.value)
+      val scope = useCoroutineScope()
+
+      useEffect(listOf(state)) { document.title = "Clicked $state times" }
 
       h1 { +"Counter" }
       p { +"Current value is $state" }
