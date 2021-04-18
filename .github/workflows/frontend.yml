@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎁 Checkout repo
+        uses: actions/checkout@v2
+      - name: ☕️ Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: 🏗 Build frontend
+        run: |
+          ./gradlew markdown-frontend:browserDistribution
+      - name: 🚀 Deploy on Firebase hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MARKDOWN_PARTY }}'
+          channelId: live
+          projectId: markdown-party
+        env:
+          FIREBASE_CLI_PREVIEWS: hostingchannels
