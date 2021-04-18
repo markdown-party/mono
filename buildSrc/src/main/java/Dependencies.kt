@@ -14,6 +14,7 @@ object Versions {
 object Plugins {
   const val KotlinMultiplatform = "multiplatform"
   const val KotlinJvm = "jvm"
+  const val KotlinJs = "js"
 
   const val KotlinBinaryCompatibility = "org.jetbrains.kotlinx.binary-compatibility-validator"
   const val KotlinSerialization = "plugin.serialization"

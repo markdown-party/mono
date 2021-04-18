@@ -18,7 +18,8 @@ include ':echo-ktor-server'
 include ':echo-transport'
 
 // markdown-party
-include 'markdown-backend'
+include ':markdown-backend'
+include ':markdown-frontend'
 
 // samples
 include ':sample-drawing'
