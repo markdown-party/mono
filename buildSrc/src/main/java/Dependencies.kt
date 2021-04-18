@@ -26,6 +26,9 @@ object Deps {
     const val CoroutinesCore =
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KotlinxCoroutines}"
 
+    const val CoroutinesCoreJs =
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:${Versions.KotlinxCoroutines}"
+
     const val CoroutinesTest =
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.KotlinxCoroutines}"
 
@@ -40,6 +43,7 @@ object Deps {
     const val ClientCore = "io.ktor:ktor-client-core:${Versions.Ktor}"
     const val ClientWebsockets = "io.ktor:ktor-client-websockets:${Versions.Ktor}"
     const val ClientEngineCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
+    const val ClientEngineJs = "io.ktor:ktor-client-js:${Versions.Ktor}"
 
     const val ServerCore = "io.ktor:ktor-server-core:${Versions.Ktor}"
     const val ServerWebsockets = "io.ktor:ktor-websockets:${Versions.Ktor}"
