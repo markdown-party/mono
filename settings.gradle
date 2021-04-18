@@ -2,11 +2,14 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenCentral()
         maven { url = "https://maven.pkg.jetbrains.space/public/p/compose/dev" }
     }
 }
 
 rootProject.name = 'kotlin-echo'
+
+enableFeaturePreview("GRADLE_METADATA")
 
 // echo replication libraries
 include ':echo'

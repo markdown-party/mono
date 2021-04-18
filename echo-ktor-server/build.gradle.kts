@@ -1,4 +1,4 @@
-plugins { kotlin("jvm") version Versions.Kotlin }
+plugins { kotlin(Plugins.KotlinJvm) }
 
 kotlin {
   target { compilations.all { kotlinOptions.allWarningsAsErrors = true } }

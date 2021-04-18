@@ -1,15 +1,17 @@
 buildscript {
   repositories {
     mavenCentral()
-    maven { url = uri("https://dl.bintray.com/kotlin/kotlinx") }
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+  }
+  dependencies {
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Kotlin}")
+    classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.KotlinxSerialization}")
   }
 }
 
 allprojects {
   repositories {
     mavenCentral()
-    maven { url = uri("https://dl.bintray.com/kotlin/kotlinx") }
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 }

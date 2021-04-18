@@ -1,6 +1,6 @@
 plugins {
-  kotlin("jvm") version Versions.Kotlin
-  kotlin("plugin.serialization") version Versions.KotlinxSerialization
+  kotlin(Plugins.KotlinJvm)
+  kotlin(Plugins.KotlinSerialization)
   id("org.jetbrains.compose") version "0.4.0-build179"
 }
 

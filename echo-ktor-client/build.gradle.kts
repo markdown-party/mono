@@ -1,7 +1,8 @@
-plugins { kotlin("multiplatform") version Versions.Kotlin }
+plugins { kotlin(Plugins.KotlinMultiplatform) }
 
 kotlin {
   jvm()
+  js { browser() }
 
   targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 

@@ -1,10 +1,11 @@
 plugins {
-  kotlin("multiplatform") version Versions.Kotlin
-  kotlin("plugin.serialization") version Versions.KotlinxSerialization
+  kotlin(Plugins.KotlinMultiplatform)
+  kotlin(Plugins.KotlinSerialization)
 }
 
 kotlin {
   jvm()
+  js { browser() }
 
   targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
