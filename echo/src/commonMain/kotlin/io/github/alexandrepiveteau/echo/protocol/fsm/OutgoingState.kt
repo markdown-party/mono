@@ -10,6 +10,7 @@ import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.selects.select
 
 /**
@@ -45,25 +46,23 @@ private data class OutgoingAdvertising<T, C>(
 ) : OutgoingState<T, C>() {
 
   @OptIn(InternalCoroutinesApi::class)
-  override suspend fun OutgoingStepScope<T, C>.step(log: ImmutableEventLog<T, C>) =
-      select<Effect<OutgoingState<T, C>>> {
-        onReceiveOrClosed { v ->
-          when (val msg = v.valueOrNull) {
-            is Inc.Advertisement -> {
-              available += msg.site
-              Effect.Move(this@OutgoingAdvertising) // mutable state update.
-            }
-            is Inc.Ready -> {
-              Effect.Move(
-                  OutgoingListening(
-                      pendingRequests = available,
-                      requested = mutableListOf(),
-                  ))
-            }
-            is Inc.Done, null -> Effect.Move(OutgoingCancelling())
-            is Inc.Event -> Effect.MoveToError(notReachable())
-          }
+  override suspend fun OutgoingStepScope<T, C>.step(
+      log: ImmutableEventLog<T, C>,
+  ): Effect<OutgoingState<T, C>> =
+      when (val msg = receiveOrNull()) {
+        is Inc.Advertisement -> {
+          available += msg.site
+          Effect.Move(this@OutgoingAdvertising) // mutable state update.
         }
+        is Inc.Ready -> {
+          Effect.Move(
+              OutgoingListening(
+                  pendingRequests = available,
+                  requested = mutableListOf(),
+              ))
+        }
+        is Inc.Done, null -> Effect.Move(OutgoingCancelling())
+        is Inc.Event -> Effect.MoveToError(notReachable())
       }
 }
 
@@ -118,5 +117,8 @@ private class OutgoingCancelling<T, C> : OutgoingState<T, C>() {
 
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>,
-  ) = select<Effect<OutgoingState<T, C>>> { onSend(Out.Done) { Effect.Terminate } }
+  ): Effect<OutgoingState<T, C>> {
+    send(Out.Done)
+    return Effect.Terminate
+  }
 }

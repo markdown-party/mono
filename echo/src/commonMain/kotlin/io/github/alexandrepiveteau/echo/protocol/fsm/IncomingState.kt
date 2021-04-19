@@ -181,6 +181,7 @@ private class IncomingCancelling<T, C> : IncomingState<T, C>() {
   override suspend fun IncomingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<IncomingState<T, C>> {
-    return select { onSend(Inc.Done) { Effect.Terminate } }
+    send(Inc.Done)
+    return Effect.Terminate
   }
 }
