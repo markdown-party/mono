@@ -1,13 +1,8 @@
 package io.github.alexandrepiveteau.echo
 
-import io.github.alexandrepiveteau.echo.causal.EventIdentifier
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
-import io.github.alexandrepiveteau.echo.logs.Change
 import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
-import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
-import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import kotlin.math.roundToInt
@@ -26,42 +21,11 @@ class Scalability {
     override fun forward(body: IndexedEvent<T>, model: T): T = body.body
   }
 
-  /** A [PersistentEventLog] which discards all events but one. */
-  private data class LWWLog<T>(
-      private val backing: PersistentEventLog<T, T> = persistentEventLogOf(),
-  ) : ImmutableEventLog<T, T> by backing, PersistentEventLog<T, T> {
-
-    @OptIn(EchoEventLogPreview::class)
-    override fun set(
-        site: SiteIdentifier,
-        seqno: SequenceNumber,
-        body: T,
-        change: Change<T>
-    ): PersistentEventLog<T, T> {
-      val last = backing.lastOrNull() ?: return LWWLog(backing.set(site, seqno, body, change))
-      if (last.identifier > EventIdentifier(seqno, site)) return this
-      return LWWLog(
-          backing
-              .remove(last.identifier.site, last.identifier.seqno)
-              .set(site, seqno, body, change),
-      )
-    }
-
-    // Not supported for LWWLog.
-    override fun remove(
-        site: SiteIdentifier,
-        seqno: SequenceNumber,
-    ): PersistentEventLog<T, T> = this
-
-    override fun toPersistentEventLog(): PersistentEventLog<T, T> = this
-  }
-
   @Test
   fun `test scalability`() = suspendTest {
     val sites = 100
     val ops = 1000
     val projection = LWWProjection<Int>()
-    // val log = LWWLog<Int>() // TODO : Investigate java.lang.OutOfMemoryError ?
     val log = persistentEventLogOf<Int>()
 
     // Measured performance - Standard log : up to      49'999 op-site/sec.
