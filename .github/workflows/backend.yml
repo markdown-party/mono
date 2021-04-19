@@ -1,7 +1,8 @@
+name: deploy backend
 on: [ push, pull_request ]
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: 🎁 Checkout repo

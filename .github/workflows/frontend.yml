@@ -1,3 +1,4 @@
+name: deploy frontend
 on:
   push:
     branches:
