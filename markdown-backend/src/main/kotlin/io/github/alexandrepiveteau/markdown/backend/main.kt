@@ -17,11 +17,17 @@ import io.ktor.server.engine.*
 import io.ktor.websocket.*
 import party.markdown.MarkdownEvent
 
+/**
+ * Returns the port number to use when running the web application. Defaults to 1234 if no port is
+ * specified.
+ */
+private val Port = System.getenv("PORT")?.toIntOrNull() ?: 1234
+
 @OptIn(EchoKtorServerPreview::class)
 fun main() {
   val site = mutableSite<MarkdownEvent>(SiteIdentifier.random())
   val server =
-      embeddedServer(CIO, port = 8080) {
+      embeddedServer(CIO, port = Port) {
         install(WebSockets)
         routing {
           route("/$ServerSenderPath") { sender(site.encode(MarkdownEvent)) }
