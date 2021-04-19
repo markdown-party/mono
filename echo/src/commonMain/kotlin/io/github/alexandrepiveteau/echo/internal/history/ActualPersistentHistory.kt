@@ -93,8 +93,17 @@ constructor(
                       null -> current
                       else -> projection.backward(delta, current)
                     }
+
+                // This check is not explicitly needed, but makes sure (custom) implementations of
+                // the EventLog  do not forget to implement the remove() behaviour and enforce
+                // progress invariants.
+                val removed = past.remove(last.identifier.site, last.identifier.seqno)
+                check(removed != past) {
+                  "Please make sure your remove() implementation always removes elements."
+                }
+
                 rewind(
-                    past.remove(last.identifier.site, last.identifier.seqno),
+                    removed,
                     updated,
                     future.add(last),
                 )
