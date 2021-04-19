@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import react.RDependenciesList
 import react.useEffectWithCleanup
 import react.useState
 
@@ -47,4 +49,21 @@ fun <T> useFlow(initial: T, flow: Flow<T>): T {
     }
   }
   return state
+}
+
+/**
+ * Runs the provided suspending [body] in a coroutine.
+ *
+ * @param dependencies the dependencies for this effect.
+ * @param body thee suspending body to be run.
+ */
+fun useLaunchedEffect(
+    dependencies: RDependenciesList? = null,
+    body: suspend () -> Unit,
+) {
+  useEffectWithCleanup(dependencies) {
+    val scope = MainScope()
+    scope.launch { body() }
+    return@useEffectWithCleanup { scope.cancel() }
+  }
 }
