@@ -118,12 +118,9 @@ constructor(
       site: SiteIdentifier,
       seqno: SequenceNumber,
   ): ActualPersistentLog<T, C> {
-    val newAll = all.mutate { it.removeAll { e -> e.identifier == EventIdentifier(seqno, site) } }
-    val newBySite =
-        bySite.mutate {
-          val siteMap = it.getOrPut(site) { persistentHashMapOf() }
-          it[site] = siteMap.mutate { map -> map.remove(seqno) }
-        }
+    val newAll = all.removeAll { it.identifier == EventIdentifier(seqno, site) }
+    val siteMap = bySite[site]?.remove(seqno)
+    val newBySite = siteMap?.let { bySite.put(site, it) } ?: bySite
 
     return ActualPersistentLog(
         all = newAll,
