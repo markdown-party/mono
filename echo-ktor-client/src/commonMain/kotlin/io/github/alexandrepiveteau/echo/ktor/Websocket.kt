@@ -9,7 +9,6 @@ import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Outgoing as Out
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -31,7 +30,7 @@ fun HttpClient.sender(
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) = SendExchange {
   channelLink<Inc, Out> { inc ->
-    ws(sender) {
+    wss(sender) {
       val rcv =
           this.incoming
               .consumeAsFlow()
@@ -63,7 +62,7 @@ fun HttpClient.receiver(
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) = ReceiveExchange {
   channelLink<Out, Inc> { inc ->
-    ws(receiver) {
+    wss(receiver) {
       val rcv =
           this.incoming
               .consumeAsFlow()

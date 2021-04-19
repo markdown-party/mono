@@ -26,14 +26,14 @@ private val Client = HttpClient(Js) { install(WebSockets) }
 private val Remote =
     Client.exchange(
             receiver = {
-              port = 80
+              port = 443
               url {
                 host = "api.markdown.party"
                 path("receiver")
               }
             },
             sender = {
-              port = 80
+              port = 443
               url {
                 host = "api.markdown.party"
                 path("sender")
