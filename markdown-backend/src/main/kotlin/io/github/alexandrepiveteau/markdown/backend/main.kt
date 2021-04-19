@@ -1,3 +1,5 @@
+@file:JvmName("Main")
+
 package io.github.alexandrepiveteau.markdown.backend
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier

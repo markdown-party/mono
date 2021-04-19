@@ -20,3 +20,9 @@ kotlin {
     implementation(Deps.Slf4f.Simple)
   }
 }
+
+application {
+  group = "markdown.party"
+  version = "0.1.0-SNAPSHOT"
+  mainClass.set("io.github.alexandrepiveteau.markdown.backend.Main")
+}
