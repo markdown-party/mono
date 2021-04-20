@@ -44,15 +44,16 @@ class MemoryExchangeIncomingTest {
 
   @Test
   fun onlyDoneWorksOnOneBufferIncoming() = suspendTest {
-    val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
+    val echo = mutableSite<Nothing>(SiteIdentifier(123))
     val exchange =
-        channelLink<I<Nothing>, O<Nothing>> { incoming ->
-              assertTrue(incoming.receive() is I.Ready)
-              send(O.Done)
-              assertTrue(incoming.receive() is I.Done)
-              assertNull(incoming.receiveOrNull())
-            }
-            .buffer(RENDEZVOUS)
+        link<I<Nothing>, O<Nothing>> { incoming ->
+          incoming.test {
+            assertEquals(I.Ready, expectItem())
+            emit(O.Done)
+            assertEquals(I.Done, expectItem())
+            expectComplete()
+          }
+        }
     sync(echo.incoming(), exchange)
   }
 
@@ -61,16 +62,17 @@ class MemoryExchangeIncomingTest {
     val seqno = SequenceNumber(123U)
     val site = SiteIdentifier(456)
     val log = persistentEventLogOf(EventIdentifier(seqno, site) to 42)
-    val echo = mutableSite(site, log).buffer(RENDEZVOUS)
+    val echo = mutableSite(site, log)
     val exchange =
-        channelLink<I<Int>, O<Int>> { incoming ->
-              assertEquals(I.Advertisement(site), incoming.receive())
-              assertEquals(I.Ready, incoming.receive())
-              send(O.Done)
-              assertTrue(incoming.receive() is I.Done)
-              assertNull(incoming.receiveOrNull())
-            }
-            .buffer(RENDEZVOUS)
+        link<I<Int>, O<Int>> { incoming ->
+          incoming.test {
+            assertEquals<Any>(I.Advertisement(site), expectItem())
+            assertEquals(I.Ready, expectItem())
+            emit(O.Done)
+            assertEquals(I.Done, expectItem())
+            expectComplete()
+          }
+        }
     sync(echo.incoming(), exchange)
   }
 
