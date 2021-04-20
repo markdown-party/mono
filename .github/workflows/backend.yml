@@ -1,5 +1,8 @@
 name: deploy backend
-on: [ push, pull_request ]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
