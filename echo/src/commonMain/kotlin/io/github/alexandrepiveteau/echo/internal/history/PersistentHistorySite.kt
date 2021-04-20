@@ -17,6 +17,8 @@ import io.github.alexandrepiveteau.echo.protocol.fsm.State
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal data class HistoryModel<T, M, C>(
     val log: PersistentEventLog<T, C>,
@@ -50,8 +52,11 @@ internal class PersistentHistorySite<T, M, C>(
   /** The current value of in the [PersistentHistory]. */
   private val current = MutableStateFlow(initial)
 
+  /** The [Mutex] that protects atomic mutations of the [current] [MutableStateFlow]. */
+  private val mutex = Mutex()
+
   /** Mutates the [current] value atomically, using the function [f]. */
-  private inline fun mutate(
+  private suspend inline fun mutate(
       f: (history: PersistentLogHistory<T, M, C>) -> PersistentLogHistory<T, M, C>
   ) {
     mutate(extract = { it }, f)
@@ -64,17 +69,10 @@ internal class PersistentHistorySite<T, M, C>(
    *
    * @return the resulting data.
    */
-  private inline fun <R> mutate(
+  private suspend inline fun <R> mutate(
       extract: (R) -> PersistentLogHistory<T, M, C>,
       f: (history: PersistentLogHistory<T, M, C>) -> R,
-  ): R {
-    while (true) {
-      // Compare-and-swap mutation.
-      val start = current.value
-      val next = f(start)
-      if (current.compareAndSet(start, extract(next))) return next
-    }
-  }
+  ): R = mutex.withLock { f(current.value).apply { current.value = extract(this) } }
 
   /**
    * Runs an exchange based on a final state machine. The FSM starts with an [initial] state, and
