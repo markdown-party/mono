@@ -49,14 +49,35 @@ private val State =
         projection = MarkdownProjection,
     )
 
+private fun useSync(
+    initial: Boolean = true,
+): Pair<Boolean, () -> Unit> {
+  val (syncing, setSyncing) = useState(initial)
+  useLaunchedEffect(listOf(syncing)) {
+    if (syncing) {
+      try {
+        sync(Remote, State)
+      } finally {
+        setSyncing(false)
+      }
+    }
+  }
+  return syncing to { setSyncing(true) }
+}
+
 /** A [functionalComponent] that displays a very simple websockets demonstration. */
 private val socket =
     functionalComponent<RProps> {
       val scope = useCoroutineScope()
-      useLaunchedEffect(listOf()) { sync(Remote, State) }
+      val (syncing, requestSync) = useSync()
 
       val total = useFlow(0, State.value)
+      val title = if (syncing) "Syncing" else "Request sync"
 
+      button {
+        attrs { onClickFunction = { requestSync() } }
+        +title
+      }
       h1 { +"Current total is $total" }
       button {
         attrs { onClickFunction = { scope.launch { State.event { yield(Decrement) } } } }
