@@ -42,7 +42,7 @@ fun interface Link<in I, out O> {
  */
 fun <I, O> link(
     @BuilderInference block: suspend FlowCollector<O>.(Flow<I>) -> Unit,
-): Link<I, O> = Link { incoming -> flow { block.invoke(this, incoming) } }
+): Link<I, O> = Link { incoming -> flow { block(this, incoming) } }
 
 /**
  * Creates a _cold_ link from elements that are send to a send channel through a [ProducerScope].
@@ -60,4 +60,4 @@ fun <I, O> link(
 @OptIn(FlowPreview::class)
 fun <I, O> channelLink(
     @BuilderInference block: suspend ProducerScope<O>.(ReceiveChannel<I>) -> Unit,
-): Link<I, O> = Link { incoming -> channelFlow { block.invoke(this, incoming.produceIn(this)) } }
+): Link<I, O> = Link { incoming -> channelFlow { block(this, incoming.produceIn(this)) } }
