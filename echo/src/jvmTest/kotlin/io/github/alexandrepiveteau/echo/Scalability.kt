@@ -59,8 +59,8 @@ class Scalability {
 
   @Test
   fun `test scalability`() = suspendTest {
-    val sites = 1000
-    val ops = 1_000_000
+    val sites = 100
+    val ops = 1000
     val projection = LWWProjection<Int>()
     val log = LWWLog<Int>()
 
