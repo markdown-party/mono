@@ -135,8 +135,13 @@ private data class IncomingSending<T, C>(
   fun handleEventSent(msg: Inc.Event<T>): IncomingState<T, C> {
     val remainingCredits = receivedCredits[msg.site]?.minus(1) ?: 0
     val nextSequenceNumber = nextSequenceNumberPerSite[msg.site]?.inc() ?: Zero
+    val sentNextSequenceNumber = msg.seqno.inc()
     return copy(
-        nextSequenceNumberPerSite = nextSequenceNumberPerSite.put(msg.site, nextSequenceNumber),
+        nextSequenceNumberPerSite =
+            nextSequenceNumberPerSite.put(
+                msg.site,
+                maxOf(nextSequenceNumber, sentNextSequenceNumber),
+            ),
         receivedCredits = receivedCredits.put(msg.site, remainingCredits),
     )
   }
