@@ -37,7 +37,7 @@ suspend fun <I, O> sync(
     second
         .talk(fToS.consumeAsFlow())
         .onEach { sToF.send(it) }
-        .onCompletion { fToS.close() }
+        .onCompletion { sToF.close() }
         .collect()
   }
 }
