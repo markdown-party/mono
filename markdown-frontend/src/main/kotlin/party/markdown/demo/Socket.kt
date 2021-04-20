@@ -1,7 +1,7 @@
 package party.markdown.demo
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
-import io.github.alexandrepiveteau.echo.ktor.exchange
+import io.github.alexandrepiveteau.echo.ktor.wssExchange
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.protocol.decode
 import io.github.alexandrepiveteau.echo.sync
@@ -24,7 +24,7 @@ import react.dom.h1
 
 private val Client = HttpClient(Js) { install(WebSockets) }
 private val Remote =
-    Client.exchange(
+    Client.wssExchange(
             receiver = {
               port = 443
               url {

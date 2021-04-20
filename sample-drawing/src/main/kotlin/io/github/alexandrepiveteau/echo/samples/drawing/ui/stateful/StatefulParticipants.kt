@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.ktor.receiver
+import io.github.alexandrepiveteau.echo.ktor.wsReceiveExchange
 import io.github.alexandrepiveteau.echo.protocol.encode
 import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Participant
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
@@ -42,11 +42,11 @@ fun StatefulParticipants(
           try {
             // TODO : Eventually extract this logic somewhere.
             val receiver =
-                HttpClient.receiver({
+                HttpClient.wsReceiveExchange {
                   host = participant.host
                   port = participant.port
                   url { path(participant.path) }
-                })
+                }
             sync(site.encode(DrawingEvent).outgoing(), receiver.incoming())
           } catch (problem: Throwable) {
             problem.printStackTrace()

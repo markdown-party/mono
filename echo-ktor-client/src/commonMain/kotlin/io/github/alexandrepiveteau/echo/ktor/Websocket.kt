@@ -10,11 +10,16 @@ import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+
+// PIPING JOBS
 
 /** Pipes an [ReceiveChannel] into a [SendChannel]. */
 private fun <T> CoroutineScope.pipe(
@@ -24,77 +29,167 @@ private fun <T> CoroutineScope.pipe(
   incoming.consumeAsFlow().onEach { outgoing.send(it) }.onCompletion { outgoing.close() }.collect()
 }
 
+// SENDERS
+
+/**
+ * A block that abstracts the sender part of the websocket. This will be changed to a multi-receiver
+ * function when they are supported in Kotlin.
+ */
+private fun CoroutineScope.sender(
+    inc: ReceiveChannel<Inc>,
+    out: SendChannel<Out>,
+    socketInc: ReceiveChannel<Frame>,
+    socketOut: SendChannel<Frame>,
+): Job {
+  val rcv =
+      socketInc
+          .consumeAsFlow()
+          .filterIsInstance<Frame.Text>()
+          .map { it.readText() }
+          .map { Json.decodeFromString(Out.serializer(), it) }
+          .produceIn(this)
+
+  val snd =
+      inc.consumeAsFlow()
+          .map { Json.encodeToString(Inc.serializer(), it) }
+          .map { Frame.Text(it) }
+          .produceIn(this)
+
+  // Create the required pipes.
+  return launch {
+    joinAll(
+        pipe(rcv, out),
+        pipe(snd, socketOut),
+    )
+  }
+}
+
 @EchoKtorPreview
-fun HttpClient.sender(
+fun HttpClient.wssSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) = SendExchange {
   channelLink<Inc, Out> { inc ->
     wss(sender) {
-      val rcv =
-          this.incoming
-              .consumeAsFlow()
-              .filterIsInstance<Frame.Text>()
-              .map { it.readText() }
-              .map { Json.decodeFromString(Out.serializer(), it) }
-              .flowOn(dispatcher)
-              .produceIn(this)
-
-      val snd =
-          inc.consumeAsFlow()
-              .map { Json.encodeToString(Inc.serializer(), it) }
-              .map { Frame.Text(it) }
-              .flowOn(dispatcher)
-              .produceIn(this)
-
-      // Create the required pipes.
-      joinAll(
-          pipe(rcv, this@channelLink),
-          pipe(snd, this.outgoing),
-      )
+      sender(
+              inc = inc,
+              out = this@channelLink,
+              socketInc = incoming,
+              socketOut = outgoing,
+          )
+          .join()
     }
   }
 }
 
 @EchoKtorPreview
-fun HttpClient.receiver(
+fun HttpClient.wsSendExchange(
+    sender: HttpRequestBuilder.() -> Unit,
+) = SendExchange {
+  channelLink<Inc, Out> { inc ->
+    ws(sender) {
+      sender(
+              inc = inc,
+              out = this@channelLink,
+              socketInc = incoming,
+              socketOut = outgoing,
+          )
+          .join()
+    }
+  }
+}
+
+// RECEIVERS
+
+/**
+ * A block that abstracts the receiver part of the websocket. This will be changed to a
+ * multi-receiver function when they are supported in Kotlin.
+ */
+private fun CoroutineScope.receiver(
+    inc: ReceiveChannel<Out>,
+    out: SendChannel<Inc>,
+    socketInc: ReceiveChannel<Frame>,
+    socketOut: SendChannel<Frame>,
+): Job {
+  val rcv =
+      socketInc
+          .consumeAsFlow()
+          .filterIsInstance<Frame.Text>()
+          .map { it.readText() }
+          .map { Json.decodeFromString(Inc.serializer(), it) }
+          .produceIn(this)
+
+  val snd =
+      inc.consumeAsFlow()
+          .map { Json.encodeToString(Out.serializer(), it) }
+          .map { Frame.Text(it) }
+          .produceIn(this)
+
+  // Create the required pipes.
+  return launch {
+    joinAll(
+        pipe(rcv, out),
+        pipe(snd, socketOut),
+    )
+  }
+}
+
+@EchoKtorPreview
+fun HttpClient.wssReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) = ReceiveExchange {
   channelLink<Out, Inc> { inc ->
     wss(receiver) {
-      val rcv =
-          this.incoming
-              .consumeAsFlow()
-              .filterIsInstance<Frame.Text>()
-              .map { it.readText() }
-              .map { Json.decodeFromString(Inc.serializer(), it) }
-              .flowOn(dispatcher)
-              .produceIn(this)
-
-      val snd =
-          inc.consumeAsFlow()
-              .map { Json.encodeToString(Out.serializer(), it) }
-              .map { Frame.Text(it) }
-              .flowOn(dispatcher)
-              .produceIn(this)
-
-      // Create the required pipes.
-      joinAll(
-          pipe(rcv, this@channelLink),
-          pipe(snd, this.outgoing),
-      )
+      receiver(
+              inc = inc,
+              out = this@channelLink,
+              socketInc = incoming,
+              socketOut = outgoing,
+          )
+          .join()
     }
   }
 }
 
 @EchoKtorPreview
-fun HttpClient.exchange(
+fun HttpClient.wsReceiveExchange(
+    receiver: HttpRequestBuilder.() -> Unit,
+) = ReceiveExchange {
+  channelLink<Out, Inc> { inc ->
+    ws(receiver) {
+      receiver(
+              inc = inc,
+              out = this@channelLink,
+              socketInc = incoming,
+              socketOut = outgoing,
+          )
+          .join()
+    }
+  }
+}
+
+// COMBINED
+
+private class DelegatingExchange<I, O>(
+    private val s: SendExchange<I, O>,
+    private val r: ReceiveExchange<I, O>,
+) : Exchange<I, O>, SendExchange<I, O> by s, ReceiveExchange<I, O> by r
+
+@EchoKtorPreview
+fun HttpClient.wssExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ): Exchange<Inc, Out> =
-    object :
-        Exchange<Inc, Out>,
-        ReceiveExchange<Inc, Out> by receiver(receiver, dispatcher),
-        SendExchange<Inc, Out> by sender(sender, dispatcher) {}
+    DelegatingExchange(
+        s = wssSendExchange(sender),
+        r = wssReceiveExchange(receiver),
+    )
+
+@EchoKtorPreview
+fun HttpClient.wsExchange(
+    receiver: HttpRequestBuilder.() -> Unit,
+    sender: HttpRequestBuilder.() -> Unit,
+): Exchange<Inc, Out> =
+    DelegatingExchange(
+        s = wsSendExchange(sender),
+        r = wsReceiveExchange(receiver),
+    )
