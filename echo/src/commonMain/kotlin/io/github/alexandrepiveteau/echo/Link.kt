@@ -26,11 +26,7 @@ fun interface Link<in I, out O> {
   fun talk(incoming: Flow<I>): Flow<O>
 }
 
-// BUILDER DSL SCOPES
-
-typealias LinkFlowBuilder<I, O> = suspend FlowCollector<O>.(Flow<I>) -> Unit
-
-typealias LinkChannelBuilder<I, O> = suspend ProducerScope<O>.(ReceiveChannel<I>) -> Unit
+// BUILDERS
 
 /**
  * Creates a _cold_ link from the given suspending [block]. The link being _cold_ means that the
@@ -45,7 +41,7 @@ typealias LinkChannelBuilder<I, O> = suspend ProducerScope<O>.(ReceiveChannel<I>
  * @param O the type of the outgoing messages.
  */
 fun <I, O> link(
-    @BuilderInference block: LinkFlowBuilder<I, O>,
+    @BuilderInference block: suspend FlowCollector<O>.(Flow<I>) -> Unit,
 ): Link<I, O> = Link { incoming -> flow { block.invoke(this, incoming) } }
 
 /**
@@ -63,5 +59,5 @@ fun <I, O> link(
 @ExperimentalCoroutinesApi
 @OptIn(FlowPreview::class)
 fun <I, O> channelLink(
-    @BuilderInference block: LinkChannelBuilder<I, O>,
+    @BuilderInference block: suspend ProducerScope<O>.(ReceiveChannel<I>) -> Unit,
 ): Link<I, O> = Link { incoming -> channelFlow { block.invoke(this, incoming.produceIn(this)) } }
