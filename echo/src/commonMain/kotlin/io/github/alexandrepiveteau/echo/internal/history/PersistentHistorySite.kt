@@ -7,13 +7,16 @@ import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.channelLink
 import io.github.alexandrepiveteau.echo.events.EventScope
+import io.github.alexandrepiveteau.echo.internal.flow.map
 import io.github.alexandrepiveteau.echo.logs.EventLog
 import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.protocol.fsm.Effect
 import io.github.alexandrepiveteau.echo.protocol.fsm.IncomingState
 import io.github.alexandrepiveteau.echo.protocol.fsm.OutgoingState
 import io.github.alexandrepiveteau.echo.protocol.fsm.State
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.produceIn
 
 internal data class HistoryModel<T, M, C>(
     val log: PersistentEventLog<T, C>,
@@ -88,7 +91,7 @@ internal class PersistentHistorySite<T, M, C>(
   ) =
       channelLink<I, O> { inc ->
         var state = initial()
-        val insertions = current.map { it.current.log }.distinctUntilChanged().produceIn(this)
+        val insertions = current.map { it.current.log }.produceIn(this)
 
         // Prepare some context information for the step.
         val scope =
@@ -112,7 +115,7 @@ internal class PersistentHistorySite<T, M, C>(
       }
 
   // The current model value flow.
-  override val value: Flow<M> = current.map { it.current.model }.distinctUntilChanged()
+  override val value: StateFlow<M> = current.map { it.current.model }
 
   override fun outgoing() = exchange { OutgoingState() }
   override fun incoming() = exchange { IncomingState(current.value.current.log.sites) }

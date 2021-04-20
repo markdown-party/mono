@@ -13,7 +13,7 @@ import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * An interface describing a [Site] in the distributed system. Each [Site] is associated with a
@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface Site<T, out M> : Exchange<Inc<T>, Out<T>> {
   val identifier: SiteIdentifier
-  val value: Flow<M>
+  val value: StateFlow<M>
 }
 
 /**

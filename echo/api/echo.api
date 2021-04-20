@@ -32,7 +32,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/SendExchange {
 
 public abstract interface class io/github/alexandrepiveteau/echo/Site : io/github/alexandrepiveteau/echo/Exchange {
 	public abstract fun getIdentifier--e_yCgk ()I
-	public abstract fun getValue ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getValue ()Lkotlinx/coroutines/flow/StateFlow;
 }
 
 public final class io/github/alexandrepiveteau/echo/SiteKt {
@@ -322,6 +322,6 @@ public final class io/github/alexandrepiveteau/echo/protocol/Message$V1$Outgoing
 }
 
 public final class io/github/alexandrepiveteau/echo/sites/TransformsKt {
-	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function2;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
 }
 

@@ -2,7 +2,7 @@ package io.github.alexandrepiveteau.echo.sites
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.events.EventScope
-import kotlinx.coroutines.flow.map
+import io.github.alexandrepiveteau.echo.internal.flow.map
 
 /**
  * Transforms a [MutableSite] to make it return a different kind of model. This may be particularly
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
  * @param M2 the type of the transformed model.
  */
 fun <T, M1, M2> MutableSite<T, M1>.map(
-    f: suspend (M1) -> M2,
+    f: (M1) -> M2,
 ): MutableSite<T, M2> = MappingMutableSite(f, this)
 
 /**
@@ -26,7 +26,7 @@ fun <T, M1, M2> MutableSite<T, M1>.map(
  * @param backing the underlying [MutableSite].
  */
 private class MappingMutableSite<T, out M1, out M2>(
-    private val f: suspend (M1) -> M2,
+    private val f: (M1) -> M2,
     private val backing: MutableSite<T, M1>
 ) : MutableSite<T, M2> {
 
