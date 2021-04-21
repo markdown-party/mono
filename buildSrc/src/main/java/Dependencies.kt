@@ -4,7 +4,7 @@ object Versions {
   const val KotlinxCoroutines = "1.4.3"
   const val KotlinxImmutableCollections = "0.3.4"
   const val KotlinxSerialization = "1.4.30"
-  const val KotlinxSerializationJson = "1.1.0"
+  const val KotlinxSerializationFormat = "1.1.0"
   const val Ktor = "1.5.3"
 
   const val CashAppTurbine = "0.4.1"
@@ -35,11 +35,16 @@ object Deps {
     const val ImmutableCollections =
         "org.jetbrains.kotlinx:kotlinx-collections-immutable:${Versions.KotlinxImmutableCollections}"
 
+    const val SerializationCore =
+        "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.KotlinxSerializationFormat}"
+
     const val SerializationJson =
-        "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinxSerializationJson}"
+        "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinxSerializationFormat}"
   }
 
   object Ktor {
+    const val CommonHttpCIO = "io.ktor:ktor-http-cio:${Versions.Ktor}"
+
     const val ClientCore = "io.ktor:ktor-client-core:${Versions.Ktor}"
     const val ClientWebsockets = "io.ktor:ktor-client-websockets:${Versions.Ktor}"
     const val ClientEngineCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"

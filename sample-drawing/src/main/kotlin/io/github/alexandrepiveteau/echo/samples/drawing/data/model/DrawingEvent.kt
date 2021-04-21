@@ -15,13 +15,15 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import io.github.alexandrepiveteau.echo.causal.*
 import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
-import kotlinx.serialization.json.Json
 
 /**
  * A sealed class representing the different events which are supported in the drawing app, and
@@ -69,12 +71,6 @@ sealed class DrawingEvent {
   data class Delete(
       val figure: FigureId,
   ) : DrawingEvent()
-
-  /** The [io.github.alexandrepiveteau.echo.Coder] implementation for [DrawingEvent]. */
-  companion object Coder : io.github.alexandrepiveteau.echo.protocol.Coder<DrawingEvent, String> {
-    override fun decode(it: String) = Json.decodeFromString(serializer(), it)
-    override fun encode(it: DrawingEvent) = Json.encodeToString(serializer(), it)
-  }
 }
 
 // CUSTOM SERIALIZERS

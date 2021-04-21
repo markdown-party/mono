@@ -7,8 +7,8 @@ import io.github.alexandrepiveteau.echo.EchoEventLogPreview
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.selects.select

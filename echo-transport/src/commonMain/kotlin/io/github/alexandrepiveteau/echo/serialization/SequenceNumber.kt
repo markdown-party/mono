@@ -17,7 +17,7 @@ fun SequenceNumber.Companion.serializer(): KSerializer<SequenceNumber> = Sequenc
  * [SequenceNumber] are represented as a [Long] in their serialized format, even though only the
  * least significant 32 bits are actually used.
  */
-private object SequenceNumberSerializer : KSerializer<SequenceNumber> {
+internal object SequenceNumberSerializer : KSerializer<SequenceNumber> {
 
   override val descriptor: SerialDescriptor =
       PrimitiveSerialDescriptor("SequenceNumber", PrimitiveKind.LONG)

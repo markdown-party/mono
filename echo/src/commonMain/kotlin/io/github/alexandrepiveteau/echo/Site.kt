@@ -11,8 +11,8 @@ import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as Inc
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as Out
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.coroutines.flow.StateFlow
 
 /**

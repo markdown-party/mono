@@ -1,6 +1,10 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Incoming as Inc
+import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming.Advertisement
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming.Companion as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming.Ready
+import io.github.alexandrepiveteau.echo.serialization.serializer
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,8 +22,8 @@ class JsonDecodingTest {
     val json = """
         {"t":"adv", "s": 123}
       """
-    val decoded = Json.decodeFromString(Transport.V1.serializer(), json)
-    assertEquals(Inc.Advertisement(site = 123), decoded)
+    val decoded = Json.decodeFromString(Inc.serializer(Body.serializer()), json)
+    assertEquals(Advertisement(site = SiteIdentifier(123)), decoded)
   }
 
   @Test
@@ -27,7 +31,7 @@ class JsonDecodingTest {
     val json = """
             {"t":"rdy"}
         """
-    val decoded = Json.decodeFromString(Transport.V1.serializer(), json)
-    assertEquals(Inc.Ready, decoded)
+    val decoded = Json.decodeFromString(Inc.serializer(Body.serializer()), json)
+    assertEquals(Ready, decoded)
   }
 }

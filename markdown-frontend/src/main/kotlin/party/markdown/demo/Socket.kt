@@ -3,7 +3,7 @@ package party.markdown.demo
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
 import io.github.alexandrepiveteau.echo.ktor.wssExchange
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.protocol.decode
+import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
 import io.github.alexandrepiveteau.echo.sync
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
@@ -40,7 +40,7 @@ private val Remote =
               }
             },
         )
-        .decode(MarkdownEvent)
+        .decodeFromFrame(MarkdownEvent.serializer())
 
 private val State =
     mutableSite(

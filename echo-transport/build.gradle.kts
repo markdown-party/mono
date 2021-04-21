@@ -14,6 +14,7 @@ kotlin {
       dependencies {
         api(project(":echo"))
         api(Deps.Kotlinx.SerializationJson)
+        api(Deps.Ktor.CommonHttpCIO)
       }
     }
     val commonTest by getting {

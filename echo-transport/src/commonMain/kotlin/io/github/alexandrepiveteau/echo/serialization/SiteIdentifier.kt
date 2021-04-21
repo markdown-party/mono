@@ -17,7 +17,7 @@ fun SiteIdentifier.Companion.serializer(): KSerializer<SiteIdentifier> = SiteIde
  * [SiteIdentifier] are represented as a [String] in their serialized format, with exactly 8
  * characters. Each character is in the hexadecimal range [0, F].
  */
-private object SiteIdentifierSerializer : KSerializer<SiteIdentifier> {
+internal object SiteIdentifierSerializer : KSerializer<SiteIdentifier> {
 
   // How much values are shifted in their encoding / representation.
   private const val HALF_INT = 1 shl 31

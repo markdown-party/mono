@@ -1,7 +1,12 @@
 package io.github.alexandrepiveteau.echo
 
+import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.events.EventScope
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flowOn
 
@@ -70,3 +75,24 @@ private class FlowOnExchange<I, O>(
 fun <I, O> Exchange<I, O>.flowOn(
     context: CoroutineContext,
 ): Exchange<I, O> = FlowOnExchange(context, this)
+
+/**
+ * Transforms a [MutableSite] by making it flow on a specific dispatcher. The same
+ * [CoroutineContext] will be used in both directions for both [Link]s.
+ *
+ * @param context the [CoroutineContext] to use for the flow.
+ */
+fun <T, M> MutableSite<T, M>.flowOn(
+    context: CoroutineContext,
+): MutableSite<T, M> =
+    object : MutableSite<T, M>, Exchange<Inc<T>, Out<T>> by FlowOnExchange(context, this) {
+
+      override val identifier: SiteIdentifier
+        get() = this@flowOn.identifier
+
+      override val value: StateFlow<M>
+        get() = this@flowOn.value
+
+      override suspend fun event(scope: suspend EventScope<T>.(M) -> Unit) =
+          this@flowOn.event(scope)
+    }

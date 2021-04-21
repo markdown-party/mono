@@ -4,8 +4,6 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.channelLink
-import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Incoming as Inc
-import io.github.alexandrepiveteau.echo.protocol.Transport.V1.Outgoing as Out
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
@@ -17,7 +15,6 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 // PIPING JOBS
 
@@ -36,24 +33,13 @@ private fun <T> CoroutineScope.pipe(
  * function when they are supported in Kotlin.
  */
 private fun CoroutineScope.sender(
-    inc: ReceiveChannel<Inc>,
-    out: SendChannel<Out>,
+    inc: ReceiveChannel<Frame>,
+    out: SendChannel<Frame>,
     socketInc: ReceiveChannel<Frame>,
     socketOut: SendChannel<Frame>,
 ): Job {
-  val rcv =
-      socketInc
-          .consumeAsFlow()
-          .filterIsInstance<Frame.Text>()
-          .map { it.readText() }
-          .map { Json.decodeFromString(Out.serializer(), it) }
-          .produceIn(this)
-
-  val snd =
-      inc.consumeAsFlow()
-          .map { Json.encodeToString(Inc.serializer(), it) }
-          .map { Frame.Text(it) }
-          .produceIn(this)
+  val rcv = socketInc.consumeAsFlow().produceIn(this)
+  val snd = inc.consumeAsFlow().produceIn(this)
 
   // Create the required pipes.
   return launch {
@@ -68,7 +54,7 @@ private fun CoroutineScope.sender(
 fun HttpClient.wssSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ) = SendExchange {
-  channelLink<Inc, Out> { inc ->
+  channelLink<Frame, Frame> { inc ->
     wss(sender) {
       sender(
               inc = inc,
@@ -85,7 +71,7 @@ fun HttpClient.wssSendExchange(
 fun HttpClient.wsSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ) = SendExchange {
-  channelLink<Inc, Out> { inc ->
+  channelLink<Frame, Frame> { inc ->
     ws(sender) {
       sender(
               inc = inc,
@@ -105,24 +91,13 @@ fun HttpClient.wsSendExchange(
  * multi-receiver function when they are supported in Kotlin.
  */
 private fun CoroutineScope.receiver(
-    inc: ReceiveChannel<Out>,
-    out: SendChannel<Inc>,
+    inc: ReceiveChannel<Frame>,
+    out: SendChannel<Frame>,
     socketInc: ReceiveChannel<Frame>,
     socketOut: SendChannel<Frame>,
 ): Job {
-  val rcv =
-      socketInc
-          .consumeAsFlow()
-          .filterIsInstance<Frame.Text>()
-          .map { it.readText() }
-          .map { Json.decodeFromString(Inc.serializer(), it) }
-          .produceIn(this)
-
-  val snd =
-      inc.consumeAsFlow()
-          .map { Json.encodeToString(Out.serializer(), it) }
-          .map { Frame.Text(it) }
-          .produceIn(this)
+  val rcv = socketInc.consumeAsFlow().produceIn(this)
+  val snd = inc.consumeAsFlow().produceIn(this)
 
   // Create the required pipes.
   return launch {
@@ -137,7 +112,7 @@ private fun CoroutineScope.receiver(
 fun HttpClient.wssReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ) = ReceiveExchange {
-  channelLink<Out, Inc> { inc ->
+  channelLink<Frame, Frame> { inc ->
     wss(receiver) {
       receiver(
               inc = inc,
@@ -154,7 +129,7 @@ fun HttpClient.wssReceiveExchange(
 fun HttpClient.wsReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ) = ReceiveExchange {
-  channelLink<Out, Inc> { inc ->
+  channelLink<Frame, Frame> { inc ->
     ws(receiver) {
       receiver(
               inc = inc,
@@ -178,7 +153,7 @@ private class DelegatingExchange<I, O>(
 fun HttpClient.wssExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
-): Exchange<Inc, Out> =
+): Exchange<Frame, Frame> =
     DelegatingExchange(
         s = wssSendExchange(sender),
         r = wssReceiveExchange(receiver),
@@ -188,7 +163,7 @@ fun HttpClient.wssExchange(
 fun HttpClient.wsExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
-): Exchange<Inc, Out> =
+): Exchange<Frame, Frame> =
     DelegatingExchange(
         s = wsSendExchange(sender),
         r = wsReceiveExchange(receiver),
