@@ -53,6 +53,7 @@ public final class io/github/alexandrepiveteau/echo/TransformsKt {
 	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Link;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Link;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Link;
+	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/MutableSite;
 }
 
 public final class io/github/alexandrepiveteau/echo/causal/EventIdentifier : java/lang/Comparable {
