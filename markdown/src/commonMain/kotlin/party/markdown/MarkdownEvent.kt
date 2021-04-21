@@ -1,6 +1,6 @@
 package party.markdown
 
-import io.github.alexandrepiveteau.echo.Coder as EchoCoder
+import io.github.alexandrepiveteau.echo.protocol.Coder as EchoCoder
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 

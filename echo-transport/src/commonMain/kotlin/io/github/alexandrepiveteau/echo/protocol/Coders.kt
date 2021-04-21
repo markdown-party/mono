@@ -1,9 +1,6 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.Coder
 import io.github.alexandrepiveteau.echo.Exchange
-import io.github.alexandrepiveteau.echo.coding
-import io.github.alexandrepiveteau.echo.reversed
 
 /**
  * Returns a [Coder] for [Message.V1.Incoming] and [Transport.V1.Incoming].

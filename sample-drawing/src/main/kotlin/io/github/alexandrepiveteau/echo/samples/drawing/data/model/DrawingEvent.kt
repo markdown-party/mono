@@ -71,7 +71,7 @@ sealed class DrawingEvent {
   ) : DrawingEvent()
 
   /** The [io.github.alexandrepiveteau.echo.Coder] implementation for [DrawingEvent]. */
-  companion object Coder : io.github.alexandrepiveteau.echo.Coder<DrawingEvent, String> {
+  companion object Coder : io.github.alexandrepiveteau.echo.protocol.Coder<DrawingEvent, String> {
     override fun decode(it: String) = Json.decodeFromString(serializer(), it)
     override fun encode(it: DrawingEvent) = Json.encodeToString(serializer(), it)
   }

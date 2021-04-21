@@ -18,7 +18,7 @@ kotlin {
     val commonMain by getting {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        implementation(Deps.Kotlinx.CoroutinesCore)
+        api(Deps.Kotlinx.CoroutinesCore)
         implementation(Deps.Kotlinx.ImmutableCollections)
       }
     }
