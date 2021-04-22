@@ -8,8 +8,8 @@ import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Incoming as I
-import io.github.alexandrepiveteau.echo.protocol.Message.V1.Outgoing as O
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlin.test.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS

@@ -14,8 +14,17 @@ kotlin {
       dependencies {
         api(project(":echo"))
         api(Deps.Kotlinx.SerializationJson)
+        api(Deps.Ktor.CommonHttpCIO)
       }
     }
+    val commonTest by getting {
+      dependencies {
+        implementation(kotlin("test-common"))
+        implementation(kotlin("test-annotations-common"))
+      }
+    }
+    val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
+    val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
 
     all { languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes") }
   }

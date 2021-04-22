@@ -7,7 +7,7 @@ import io.github.alexandrepiveteau.echo.ktor.server.EchoKtorServerPreview
 import io.github.alexandrepiveteau.echo.ktor.server.receiver
 import io.github.alexandrepiveteau.echo.ktor.server.sender
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.protocol.encode
+import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
 import io.github.alexandrepiveteau.markdown.ServerReceiverPath
 import io.github.alexandrepiveteau.markdown.ServerSenderPath
 import io.ktor.application.*
@@ -16,6 +16,7 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.websocket.*
 import party.markdown.MarkdownEvent
+import party.markdown.MarkdownEvent.Companion.serializer
 
 /**
  * Returns the port number to use when running the web application. Defaults to 1234 if no port is
@@ -30,8 +31,8 @@ fun main() {
       embeddedServer(CIO, port = Port) {
         install(WebSockets)
         routing {
-          route("/$ServerSenderPath") { sender(site.encode(MarkdownEvent)) }
-          route("/$ServerReceiverPath") { receiver(site.encode(MarkdownEvent)) }
+          route("/$ServerSenderPath") { sender(site.encodeToFrame(serializer())) }
+          route("/$ServerReceiverPath") { receiver(site.encodeToFrame(serializer())) }
         }
       }
   server.start(wait = true)

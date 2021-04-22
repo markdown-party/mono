@@ -8,11 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.ktor.wsReceiveExchange
-import io.github.alexandrepiveteau.echo.protocol.encode
 import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Participant
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.PersistentDrawingBoard
 import io.github.alexandrepiveteau.echo.samples.drawing.ui.features.network.Participant as Cell
+import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
 import io.github.alexandrepiveteau.echo.sync
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -47,7 +47,10 @@ fun StatefulParticipants(
                   port = participant.port
                   url { path(participant.path) }
                 }
-            sync(site.encode(DrawingEvent).outgoing(), receiver.incoming())
+            sync(
+                site.encodeToFrame(DrawingEvent.serializer()).outgoing(),
+                receiver.incoming(),
+            )
           } catch (problem: Throwable) {
             problem.printStackTrace()
           } finally {

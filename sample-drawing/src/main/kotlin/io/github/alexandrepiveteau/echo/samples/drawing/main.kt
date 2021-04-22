@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.flowOn
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Config
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingBoardProjection
@@ -32,6 +33,7 @@ import io.github.alexandrepiveteau.echo.samples.drawing.ui.stateful.StatefulPart
 import kotlin.random.Random
 import kotlin.system.exitProcess
 import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -45,7 +47,7 @@ fun main(args: Array<String>) = runBlocking {
           identifier = SiteIdentifier.random(),
           initial = persistentDrawingBoardOf(),
           projection = DrawingBoardProjection,
-      )
+      ).flowOn(Dispatchers.Default)
 
   // Parse the launch configuration.
   val config = Config.parse(args) ?: exitProcess(1)
