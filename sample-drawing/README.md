@@ -168,5 +168,3 @@ figures.collect { figures: List<Figure> ->
 - [[#23]](https://github.com/markdown-party/kotlin-echo/issues/23) The event log is not compacted,
   even though the data model could implement some compaction for LWW operations (such as move and
   color).
-- [[#29]](https://github.com/markdown-party/kotlin-echo/issues/29) Disconnecting websockets do not
-  cancel the `suspend fun sync()` call, resulting in an inconsistent GUI state for offline sites.
