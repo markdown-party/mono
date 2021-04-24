@@ -85,11 +85,9 @@ internal class PersistentHistorySite<T, M, C>(
    * @param O the type of the output messages.
    * @param S the type of the FSM states.
    */
-  private fun <I, O, S : State<I, O, T, C, S>> exchange(
-      initial: suspend () -> S,
-  ) =
+  private fun <I, O, S : State<I, O, T, C, S>> exchange(initial: S) =
       channelLink<I, O> { inc ->
-        var state = initial()
+        var state = initial
         val insertions = current.map { it.current.log }.produceIn(this)
 
         // Give the producer a chance to issue closed events.
@@ -119,8 +117,8 @@ internal class PersistentHistorySite<T, M, C>(
   // The current model value flow.
   override val value: StateFlow<M> = current.map { it.current.model }
 
-  override fun outgoing() = exchange { OutgoingState() }
-  override fun incoming() = exchange { IncomingState(current.value.current.log.sites) }
+  override fun outgoing() = exchange(OutgoingState())
+  override fun incoming() = exchange(IncomingState(current.value.current.log.sites))
 
   @OptIn(EchoEventLogPreview::class)
   override suspend fun event(
