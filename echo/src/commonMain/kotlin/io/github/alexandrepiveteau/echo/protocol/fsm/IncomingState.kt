@@ -57,7 +57,7 @@ private data class IncomingNew<T, C>(
       // Priority is given to the reception of cancellation messages.
       onReceiveOrClosed { v ->
         when (v.valueOrNull) {
-          Out.Done, null -> Move(IncomingCancelling())
+          null -> Effect.Terminate
           else -> Effect.MoveToError(IllegalStateException(/* TODO */ ))
         }
       }
@@ -171,23 +171,12 @@ private data class IncomingSending<T, C>(
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
           is Out.Request -> Move(handleRequestReceived(msg))
-          is Out.Done, null -> Move(IncomingCancelling())
+          null -> Effect.Terminate
         }
       }
 
       // On new events, request another pass of the step.
       onInsert { Move(this@IncomingSending) }
     }
-  }
-}
-
-// 1. We can send a Done message, and move to Completed.
-private class IncomingCancelling<T, C> : IncomingState<T, C>() {
-
-  override suspend fun IncomingStepScope<T, C>.step(
-      log: ImmutableEventLog<T, C>
-  ): Effect<IncomingState<T, C>> {
-    send(Inc.Done)
-    return Effect.Terminate
   }
 }

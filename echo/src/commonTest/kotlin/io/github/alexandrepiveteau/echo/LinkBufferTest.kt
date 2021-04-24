@@ -8,6 +8,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.yield
@@ -40,5 +41,17 @@ class LinkBufferTest {
             }
             .buffer(Channel.RENDEZVOUS)
     assertEquals(emptyList(), link.talk(emptyFlow()).toList())
+  }
+
+  @Test
+  fun channelLink_close_terminates() = suspendTest {
+    val emit = flow<Int> { suspendForever() }
+    val link =
+        channelLink<Int, Int> {
+          close()
+          suspendForever()
+        }
+
+    assertEquals(emptyList(), link.talk(emit).toList())
   }
 }

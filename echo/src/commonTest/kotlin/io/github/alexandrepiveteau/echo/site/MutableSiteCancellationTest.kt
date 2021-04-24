@@ -3,7 +3,6 @@ package io.github.alexandrepiveteau.echo.site
 import io.github.alexandrepiveteau.echo.buffer
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.protocol.Message.Incoming.Done
 import io.github.alexandrepiveteau.echo.suspendTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,6 +19,6 @@ class MutableSiteCancellationTest {
             .apply { event { yield(123) } }
             .buffer(Channel.RENDEZVOUS)
     val result = site.incoming().talk(emptyFlow()).toList()
-    assertEquals(listOf(Done), result)
+    assertEquals(emptyList(), result)
   }
 }

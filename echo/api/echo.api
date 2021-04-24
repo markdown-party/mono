@@ -258,10 +258,6 @@ public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Ad
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Companion {
 }
 
-public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Done : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
-	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Done;
-}
-
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Event : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
 	public synthetic fun <init> (IILjava/lang/Object;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-o38t-jg ()I
@@ -286,10 +282,6 @@ public abstract class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Companion {
-}
-
-public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Done : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {
-	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Done;
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {

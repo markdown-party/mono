@@ -19,19 +19,17 @@ class Fuzzing {
   private fun fuzzSiteIdentifier() = SiteIdentifier.random()
   private fun fuzzSequenceNumber() = SequenceNumber(Random.nextInt().toUInt())
   private fun fuzzIncoming() =
-      when (Random.nextInt(until = 4)) {
+      when (Random.nextInt(until = 3)) {
         0 -> Incoming.Advertisement(fuzzSiteIdentifier())
         1 -> Incoming.Ready
         2 -> Incoming.Event(fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzInt())
-        3 -> Incoming.Done
         else -> error("bad fuzzing")
       }
   private fun fuzzOutgoing() =
-      when (Random.nextInt(until = 2)) {
+      when (Random.nextInt(until = 1)) {
         0 ->
             Outgoing.Request(
                 fuzzSequenceNumber(), fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzLong())
-        1 -> Outgoing.Done
         else -> error("bad fuzzing")
       }
 

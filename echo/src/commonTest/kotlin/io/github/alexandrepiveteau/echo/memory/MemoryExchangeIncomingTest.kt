@@ -27,9 +27,7 @@ class MemoryExchangeIncomingTest {
         link<I<Nothing>, O<Nothing>> { incoming ->
           incoming.test {
             assertEquals(I.Ready, expectItem())
-            emit(O.Done)
-            assertEquals(I.Done, expectItem())
-            expectComplete()
+            expectNoEvents()
           }
         }
     sync(echo.incoming(), exchange)
@@ -39,7 +37,7 @@ class MemoryExchangeIncomingTest {
   fun noMessagesToIncomingWorks() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val received = echo.incoming().talk(emptyFlow()).toList()
-    assertEquals(listOf(I.Done), received)
+    assertEquals(emptyList(), received)
   }
 
   @Test
@@ -49,9 +47,7 @@ class MemoryExchangeIncomingTest {
         link<I<Nothing>, O<Nothing>> { incoming ->
           incoming.test {
             assertEquals(I.Ready, expectItem())
-            emit(O.Done)
-            assertEquals(I.Done, expectItem())
-            expectComplete()
+            expectNoEvents()
           }
         }
     sync(echo.incoming(), exchange)
@@ -68,9 +64,7 @@ class MemoryExchangeIncomingTest {
           incoming.test {
             assertEquals<Any>(I.Advertisement(site), expectItem())
             assertEquals(I.Ready, expectItem())
-            emit(O.Done)
-            assertEquals(I.Done, expectItem())
-            expectComplete()
+            expectNoEvents()
           }
         }
     sync(echo.incoming(), exchange)
@@ -95,9 +89,8 @@ class MemoryExchangeIncomingTest {
                 }
               }
               assertTrue(received.containsAll(sites))
-              send(O.Done)
-              incoming.receive() as I.Done
-              incoming.receiveOrNull()
+              close()
+              assertNull(incoming.receiveOrNull())
             }
             .buffer(RENDEZVOUS)
     sync(echo.incoming(), exchange)
@@ -115,8 +108,7 @@ class MemoryExchangeIncomingTest {
               assertEquals(I.Ready, incoming.receive())
               send(O.Request(seqno, seqno, site = site))
               assertEquals(I.Event(seqno, site, true), incoming.receive())
-              send(O.Done)
-              assertEquals(I.Done, incoming.receive())
+              close()
               assertNull(incoming.receiveOrNull())
             }
             .buffer(RENDEZVOUS)
@@ -154,8 +146,7 @@ class MemoryExchangeIncomingTest {
           send(O.Request(seqno, seqno, site, count = 0))
           send(O.Request(seqno, seqno, site, count = 1))
           assertEquals(I.Event(seqno, site, true), incoming.receive())
-          send(O.Done)
-          assertEquals(I.Done, incoming.receive())
+          close()
           assertNull(incoming.receiveOrNull())
         }
     sync(echo.incoming(), exchange)

@@ -104,15 +104,6 @@ sealed class Message<out T> {
         val body: T,
     ) : Incoming<T>()
 
-    /**
-     * Indicates that the [Incoming] side of the [Link] would like to terminate the communication.
-     * Once the [Done] message is emitted, the [Incoming] side will drain all the in-flight messages
-     * until the other side's [Outgoing.Done] message is received.
-     *
-     * Afterwards, both sites may disconnect.
-     */
-    object Done : Incoming<Nothing>()
-
     companion object
   }
 
@@ -141,15 +132,6 @@ sealed class Message<out T> {
         val site: SiteIdentifier,
         val count: Long = Long.MAX_VALUE,
     ) : Outgoing<Nothing>()
-
-    /**
-     * Indicates that the [Outgoing] side of the [Link] would like to terminate the communication.
-     * Once the [Done] message is emitted, the [Outgoing] side will drain all the in-flight messages
-     * until the other's side [Incoming.Done] message is received.
-     *
-     * Afterwards, both sites may disconnect.
-     */
-    object Done : Outgoing<Nothing>()
 
     companion object
   }

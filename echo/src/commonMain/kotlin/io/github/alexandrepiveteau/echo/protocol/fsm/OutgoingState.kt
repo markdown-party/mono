@@ -61,7 +61,7 @@ private data class OutgoingAdvertising<T, C>(
                   requested = mutableListOf(),
               ))
         }
-        is Inc.Done, null -> Effect.Move(OutgoingCancelling())
+        null -> Effect.Terminate
         is Inc.Event -> Effect.MoveToError(notReachable())
       }
 }
@@ -96,7 +96,7 @@ private data class OutgoingListening<T, C>(
 
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
-          is Inc.Done, null -> Effect.Move(OutgoingCancelling())
+          null -> Effect.Terminate
           is Inc.Advertisement -> {
             pendingRequests.add(msg.site)
             Effect.Move(this@OutgoingListening) // mutable state update.
@@ -109,16 +109,5 @@ private data class OutgoingListening<T, C>(
         }
       }
     }
-  }
-}
-
-// 1. We can send a Done message, and move to Completed.
-private class OutgoingCancelling<T, C> : OutgoingState<T, C>() {
-
-  override suspend fun OutgoingStepScope<T, C>.step(
-      log: ImmutableEventLog<T, C>,
-  ): Effect<OutgoingState<T, C>> {
-    send(Out.Done)
-    return Effect.Terminate
   }
 }

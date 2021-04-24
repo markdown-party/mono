@@ -43,7 +43,6 @@ private class IncomingSerializer<T>(
     private const val TypeAdv = "advertisement"
     private const val TypeReady = "ready"
     private const val TypeEvent = "event"
-    private const val TypeDone = "done"
   }
 
   override val descriptor: SerialDescriptor
@@ -71,7 +70,6 @@ private class IncomingSerializer<T>(
             seqno = json.decodeFromJsonElement(SequenceNumber.serializer(), seqno),
             body = json.decodeFromJsonElement(elementSerializer, body))
       }
-      TypeDone -> Message.Incoming.Done
       else -> badSerial()
     }
   }
@@ -96,8 +94,6 @@ private class IncomingSerializer<T>(
                 put(KeySeqno, value.seqno, json)
                 put(KeyEvent, json.encodeToJsonElement(elementSerializer, value.body))
               })
-      Message.Incoming.Done ->
-          encoder.encodeJsonElement(buildJsonObject { put(KeyType, JsonPrimitive(TypeDone)) })
     }
   }
 }
@@ -113,7 +109,6 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
     private const val KeyCount = "count"
 
     private const val TypeRequest = "request"
-    private const val TypeDone = "done"
   }
 
   override val descriptor: SerialDescriptor
@@ -134,7 +129,6 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
             nextForSite = json.decodeFromJsonElement(SequenceNumber.serializer(), nextForSite),
             count = count.jsonPrimitive.longOrNull ?: badSerial())
       }
-      TypeDone -> Message.Outgoing.Done
       else -> badSerial()
     }
   }
@@ -151,8 +145,6 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
                 put(KeyCount, value.count)
                 put(KeySite, value.site, json)
               })
-      Message.Outgoing.Done ->
-          encoder.encodeJsonElement(buildJsonObject { put(KeyType, JsonPrimitive(TypeDone)) })
     }
   }
 }

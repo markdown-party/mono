@@ -47,13 +47,4 @@ class IncomingTest {
         ),
         decoded)
   }
-
-  @Test
-  fun testDoneDecoding() {
-    val json = """
-            {"type": "done"}
-        """
-    val decoded = Json.decodeFromString(Incoming.serializer(Int.serializer()), json)
-    assertEquals(Incoming.Done, decoded)
-  }
 }
