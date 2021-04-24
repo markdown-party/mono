@@ -105,7 +105,6 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
     private const val KeyType = "type"
     private const val KeySite = "site"
     private const val KeyNextForSite = "nextForSite"
-    private const val KeyNextForAll = "nextForAll"
     private const val KeyCount = "count"
 
     private const val TypeRequest = "request"
@@ -120,12 +119,10 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
     return when (element.jsonObject[KeyType]?.jsonPrimitive?.contentOrNull) {
       TypeRequest -> {
         val site = element.jsonObject[KeySite] ?: badSerial()
-        val nextForAll = element.jsonObject[KeyNextForAll] ?: badSerial()
         val nextForSite = element.jsonObject[KeyNextForSite] ?: badSerial()
         val count = element.jsonObject[KeyCount] ?: badSerial()
         Message.Outgoing.Request(
             site = json.decodeFromJsonElement(SiteIdentifier.serializer(), site),
-            nextForAll = json.decodeFromJsonElement(SequenceNumber.serializer(), nextForAll),
             nextForSite = json.decodeFromJsonElement(SequenceNumber.serializer(), nextForSite),
             count = count.jsonPrimitive.longOrNull ?: badSerial())
       }
@@ -140,7 +137,6 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
           encoder.encodeJsonElement(
               buildJsonObject {
                 put(KeyType, TypeRequest)
-                put(KeyNextForAll, value.nextForAll, json)
                 put(KeyNextForSite, value.nextForSite, json)
                 put(KeyCount, value.count)
                 put(KeySite, value.site, json)

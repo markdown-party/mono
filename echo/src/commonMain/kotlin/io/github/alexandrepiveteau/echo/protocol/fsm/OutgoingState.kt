@@ -77,13 +77,11 @@ private data class OutgoingListening<T, C>(
   ): Effect<OutgoingState<T, C>> {
     val request = pendingRequests.lastOrNull()
     val expected = request?.let(log::expected) ?: SequenceNumber.Zero
-    val max = log.expected
 
     return select {
       if (request != null) {
         onSend(
             Out.Request(
-                nextForAll = max,
                 nextForSite = expected,
                 site = request,
                 count = Long.MAX_VALUE,

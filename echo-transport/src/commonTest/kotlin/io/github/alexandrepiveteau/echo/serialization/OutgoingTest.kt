@@ -15,7 +15,6 @@ class OutgoingTest {
         """
             { "type": "request"
             , "nextForSite": 123
-            , "nextForAll": 321
             , "site": "00000000"
             , "count": 42
             }
@@ -24,7 +23,6 @@ class OutgoingTest {
     assertEquals(
         Outgoing.Request(
             nextForSite = SequenceNumber(123u),
-            nextForAll = SequenceNumber(321u),
             site = SiteIdentifier(Int.MIN_VALUE),
             count = 42,
         ),

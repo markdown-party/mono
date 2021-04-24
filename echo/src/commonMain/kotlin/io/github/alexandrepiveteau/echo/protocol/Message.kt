@@ -118,16 +118,12 @@ sealed class Message<out T> {
      * - The request is tied to a specific [site]. You may not issue a [Request] for a
      * [SiteIdentifier] that has not been advertised through an [Incoming.Advertisement].
      * - The [nextForSite] indicates what the requested sequence number for the specific [site] is.
-     * - The [nextForAll] indicates the requested sequence number if the other site was to generate
-     * an event that's definitely higher than your current knowledge.
      *
-     * @param nextForAll the next [SequenceNumber] that is expected for all the sites.
      * @param nextForSite the next [SequenceNumber] that is expected for the [site].
      * @param site the site identifier for which we're interested in this sequence number.
      * @param count how many events were requested.
      */
     data class Request(
-        val nextForAll: SequenceNumber,
         val nextForSite: SequenceNumber,
         val site: SiteIdentifier,
         val count: Long = Long.MAX_VALUE,

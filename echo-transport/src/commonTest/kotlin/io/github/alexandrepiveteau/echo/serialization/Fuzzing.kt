@@ -27,9 +27,7 @@ class Fuzzing {
       }
   private fun fuzzOutgoing() =
       when (Random.nextInt(until = 1)) {
-        0 ->
-            Outgoing.Request(
-                fuzzSequenceNumber(), fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzLong())
+        0 -> Outgoing.Request(fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzLong())
         else -> error("bad fuzzing")
       }
 
