@@ -3,10 +3,13 @@ package io.github.alexandrepiveteau.echo.site
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.suspendTest
+import io.github.alexandrepiveteau.echo.sync
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.withTimeoutOrNull
 
 class MutableSiteEventTest {
 
@@ -45,5 +48,15 @@ class MutableSiteEventTest {
         assertEquals(EventIdentifier(SequenceNumber(1U), site), yield(456))
       }
     }
+  }
+
+  @Test
+  fun sequential_yields_areOrdered() = suspendTest {
+    val alice = mutableSite<Int>(random())
+    val bob = mutableSite<Int>(random())
+    alice.event { assertEquals(SequenceNumber(0u), yield(123).seqno) }
+    // TODO : Use one-shot sync when supported.
+    withTimeoutOrNull(100) { sync(alice, bob) }
+    bob.event { assertEquals(SequenceNumber(1u), yield(123).seqno) }
   }
 }
