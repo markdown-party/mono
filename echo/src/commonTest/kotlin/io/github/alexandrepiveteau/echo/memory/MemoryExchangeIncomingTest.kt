@@ -39,7 +39,7 @@ class MemoryExchangeIncomingTest {
   fun noMessagesToIncomingWorks() = suspendTest {
     val echo = mutableSite<Nothing>(SiteIdentifier(123)).buffer(RENDEZVOUS)
     val received = echo.incoming().talk(emptyFlow()).toList()
-    assertEquals(listOf(I.Ready, I.Done), received)
+    assertEquals(listOf(I.Done), received)
   }
 
   @Test

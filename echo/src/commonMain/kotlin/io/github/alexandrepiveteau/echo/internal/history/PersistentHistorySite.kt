@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.yield
 
 internal data class HistoryModel<T, M, C>(
     val log: PersistentEventLog<T, C>,
@@ -90,6 +91,9 @@ internal class PersistentHistorySite<T, M, C>(
       channelLink<I, O> { inc ->
         var state = initial()
         val insertions = current.map { it.current.log }.produceIn(this)
+
+        // Give the producer a chance to issue closed events.
+        yield()
 
         // Prepare some context information for the step.
         val scope =

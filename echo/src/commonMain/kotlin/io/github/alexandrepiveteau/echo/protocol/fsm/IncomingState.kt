@@ -54,6 +54,13 @@ private data class IncomingNew<T, C>(
       log: ImmutableEventLog<T, C>
   ): Effect<IncomingState<T, C>> {
     return select {
+      // Priority is given to the reception of cancellation messages.
+      onReceiveOrClosed { v ->
+        when (v.valueOrNull) {
+          Out.Done, null -> Move(IncomingCancelling())
+          else -> Effect.MoveToError(IllegalStateException(/* TODO */ ))
+        }
+      }
       val pending = remainingToSend.lastOrNull()
       if (pending != null) {
         onSend(Inc.Advertisement(pending)) {
@@ -65,12 +72,6 @@ private data class IncomingNew<T, C>(
         }
       } else {
         onSend(Inc.Ready) { Move(IncomingSending(advertised = alreadySent)) }
-      }
-      onReceiveOrClosed { v ->
-        when (v.valueOrNull) {
-          Out.Done, null -> Move(IncomingCancelling())
-          else -> Effect.MoveToError(IllegalStateException(/* TODO */ ))
-        }
       }
     }
   }
