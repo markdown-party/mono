@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.memory
+package io.github.alexandrepiveteau.echo.site
 
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
@@ -8,29 +8,28 @@ import io.github.alexandrepiveteau.echo.suspendTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MemoryExchangeEventTest {
+class MutableSiteEventTest {
 
   @Test
-  fun mutableSite_emptyEvent_terminates() = suspendTest {
+  fun empty_event_terminates() = suspendTest {
     val alice = mutableSite<Int>(SiteIdentifier(123))
     alice.event {}
   }
 
   @Test
-  fun mutableSite_manyEmptyEvent_terminates() = suspendTest {
+  fun multiple_empty_event_terminates() = suspendTest {
     val echo = mutableSite<Int>(SiteIdentifier(456))
-    repeat(1000) { echo.event {} }
+    repeat(2) { echo.event {} }
   }
 
   @Test
-  fun mutableSite_manyNonEmptyEvent_terminates() = suspendTest {
+  fun multiple_nonEmpty_event_terminates() = suspendTest {
     val site = mutableSite<Int>(SiteIdentifier(456))
-    val count = 1000
-    repeat(count) { iteration -> site.event { yield(iteration) } }
+    repeat(2) { iteration -> site.event { yield(iteration) } }
   }
 
   @Test
-  fun mutableSite_singleYield_terminates() = suspendTest {
+  fun singleYield_terminates() = suspendTest {
     val site = SiteIdentifier(145)
     with(mutableSite<Int>(site)) {
       event { assertEquals(EventIdentifier(SequenceNumber(0U), site), yield(123)) }
@@ -38,7 +37,7 @@ class MemoryExchangeEventTest {
   }
 
   @Test
-  fun mutableSite_manyYield_terminates() = suspendTest {
+  fun multipleYield_terminates() = suspendTest {
     val site = SiteIdentifier(145)
     with(mutableSite<Int>(site)) {
       event {
