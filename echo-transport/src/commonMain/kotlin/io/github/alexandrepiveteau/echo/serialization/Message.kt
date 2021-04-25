@@ -5,8 +5,10 @@ package io.github.alexandrepiveteau.echo.serialization
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -104,9 +106,10 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
 
     private const val KeyType = "type"
     private const val KeySite = "site"
-    private const val KeyNextForSite = "nextForSite"
+    private const val KeyNextSeqno = "nextSeqno"
     private const val KeyCount = "count"
 
+    private const val TypeAcknowledge = "acknowledge"
     private const val TypeRequest = "request"
   }
 
@@ -117,14 +120,21 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
     val json = decoder.json
     val element = decoder.decodeJsonElement()
     return when (element.jsonObject[KeyType]?.jsonPrimitive?.contentOrNull) {
+      TypeAcknowledge -> {
+        val site = element.jsonObject[KeySite] ?: badSerial()
+        val nextForSite = element.jsonObject[KeyNextSeqno] ?: badSerial()
+        Message.Outgoing.Acknowledge(
+            site = json.decodeFromJsonElement(SiteIdentifier.serializer(), site),
+            nextSeqno = json.decodeFromJsonElement(SequenceNumber.serializer(), nextForSite),
+        )
+      }
       TypeRequest -> {
         val site = element.jsonObject[KeySite] ?: badSerial()
-        val nextForSite = element.jsonObject[KeyNextForSite] ?: badSerial()
         val count = element.jsonObject[KeyCount] ?: badSerial()
         Message.Outgoing.Request(
             site = json.decodeFromJsonElement(SiteIdentifier.serializer(), site),
-            nextForSite = json.decodeFromJsonElement(SequenceNumber.serializer(), nextForSite),
-            count = count.jsonPrimitive.longOrNull ?: badSerial())
+            count = count.jsonPrimitive.intOrNull?.toUInt() ?: badSerial(),
+        )
       }
       else -> badSerial()
     }
@@ -133,11 +143,17 @@ private class OutgoingSerializer<T> : JsonSerializer<Message.Outgoing<T>>() {
   override fun serialize(encoder: JsonEncoder, value: Message.Outgoing<T>) {
     val json = encoder.json
     when (value) {
+      is Message.Outgoing.Acknowledge ->
+          encoder.encodeJsonElement(
+              buildJsonObject {
+                put(KeyType, TypeAcknowledge)
+                put(KeyNextSeqno, value.nextSeqno, json)
+                put(KeySite, value.site, json)
+              })
       is Message.Outgoing.Request ->
           encoder.encodeJsonElement(
               buildJsonObject {
                 put(KeyType, TypeRequest)
-                put(KeyNextForSite, value.nextForSite, json)
                 put(KeyCount, value.count)
                 put(KeySite, value.site, json)
               })

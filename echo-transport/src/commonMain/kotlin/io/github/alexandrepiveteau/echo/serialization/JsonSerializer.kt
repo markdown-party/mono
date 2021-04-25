@@ -29,6 +29,11 @@ internal abstract class JsonSerializer<T> : KSerializer<T> {
 
 internal fun JsonObjectBuilder.put(
     key: String,
+    value: UInt,
+): JsonElement? = put(key, value.toInt())
+
+internal fun JsonObjectBuilder.put(
+    key: String,
     value: SequenceNumber,
     json: Json,
 ): JsonElement? = put(key, json.encodeToJsonElement(SequenceNumber.serializer(), value))

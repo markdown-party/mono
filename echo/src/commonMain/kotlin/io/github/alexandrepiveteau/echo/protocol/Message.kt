@@ -110,6 +110,21 @@ sealed class Message<out T> {
   sealed class Outgoing<out T> : Message<T>() {
 
     /**
+     * Indicates the next sequence number that is not known by the [Outgoing] side for a specific
+     * site. The [Incoming] side will only messages for acknowledged sites with a remaining request
+     * count greater than 0.
+     *
+     * Receiving an [Acknowledge] resets the [Request] count total to zero.
+     *
+     * @param site the identifier for the site.
+     * @param nextSeqno the next expected sequence number for this site.
+     */
+    data class Acknowledge(
+        val site: SiteIdentifier,
+        val nextSeqno: SequenceNumber,
+    ) : Outgoing<Nothing>()
+
+    /**
      * Indicates that the [Outgoing] side of the [Link] is ready to receive some events. A [Request]
      * message can not be sent before the [Incoming.Ready] message has already been received.
      *
@@ -117,16 +132,13 @@ sealed class Message<out T> {
      *
      * - The request is tied to a specific [site]. You may not issue a [Request] for a
      * [SiteIdentifier] that has not been advertised through an [Incoming.Advertisement].
-     * - The [nextForSite] indicates what the requested sequence number for the specific [site] is.
      *
-     * @param nextForSite the next [SequenceNumber] that is expected for the [site].
      * @param site the site identifier for which we're interested in this sequence number.
      * @param count how many events were requested.
      */
     data class Request(
-        val nextForSite: SequenceNumber,
         val site: SiteIdentifier,
-        val count: Long = Long.MAX_VALUE,
+        val count: UInt,
     ) : Outgoing<Nothing>()
 
     companion object

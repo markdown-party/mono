@@ -5,6 +5,7 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import kotlin.random.Random
+import kotlin.random.nextUInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.serialization.builtins.serializer
@@ -15,7 +16,7 @@ private const val FuzzIterationsCount = 1000
 class Fuzzing {
 
   private fun fuzzInt() = Random.nextInt()
-  private fun fuzzLong() = Random.nextLong()
+  private fun fuzzUInt() = Random.nextUInt()
   private fun fuzzSiteIdentifier() = SiteIdentifier.random()
   private fun fuzzSequenceNumber() = SequenceNumber(Random.nextInt().toUInt())
   private fun fuzzIncoming() =
@@ -26,8 +27,9 @@ class Fuzzing {
         else -> error("bad fuzzing")
       }
   private fun fuzzOutgoing() =
-      when (Random.nextInt(until = 1)) {
-        0 -> Outgoing.Request(fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzLong())
+      when (Random.nextInt(until = 2)) {
+        0 -> Outgoing.Acknowledge(fuzzSiteIdentifier(), fuzzSequenceNumber())
+        1 -> Outgoing.Request(fuzzSiteIdentifier(), fuzzUInt())
         else -> error("bad fuzzing")
       }
 

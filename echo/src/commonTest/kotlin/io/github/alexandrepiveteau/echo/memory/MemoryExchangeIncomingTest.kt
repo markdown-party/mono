@@ -16,7 +16,6 @@ import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withTimeoutOrNull
 
 class MemoryExchangeIncomingTest {
 
@@ -106,31 +105,14 @@ class MemoryExchangeIncomingTest {
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
               assertEquals(I.Advertisement(site), incoming.receive())
               assertEquals(I.Ready, incoming.receive())
-              send(O.Request(seqno, site = site))
+              send(O.Acknowledge(site, seqno))
+              send(O.Request(site, UInt.MAX_VALUE))
               assertEquals(I.Event(seqno, site, true), incoming.receive())
               close()
               assertNull(incoming.receiveOrNull())
             }
             .buffer(RENDEZVOUS)
     sync(echo.incoming(), exchange)
-  }
-
-  @Test
-  fun noEventIsSentIfRequestSizeIsZero() = suspendTest {
-    val site = SiteIdentifier(123)
-    val seqno = SequenceNumber(150U)
-    val events = persistentEventLogOf(EventIdentifier(seqno, site) to true)
-    val echo = mutableSite(SiteIdentifier(0), events)
-    val exchange =
-        channelLink<I<Boolean>, O<Boolean>> { incoming ->
-          assertEquals(I.Advertisement(site), incoming.receive())
-          assertEquals(I.Ready, incoming.receive())
-          send(O.Request(seqno, site, count = 0))
-          incoming.receive()
-          fail("incoming.receive() should have timeout.")
-        }
-    val nullIfFailure = withTimeoutOrNull(1000) { sync(echo.incoming(), exchange) }
-    assertNull(nullIfFailure)
   }
 
   @Test
@@ -143,8 +125,9 @@ class MemoryExchangeIncomingTest {
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
           assertEquals(I.Advertisement(site), incoming.receive())
           assertEquals(I.Ready, incoming.receive())
-          send(O.Request(seqno, site, count = 0))
-          send(O.Request(seqno, site, count = 1))
+          send(O.Acknowledge(site, seqno))
+          send(O.Request(site, count = 0U))
+          send(O.Request(site, count = 1U))
           assertEquals(I.Event(seqno, site, true), incoming.receive())
           close()
           assertNull(incoming.receiveOrNull())

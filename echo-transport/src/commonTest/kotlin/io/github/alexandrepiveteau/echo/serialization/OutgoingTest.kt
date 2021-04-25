@@ -10,11 +10,29 @@ import kotlinx.serialization.json.Json
 class OutgoingTest {
 
   @Test
+  fun testAcknowledgeDecoding() {
+    val json =
+        """
+            { "type": "acknowledge"
+            , "nextSeqno": 123
+            , "site": "00000000"
+            }
+        """
+    val decoded = Json.decodeFromString(Outgoing.serializer<Nothing>(), json)
+    assertEquals(
+        Outgoing.Acknowledge(
+            nextSeqno = SequenceNumber(123u),
+            site = SiteIdentifier(Int.MIN_VALUE),
+        ),
+        decoded,
+    )
+  }
+
+  @Test
   fun testRequestDecoding() {
     val json =
         """
             { "type": "request"
-            , "nextForSite": 123
             , "site": "00000000"
             , "count": 42
             }
@@ -22,10 +40,10 @@ class OutgoingTest {
     val decoded = Json.decodeFromString(Outgoing.serializer<Nothing>(), json)
     assertEquals(
         Outgoing.Request(
-            nextForSite = SequenceNumber(123u),
             site = SiteIdentifier(Int.MIN_VALUE),
-            count = 42,
+            count = 42U,
         ),
-        decoded)
+        decoded,
+    )
   }
 }

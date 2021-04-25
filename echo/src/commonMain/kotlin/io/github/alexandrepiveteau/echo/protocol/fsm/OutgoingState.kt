@@ -57,7 +57,8 @@ private data class OutgoingAdvertising<T, C>(
         is Inc.Ready -> {
           Effect.Move(
               OutgoingListening(
-                  pendingRequests = available,
+                  pendingAcks = available,
+                  pendingRequested = mutableListOf(),
                   requested = mutableListOf(),
               ))
         }
@@ -66,29 +67,45 @@ private data class OutgoingAdvertising<T, C>(
       }
 }
 
+// TODO : Refactor this to Persistent states.
+// TODO : Add more sophisticated precondition checks in protocol.
 @OptIn(EchoEventLogPreview::class)
 private data class OutgoingListening<T, C>(
-    private val pendingRequests: MutableList<SiteIdentifier>,
+    private val pendingAcks: MutableList<SiteIdentifier>,
+    private val pendingRequested: MutableList<SiteIdentifier>,
     private val requested: MutableList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<OutgoingState<T, C>> {
-    val request = pendingRequests.lastOrNull()
-    val expected = request?.let(log::expected) ?: SequenceNumber.Zero
+    val acknowledge = pendingAcks.lastOrNull()
+    val expected = acknowledge?.let(log::expected) ?: SequenceNumber.Zero
+
+    val request = pendingRequested.lastOrNull()
 
     return select {
+      if (acknowledge != null) {
+        onSend(
+            Out.Acknowledge(
+                site = acknowledge,
+                nextSeqno = expected,
+            )) {
+          pendingAcks.removeLast()
+          pendingRequested.add(acknowledge)
+          Effect.Move(this@OutgoingListening) // mutable state update.
+        }
+      }
+
       if (request != null) {
         onSend(
             Out.Request(
-                nextForSite = expected,
                 site = request,
-                count = Long.MAX_VALUE,
+                count = UInt.MAX_VALUE,
             )) {
-          pendingRequests.removeLast()
-          requested.add(request)
-          Effect.Move(this@OutgoingListening) // mutable state update.
+            pendingRequested.removeLast()
+            requested.add(request)
+            Effect.Move(this@OutgoingListening) // mutable state update.
         }
       }
 
@@ -96,7 +113,7 @@ private data class OutgoingListening<T, C>(
         when (val msg = v.valueOrNull) {
           null -> Effect.Terminate
           is Inc.Advertisement -> {
-            pendingRequests.add(msg.site)
+            pendingAcks.add(msg.site)
             Effect.Move(this@OutgoingListening) // mutable state update.
           }
           is Inc.Event -> {

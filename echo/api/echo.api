@@ -281,20 +281,30 @@ public abstract class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing
 	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Companion;
 }
 
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1--e_yCgk ()I
+	public final fun component2-o38t-jg ()I
+	public final fun copy-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;
+	public static synthetic fun copy-9IG4cKU$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextSeqno-o38t-jg ()I
+	public final fun getSite--e_yCgk ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Companion {
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {
-	public synthetic fun <init> (IIJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (IIJLkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1-o38t-jg ()I
-	public final fun component2--e_yCgk ()I
-	public final fun component3 ()J
-	public final fun copy-F9woSY0 (IIJ)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
-	public static synthetic fun copy-F9woSY0$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;IIJILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1--e_yCgk ()I
+	public final fun component2-pVg5ArA ()I
+	public final fun copy--9cDTJo (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
+	public static synthetic fun copy--9cDTJo$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCount ()J
-	public final fun getNextForSite-o38t-jg ()I
+	public final fun getCount-pVg5ArA ()I
 	public final fun getSite--e_yCgk ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
