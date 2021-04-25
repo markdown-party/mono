@@ -15,6 +15,7 @@ public final class io/github/alexandrepiveteau/echo/LinkKt {
 
 public abstract interface class io/github/alexandrepiveteau/echo/MutableSite : io/github/alexandrepiveteau/echo/Site {
 	public abstract fun event (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getIdentifier--e_yCgk ()I
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/ReceiveExchange {
@@ -26,7 +27,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/SendExchange {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/Site : io/github/alexandrepiveteau/echo/Exchange {
-	public abstract fun getIdentifier--e_yCgk ()I
 	public abstract fun getValue ()Lkotlinx/coroutines/flow/StateFlow;
 }
 
@@ -37,8 +37,8 @@ public final class io/github/alexandrepiveteau/echo/SiteKt {
 	public static final fun mutableSite-wX_9w_8 (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static synthetic fun mutableSite-wX_9w_8$default (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun site-hoqhmwc (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;)Lio/github/alexandrepiveteau/echo/Site;
-	public static synthetic fun site-hoqhmwc$default (ILio/github/alexandrepiveteau/echo/logs/PersistentEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun site (Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;)Lio/github/alexandrepiveteau/echo/Site;
+	public static synthetic fun site$default (Lio/github/alexandrepiveteau/echo/logs/PersistentEventLog;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Site;
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {

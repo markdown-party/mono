@@ -3,6 +3,7 @@ package io.github.alexandrepiveteau.echo
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.internal.history.ActualPersistentHistory
+import io.github.alexandrepiveteau.echo.internal.history.PersistentHistoryMutableSite
 import io.github.alexandrepiveteau.echo.internal.history.PersistentHistorySite
 import io.github.alexandrepiveteau.echo.logs.Change.Companion.skipped
 import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
@@ -16,25 +17,27 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * An interface describing a [Site] in the distributed system. Each [Site] is associated with a
- * globally unique [SiteIdentifier].
+ * An interface describing a [Site] in the distributed system.
  *
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
 interface Site<T, out M> : Exchange<Inc<T>, Out<T>> {
-  val identifier: SiteIdentifier
   val value: StateFlow<M>
 }
 
 /**
  * A mutable version of [Site], which allows the insertion of the events [T] through its [event]
- * method.
+ * method. Each [MutableSite] is associated with a globally unique [SiteIdentifier], which will be
+ * used when yielding events.
  *
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
 interface MutableSite<T, out M> : Site<T, M> {
+
+  /** The globally unique [SiteIdentifier] for this [Site]. */
+  val identifier: SiteIdentifier
 
   /**
    * Creates some new events, that are generated in the [EventScope]. This function returns once the
@@ -44,16 +47,23 @@ interface MutableSite<T, out M> : Site<T, M> {
 }
 
 /**
- * Creates a new [Site] for the provided [SiteIdentifier], which can not be manually mutated.
+ * Creates a new [Site], which can not be manually mutated. These sites are mostly used replication
+ * purposes.
  *
- * @param identifier the globally unique identifier for this [Site].
  * @param log the underlying [PersistentEventLog] for this [site].
  * @param T the type of the events managed by this [Site].
  */
 fun <T> site(
-    identifier: SiteIdentifier,
     log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
-): Site<T, ImmutableEventLog<T, Nothing>> = mutableSite(identifier, log)
+): Site<T, ImmutableEventLog<T, Nothing>> =
+    unorderedSite(
+        initial = persistentEventLogOf(),
+        log = log,
+    ) { entry, model ->
+      model.apply {
+        set(entry.identifier.site, entry.identifier.seqno, entry.body, change = skipped())
+      }
+    }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -68,10 +78,10 @@ fun <T> mutableSite(
     identifier: SiteIdentifier,
     log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
 ): MutableSite<T, PersistentEventLog<T, Nothing>> =
-    unorderedSite(
+    unorderedMutableSite(
         identifier = identifier,
-        log = log.toPersistentEventLog(),
         initial = persistentEventLogOf(),
+        log = log,
     ) { entry, model ->
       model.apply {
         set(entry.identifier.site, entry.identifier.seqno, entry.body, change = skipped())
@@ -96,7 +106,13 @@ fun <M, T> mutableSite(
     initial: M,
     log: PersistentEventLog<T, M> = persistentEventLogOf(),
     projection: OneWayProjection<M, IndexedEvent<T>>,
-): MutableSite<T, M> = unorderedSite(identifier, initial, log, projection)
+): MutableSite<T, M> =
+    unorderedMutableSite(
+        identifier = identifier,
+        initial = initial,
+        log = log,
+        projection = projection,
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -117,28 +133,45 @@ fun <M, T, C> mutableSite(
     initial: M,
     log: PersistentEventLog<T, C> = persistentEventLogOf(),
     projection: TwoWayProjection<M, IndexedEvent<T>, C>,
-): MutableSite<T, M> = unorderedSite(identifier, initial, log, projection)
+): MutableSite<T, M> =
+    unorderedMutableSite(
+        identifier = identifier,
+        initial = initial,
+        log = log,
+        projection = projection,
+    )
 
-// INTERNAL BUILDERS
+// SITE BUILDERS
 
 internal fun <M, T> unorderedSite(
+    initial: M,
+    log: PersistentEventLog<T, M> = persistentEventLogOf(),
+    projection: OneWayProjection<M, IndexedEvent<T>>,
+): Site<T, M> =
+    PersistentHistorySite(
+        initial = ActualPersistentHistory(initial, log, projection),
+    )
+
+// MUTABLE SITE BUILDERS
+
+internal fun <M, T> unorderedMutableSite(
     identifier: SiteIdentifier,
     initial: M,
     log: PersistentEventLog<T, M> = persistentEventLogOf(),
     projection: OneWayProjection<M, IndexedEvent<T>>,
 ): MutableSite<T, M> =
-    PersistentHistorySite(
-        identifier,
-        ActualPersistentHistory(initial, log, projection),
+    PersistentHistoryMutableSite(
+        identifier = identifier,
+        initial = ActualPersistentHistory(initial, log, projection),
     )
 
-internal fun <M, T, C> unorderedSite(
+internal fun <M, T, C> unorderedMutableSite(
     identifier: SiteIdentifier,
     initial: M,
     log: PersistentEventLog<T, C> = persistentEventLogOf(),
     projection: TwoWayProjection<M, IndexedEvent<T>, C>,
 ): MutableSite<T, M> =
-    PersistentHistorySite(
-        identifier,
-        ActualPersistentHistory(initial, log, projection),
+    PersistentHistoryMutableSite(
+        identifier = identifier,
+        initial = ActualPersistentHistory(initial, log, projection),
     )

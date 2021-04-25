@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.internal.history
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
 import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.Site
 import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
@@ -39,19 +40,18 @@ internal typealias PersistentLogHistory<T, M, C> =
     PersistentHistory<HistoryEvent<T>, HistoryModel<T, M, C>, EventIdentifier>
 
 /**
- * An implementation of [MutableSite] that wraps a [PersistentLogHistory].
+ * An implementation of [Site] that wraps a [PersistentLogHistory].
  *
  * @param T the type of the events.
  * @param M the type of the model.
  * @param C the type of the changes.
  */
-internal class PersistentHistorySite<T, M, C>(
-    override val identifier: SiteIdentifier,
+internal open class PersistentHistorySite<T, M, C>(
     initial: PersistentLogHistory<T, M, C>,
-) : MutableSite<T, M> {
+) : Site<T, M> {
 
   /** The current value of in the [PersistentHistory]. */
-  private val current = MutableStateFlow(initial)
+  internal val current = MutableStateFlow(initial)
 
   /** The [Mutex] that protects atomic mutations of the [current] [MutableStateFlow]. */
   private val mutex = Mutex()
@@ -70,7 +70,7 @@ internal class PersistentHistorySite<T, M, C>(
    *
    * @return the resulting data.
    */
-  private suspend inline fun <R> mutate(
+  internal suspend inline fun <R> mutate(
       extract: (R) -> PersistentLogHistory<T, M, C>,
       f: (history: PersistentLogHistory<T, M, C>) -> R,
   ): R = mutex.withLock { f(current.value).apply { current.value = extract(this) } }
@@ -119,6 +119,19 @@ internal class PersistentHistorySite<T, M, C>(
 
   override fun outgoing() = exchange(OutgoingState())
   override fun incoming() = exchange(IncomingState(current.value.current.log.sites))
+}
+
+/**
+ * An implementation of [MutableSite] that wraps a [PersistentLogHistory].
+ *
+ * @param T the type of the events.
+ * @param M the type of the model.
+ * @param C the type of the changes.
+ */
+internal open class PersistentHistoryMutableSite<T, M, C>(
+    override val identifier: SiteIdentifier,
+    initial: PersistentLogHistory<T, M, C>,
+) : PersistentHistorySite<T, M, C>(initial), MutableSite<T, M> {
 
   @OptIn(EchoEventLogPreview::class)
   override suspend fun event(
