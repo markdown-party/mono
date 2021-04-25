@@ -21,7 +21,7 @@ class Fuzzing {
   private fun fuzzSequenceNumber() = SequenceNumber(Random.nextInt().toUInt())
   private fun fuzzIncoming() =
       when (Random.nextInt(until = 3)) {
-        0 -> Incoming.Advertisement(fuzzSiteIdentifier())
+        0 -> Incoming.Advertisement(fuzzSiteIdentifier(), fuzzSequenceNumber())
         1 -> Incoming.Ready
         2 -> Incoming.Event(fuzzSequenceNumber(), fuzzSiteIdentifier(), fuzzInt())
         else -> error("bad fuzzing")

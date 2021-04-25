@@ -25,7 +25,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             expectNoEvents()
           }
@@ -41,7 +41,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id.site, Zero))
             expectNoEvents()
@@ -58,7 +58,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Request(id.site, 10U))
             expectNoEvents()
@@ -75,7 +75,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id.site, Zero))
             emit(Out.Request(id.site, 0U))
@@ -93,7 +93,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id.site, Zero))
             emit(Out.Request(id.site, 1U))
@@ -112,7 +112,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id.site), expectItem())
+            assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Request(id.site, 1U))
             emit(Out.Acknowledge(id.site, Zero))
@@ -133,7 +133,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id), expectItem())
+            assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id, Zero))
             // Sum two requests before expecting items.
@@ -158,7 +158,7 @@ class MutableSiteRequestTest {
     val link =
         link<Inc<Int>, Out<Int>> { inc ->
           inc.test {
-            assertEquals(Inc.Advertisement(id), expectItem())
+            assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id, Zero))
             // Interleave item reception and requests.
@@ -180,7 +180,7 @@ class MutableSiteRequestTest {
     val link =
         link<Out<Int>, Inc<Int>> { inc ->
           inc.test {
-            emit(Inc.Advertisement(id.site))
+            emit(Inc.Advertisement(id.site, id.seqno.inc()))
             emit(Inc.Ready)
             assertEquals(Out.Acknowledge(id.site, Zero), expectItem())
             val request = expectItem() as Out.Request
@@ -202,7 +202,7 @@ class MutableSiteRequestTest {
     val link =
       link<Inc<Int>, Out<Int>> { inc ->
         inc.test {
-          assertEquals(Inc.Advertisement(id), expectItem())
+          assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
           assertEquals(Inc.Ready, expectItem())
           emit(Out.Acknowledge(id, Zero))
           // Sum two requests such that their overflowing total is 0U before expecting items.

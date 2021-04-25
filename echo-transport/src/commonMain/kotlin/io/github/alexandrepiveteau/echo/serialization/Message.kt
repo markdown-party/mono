@@ -5,10 +5,8 @@ package io.github.alexandrepiveteau.echo.serialization
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -39,6 +37,7 @@ private class IncomingSerializer<T>(
 
     private const val KeyType = "type"
     private const val KeySite = "site"
+    private const val KeyNextSeqno = "nextSeqno"
     private const val KeySeqno = "seqno"
     private const val KeyEvent = "event"
 
@@ -56,11 +55,11 @@ private class IncomingSerializer<T>(
     return when (element.jsonObject[KeyType]?.jsonPrimitive?.contentOrNull) {
       TypeAdv -> {
         val site = element.jsonObject[KeySite] ?: badSerial()
+        val seqno = element.jsonObject[KeyNextSeqno] ?: badSerial()
         Message.Incoming.Advertisement(
-            json.decodeFromJsonElement(
-                SiteIdentifier.serializer(),
-                site,
-            ))
+            json.decodeFromJsonElement(SiteIdentifier.serializer(), site),
+            json.decodeFromJsonElement(SequenceNumber.serializer(), seqno),
+        )
       }
       TypeReady -> Message.Incoming.Ready
       TypeEvent -> {
@@ -84,6 +83,7 @@ private class IncomingSerializer<T>(
               buildJsonObject {
                 put(KeyType, TypeAdv)
                 put(KeySite, value.site, json)
+                put(KeyNextSeqno, value.nextSeqno, json)
               },
           )
       Message.Incoming.Ready ->

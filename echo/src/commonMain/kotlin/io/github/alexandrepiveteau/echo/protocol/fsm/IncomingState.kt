@@ -64,7 +64,8 @@ private data class IncomingNew<T, C>(
       }
       val pending = remainingToSend.lastOrNull()
       if (pending != null) {
-        onSend(Inc.Advertisement(pending)) {
+        val pendingSeqno = log.expected(pending)
+        onSend(Inc.Advertisement(site = pending, nextSeqno = pendingSeqno)) {
           Move(
               copy(
                   alreadySent = alreadySent.add(pending),
@@ -88,7 +89,8 @@ private data class IncomingSending<T, C>(
   /** Returns the next [Inc.Advertisement] message to send, if there's any. */
   fun nextAdvertisementOrNull(log: ImmutableEventLog<T, C>): Inc.Advertisement? {
     val missing = log.sites.asSequence().minus(advertised).firstOrNull() ?: return null
-    return Inc.Advertisement(missing)
+    val seqno = log.expected(missing)
+    return Inc.Advertisement(site = missing, nextSeqno = seqno)
   }
 
   /**
