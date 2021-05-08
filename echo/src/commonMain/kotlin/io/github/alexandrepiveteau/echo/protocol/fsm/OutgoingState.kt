@@ -101,6 +101,18 @@ private data class OutgoingListening<T, C>(
     return Effect.Move(this)
   }
 
+  private fun handleAdvertisementReceived(msg: Inc.Advertisement): Effect<OutgoingState<T, C>> {
+    pendingAcks.add(msg.site)
+    return Effect.Move(this@OutgoingListening)
+  }
+
+  private fun OutgoingStepScope<T, C>.handleEventReceived(
+      msg: Inc.Event<T>,
+  ): Effect<OutgoingState<T, C>> {
+    set(msg.seqno, msg.site, msg.body)
+    return Effect.Move(this@OutgoingListening)
+  }
+
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<OutgoingState<T, C>> {
@@ -118,16 +130,10 @@ private data class OutgoingListening<T, C>(
 
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
-          null -> Effect.Terminate
-          is Inc.Advertisement -> {
-            pendingAcks.add(msg.site)
-            Effect.Move(this@OutgoingListening) // mutable state update.
-          }
-          is Inc.Event -> {
-            set(msg.seqno, msg.site, msg.body)
-            Effect.Move(this@OutgoingListening)
-          }
+          is Inc.Advertisement -> handleAdvertisementReceived(msg)
+          is Inc.Event -> handleEventReceived(msg)
           is Inc.Ready -> Effect.MoveToError(notReachable())
+          null -> Effect.Terminate
         }
       }
     }
