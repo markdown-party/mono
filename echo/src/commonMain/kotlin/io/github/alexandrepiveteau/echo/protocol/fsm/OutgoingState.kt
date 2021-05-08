@@ -57,9 +57,9 @@ private data class OutgoingAdvertising<T, C>(
         is Inc.Ready -> {
           Effect.Move(
               OutgoingListening(
-                  pendingAcks = available.toMutableList(),
-                  pendingRequested = mutableListOf(),
-                  requested = mutableListOf(),
+                  pendingAcks = available,
+                  pendingRequested = persistentListOf(),
+                  requested = persistentListOf(),
               ))
         }
         null -> Effect.Terminate
@@ -67,13 +67,12 @@ private data class OutgoingAdvertising<T, C>(
       }
 }
 
-// TODO : Refactor this to Persistent states.
 // TODO : Add more sophisticated precondition checks in protocol.
 @OptIn(EchoEventLogPreview::class)
 private data class OutgoingListening<T, C>(
-    private val pendingAcks: MutableList<SiteIdentifier>,
-    private val pendingRequested: MutableList<SiteIdentifier>,
-    private val requested: MutableList<SiteIdentifier>,
+    private val pendingAcks: PersistentList<SiteIdentifier>,
+    private val pendingRequested: PersistentList<SiteIdentifier>,
+    private val requested: PersistentList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
   private fun nextAcknowledgeOrNull(
@@ -85,9 +84,11 @@ private data class OutgoingListening<T, C>(
   }
 
   private fun handleAcknowledgeSent(msg: Out.Acknowledge): Effect<OutgoingState<T, C>> {
-    pendingAcks.remove(msg.site)
-    pendingRequested.add(msg.site)
-    return Effect.Move(this)
+    return Effect.Move(
+        copy(
+            pendingAcks = pendingAcks.remove(msg.site),
+            pendingRequested = pendingRequested.add(msg.site),
+        ))
   }
 
   private fun nextRequestOrNull(): Out.Request? {
@@ -96,14 +97,15 @@ private data class OutgoingListening<T, C>(
   }
 
   private fun handleRequestSent(msg: Out.Request): Effect<OutgoingState<T, C>> {
-    pendingRequested.remove(msg.site)
-    requested.add(msg.site)
-    return Effect.Move(this)
+    return Effect.Move(
+        copy(
+            pendingRequested = pendingRequested.remove(msg.site),
+            requested = requested.add(msg.site),
+        ))
   }
 
   private fun handleAdvertisementReceived(msg: Inc.Advertisement): Effect<OutgoingState<T, C>> {
-    pendingAcks.add(msg.site)
-    return Effect.Move(this@OutgoingListening)
+    return Effect.Move(copy(pendingAcks = pendingAcks.add(msg.site)))
   }
 
   private fun OutgoingStepScope<T, C>.handleEventReceived(
