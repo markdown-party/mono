@@ -4,7 +4,6 @@
 package io.github.alexandrepiveteau.echo.protocol.fsm
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
@@ -77,37 +76,44 @@ private data class OutgoingListening<T, C>(
     private val requested: MutableList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
+  private fun nextAcknowledgeOrNull(
+      log: ImmutableEventLog<T, C>,
+  ): Out.Acknowledge? {
+    val acknowledge = pendingAcks.lastOrNull() ?: return null
+    val expected = log.expected(acknowledge)
+    return Out.Acknowledge(acknowledge, expected)
+  }
+
+  private fun handleAcknowledgeSent(msg: Out.Acknowledge): Effect<OutgoingState<T, C>> {
+    pendingAcks.remove(msg.site)
+    pendingRequested.add(msg.site)
+    return Effect.Move(this)
+  }
+
+  private fun nextRequestOrNull(): Out.Request? {
+    val request = pendingRequested.firstOrNull() ?: return null
+    return Out.Request(site = request, count = UInt.MAX_VALUE)
+  }
+
+  private fun handleRequestSent(msg: Out.Request): Effect<OutgoingState<T, C>> {
+    pendingRequested.remove(msg.site)
+    requested.add(msg.site)
+    return Effect.Move(this)
+  }
+
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<OutgoingState<T, C>> {
-    val acknowledge = pendingAcks.lastOrNull()
-    val expected = acknowledge?.let(log::expected) ?: SequenceNumber.Zero
-
-    val request = pendingRequested.lastOrNull()
 
     return select {
+      val acknowledge = nextAcknowledgeOrNull(log)
       if (acknowledge != null) {
-        onSend(
-            Out.Acknowledge(
-                site = acknowledge,
-                nextSeqno = expected,
-            )) {
-          pendingAcks.removeLast()
-          pendingRequested.add(acknowledge)
-          Effect.Move(this@OutgoingListening) // mutable state update.
-        }
+        onSend(acknowledge) { handleAcknowledgeSent(acknowledge) }
       }
 
+      val request = nextRequestOrNull()
       if (request != null) {
-        onSend(
-            Out.Request(
-                site = request,
-                count = UInt.MAX_VALUE,
-            )) {
-          pendingRequested.removeLast()
-          requested.add(request)
-          Effect.Move(this@OutgoingListening) // mutable state update.
-        }
+        onSend(request) { handleRequestSent(request) }
       }
 
       onReceiveOrClosed { v ->
