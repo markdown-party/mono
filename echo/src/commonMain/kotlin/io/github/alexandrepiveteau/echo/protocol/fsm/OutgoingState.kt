@@ -9,6 +9,8 @@ import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.selects.select
@@ -26,7 +28,7 @@ internal sealed class OutgoingState<T, C> : State<Inc<T>, Out<T>, T, C, Outgoing
   companion object {
 
     /** Creates a new [OutgoingState] that's the beginning of the FSM. */
-    operator fun <T, C> invoke(): OutgoingState<T, C> = OutgoingAdvertising(mutableListOf())
+    operator fun <T, C> invoke(): OutgoingState<T, C> = OutgoingAdvertising(persistentListOf())
   }
 }
 
@@ -42,7 +44,7 @@ private fun notReachable(name: String? = null): Throwable {
 // FINITE STATE MACHINE
 
 private data class OutgoingAdvertising<T, C>(
-    private val available: MutableList<SiteIdentifier>,
+    private val available: PersistentList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
   @OptIn(InternalCoroutinesApi::class)
@@ -51,13 +53,12 @@ private data class OutgoingAdvertising<T, C>(
   ): Effect<OutgoingState<T, C>> =
       when (val msg = receiveOrNull()) {
         is Inc.Advertisement -> {
-          available += msg.site
-          Effect.Move(this@OutgoingAdvertising) // mutable state update.
+          Effect.Move(copy(available = available.add(msg.site)))
         }
         is Inc.Ready -> {
           Effect.Move(
               OutgoingListening(
-                  pendingAcks = available,
+                  pendingAcks = available.toMutableList(),
                   pendingRequested = mutableListOf(),
                   requested = mutableListOf(),
               ))
@@ -103,9 +104,9 @@ private data class OutgoingListening<T, C>(
                 site = request,
                 count = UInt.MAX_VALUE,
             )) {
-            pendingRequested.removeLast()
-            requested.add(request)
-            Effect.Move(this@OutgoingListening) // mutable state update.
+          pendingRequested.removeLast()
+          requested.add(request)
+          Effect.Move(this@OutgoingListening) // mutable state update.
         }
       }
 
