@@ -3,6 +3,7 @@
 
 package io.github.alexandrepiveteau.echo.protocol.fsm
 
+import io.github.alexandrepiveteau.echo.causal.EventIdentifier
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber.Companion.Zero
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
@@ -29,11 +30,8 @@ internal sealed class IncomingState<T, C> : State<Out<T>, Inc<T>, T, C, Incoming
   companion object {
 
     /** Creates a new [IncomingState] that's the beginning of the FSM. */
-    operator fun <T, C> invoke(pending: Iterable<SiteIdentifier>): IncomingState<T, C> =
-        IncomingNew(
-            alreadySent = persistentListOf(),
-            remainingToSend = pending.toPersistentList(),
-        )
+    operator fun <T, C> invoke(): IncomingState<T, C> =
+        IncomingNew(alreadySent = persistentListOf())
   }
 }
 
@@ -47,14 +45,43 @@ internal sealed class IncomingState<T, C> : State<Out<T>, Inc<T>, T, C, Incoming
 // 3. We receive a Done event, so we move to Cancelling.
 // 4. We receive an unsupported message, so we fail.
 private data class IncomingNew<T, C>(
-    private val alreadySent: PersistentList<SiteIdentifier>,
-    private val remainingToSend: PersistentList<SiteIdentifier>,
+    private val alreadySent: PersistentList<EventIdentifier>,
 ) : IncomingState<T, C>() {
+
+  /** Returns the next [Inc.Advertisement] message to send, if there's any. */
+  private fun nextAdvertisementOrNull(log: ImmutableEventLog<*, *>): Inc.Advertisement? {
+    val site = log.sites.minus(alreadySent.map { it.site }).firstOrNull() ?: return null
+    return Inc.Advertisement(site, log.expected(site))
+  }
+
+  /**
+   * Handles an advertisement message being successfully sent. This will update the list of
+   * advertisements sent before the [Inc.Ready] message, and remove the site from the remaining
+   * sites to send before the [Inc.Ready] message.
+   *
+   * @param msg the [Inc.Advertisement] message that was sent.
+   */
+  private fun handleAdvertisementSent(
+      msg: Inc.Advertisement,
+  ): Effect<IncomingState<T, C>> {
+    val sent = alreadySent.add(EventIdentifier(msg.nextSeqno, msg.site))
+    return Move(copy(alreadySent = sent))
+  }
+
+  /**
+   * Handles the [Inc.Ready] message being sent, indicating that we are now done with the handshake
+   * and can send events (and receive acknowledgements).
+   */
+  private fun handleReadySent(): Effect<IncomingState<T, C>> {
+    // TODO : Eventually use the whole EventIdentifier.
+    return Move(IncomingSending(advertised = alreadySent.map { it.site }.toPersistentList()))
+  }
 
   override suspend fun IncomingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<IncomingState<T, C>> {
     return select {
+
       // Priority is given to the reception of cancellation messages.
       onReceiveOrClosed { v ->
         when (v.valueOrNull) {
@@ -62,18 +89,20 @@ private data class IncomingNew<T, C>(
           else -> Effect.MoveToError(IllegalStateException())
         }
       }
-      val pending = remainingToSend.lastOrNull()
+
+      // Try to send an advertisement, or Ready if we're done advertising sites.
+      val pending = nextAdvertisementOrNull(log)
       if (pending != null) {
-        val pendingSeqno = log.expected(pending)
-        onSend(Inc.Advertisement(site = pending, nextSeqno = pendingSeqno)) {
-          Move(
-              copy(
-                  alreadySent = alreadySent.add(pending),
-                  remainingToSend = remainingToSend.removeAt(remainingToSend.lastIndex),
-              ))
-        }
+        // TODO : Investigate if this is an issue and if we need to better define sync semantics.
+        // There is a small non-intuitive behavior here, if the log is updated via another site
+        // before  the expected from another site is sent, and we may have some events with missing
+        // dependencies (at the application level).
+        //
+        // On one hand, these missing dependencies should already be handled by the business logic,
+        // but on the other hand, the semantics are not obvious to a user.
+        onSend(pending) { handleAdvertisementSent(pending) }
       } else {
-        onSend(Inc.Ready) { Move(IncomingSending(advertised = alreadySent)) }
+        onSend(Inc.Ready) { handleReadySent() }
       }
     }
   }

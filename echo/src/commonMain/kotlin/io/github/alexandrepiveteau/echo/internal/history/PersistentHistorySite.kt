@@ -121,7 +121,7 @@ internal open class PersistentHistorySite<T, M, C>(
   override val value: StateFlow<M> = current.map { it.current.model }
 
   override fun outgoing() = exchange(OutgoingState())
-  override fun incoming() = exchange(IncomingState(current.value.current.log.sites))
+  override fun incoming() = exchange(IncomingState())
 }
 
 /**
