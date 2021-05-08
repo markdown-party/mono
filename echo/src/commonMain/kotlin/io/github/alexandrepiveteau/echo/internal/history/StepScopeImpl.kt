@@ -13,12 +13,12 @@ internal class StepScopeImpl<I, O, T, C>(
     inc: ReceiveChannel<I>,
     out: SendChannel<O>,
     insertions: ReceiveChannel<ImmutableEventLog<T, C>>,
-    private val update: suspend (SequenceNumber, SiteIdentifier, T) -> Unit,
+    private val update: (SequenceNumber, SiteIdentifier, T) -> Unit,
 ) : StepScope<I, O, T, C>, ReceiveChannel<I> by inc, SendChannel<O> by out {
 
   override val onInsert: SelectClause1<ImmutableEventLog<T, C>> = insertions.onReceive
 
-  override suspend fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T) {
+  override fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T) {
     update(seqno, site, event)
   }
 }
