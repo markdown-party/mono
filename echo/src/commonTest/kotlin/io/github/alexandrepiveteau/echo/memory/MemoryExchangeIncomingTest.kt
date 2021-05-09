@@ -61,7 +61,7 @@ class MemoryExchangeIncomingTest {
     val exchange =
         link<I<Int>, O<Int>> { incoming ->
           incoming.test {
-            assertEquals<Any>(I.Advertisement(site), expectItem())
+            assertEquals<Any>(I.Advertisement(site, seqno.inc()), expectItem())
             assertEquals(I.Ready, expectItem())
             expectNoEvents()
           }
@@ -103,7 +103,7 @@ class MemoryExchangeIncomingTest {
     val echo = mutableSite(SiteIdentifier(0), events).buffer(RENDEZVOUS)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
-              assertEquals(I.Advertisement(site), incoming.receive())
+              assertEquals(I.Advertisement(site, seqno.inc()), incoming.receive())
               assertEquals(I.Ready, incoming.receive())
               send(O.Acknowledge(site, seqno))
               send(O.Request(site, UInt.MAX_VALUE))
@@ -123,7 +123,7 @@ class MemoryExchangeIncomingTest {
     val echo = mutableSite(SiteIdentifier(0), events)
     val exchange =
         channelLink<I<Boolean>, O<Boolean>> { incoming ->
-          assertEquals(I.Advertisement(site), incoming.receive())
+          assertEquals(I.Advertisement(site, seqno.inc()), incoming.receive())
           assertEquals(I.Ready, incoming.receive())
           send(O.Acknowledge(site, seqno))
           send(O.Request(site, count = 0U))

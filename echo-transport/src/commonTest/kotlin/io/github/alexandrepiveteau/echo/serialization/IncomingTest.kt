@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
+import io.github.alexandrepiveteau.echo.causal.SequenceNumber.Companion.Zero
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import kotlin.test.Test
@@ -13,10 +14,13 @@ class IncomingTest {
   @Test
   fun testAdvertisementDecoding() {
     val json = """
-        {"type":"advertisement", "site": "00000000"}
+        {"type":"advertisement", "site": "00000000", "nextSeqno": 0 }
       """
     val decoded = Json.decodeFromString(Incoming.serializer(Int.serializer()), json)
-    assertEquals(Incoming.Advertisement(site = SiteIdentifier(Int.MIN_VALUE)), decoded)
+    assertEquals(
+        Incoming.Advertisement(site = SiteIdentifier(Int.MIN_VALUE), nextSeqno = Zero),
+        decoded,
+    )
   }
 
   @Test

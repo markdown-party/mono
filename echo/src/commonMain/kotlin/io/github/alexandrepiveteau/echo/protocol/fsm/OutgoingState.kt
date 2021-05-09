@@ -4,11 +4,12 @@
 package io.github.alexandrepiveteau.echo.protocol.fsm
 
 import io.github.alexandrepiveteau.echo.EchoEventLogPreview
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.selects.select
@@ -26,7 +27,7 @@ internal sealed class OutgoingState<T, C> : State<Inc<T>, Out<T>, T, C, Outgoing
   companion object {
 
     /** Creates a new [OutgoingState] that's the beginning of the FSM. */
-    operator fun <T, C> invoke(): OutgoingState<T, C> = OutgoingAdvertising(mutableListOf())
+    operator fun <T, C> invoke(): OutgoingState<T, C> = OutgoingAdvertising(persistentListOf())
   }
 }
 
@@ -42,7 +43,7 @@ private fun notReachable(name: String? = null): Throwable {
 // FINITE STATE MACHINE
 
 private data class OutgoingAdvertising<T, C>(
-    private val available: MutableList<SiteIdentifier>,
+    private val available: PersistentList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
   @OptIn(InternalCoroutinesApi::class)
@@ -51,15 +52,14 @@ private data class OutgoingAdvertising<T, C>(
   ): Effect<OutgoingState<T, C>> =
       when (val msg = receiveOrNull()) {
         is Inc.Advertisement -> {
-          available += msg.site
-          Effect.Move(this@OutgoingAdvertising) // mutable state update.
+          Effect.Move(copy(available = available.add(msg.site)))
         }
         is Inc.Ready -> {
           Effect.Move(
               OutgoingListening(
                   pendingAcks = available,
-                  pendingRequested = mutableListOf(),
-                  requested = mutableListOf(),
+                  pendingRequested = persistentListOf(),
+                  requested = persistentListOf(),
               ))
         }
         null -> Effect.Terminate
@@ -67,60 +67,75 @@ private data class OutgoingAdvertising<T, C>(
       }
 }
 
-// TODO : Refactor this to Persistent states.
 // TODO : Add more sophisticated precondition checks in protocol.
 @OptIn(EchoEventLogPreview::class)
 private data class OutgoingListening<T, C>(
-    private val pendingAcks: MutableList<SiteIdentifier>,
-    private val pendingRequested: MutableList<SiteIdentifier>,
-    private val requested: MutableList<SiteIdentifier>,
+    private val pendingAcks: PersistentList<SiteIdentifier>,
+    private val pendingRequested: PersistentList<SiteIdentifier>,
+    private val requested: PersistentList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
+
+  private fun nextAcknowledgeOrNull(
+      log: ImmutableEventLog<T, C>,
+  ): Out.Acknowledge? {
+    val acknowledge = pendingAcks.lastOrNull() ?: return null
+    val expected = log.expected(acknowledge)
+    return Out.Acknowledge(acknowledge, expected)
+  }
+
+  private fun handleAcknowledgeSent(msg: Out.Acknowledge): Effect<OutgoingState<T, C>> {
+    return Effect.Move(
+        copy(
+            pendingAcks = pendingAcks.remove(msg.site),
+            pendingRequested = pendingRequested.add(msg.site),
+        ))
+  }
+
+  private fun nextRequestOrNull(): Out.Request? {
+    val request = pendingRequested.firstOrNull() ?: return null
+    return Out.Request(site = request, count = UInt.MAX_VALUE)
+  }
+
+  private fun handleRequestSent(msg: Out.Request): Effect<OutgoingState<T, C>> {
+    return Effect.Move(
+        copy(
+            pendingRequested = pendingRequested.remove(msg.site),
+            requested = requested.add(msg.site),
+        ))
+  }
+
+  private fun handleAdvertisementReceived(msg: Inc.Advertisement): Effect<OutgoingState<T, C>> {
+    return Effect.Move(copy(pendingAcks = pendingAcks.add(msg.site)))
+  }
+
+  private fun OutgoingStepScope<T, C>.handleEventReceived(
+      msg: Inc.Event<T>,
+  ): Effect<OutgoingState<T, C>> {
+    set(msg.seqno, msg.site, msg.body)
+    return Effect.Move(this@OutgoingListening)
+  }
 
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>
   ): Effect<OutgoingState<T, C>> {
-    val acknowledge = pendingAcks.lastOrNull()
-    val expected = acknowledge?.let(log::expected) ?: SequenceNumber.Zero
-
-    val request = pendingRequested.lastOrNull()
 
     return select {
+      val acknowledge = nextAcknowledgeOrNull(log)
       if (acknowledge != null) {
-        onSend(
-            Out.Acknowledge(
-                site = acknowledge,
-                nextSeqno = expected,
-            )) {
-          pendingAcks.removeLast()
-          pendingRequested.add(acknowledge)
-          Effect.Move(this@OutgoingListening) // mutable state update.
-        }
+        onSend(acknowledge) { handleAcknowledgeSent(acknowledge) }
       }
 
+      val request = nextRequestOrNull()
       if (request != null) {
-        onSend(
-            Out.Request(
-                site = request,
-                count = UInt.MAX_VALUE,
-            )) {
-            pendingRequested.removeLast()
-            requested.add(request)
-            Effect.Move(this@OutgoingListening) // mutable state update.
-        }
+        onSend(request) { handleRequestSent(request) }
       }
 
       onReceiveOrClosed { v ->
         when (val msg = v.valueOrNull) {
-          null -> Effect.Terminate
-          is Inc.Advertisement -> {
-            pendingAcks.add(msg.site)
-            Effect.Move(this@OutgoingListening) // mutable state update.
-          }
-          is Inc.Event -> {
-            set(msg.seqno, msg.site, msg.body)
-            Effect.Move(this@OutgoingListening)
-          }
+          is Inc.Advertisement -> handleAdvertisementReceived(msg)
+          is Inc.Event -> handleEventReceived(msg)
           is Inc.Ready -> Effect.MoveToError(notReachable())
+          null -> Effect.Terminate
         }
       }
     }

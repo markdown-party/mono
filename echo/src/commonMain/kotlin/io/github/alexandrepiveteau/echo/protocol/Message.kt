@@ -58,24 +58,22 @@ sealed class Message<out T> {
 
     /**
      * This message is sent to let the other site know that we have some events at our disposable
-     * for a certain site. When an [Link] is started, the [Incoming] site will send some
+     * for a certain site. When an exchange is started, the [Incoming] site will send some
      * [Advertisement] for all the sites it knows about, before sending a [Ready] message.
      *
      * Afterwards, if messages from new sites become available, some additional [Advertisement] may
      * eventually get sent.
      *
-     * TODO : Eventually provide a [SequenceNumber] with the highest event available ?
-     * ```
-     *        This could help with one-off syncs, letting the other side know what's a good
-     *        request if one wants to only stick to the pre-[Ready] events.
+     * Additionally, the next expected [SequenceNumber] when the [Advertisement] is issued is
+     * transmitted. This allows one-shot sync support, because sites may terminate after they have
+     * synced all the events advertised before the [Ready] message was sent.
      *
-     * @param site
-     * ```
-     * the [SiteIdentifier] for the available site.
+     * @param site the [SiteIdentifier] for the available site.
+     * @param nextSeqno the next expected [SequenceNumber] for the available site.
      */
     data class Advertisement(
         val site: SiteIdentifier,
-    // val seqno: SequenceNumber?,
+        val nextSeqno: SequenceNumber,
     ) : Incoming<Nothing>()
 
     /**

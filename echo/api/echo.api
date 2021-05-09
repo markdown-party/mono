@@ -245,11 +245,13 @@ public abstract class io/github/alexandrepiveteau/echo/protocol/Message$Incoming
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
-	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1--e_yCgk ()I
-	public final fun copy-BJWj3EQ (I)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
-	public static synthetic fun copy-BJWj3EQ$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
+	public final fun component2-o38t-jg ()I
+	public final fun copy-9IG4cKU (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
+	public static synthetic fun copy-9IG4cKU$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextSeqno-o38t-jg ()I
 	public final fun getSite--e_yCgk ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

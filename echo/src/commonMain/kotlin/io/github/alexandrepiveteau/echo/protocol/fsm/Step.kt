@@ -29,7 +29,7 @@ internal interface StepScope<out I, in O, T, C> : ReceiveChannel<I>, SendChannel
    * Sets the [event] for a certain [seqno] and a given [site]. This will mutate the current site,
    * but won't affect already emitted [ImmutableEventLog] instances.
    */
-  suspend fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T)
+  fun set(seqno: SequenceNumber, site: SiteIdentifier, event: T)
 }
 
 /** A specific version of [StepScope] that receives [Inc] messages and sends [Out] messages. */
