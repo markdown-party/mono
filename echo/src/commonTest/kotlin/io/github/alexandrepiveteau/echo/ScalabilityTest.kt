@@ -11,7 +11,6 @@ import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
 import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import kotlin.math.roundToInt
-import kotlin.system.measureTimeMillis
 import kotlin.test.Test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -19,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class Scalability {
+class ScalabilityTest {
 
   /** A [OneWayProjection] that simply takes the last value. */
   private class LWWProjection<T> : OneWayProjection<T, IndexedEvent<T>> {
@@ -58,7 +57,7 @@ class Scalability {
   }
 
   @Test
-  fun `test scalability`() = suspendTest {
+  fun testScalability() = suspendTest {
     val sites = 100
     val ops = 1000
     val projection = LWWProjection<Int>()
