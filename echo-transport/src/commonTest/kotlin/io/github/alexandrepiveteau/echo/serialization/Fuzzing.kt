@@ -1,15 +1,15 @@
 package io.github.alexandrepiveteau.echo.serialization
 
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import kotlin.random.Random
 import kotlin.random.nextUInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.Json
 
 private const val FuzzIterationsCount = 1000
 
@@ -18,7 +18,7 @@ class Fuzzing {
   private fun fuzzInt() = Random.nextInt()
   private fun fuzzUInt() = Random.nextUInt()
   private fun fuzzSiteIdentifier() = SiteIdentifier.random()
-  private fun fuzzSequenceNumber() = SequenceNumber(Random.nextInt().toUInt())
+  private fun fuzzSequenceNumber() = Random.nextInt().toUInt().toSequenceNumber()
   private fun fuzzIncoming() =
       when (Random.nextInt(until = 3)) {
         0 -> Incoming.Advertisement(fuzzSiteIdentifier(), fuzzSequenceNumber())

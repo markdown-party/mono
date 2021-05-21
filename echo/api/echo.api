@@ -85,7 +85,6 @@ public final class io/github/alexandrepiveteau/echo/causal/SequenceNumber : java
 	public synthetic fun compareTo (Ljava/lang/Object;)I
 	public fun compareTo-fsPE6Dk (I)I
 	public static fun compareTo-fsPE6Dk (II)I
-	public static fun constructor-impl (I)I
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (ILjava/lang/Object;)Z
 	public static final fun equals-impl0 (II)Z
@@ -104,13 +103,13 @@ public final class io/github/alexandrepiveteau/echo/causal/SequenceNumber$Compan
 }
 
 public final class io/github/alexandrepiveteau/echo/causal/SequenceNumberKt {
+	public static final fun toSequenceNumber-WZ4Q5Ns (I)I
 	public static final fun toUInt-fsPE6Dk (I)I
 }
 
 public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifier {
 	public static final field Companion Lio/github/alexandrepiveteau/echo/causal/SiteIdentifier$Companion;
 	public static final synthetic fun box-impl (I)Lio/github/alexandrepiveteau/echo/causal/SiteIdentifier;
-	public static fun constructor-impl (I)I
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (ILjava/lang/Object;)Z
 	public static final fun equals-impl0 (II)Z
@@ -127,6 +126,7 @@ public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifier$Compan
 
 public final class io/github/alexandrepiveteau/echo/causal/SiteIdentifierKt {
 	public static final fun toInt-BJWj3EQ (I)I
+	public static final fun toSiteIdentifier (I)I
 }
 
 public abstract interface annotation class io/github/alexandrepiveteau/echo/events/EventDsl : java/lang/annotation/Annotation {

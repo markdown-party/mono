@@ -3,6 +3,8 @@ package io.github.alexandrepiveteau.echo.serialization
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber.Companion.Zero
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
+import io.github.alexandrepiveteau.echo.causal.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,7 +20,7 @@ class IncomingTest {
       """
     val decoded = Json.decodeFromString(Incoming.serializer(Int.serializer()), json)
     assertEquals(
-        Incoming.Advertisement(site = SiteIdentifier(Int.MIN_VALUE), nextSeqno = Zero),
+        Incoming.Advertisement(site = Int.MIN_VALUE.toSiteIdentifier(), nextSeqno = Zero),
         decoded,
     )
   }
@@ -45,8 +47,8 @@ class IncomingTest {
     val decoded = Json.decodeFromString(Incoming.serializer(Int.serializer()), json)
     assertEquals(
         Incoming.Event(
-            site = SiteIdentifier(Int.MIN_VALUE),
-            seqno = SequenceNumber(123U),
+            site = Int.MIN_VALUE.toSiteIdentifier(),
+            seqno = 123U.toSequenceNumber(),
             body = 1234,
         ),
         decoded)

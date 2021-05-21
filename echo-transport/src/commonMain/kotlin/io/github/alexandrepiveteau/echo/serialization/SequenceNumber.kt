@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
+import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
 import io.github.alexandrepiveteau.echo.causal.toUInt
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
@@ -29,7 +30,7 @@ internal object SequenceNumberSerializer : KSerializer<SequenceNumber> {
         throw SerializationException(
             "SequenceNumber not in [${UInt.MIN_VALUE}, ${UInt.MAX_VALUE}] range",
         )
-    return SequenceNumber(leastSignificant.toUInt())
+    return leastSignificant.toUInt().toSequenceNumber()
   }
 
   override fun serialize(encoder: Encoder, value: SequenceNumber) {

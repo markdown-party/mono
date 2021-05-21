@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
 import io.github.alexandrepiveteau.echo.causal.toInt
+import io.github.alexandrepiveteau.echo.causal.toSiteIdentifier
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -34,7 +35,7 @@ internal object SiteIdentifierSerializer : KSerializer<SiteIdentifier> {
     val unpacked =
         packed.toUIntOrNull(RADIX) ?: throw SerializationException("Invalid SiteIdentifier")
     val unshifted = unpacked.toInt() + HALF_INT
-    return SiteIdentifier(unshifted)
+    return unshifted.toSiteIdentifier()
   }
 
   override fun serialize(encoder: Encoder, value: SiteIdentifier) {

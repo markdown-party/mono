@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.causal.SequenceNumber
+import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,7 +53,7 @@ class SequenceNumberTest {
   @Test
   fun testExhaustively() {
     for (i in UInt.MIN_VALUE..UInt.MAX_VALUE) {
-      testEncodingDecoding(SequenceNumber(i))
+      testEncodingDecoding(i.toSequenceNumber())
     }
   }
 }

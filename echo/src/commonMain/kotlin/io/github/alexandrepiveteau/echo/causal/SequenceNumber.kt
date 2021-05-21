@@ -12,7 +12,7 @@ import kotlin.jvm.JvmInline
  */
 @JvmInline
 value class SequenceNumber
-constructor(
+internal constructor(
     internal val index: UInt,
 ) : Comparable<SequenceNumber> {
   operator fun inc(): SequenceNumber = plus(1U)
@@ -33,5 +33,7 @@ constructor(
     val Max: SequenceNumber = SequenceNumber(UInt.MAX_VALUE)
   }
 }
+
+fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(index = this)
 
 fun SequenceNumber.toUInt(): UInt = index

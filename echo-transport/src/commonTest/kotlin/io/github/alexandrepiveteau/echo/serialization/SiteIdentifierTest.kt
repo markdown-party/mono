@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.causal.toSiteIdentifier
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.serialization.json.Json
@@ -17,7 +18,7 @@ class SiteIdentifierTest {
   @Test
   fun testMinSerialization() {
     val expected = "\"00000000\""
-    val identifier = SiteIdentifier(Int.MIN_VALUE)
+    val identifier = Int.MIN_VALUE.toSiteIdentifier()
     val encoded = Json.encodeToString(SiteIdentifier.serializer(), identifier)
     assertEquals(expected, encoded)
     val decoded = Json.decodeFromString(SiteIdentifier.serializer(), expected)
@@ -27,7 +28,7 @@ class SiteIdentifierTest {
   @Test
   fun testMaxSerialization() {
     val expected = "\"ffffffff\""
-    val identifier = SiteIdentifier(Int.MAX_VALUE)
+    val identifier = Int.MAX_VALUE.toSiteIdentifier()
     val encoded = Json.encodeToString(SiteIdentifier.serializer(), identifier)
     assertEquals(expected, encoded)
     val decoded = Json.decodeFromString(SiteIdentifier.serializer(), expected)
@@ -38,7 +39,7 @@ class SiteIdentifierTest {
   fun testZeroSerialization() {
     // 2^31 = 2 147 483 648 = 0x80000000
     val expected = "\"80000000\""
-    val identifier = SiteIdentifier(0)
+    val identifier = 0.toSiteIdentifier()
     val encoded = Json.encodeToString(SiteIdentifier.serializer(), identifier)
     assertEquals(expected, encoded)
     val decoded = Json.decodeFromString(SiteIdentifier.serializer(), expected)
@@ -57,6 +58,6 @@ class SiteIdentifierTest {
 
   @Test
   fun testAFewValues() {
-    for (i in -2..2) testEncodingDecoding(SiteIdentifier(i))
+    for (i in -2..2) testEncodingDecoding(i.toSiteIdentifier())
   }
 }

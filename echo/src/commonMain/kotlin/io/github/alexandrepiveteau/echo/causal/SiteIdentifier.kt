@@ -10,7 +10,7 @@ import kotlin.random.Random
  */
 @JvmInline
 value class SiteIdentifier
-constructor(
+internal constructor(
     internal val unique: Int,
 ) {
 
@@ -22,5 +22,7 @@ constructor(
     fun random(): SiteIdentifier = SiteIdentifier(unique = Random.nextInt())
   }
 }
+
+fun Int.toSiteIdentifier(): SiteIdentifier = SiteIdentifier(unique = this)
 
 fun SiteIdentifier.toInt(): Int = unique

@@ -112,8 +112,8 @@ private object EventIdentifierSerializer : KSerializer<EventIdentifier> {
       }
 
       EventIdentifier(
-          SequenceNumber(requireNotNull(seqno).toUInt()),
-          SiteIdentifier(requireNotNull(site)),
+          requireNotNull(seqno).toUInt().toSequenceNumber(),
+          requireNotNull(site).toSiteIdentifier(),
       )
     }
   }
