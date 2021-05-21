@@ -1,13 +1,13 @@
 object Versions {
-  const val Kotlin = "1.4.32"
+  const val Kotlin = "1.5.0"
   const val KotlinBinaryCompatibility = "0.5.0"
-  const val KotlinxCoroutines = "1.4.3"
+  const val KotlinxCoroutines = "1.5.0"
   const val KotlinxImmutableCollections = "0.3.4"
-  const val KotlinxSerialization = "1.4.30"
-  const val KotlinxSerializationFormat = "1.1.0"
-  const val Ktor = "1.5.3"
+  const val KotlinxSerialization = "1.5.0"
+  const val KotlinxSerializationFormat = "1.2.1"
+  const val Ktor = "main-128"
 
-  const val CashAppTurbine = "0.4.1"
+  const val CashAppTurbine = "0.5.1"
   const val Slf4j = "1.7.21"
 }
 

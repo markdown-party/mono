@@ -11,7 +11,6 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.selects.select
 
 /**
@@ -50,7 +49,7 @@ private data class OutgoingAdvertising<T, C>(
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>,
   ): Effect<OutgoingState<T, C>> =
-      when (val msg = receiveOrNull()) {
+      when (val msg = receiveCatching().getOrNull()) {
         is Inc.Advertisement -> {
           Effect.Move(copy(available = available.add(msg.site)))
         }
@@ -130,8 +129,8 @@ private data class OutgoingListening<T, C>(
         onSend(request) { handleRequestSent(request) }
       }
 
-      onReceiveOrClosed { v ->
-        when (val msg = v.valueOrNull) {
+      onReceiveCatching { v ->
+        when (val msg = v.getOrNull()) {
           is Inc.Advertisement -> handleAdvertisementReceived(msg)
           is Inc.Event -> handleEventReceived(msg)
           is Inc.Ready -> Effect.MoveToError(notReachable())

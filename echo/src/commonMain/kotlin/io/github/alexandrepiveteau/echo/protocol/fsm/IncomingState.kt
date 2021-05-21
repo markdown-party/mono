@@ -83,8 +83,8 @@ private data class IncomingNew<T, C>(
     return select {
 
       // Priority is given to the reception of cancellation messages.
-      onReceiveOrClosed { v ->
-        when (v.valueOrNull) {
+      onReceiveCatching { v ->
+        when (v.getOrNull()) {
           null -> Terminate
           else -> Effect.MoveToError(IllegalStateException())
         }
@@ -189,8 +189,8 @@ private data class IncomingSending<T, C>(
       log: ImmutableEventLog<T, C>
   ): Effect<IncomingState<T, C>> {
     return select {
-      onReceiveOrClosed { v ->
-        when (val msg = v.valueOrNull) {
+      onReceiveCatching { v ->
+        when (val msg = v.getOrNull()) {
           is Out.Acknowledge -> Move(handleAcknowledgeReceived(msg))
           is Out.Request -> Move(handleRequestReceived(msg))
           null -> Terminate

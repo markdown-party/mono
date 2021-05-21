@@ -89,7 +89,7 @@ class MemoryExchangeIncomingTest {
               }
               assertTrue(received.containsAll(sites))
               close()
-              assertNull(incoming.receiveOrNull())
+              assertNull(incoming.receiveCatching().getOrNull())
             }
             .buffer(RENDEZVOUS)
     sync(echo.incoming(), exchange)
@@ -109,7 +109,7 @@ class MemoryExchangeIncomingTest {
               send(O.Request(site, UInt.MAX_VALUE))
               assertEquals(I.Event(seqno, site, true), incoming.receive())
               close()
-              assertNull(incoming.receiveOrNull())
+              assertNull(incoming.receiveCatching().getOrNull())
             }
             .buffer(RENDEZVOUS)
     sync(echo.incoming(), exchange)
@@ -130,7 +130,7 @@ class MemoryExchangeIncomingTest {
           send(O.Request(site, count = 1U))
           assertEquals(I.Event(seqno, site, true), incoming.receive())
           close()
-          assertNull(incoming.receiveOrNull())
+          assertNull(incoming.receiveCatching().getOrNull())
         }
     sync(echo.incoming(), exchange)
   }

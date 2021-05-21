@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.causal
 
+import kotlin.jvm.JvmInline
 import kotlin.random.Random
 
 /**
@@ -7,7 +8,8 @@ import kotlin.random.Random
  *
  * TODO : Make sure there is enough entropy.
  */
-inline class SiteIdentifier
+@JvmInline
+value class SiteIdentifier
 constructor(
     internal val unique: Int,
 ) {

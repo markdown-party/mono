@@ -2,7 +2,7 @@ package io.github.alexandrepiveteau.echo
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +35,7 @@ class LinkBufferTest {
         channelLink<Int, Int> {
               yield() // The produceIn(..) call of channelLink should run first.
               select {
-                it.onReceiveOrClosed { v -> assertNull(v.valueOrNull) }
+                it.onReceiveCatching { v -> assertTrue(v.isClosed) }
                 onSend(123) { fail() }
               }
             }

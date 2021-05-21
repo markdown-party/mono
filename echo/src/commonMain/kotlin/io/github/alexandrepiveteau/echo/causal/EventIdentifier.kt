@@ -5,6 +5,7 @@ package io.github.alexandrepiveteau.echo.causal
 import io.github.alexandrepiveteau.echo.util.packInts
 import io.github.alexandrepiveteau.echo.util.unpackInt1
 import io.github.alexandrepiveteau.echo.util.unpackInt2
+import kotlin.jvm.JvmInline
 
 /**
  * Builds a new [EventIdentifier], for a given [SequenceNumber] and a given [SiteIdentifier].
@@ -25,7 +26,8 @@ fun EventIdentifier(
  *
  * @param packed the packed value for this identifier.
  */
-inline class EventIdentifier
+@JvmInline
+value class EventIdentifier
 internal constructor(
     private val packed: Long,
 ) : Comparable<EventIdentifier> {

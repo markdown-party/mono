@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.logs
 
+import kotlin.jvm.JvmInline
+
 /**
  * A discriminated union of changes, usually associated with events. It encapsulates a present or
  * absent change, which contains a delta over a previous value in an event log.
@@ -7,7 +9,8 @@ package io.github.alexandrepiveteau.echo.logs
  * Actual changes represent a value of type [T], which contains the delta to rewind the operation.
  * Skipped (or empty) changes represent an absence of delta to apply.
  */
-inline class Change<out T> internal constructor(private val holder: Any?) {
+@JvmInline
+value class Change<out T> internal constructor(private val holder: Any?) {
 
   /** Returns true if the [Change] can be skipped. */
   val isSkipped: Boolean

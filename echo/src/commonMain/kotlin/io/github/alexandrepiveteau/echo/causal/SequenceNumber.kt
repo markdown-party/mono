@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.causal
 
 import io.github.alexandrepiveteau.echo.util.plusBoundOverflows
+import kotlin.jvm.JvmInline
 
 /**
  * A [SequenceNumber] is a logical timestamp. The implementation won't overflow, and is clamped
@@ -9,7 +10,8 @@ import io.github.alexandrepiveteau.echo.util.plusBoundOverflows
  * Increasing sequence numbers do not imply a causality relationship, but a causality relationship
  * implies increasing sequence numbers.
  */
-inline class SequenceNumber
+@JvmInline
+value class SequenceNumber
 constructor(
     internal val index: UInt,
 ) : Comparable<SequenceNumber> {

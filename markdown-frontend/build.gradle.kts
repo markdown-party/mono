@@ -1,6 +1,9 @@
 plugins { kotlin(Plugins.KotlinJs) }
 
-repositories { jcenter() }
+repositories {
+  jcenter()
+  mavenCentral()
+}
 
 dependencies {
   implementation(kotlin("stdlib-js"))
@@ -15,11 +18,12 @@ dependencies {
   // TODO : Reference these versions in Versions.kt
   implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.7.2")
 
-  implementation("org.jetbrains:kotlin-react:16.13.1-pre.110-kotlin-1.4.0")
-  implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.110-kotlin-1.4.0")
-  implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.110-kotlin-1.4.0")
-  implementation(npm("react", "16.13.0"))
-  implementation(npm("react-dom", "16.13.0"))
+  implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.203-kotlin-1.5.0")
+  implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.203-kotlin-1.5.0")
+  implementation("org.jetbrains.kotlin-wrappers:kotlin-react-router-dom:5.2.0-pre.203-kotlin-1.5.0")
+  implementation(npm("react", "17.0.2"))
+  implementation(npm("react-dom", "17.0.2"))
+  implementation(npm("react-router-dom", "5.2.0"))
 }
 
 kotlin { js { browser() } }
