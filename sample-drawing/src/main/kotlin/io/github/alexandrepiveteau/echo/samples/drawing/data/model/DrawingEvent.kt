@@ -1,6 +1,5 @@
 @file:OptIn(
     ExperimentalSerializationApi::class,
-    ExperimentalUnsignedTypes::class,
 )
 @file:UseSerializers(
     ColorSerializer::class,

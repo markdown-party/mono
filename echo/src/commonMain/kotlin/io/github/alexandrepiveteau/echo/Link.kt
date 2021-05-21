@@ -1,5 +1,4 @@
 @file:OptIn(
-    ExperimentalCoroutinesApi::class,
     ExperimentalTypeInference::class,
 )
 

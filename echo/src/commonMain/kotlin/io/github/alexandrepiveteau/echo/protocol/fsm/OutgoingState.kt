@@ -1,4 +1,3 @@
-@file:OptIn(InternalCoroutinesApi::class)
 @file:Suppress("SameParameterValue")
 
 package io.github.alexandrepiveteau.echo.protocol.fsm
@@ -10,7 +9,6 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
 
 /**
@@ -45,7 +43,6 @@ private data class OutgoingAdvertising<T, C>(
     private val available: PersistentList<SiteIdentifier>,
 ) : OutgoingState<T, C>() {
 
-  @OptIn(InternalCoroutinesApi::class)
   override suspend fun OutgoingStepScope<T, C>.step(
       log: ImmutableEventLog<T, C>,
   ): Effect<OutgoingState<T, C>> =

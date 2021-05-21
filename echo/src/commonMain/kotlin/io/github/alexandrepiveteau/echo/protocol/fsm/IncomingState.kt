@@ -1,4 +1,3 @@
-@file:OptIn(InternalCoroutinesApi::class)
 @file:Suppress("SameParameterValue")
 
 package io.github.alexandrepiveteau.echo.protocol.fsm
@@ -14,7 +13,6 @@ import io.github.alexandrepiveteau.echo.protocol.fsm.Effect.Move
 import io.github.alexandrepiveteau.echo.protocol.fsm.Effect.Terminate
 import io.github.alexandrepiveteau.echo.util.plusBoundOverflows
 import kotlinx.collections.immutable.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.selects.select
 
 /**

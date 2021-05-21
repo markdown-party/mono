@@ -15,7 +15,6 @@ internal inline fun Int.plusBoundOverflows(other: Int): Int {
 }
 
 /** Adds two [UInt], bounding the result to [UInt.MAX_VALUE] on overflow. */
-@ExperimentalUnsignedTypes
 internal inline fun UInt.plusBoundOverflows(other: UInt): UInt {
   val result = this + other
   if (result < this || result < other) return UInt.MAX_VALUE
@@ -35,7 +34,6 @@ internal inline fun Long.plusBoundOverflows(other: Long): Long {
 }
 
 /** Adds two [ULong], bounding the result to [ULong.MAX_VALUE] on overflow. */
-@ExperimentalUnsignedTypes
 internal inline fun ULong.plusBoundOverflows(other: ULong): ULong {
   val result = this + other
   if (result < this || result < other) return ULong.MAX_VALUE
