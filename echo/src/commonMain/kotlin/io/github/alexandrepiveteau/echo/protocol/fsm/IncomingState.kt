@@ -141,10 +141,9 @@ private data class IncomingSending<T, C>(
             .filter { (_, credits) -> credits > 0U }
             .filter { (site, _) -> site in advertised }
             .mapNotNull { (site, _) ->
-              nextSequenceNumberPerSite[site]?.let { log.events(site, it) }
+              nextSequenceNumberPerSite[site]?.let { log.events(site, it).firstOrNull() }
             }
-            .flatten()
-            .firstOrNull()
+            .minByOrNull { it.identifier }
             ?: return null
 
     return Inc.Event(
