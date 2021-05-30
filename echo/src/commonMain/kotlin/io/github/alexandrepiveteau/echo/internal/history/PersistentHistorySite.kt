@@ -15,8 +15,10 @@ import io.github.alexandrepiveteau.echo.protocol.fsm.Effect
 import io.github.alexandrepiveteau.echo.protocol.fsm.IncomingState
 import io.github.alexandrepiveteau.echo.protocol.fsm.OutgoingState
 import io.github.alexandrepiveteau.echo.protocol.fsm.State
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.yield
 
@@ -91,7 +93,7 @@ internal open class PersistentHistorySite<T, M, C>(
   private fun <I, O, S : State<I, O, T, C, S>> exchange(initial: S) =
       channelLink<I, O> { inc ->
         var state = initial
-        val insertions = current.map { it.current.log }.produceIn(this)
+        val insertions = current.map { it.current.log }.buffer(Channel.CONFLATED).produceIn(this)
 
         // Give the producer a chance to issue closed events.
         yield()
