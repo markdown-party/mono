@@ -1,5 +1,6 @@
-package io.github.alexandrepiveteau.echo.core
+package io.github.alexandrepiveteau.echo.core.internal
 
+import io.github.alexandrepiveteau.echo.core.Performance
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.measureTime
@@ -19,6 +20,7 @@ class PerfTest {
     assertEquals(0x12345678, packBytes(0x12, 0x34, 0x56, 0x78))
   }
 
+  @Performance
   @Test
   fun testPerf() {
     val time = measureTime {
