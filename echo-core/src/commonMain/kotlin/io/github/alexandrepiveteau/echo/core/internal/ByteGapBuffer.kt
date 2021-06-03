@@ -155,6 +155,6 @@ internal class ByteGapBuffer {
         index++
       }
     }
-    return "EventLog(start=$gapStart, end=$gapEnd, data=[${content}])"
+    return "ByteGapBuffer(start=$gapStart, end=$gapEnd, data=[${content}])"
   }
 }
