@@ -11,4 +11,4 @@ internal const val DefaultGapBufferSize = 32
  */
 @MustBeDocumented
 @RequiresOptIn(level = WARNING, message = "This API is low-level and requires cautious usage.")
-annotation class DelicateGapBufferApi
+internal annotation class DelicateGapBufferApi

@@ -90,6 +90,12 @@ internal class IntGapBuffer {
         else -> Unit
       }
 
+  /** Clears this [IntGapBuffer] and removes all its content. */
+  fun clear() {
+    gapStart = 0
+    gapEnd = events.size
+  }
+
   // DELICATE BUFFER MANAGEMENT
 
   /**

@@ -52,4 +52,15 @@ class ByteGapBufferTest {
         assertEquals(3, get(2))
         assertEquals(4, size)
       }
+
+  @Test
+  fun emptyBuffer_clear_empties(): Unit =
+      with(ByteGapBuffer()) {
+        push(4)
+        clear()
+        assertEquals(0, size)
+        push(5)
+        assertEquals(5, get(0))
+        assertEquals(1, size)
+      }
 }

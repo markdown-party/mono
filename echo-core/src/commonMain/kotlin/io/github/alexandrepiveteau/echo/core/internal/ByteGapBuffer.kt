@@ -90,6 +90,12 @@ internal class ByteGapBuffer {
         else -> Unit
       }
 
+  /** Clears this [ByteGapBuffer] and removes all its content. */
+  fun clear() {
+    gapStart = 0
+    gapEnd = events.size
+  }
+
   // DELICATE BUFFER MANAGEMENT
 
   /**
