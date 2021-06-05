@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.core
 
 import io.github.alexandrepiveteau.echo.core.internal.ByteGapBuffer
+import io.github.alexandrepiveteau.echo.core.internal.EventIdentifierGapBuffer
 import io.github.alexandrepiveteau.echo.core.internal.IntGapBuffer
 
 /**
@@ -13,6 +14,7 @@ class EventLog {
 
   /** The [ByteGapBuffer] in which the events are individually managed. */
   private val events = ByteGapBuffer()
+  private val identifiers = EventIdentifierGapBuffer()
   private val sizes = IntGapBuffer()
 
   init {}
@@ -26,6 +28,7 @@ class EventLog {
   /** Clears this [EventLog], removing all the contained operations. */
   fun clear() {
     events.clear()
+    identifiers.clear()
     sizes.clear()
   }
 }

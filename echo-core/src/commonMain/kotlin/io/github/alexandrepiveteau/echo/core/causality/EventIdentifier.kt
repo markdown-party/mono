@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core
+package io.github.alexandrepiveteau.echo.core.causality
 
 import io.github.alexandrepiveteau.echo.core.internal.packInts
 import io.github.alexandrepiveteau.echo.core.internal.unpackInt1
@@ -27,7 +27,7 @@ fun EventIdentifier(
 @JvmInline
 value class EventIdentifier
 internal constructor(
-    private val packed: Long,
+    internal val packed: Long,
 ) {
 
   init {

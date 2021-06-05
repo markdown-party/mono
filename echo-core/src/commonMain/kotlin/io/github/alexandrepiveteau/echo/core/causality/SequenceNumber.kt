@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core
+package io.github.alexandrepiveteau.echo.core.causality
 
 import kotlin.jvm.JvmInline
 
