@@ -43,10 +43,9 @@ internal constructor(
   /** Creates an iterator over the elements of the array. */
   operator fun iterator(): EventIdentifierIterator = ActualEventIdentifier(backing.iterator())
 
-  @JvmInline
-  private value class ActualEventIdentifier(
+  private class ActualEventIdentifier(
       private val backing: LongIterator,
-  ) : EventIdentifierIterator {
+  ) : EventIdentifierIterator() {
     override fun hasNext(): Boolean = backing.hasNext()
     override fun nextEventIdentifier(): EventIdentifier = EventIdentifier(backing.nextLong())
   }
