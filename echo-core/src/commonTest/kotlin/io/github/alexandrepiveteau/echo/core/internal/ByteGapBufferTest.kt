@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.internal
 
+import io.github.alexandrepiveteau.echo.core.internal.buffer.ByteGapBuffer
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 
@@ -17,6 +19,7 @@ class ByteGapBufferTest {
         assertFails { remove(0) }
         assertFails { remove(Int.MIN_VALUE) }
         assertFails { remove(Int.MAX_VALUE) }
+        assertContentEquals(byteArrayOf(), toArray())
       }
 
   @Test
@@ -28,6 +31,7 @@ class ByteGapBufferTest {
         assertFails { get(1) }
         assertEquals(4, remove(0))
         assertEquals(0, size)
+        assertContentEquals(byteArrayOf(), toArray())
       }
 
   @Test
@@ -39,6 +43,7 @@ class ByteGapBufferTest {
         assertEquals(2, get(0))
         assertEquals(1, get(1))
         assertEquals(3, get(2))
+        assertContentEquals(byteArrayOf(2, 1, 3), toArray())
       }
 
   @Test
@@ -51,6 +56,7 @@ class ByteGapBufferTest {
         assertEquals(1, get(1))
         assertEquals(3, get(2))
         assertEquals(4, size)
+        assertContentEquals(byteArrayOf(2, 1, 3, 4), toArray())
       }
 
   @Test
@@ -62,5 +68,14 @@ class ByteGapBufferTest {
         push(5)
         assertEquals(5, get(0))
         assertEquals(1, size)
+        assertContentEquals(byteArrayOf(5), toArray())
+      }
+
+  @Test
+  fun emptyBuffer_insertionsOutOfOrder(): Unit =
+      with(ByteGapBuffer()) {
+        push(byteArrayOf(1, 2, 3, 4))
+        push(byteArrayOf(5, 6, 7, 8), index = 0)
+        assertContentEquals(byteArrayOf(5, 6, 7, 8, 1, 2, 3, 4), toArray())
       }
 }

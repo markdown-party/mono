@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core.internal.buffer
 
 /**
  * An [ByteGapBuffer] is a high-performance mutable list of bytes, which are concatenated one after
@@ -48,6 +48,7 @@ internal class ByteGapBuffer {
     while (this.capacity < capacity) {
       // Evaluate new size.
       var newSize = events.size * 2
+      if (newSize == 0) newSize = DefaultGapBufferSize
       if (newSize < 0) newSize = Int.MAX_VALUE // Avoid overflows.
 
       // Adjust pointers.
@@ -73,6 +74,24 @@ internal class ByteGapBuffer {
       events[index]
     } else {
       events[index + capacity]
+    }
+  }
+
+  /** Sets the value at the provided index in the [events] buffer. */
+  operator fun set(index: Int, value: Byte) {
+    if (index < 0 || index >= events.size - capacity) throw IndexOutOfBoundsException()
+    return if (index < gapStart) {
+      events[index] = value
+    } else {
+      events[index + capacity] = value
+    }
+  }
+
+  /** Returns an [ByteArray] that contains a copy of the events from this buffer. */
+  fun toArray(): ByteArray {
+    return ByteArray(size).apply {
+      events.copyInto(this, 0, startIndex = 0, endIndex = gapStart)
+      events.copyInto(this, gapStart, startIndex = gapEnd, endIndex = events.size)
     }
   }
 
@@ -151,16 +170,7 @@ internal class ByteGapBuffer {
    * be prefixed by a '*' symbol.
    */
   override fun toString(): String {
-    val content = buildString {
-      var index = 0
-      val gap = gapStart..gapEnd
-      while (index < events.size) {
-        if (index in gap) append('*')
-        append(events[index])
-        if (index != events.size - 1) append(", ")
-        index++
-      }
-    }
+    val content = bufferToString(events.toTypedArray(), gapStart until gapEnd)
     return "ByteGapBuffer(start=$gapStart, end=$gapEnd, data=[${content}])"
   }
 }

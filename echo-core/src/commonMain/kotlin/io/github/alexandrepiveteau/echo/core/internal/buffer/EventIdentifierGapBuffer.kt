@@ -1,11 +1,17 @@
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core.internal.buffer
+
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
+import io.github.alexandrepiveteau.echo.core.causality.copyInto
+import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
 
 /**
- * An [IntGapBuffer] is a high-performance mutable list of integers, which are concatenated one
- * after each other in a contiguous [IntArray]. An [IntGapBuffer] is optimized for consecutive
- * insertions and removals at the same index.
+ * An [EventIdentifierGapBuffer] is a high-performance mutable list of event identifiers, which are
+ * concatenated one after each other in a contiguous [EventIdentifierArray]. A
+ * [EventIdentifierGapBuffer] is optimized for consecutive insertions and removals at the same
+ * index.
  */
-internal class IntGapBuffer {
+internal class EventIdentifierGapBuffer {
 
   /** The index at which new events should be inserted in the [events] array. */
   private var gapStart: Int = 0
@@ -13,12 +19,12 @@ internal class IntGapBuffer {
   /** The index at which the insertion gap ends, non-inclusive. */
   private var gapEnd: Int = DefaultGapBufferSize
 
-  /** A contiguous sequence of ints, representing the events in the log. */
-  private var events = IntArray(DefaultGapBufferSize)
+  /** A contiguous sequence of event identifiers, representing the ids of the events in the log. */
+  private var events = EventIdentifierArray(DefaultGapBufferSize)
 
   // LOW-LEVEL GAP BUFFER
 
-  /** How many [Int] can be written without having to re-grow the backing array. */
+  /** How many [EventIdentifier] can be written without having to re-grow the backing array. */
   private val capacity: Int
     get() = gapEnd - gapStart
 
@@ -48,6 +54,7 @@ internal class IntGapBuffer {
     while (this.capacity < capacity) {
       // Evaluate new size.
       var newSize = events.size * 2
+      if (newSize == 0) newSize = DefaultGapBufferSize
       if (newSize < 0) newSize = Int.MAX_VALUE // Avoid overflows.
 
       // Adjust pointers.
@@ -55,7 +62,7 @@ internal class IntGapBuffer {
       val newEnd = newSize - (events.size - gapEnd)
 
       // Create and batch copy data in the buffer.
-      val buffer = IntArray(newSize)
+      val buffer = EventIdentifierArray(newSize)
       events.copyInto(buffer, 0, startIndex = 0, endIndex = gapStart)
       events.copyInto(buffer, newEnd, startIndex = gapEnd, endIndex = events.size)
 
@@ -66,13 +73,31 @@ internal class IntGapBuffer {
     }
   }
 
-  /** Returns the [Int] at the given [index] in the [events] buffer. */
-  operator fun get(index: Int): Int {
+  /** Returns the [EventIdentifier] at the given [index] in the [events] buffer. */
+  operator fun get(index: Int): EventIdentifier {
     if (index < 0 || index >= events.size - capacity) throw IndexOutOfBoundsException()
     return if (index < gapStart) {
       events[index]
     } else {
       events[index + capacity]
+    }
+  }
+
+  /** Sets the value at the provided index in the [events] buffer. */
+  operator fun set(index: Int, value: EventIdentifier) {
+    if (index < 0 || index >= events.size - capacity) throw IndexOutOfBoundsException()
+    return if (index < gapStart) {
+      events[index] = value
+    } else {
+      events[index + capacity] = value
+    }
+  }
+
+  /** Returns an [EventIdentifierArray] that contains a copy of the events from this buffer. */
+  fun toArray(): EventIdentifierArray {
+    return EventIdentifierArray(size).apply {
+      events.copyInto(this, 0, startIndex = 0, endIndex = gapStart)
+      events.copyInto(this, gapStart, startIndex = gapEnd, endIndex = events.size)
     }
   }
 
@@ -90,7 +115,7 @@ internal class IntGapBuffer {
         else -> Unit
       }
 
-  /** Clears this [IntGapBuffer] and removes all its content. */
+  /** Clears this [EventIdentifierGapBuffer] and removes all its content. */
   fun clear() {
     gapStart = 0
     gapEnd = events.size
@@ -99,9 +124,9 @@ internal class IntGapBuffer {
   // DELICATE BUFFER MANAGEMENT
 
   /**
-   * The "cursor" index, represented as the start of the gap. Inserting before the first int results
-   * in a cursor value of 0, and inserting at the end of the sequence results in a cursor value of
-   * [size]
+   * The "cursor" index, represented as the start of the gap. Inserting before the first event
+   * identifier results in a cursor value of 0, and inserting at the end of the sequence results in
+   * a cursor value of [size]
    */
   val cursor: Int
     @DelicateGapBufferApi get() = gapStart
@@ -121,46 +146,37 @@ internal class IntGapBuffer {
   val size: Int
     get() = events.size - capacity
 
-  /** Pushes a single [Int] onto the [events] buffer, at the provided index. */
-  fun push(int: Int, index: Int = size) {
+  /** Pushes a single [EventIdentifier] onto the [events] buffer, at the provided index. */
+  fun push(identifier: EventIdentifier, index: Int = size) {
     if (index < 0 || index > size) throw IndexOutOfBoundsException()
     grow(capacity = 1)
     move(index)
-    events[gapStart++] = int
+    events[gapStart++] = identifier
   }
 
-  /** Pushes a [IntArray] onto the [events] buffer, at the provided index. */
-  fun push(ints: IntArray, index: Int = size) {
+  /** Pushes a [EventIdentifierArray] onto the [events] buffer, at the provided index. */
+  fun push(identifiers: EventIdentifierArray, index: Int = size) {
     if (index < 0 || index > size) throw IndexOutOfBoundsException()
-    grow(capacity = ints.size)
+    grow(capacity = identifiers.size)
     move(index)
-    for (int in ints) {
-      events[gapStart++] = int
+    for (identifier in identifiers) {
+      events[gapStart++] = identifier
     }
   }
 
   /** Removes the element at the given [index] from the gap buffer. */
-  fun remove(index: Int): Int {
+  fun remove(index: Int): EventIdentifier {
     if (index < 0 || index >= size) throw IndexOutOfBoundsException()
     move(index)
     return events[gapEnd++]
   }
 
   /**
-   * Outputs a [String] representation of the [IntGapBuffer]. Ints which are part of the gap will be
-   * prefixed by a '*' symbol.
+   * Outputs a [String] representation of the [EventIdentifierGapBuffer]. EventIdentifiers which are
+   * part of the gap will be prefixed by a '*' symbol.
    */
   override fun toString(): String {
-    val content = buildString {
-      var index = 0
-      val gap = gapStart..gapEnd
-      while (index < events.size) {
-        if (index in gap) append('*')
-        append(events[index])
-        if (index != events.size - 1) append(", ")
-        index++
-      }
-    }
-    return "IntGapBuffer(start=$gapStart, end=$gapEnd, data=[${content}])"
+    val content = bufferToString(events.toTypedArray(), gapStart until gapEnd)
+    return "EventIdentifierGapBuffer(start=$gapStart, end=$gapEnd, data=[${content}])"
   }
 }

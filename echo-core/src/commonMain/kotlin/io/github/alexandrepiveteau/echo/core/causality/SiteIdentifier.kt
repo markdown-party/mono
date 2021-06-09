@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.core.causality
 
 import kotlin.jvm.JvmInline
 import kotlin.random.Random
+import kotlin.random.nextUInt
 
 /**
  * A [SiteIdentifier] is a unique identifier amongst all the sites in a distributed system. Two
@@ -10,7 +11,7 @@ import kotlin.random.Random
 @JvmInline
 value class SiteIdentifier
 internal constructor(
-  internal val unique: Int,
+    @PublishedApi internal val unique: UInt,
 ) {
   companion object {
 
@@ -20,24 +21,40 @@ internal constructor(
      *
      * Using a dedicated value rather than an optional avoids auto-boxing.
      */
-    val None: SiteIdentifier = SiteIdentifier(Int.MAX_VALUE)
+    val Unspecified: SiteIdentifier = SiteIdentifier(0U)
   }
 }
 
+/** `false` when this is [SiteIdentifier.Unspecified]. */
+inline val SiteIdentifier.isSpecified: Boolean
+  get() = unique != SiteIdentifier.Unspecified.unique
+
+/** `true` when this is [SiteIdentifier.Unspecified]. */
+inline val SiteIdentifier.isUnspecified: Boolean
+  get() = unique == SiteIdentifier.Unspecified.unique
+
+/**
+ * If this [SiteIdentifier] [isSpecified] then this is returned, otherwise [block] is executed and
+ * its result is returned.
+ */
+inline fun SiteIdentifier.takeOrElse(block: () -> SiteIdentifier): SiteIdentifier =
+    if (isSpecified) this else block()
+
 /** Creates a [SiteIdentifier] from the current [Int]. */
-fun Int.toSiteIdentifier(): SiteIdentifier {
+fun UInt.toSiteIdentifier(): SiteIdentifier {
   return SiteIdentifier(this)
 }
 
-/** Creates an [Int] from the current [SiteIdentifier]. */
-fun SiteIdentifier.toInt(): Int {
+/** Creates an [UInt] from the current [SiteIdentifier]. */
+fun SiteIdentifier.toUInt(): UInt {
   return this.unique
 }
 
 /**
  * Gets the next random [SiteIdentifier] from the random number generator. It is guaranteed not to
- * be [SiteIdentifier.None].
+ * be [SiteIdentifier.Unspecified].
  */
 fun Random.nextSiteIdentifier(): SiteIdentifier {
-  return SiteIdentifier(nextInt(until = Int.MAX_VALUE))
+  // In range [0, UInt.MAX_VALUE), then shifted right by one.
+  return SiteIdentifier(nextUInt(until = UInt.MAX_VALUE) + 1U)
 }

@@ -12,7 +12,7 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class SequenceNumber
 internal constructor(
-  internal val index: UInt,
+    @PublishedApi internal val index: UInt,
 ) {
 
   /** Increments this value. */
@@ -27,13 +27,44 @@ internal constructor(
 
   companion object {
 
-    /** The minimum possible value for a [SequenceNumber]. */
-    val MIN_VALUE = SequenceNumber(UInt.MIN_VALUE)
+    /**
+     * A sentinel value used to initialize a non-null parameter. It also has the property of being
+     * the smallest [SequenceNumber], so [maxOf] will always return the other choice.
+     */
+    val Unspecified = SequenceNumber(UInt.MIN_VALUE)
+
+    /**
+     * The minimum possible value for a [SequenceNumber]. Events may not be assigned a value smaller
+     * than that.
+     */
+    val Min = SequenceNumber(UInt.MIN_VALUE + 1U)
 
     /** The maximum possible value for a [SequenceNumber]. */
-    val MAX_VALUE = SequenceNumber(UInt.MAX_VALUE)
+    val Max = SequenceNumber(UInt.MAX_VALUE)
   }
 }
+
+/** Returns the maximum [SequenceNumber] in a pair. */
+fun maxOf(a: SequenceNumber, b: SequenceNumber): SequenceNumber = if (a >= b) a else b
+
+/** Returns the maximum [SequenceNumber] in a pair. */
+fun maxOf(a: SequenceNumber, b: SequenceNumber, c: SequenceNumber): SequenceNumber =
+    maxOf(a, maxOf(b, c))
+
+/** `false` when this is [SequenceNumber.Unspecified]. */
+inline val SequenceNumber.isSpecified: Boolean
+  get() = index != SequenceNumber.Unspecified.index
+
+/** `true` when this is [SequenceNumber.Unspecified]. */
+inline val SequenceNumber.isUnspecified: Boolean
+  get() = index == SequenceNumber.Unspecified.index
+
+/**
+ * If this [SequenceNumber] [isSpecified] then this is returned, otherwise [block] is executed and
+ * its result is returned.
+ */
+inline fun SequenceNumber.takeOrElse(block: () -> SequenceNumber): SequenceNumber =
+    if (isSpecified) this else block()
 
 /** Creates a [SequenceNumber] from a [UInt]. */
 fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)

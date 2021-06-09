@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.internal
 
 import io.github.alexandrepiveteau.echo.core.Performance
+import io.github.alexandrepiveteau.echo.core.internal.buffer.ByteGapBuffer
 import kotlin.test.Test
 import kotlin.time.measureTime
 

@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.internal
 
 import io.github.alexandrepiveteau.echo.core.Performance
+import io.github.alexandrepiveteau.echo.core.internal.buffer.ByteGapBuffer
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals

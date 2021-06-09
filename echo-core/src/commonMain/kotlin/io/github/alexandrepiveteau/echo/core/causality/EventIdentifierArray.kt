@@ -15,7 +15,10 @@ internal constructor(
     internal val backing: LongArray,
 ) {
 
-  /** Creates a new array of the specified [size], with all elements initialized to zero. */
+  /**
+   * Creates a new array of the specified [size], with all elements initialized to
+   * [EventIdentifier.Unspecified].
+   */
   constructor(size: Int) : this(LongArray(size))
 
   /** Returns the number of elements in the array. */
@@ -84,3 +87,8 @@ fun EventIdentifierArray.copyInto(
             endIndex = endIndex,
         ),
     )
+
+/** Returns a typed object array containing all of the elements of this primitive array. */
+fun EventIdentifierArray.toTypedArray(): Array<EventIdentifier> {
+  return Array(size, this::get)
+}
