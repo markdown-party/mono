@@ -4,6 +4,15 @@ package io.github.alexandrepiveteau.echo.core.internal.buffer
 fun mutableByteGapBufferOf(): MutableByteGapBuffer = MutableByteGapBufferImpl()
 
 /**
+ * Creates a [MutableByteGapBuffer] with a given [size], where each cell is init at zero.
+ *
+ * @throws IllegalArgumentException if the size is negative.
+ */
+fun MutableByteGapBuffer(size: Int): MutableByteGapBuffer {
+  return MutableByteGapBuffer(size) { 0 }
+}
+
+/**
  * Creates a [MutableByteGapBuffer] with a given [size], where each item is [init].
  *
  * @throws IllegalArgumentException if the size is negative.
