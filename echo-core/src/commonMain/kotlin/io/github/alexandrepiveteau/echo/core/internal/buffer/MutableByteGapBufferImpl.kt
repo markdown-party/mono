@@ -179,7 +179,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     if (endOffset == startOffset) return bytes
 
     // We have to perform two chunk copies of the buffer, for the elements located before the gap,
-    // and for the elements localed after the gap.
+    // and for the elements located after the gap.
     return bytes.apply {
       buffer.copyInto(this, destinationOffset, startOffset, startIndex)
       buffer.copyInto(bytes, destinationOffset - startOffset + startIndex, endIndex, buffer.size)
