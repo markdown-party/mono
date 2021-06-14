@@ -1,8 +1,5 @@
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core.buffer
 
-import io.github.alexandrepiveteau.echo.core.internal.buffer.mutableByteGapBufferOf
-import io.github.alexandrepiveteau.echo.core.internal.buffer.toByteArray
-import io.github.alexandrepiveteau.echo.core.internal.buffer.toTypedArray
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -17,7 +14,7 @@ class MutableByteGapBufferEmptyTest {
       assertFails { get(0) }
       assertFails { set(offset = 0, 0) }
       assertEquals(0, gap.startIndex)
-      assertEquals(io.github.alexandrepiveteau.echo.core.internal.buffer.Gap.DefaultSize, gap.endIndex)
+      assertEquals(Gap.DefaultSize, gap.endIndex)
       assertContentEquals(byteArrayOf(), toByteArray())
       assertContentEquals(emptyArray(), toTypedArray())
     }

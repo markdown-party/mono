@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core.internal.buffer
+package io.github.alexandrepiveteau.echo.core.buffer
 
 /** Creates an empty [MutableByteGapBuffer]. */
 fun mutableByteGapBufferOf(): MutableByteGapBuffer = MutableByteGapBufferImpl()

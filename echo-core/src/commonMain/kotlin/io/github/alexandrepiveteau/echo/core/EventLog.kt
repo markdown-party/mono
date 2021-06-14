@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.core
 
+import io.github.alexandrepiveteau.echo.core.internal.buffer.DelicateGapBufferApi
+import io.github.alexandrepiveteau.echo.core.buffer.mutableByteGapBufferOf
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.internal.buffer.*
 

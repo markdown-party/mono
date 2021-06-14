@@ -1,9 +1,5 @@
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core.buffer
 
-import io.github.alexandrepiveteau.echo.core.internal.buffer.Gap
-import io.github.alexandrepiveteau.echo.core.internal.buffer.MutableByteGapBuffer
-import io.github.alexandrepiveteau.echo.core.internal.buffer.mutableByteGapBufferOf
-import io.github.alexandrepiveteau.echo.core.internal.buffer.toByteArray
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

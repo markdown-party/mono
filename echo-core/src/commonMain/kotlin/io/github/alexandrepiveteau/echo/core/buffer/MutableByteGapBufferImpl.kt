@@ -1,5 +1,6 @@
-package io.github.alexandrepiveteau.echo.core.internal.buffer
+package io.github.alexandrepiveteau.echo.core.buffer
 
+import io.github.alexandrepiveteau.echo.core.internal.buffer.bufferToString
 import io.github.alexandrepiveteau.echo.core.internal.requireIn
 import kotlin.math.max
 

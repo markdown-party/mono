@@ -1,7 +1,5 @@
 package io.github.alexandrepiveteau.echo.core.internal.buffer
 
-import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
-
 /**
  * An [IntGapBuffer] is a high-performance mutable list of integers, which are concatenated one
  * after each other in a contiguous [IntArray]. An [IntGapBuffer] is optimized for consecutive

@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core.internal.buffer
+package io.github.alexandrepiveteau.echo.core.buffer
 
 /** An interface representing the [Gap] from a gap buffer. */
 interface Gap {
