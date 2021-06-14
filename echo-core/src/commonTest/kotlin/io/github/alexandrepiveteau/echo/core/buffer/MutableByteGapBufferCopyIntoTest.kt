@@ -40,7 +40,7 @@ class MutableByteGapBufferCopyIntoTest {
       assertContentEquals(
           byteArrayOf(7, 0),
           copyInto(
-              bytes = ByteArray(2) { 7 },
+              array = ByteArray(2) { 7 },
               destinationOffset = 1,
               startOffset = 0,
               endOffset = 1,
@@ -48,7 +48,7 @@ class MutableByteGapBufferCopyIntoTest {
       assertContentEquals(
           byteArrayOf(7, 2),
           copyInto(
-              bytes = ByteArray(2) { 7 },
+              array = ByteArray(2) { 7 },
               destinationOffset = 1,
               startOffset = 2,
               endOffset = 3,

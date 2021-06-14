@@ -44,7 +44,7 @@ interface MutableByteGapBuffer {
    * This operation may move the gap.
    */
   fun push(
-      byte: Byte,
+      value: Byte,
       offset: Int = size,
   )
 
@@ -54,23 +54,23 @@ interface MutableByteGapBuffer {
    * This operation may move the gap.
    */
   fun push(
-      bytes: ByteArray,
+      array: ByteArray,
       offset: Int = size,
       startIndex: Int = 0,
-      endIndex: Int = bytes.size,
+      endIndex: Int = array.size,
   )
 
   /**
    * Copies from the gap buffer into the provided [ByteArray].
    *
-   * @param bytes the [ByteArray] into which data should be copied.
+   * @param array the [ByteArray] into which data should be copied.
    * @param destinationOffset the destination index at which the copy starts.
    * @param startOffset the offset at which copy starts, in the gap buffer.
    *
    * This operation may move the gap.
    */
   fun copyInto(
-      bytes: ByteArray,
+      array: ByteArray,
       destinationOffset: Int = 0,
       startOffset: Int = 0,
       endOffset: Int = size,

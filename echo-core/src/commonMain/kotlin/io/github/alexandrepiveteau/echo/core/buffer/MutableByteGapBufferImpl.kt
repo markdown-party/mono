@@ -132,7 +132,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     this.buffer[offsetToIndex(offset)] = value
   }
 
-  override fun push(byte: Byte, offset: Int) {
+  override fun push(value: Byte, offset: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size + 1)
 
@@ -142,14 +142,14 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     // The ordering of growing then moving matters.
     grow(nextSize(capacity = 1))
     move(to = offset)
-    this.buffer[this.startIndex++] = byte
+    this.buffer[this.startIndex++] = value
   }
 
-  override fun push(bytes: ByteArray, offset: Int, startIndex: Int, endIndex: Int) {
+  override fun push(array: ByteArray, offset: Int, startIndex: Int, endIndex: Int) {
     // Range preconditions
     require(endIndex >= startIndex)
-    requireIn(startIndex, 0, bytes.size + 1)
-    requireIn(endIndex, 0, bytes.size + 1)
+    requireIn(startIndex, 0, array.size + 1)
+    requireIn(endIndex, 0, array.size + 1)
     requireIn(offset, 0, this.size + 1)
 
     // Optimizations.
@@ -160,25 +160,25 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     // at the current cursor position. Finally, the startIndex is incremented.
     grow(nextSize(capacity = endIndex - startIndex))
     move(to = offset)
-    bytes.copyInto(this.buffer, offset, startIndex, endIndex)
+    array.copyInto(this.buffer, offset, startIndex, endIndex)
     this.startIndex += (endIndex - startIndex)
   }
 
   override fun copyInto(
-      bytes: ByteArray,
-      destinationOffset: Int,
-      startOffset: Int,
-      endOffset: Int
+    array: ByteArray,
+    destinationOffset: Int,
+    startOffset: Int,
+    endOffset: Int
   ): ByteArray {
     // Preconditions.
-    requireIn(destinationOffset, 0, bytes.size + 1)
-    require(destinationOffset + endOffset - startOffset in 0..bytes.size)
+    requireIn(destinationOffset, 0, array.size + 1)
+    require(destinationOffset + endOffset - startOffset in 0..array.size)
     requireIn(startOffset, 0, this.size + 1)
     requireIn(endOffset, 0, this.size + 1)
     require(startOffset <= endOffset)
 
     // Optimizations.
-    if (endOffset == startOffset) return bytes
+    if (endOffset == startOffset) return array
 
     // We have to perform two chunk copies of the buffer, for the elements located before the gap,
     // and for the elements located after the gap.
@@ -199,7 +199,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     // the gap will be skilled
     // #skipAfter elements will be skipped, at least 0
     // #after elements will be taken, at least 0
-    return bytes.apply {
+    return array.apply {
       buffer.copyInto(
           this,
           destinationOffset,
