@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.internal.buffer
 
 import io.github.alexandrepiveteau.echo.core.internal.requireIn
+import kotlin.math.max
 
 /**
  * An implementation of [MutableByteGapBuffer]. The class implements [Gap] to avoid additional
@@ -180,9 +181,36 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
     // We have to perform two chunk copies of the buffer, for the elements located before the gap,
     // and for the elements located after the gap.
+    //
+    // It's important to account for the fact that the required range may stop before the gap, and
+    // that it may not extend up to the end of the buffer. Therefore, the input array has 4 indices
+    // calculated, with the following pattern when copying bytes :
+
+    val before = max(0, startIndex - startOffset)
+    val skipBefore = max(0, startIndex - endOffset)
+    val skipAfter = max(0, startOffset - endIndex)
+    val after = max(0, endOffset - startOffset - (before - skipBefore))
+
+    // Pattern :
+    //
+    // #before elements will be taken, at least 0
+    // #skipBefore elements will be skipped, at least 0
+    // the gap will be skilled
+    // #skipAfter elements will be skipped, at least 0
+    // #after elements will be taken, at least 0
     return bytes.apply {
-      buffer.copyInto(this, destinationOffset, startOffset, startIndex)
-      buffer.copyInto(bytes, destinationOffset - startOffset + startIndex, endIndex, buffer.size)
+      buffer.copyInto(
+          this,
+          destinationOffset,
+          startIndex - before,
+          startIndex - skipBefore,
+      )
+      buffer.copyInto(
+          this,
+          destinationOffset + (before - skipBefore),
+          endIndex + skipAfter,
+          endIndex + after,
+      )
     }
   }
 
