@@ -21,7 +21,7 @@ class MutableByteGapBufferRemoveTest {
   @Test
   fun simple() {
     with(MutableByteGapBuffer(1)) {
-      assertContentEquals(byteArrayOf(1), remove(0))
+      assertContentEquals(byteArrayOf(0), remove(0))
       assertEquals(0, size)
     }
   }
