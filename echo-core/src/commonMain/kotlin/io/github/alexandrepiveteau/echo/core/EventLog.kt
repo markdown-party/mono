@@ -1,10 +1,7 @@
 package io.github.alexandrepiveteau.echo.core
 
 import io.github.alexandrepiveteau.echo.core.causality.*
-import io.github.alexandrepiveteau.echo.core.internal.buffer.ByteGapBuffer
-import io.github.alexandrepiveteau.echo.core.internal.buffer.DelicateGapBufferApi
-import io.github.alexandrepiveteau.echo.core.internal.buffer.EventIdentifierGapBuffer
-import io.github.alexandrepiveteau.echo.core.internal.buffer.IntGapBuffer
+import io.github.alexandrepiveteau.echo.core.internal.buffer.*
 
 /**
  * An [EventLog] is a high-performance mutable list of serialized events, which are concatenated one
@@ -16,8 +13,8 @@ class EventLog {
 
   // INTERNAL STATE
 
-  /** The [ByteGapBuffer] in which the events are individually managed. */
-  private val events = ByteGapBuffer()
+  /** The [MutableByteGapBuffer] in which the events are individually managed. */
+  private val events = mutableByteGapBufferOf()
 
   /** The [EventIdentifierGapBuffer] in which the event identifiers are individually managed. */
   // TODO : Use an optimized (delta + run-length encoding) identifiers buffer.
@@ -42,7 +39,7 @@ class EventLog {
       // If we have at least one event to the left, shift the events buffer by the size of the
       // event, and the identifiers and sizes by minus one.
       val size = sizes[sizes.cursor - 1]
-      events.shift(-size)
+      events.gap.shift(-size)
       identifiers.shift(-1)
       sizes.shift(-1)
     }
@@ -55,7 +52,7 @@ class EventLog {
       // If we are not at the end of the buffer, shift the events buffer by the size of the event,
       // and the identifiers and sizes by one.
       val size = sizes[sizes.cursor]
-      events.shift(size)
+      events.gap.shift(size)
       identifiers.shift(1)
       sizes.shift(1)
     }
@@ -103,23 +100,6 @@ class EventLog {
   }
 
   /**
-   * Uses binary search to find the insertion position of an event with the given [SequenceNumber]
-   * and [SiteIdentifier].
-   */
-  private fun EventIdentifierGapBuffer.binarySearch(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Int {
-    // TODO : Use binary search rather than linear search from start.
-    var position = 0
-    while (true) {
-      if (position == size) return size
-      if (get(position) > EventIdentifier(seqno, site)) return position
-      position++
-    }
-  }
-
-  /**
    * Inserts the provided event in the [EventLog] at the appropriate index. If the event is already
    * present, or an event with the same [SiteIdentifier] has already been inserted, the insertion
    * will simply be ignored.
@@ -128,7 +108,6 @@ class EventLog {
    * @param site the [SiteIdentifier] for the inserted event.
    * @param seqno the [SequenceNumber] for the inserted event.
    */
-  // TODO : Reverse and replay the operation log.
   // TODO : How can we manage changes ?
   @OptIn(DelicateGapBufferApi::class)
   fun insert(
@@ -149,7 +128,7 @@ class EventLog {
     while (position < sizes.cursor) left()
 
     // Find the insertion index, and add the operation.
-    events.push(event, index = events.cursor)
+    events.push(event, offset = events.gap.startIndex)
     identifiers.push(EventIdentifier(seqno, site), index = identifiers.cursor)
     sizes.push(event.size, index = sizes.cursor)
     acknowledge(seqno, site)
