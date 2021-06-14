@@ -19,12 +19,20 @@ interface MutableByteGapBuffer {
   /** Some meta-data about the [Gap]. This may be useful for specific optimizations. */
   val gap: Gap
 
-  /** Gets the [Byte] at the given [offset]. */
+  /**
+   * Gets the [Byte] at the given [offset].
+   *
+   * @throws IllegalArgumentException if the [offset] is out of bounds.
+   */
   operator fun get(
       offset: Int,
   ): Byte
 
-  /** Sets the [Byte] at the given [offset]. */
+  /**
+   * Sets the [Byte] at the given [offset].
+   *
+   * @throws IllegalArgumentException if the [offset] is out of bounds.
+   */
   operator fun set(
       offset: Int,
       value: Byte,

@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.internal.buffer
 
+import io.github.alexandrepiveteau.echo.core.internal.requireIn
+
 /**
  * An implementation of [MutableByteGapBuffer]. The class implements [Gap] to avoid additional
  * allocations when the buffer's [Gap] is fetched.
@@ -19,7 +21,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   /** Converts the given [Int] [offset] into the associated [buffer] index. */
   private fun offsetToIndex(offset: Int): Int {
-    if (offset < 0 || offset >= this.size) throw IndexOutOfBoundsException()
+    requireIn(offset, 0, this.size)
     return if (offset < this.startIndex) offset else offset + this.capacity
   }
 
@@ -53,7 +55,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
    */
   private fun grow(size: Int) {
     // Preconditions.
-    check(size >= this.buffer.size)
+    require(size >= this.buffer.size)
 
     // Optimizations.
     if (size == this.buffer.size) return // fast path
@@ -114,7 +116,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   override fun get(offset: Int): Byte {
     // Preconditions.
-    check(offset in 0 until this.size)
+    requireIn(offset, 0, this.size)
 
     // Convert the indices, without moving the gap.
     return this.buffer[offsetToIndex(offset)]
@@ -122,7 +124,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   override fun set(offset: Int, value: Byte) {
     // Preconditions.
-    check(offset in 0 until this.size)
+    requireIn(offset, 0, this.size)
 
     // Convert the indices, without moving the gap.
     this.buffer[offsetToIndex(offset)] = value
@@ -130,7 +132,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   override fun push(byte: Byte, offset: Int) {
     // Preconditions.
-    check(offset in 0..this.size)
+    requireIn(offset, 0, this.size + 1)
 
     // Grow the buffer by one, then move to the insertion index, and finally insert the new element
     // into the gap by incrementing the startIndex.
@@ -143,10 +145,10 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   override fun push(bytes: ByteArray, offset: Int, startIndex: Int, endIndex: Int) {
     // Range preconditions
-    check(endIndex >= startIndex)
-    check(startIndex in 0..bytes.size)
-    check(endIndex in 0..bytes.size)
-    check(offset in 0..this.size)
+    require(endIndex >= startIndex)
+    requireIn(startIndex, 0, bytes.size + 1)
+    requireIn(endIndex, 0, bytes.size + 1)
+    requireIn(offset, 0, this.size + 1)
 
     // Optimizations.
     if (endIndex == startIndex) return
@@ -167,11 +169,11 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
       endOffset: Int
   ): ByteArray {
     // Preconditions.
-    check(destinationOffset in 0..bytes.size)
-    check(destinationOffset + endOffset - startOffset in 0..bytes.size)
-    check(startOffset in 0..this.size)
-    check(endOffset in 0..this.size)
-    check(startOffset <= endOffset)
+    requireIn(destinationOffset, 0, bytes.size + 1)
+    require(destinationOffset + endOffset - startOffset in 0..bytes.size)
+    requireIn(startOffset, 0, this.size + 1)
+    requireIn(endOffset, 0, this.size + 1)
+    require(startOffset <= endOffset)
 
     // Optimizations.
     if (endOffset == startOffset) return bytes
@@ -186,8 +188,8 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   override fun remove(offset: Int, size: Int): ByteArray {
     // Preconditions.
-    check(offset in 0 until this.size)
-    check(offset + size in 0..this.size)
+    requireIn(offset, 0, this.size)
+    requireIn(offset + size, 0, this.size + 1)
     move(to = offset)
 
     // Increment the endIndex, and then copy the previous size elements from the buffer into the
