@@ -1,8 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.causality
 
-import io.github.alexandrepiveteau.echo.core.internal.packInts
-import io.github.alexandrepiveteau.echo.core.internal.unpackInt1
-import io.github.alexandrepiveteau.echo.core.internal.unpackInt2
+import io.github.alexandrepiveteau.echo.core.packInts
+import io.github.alexandrepiveteau.echo.core.unpackInt1
+import io.github.alexandrepiveteau.echo.core.unpackInt2
 import kotlin.jvm.JvmInline
 
 /**

@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core
 
 // BYTE <-> INT conversions
 

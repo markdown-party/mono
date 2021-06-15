@@ -1,6 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.internal
 
-import io.github.alexandrepiveteau.echo.core.Performance
+import io.github.alexandrepiveteau.echo.core.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.measureTime

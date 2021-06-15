@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalContracts::class)
 @file:Suppress("NOTHING_TO_INLINE")
 
-package io.github.alexandrepiveteau.echo.core.internal
+package io.github.alexandrepiveteau.echo.core
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE

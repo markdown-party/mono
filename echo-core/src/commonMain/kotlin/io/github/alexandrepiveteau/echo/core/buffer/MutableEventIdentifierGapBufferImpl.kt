@@ -4,7 +4,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.copyInto
 import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
-import io.github.alexandrepiveteau.echo.core.internal.requireIn
+import io.github.alexandrepiveteau.echo.core.requireIn
 import kotlin.math.max
 
 /**
