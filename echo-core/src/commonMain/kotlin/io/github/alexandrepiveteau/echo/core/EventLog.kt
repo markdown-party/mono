@@ -1,9 +1,7 @@
 package io.github.alexandrepiveteau.echo.core
 
-import io.github.alexandrepiveteau.echo.core.buffer.mutableByteGapBufferOf
-import io.github.alexandrepiveteau.echo.core.buffer.mutableIntGapBufferOf
+import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
-import io.github.alexandrepiveteau.echo.core.internal.buffer.*
 
 /**
  * An [EventLog] is a high-performance mutable list of serialized events, which are concatenated one
@@ -20,7 +18,7 @@ class EventLog {
 
   /** The [EventIdentifierGapBuffer] in which the event identifiers are individually managed. */
   // TODO : Use an optimized (delta + run-length encoding) identifiers buffer.
-  private val identifiers = EventIdentifierGapBuffer()
+  private val identifiers = mutableEventIdentifierGapBufferOf()
 
   /**
    * The [MutableIntGapBuffer] in which the event sites are individually managed. This is used in
@@ -30,38 +28,35 @@ class EventLog {
 
   // TODO : Use a tree-like (ev. heap-like ?) data structure instead.
   /** An array of all the acknowledged event identifiers. */
-  private val acknowledged = EventIdentifierGapBuffer()
+  private val acknowledged = mutableEventIdentifierGapBufferOf()
 
   // INTERNAL LOW-LEVEL OPERATIONS
 
   /** Moves the internal event cursor by one event to the left. */
-  @DelicateGapBufferApi
   private fun left() {
     if (sizes.gap.startIndex > 0) {
       // If we have at least one event to the left, shift the events buffer by the size of the
       // event, and the identifiers and sizes by minus one.
       val size = sizes[sizes.gap.startIndex - 1]
       events.gap.shift(-size)
-      identifiers.shift(-1)
+      identifiers.gap.shift(-1)
       sizes.gap.shift(-1)
     }
   }
 
   /** Moves the internal event cursor by one event to the right. */
-  @DelicateGapBufferApi
   private fun right() {
     if (sizes.gap.startIndex < sizes.size) {
       // If we are not at the end of the buffer, shift the events buffer by the size of the event,
       // and the identifiers and sizes by one.
       val size = sizes[sizes.gap.startIndex]
       events.gap.shift(size)
-      identifiers.shift(1)
+      identifiers.gap.shift(1)
       sizes.gap.shift(1)
     }
   }
 
   /** Moves the cursor by the provided [amount], using the [left] and [right] methods. */
-  @DelicateGapBufferApi
   private fun move(amount: Int): Unit =
       when {
         amount > 0 -> {
@@ -111,7 +106,6 @@ class EventLog {
    * @param seqno the [SequenceNumber] for the inserted event.
    */
   // TODO : How can we manage changes ?
-  @OptIn(DelicateGapBufferApi::class)
   fun insert(
       event: ByteArray,
       seqno: SequenceNumber,
@@ -131,7 +125,7 @@ class EventLog {
 
     // Find the insertion index, and add the operation.
     events.push(event, offset = events.gap.startIndex)
-    identifiers.push(EventIdentifier(seqno, site), index = identifiers.cursor)
+    identifiers.push(EventIdentifier(seqno, site), offset = identifiers.gap.startIndex)
     sizes.push(event.size, offset = sizes.gap.startIndex)
     acknowledge(seqno, site)
   }
@@ -189,7 +183,7 @@ class EventLog {
    * each site.
    */
   fun acknowledged(): EventIdentifierArray {
-    return acknowledged.toArray()
+    return acknowledged.toEventIdentifierArray()
   }
 
   /**

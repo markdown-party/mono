@@ -1,22 +1,26 @@
 package io.github.alexandrepiveteau.echo.core.buffer
 
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
+import io.github.alexandrepiveteau.echo.core.causality.copyInto
+import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
 import io.github.alexandrepiveteau.echo.core.internal.requireIn
 import kotlin.math.max
 
 /**
- * An implementation of [MutableIntGapBuffer]. The class implements [Gap] to avoid additional
- * allocations when the buffer's [Gap] is fetched.
+ * An implementation of [MutableEventIdentifierGapBuffer]. The class implements [Gap] to avoid
+ * additional allocations when the buffer's [Gap] is fetched.
  *
  * This implementation is optimized to perform chunk array copies, rather than element-wise
  * operations on the underlying buffer.
  */
-internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
+internal class MutableEventIdentifierGapBufferImpl : MutableEventIdentifierGapBuffer, Gap {
 
   override var startIndex: Int = 0
   override var endIndex: Int = Gap.DefaultSize
 
   // Internal visibility is defined for testing.
-  internal var buffer = IntArray(Gap.DefaultSize)
+  internal var buffer = EventIdentifierArray(Gap.DefaultSize)
 
   // HELPERS
 
@@ -49,8 +53,8 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
   }
 
   /**
-   * Grows the [MutableIntGapBuffer] backing [buffer] to the given [size]. If the provided [size] is
-   * smaller than the current backing [buffer] size, an exception will be thrown.
+   * Grows the [MutableEventIdentifierGapBuffer] backing [buffer] to the given [size]. If the
+   * provided [size] is smaller than the current backing [buffer] size, an exception will be thrown.
    *
    * @throws IllegalArgumentException if the backing size is would require shrinking.
    */
@@ -62,7 +66,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     if (size == this.buffer.size) return // fast path
 
     val end = size - (this.buffer.size - this.endIndex)
-    val buffer = IntArray(size)
+    val buffer = EventIdentifierArray(size)
     this.buffer.copyInto(buffer, 0, startIndex = 0, endIndex = this.startIndex)
     this.buffer.copyInto(buffer, end, startIndex = this.endIndex, endIndex = this.buffer.size)
     this.endIndex = end
@@ -115,7 +119,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
   override val gap: Gap
     get() = this
 
-  override fun get(offset: Int): Int {
+  override fun get(offset: Int): EventIdentifier {
     // Preconditions.
     requireIn(offset, 0, this.size)
 
@@ -123,7 +127,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     return this.buffer[offsetToIndex(offset)]
   }
 
-  override fun set(offset: Int, value: Int) {
+  override fun set(offset: Int, value: EventIdentifier) {
     // Preconditions.
     requireIn(offset, 0, this.size)
 
@@ -131,7 +135,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     this.buffer[offsetToIndex(offset)] = value
   }
 
-  override fun push(value: Int, offset: Int) {
+  override fun push(value: EventIdentifier, offset: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size + 1)
 
@@ -144,7 +148,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     this.buffer[this.startIndex++] = value
   }
 
-  override fun push(array: IntArray, offset: Int, startIndex: Int, endIndex: Int) {
+  override fun push(array: EventIdentifierArray, offset: Int, startIndex: Int, endIndex: Int) {
     // Range preconditions
     require(endIndex >= startIndex)
     requireIn(startIndex, 0, array.size + 1)
@@ -164,11 +168,11 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
   }
 
   override fun copyInto(
-      array: IntArray,
+      array: EventIdentifierArray,
       destinationOffset: Int,
       startOffset: Int,
       endOffset: Int
-  ): IntArray {
+  ): EventIdentifierArray {
     // Preconditions.
     requireIn(destinationOffset, 0, array.size + 1)
     require(destinationOffset + endOffset - startOffset in 0..array.size)
@@ -184,7 +188,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     //
     // It's important to account for the fact that the required range may stop before the gap, and
     // that it may not extend up to the end of the buffer. Therefore, the input array has 4 indices
-    // calculated, with the following pattern when copying ints :
+    // calculated, with the following pattern when copying event identifiers :
 
     val before = max(0, startIndex - startOffset)
     val skipBefore = max(0, startIndex - endOffset)
@@ -214,7 +218,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     }
   }
 
-  override fun remove(offset: Int, size: Int): IntArray {
+  override fun remove(offset: Int, size: Int): EventIdentifierArray {
     // Preconditions.
     requireIn(offset, 0, this.size)
     requireIn(offset + size, 0, this.size + 1)
@@ -224,7 +228,7 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
     // returned array. Because the cursor was moved, we can simply sequentially move them.
     this.endIndex += size
     return this.buffer.copyInto(
-        destination = IntArray(size),
+        destination = EventIdentifierArray(size),
         startIndex = this.endIndex - size,
         endIndex = this.endIndex,
     )
@@ -237,11 +241,11 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
   }
 
   /**
-   * Outputs a [String] representation of the [MutableIntGapBuffer]. Ints which are part of the gap
-   * will be prefixed by a '*' symbol.
+   * Outputs a [String] representation of the [MutableEventIdentifierGapBuffer]. Event identifiers
+   * which are part of the gap will be prefixed by a '*' symbol.
    */
   override fun toString(): String {
     val content = gap.bufferToString(buffer.toTypedArray())
-    return "MutableIntGapBuffer(start=$startIndex, end=$endIndex, data=[${content}])"
+    return "MutableEventIdentifierGapBuffer(start=$startIndex, end=$endIndex, data=[${content}])"
   }
 }

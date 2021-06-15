@@ -1,6 +1,5 @@
 package io.github.alexandrepiveteau.echo.core.buffer
 
-import io.github.alexandrepiveteau.echo.core.internal.buffer.bufferToString
 import io.github.alexandrepiveteau.echo.core.internal.requireIn
 import kotlin.math.max
 
@@ -165,10 +164,10 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
   }
 
   override fun copyInto(
-    array: ByteArray,
-    destinationOffset: Int,
-    startOffset: Int,
-    endOffset: Int
+      array: ByteArray,
+      destinationOffset: Int,
+      startOffset: Int,
+      endOffset: Int
   ): ByteArray {
     // Preconditions.
     requireIn(destinationOffset, 0, array.size + 1)
@@ -242,7 +241,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
    * gap will be prefixed by a '*' symbol.
    */
   override fun toString(): String {
-    val content = bufferToString(buffer.toTypedArray(), startIndex until endIndex)
+    val content = gap.bufferToString(buffer.toTypedArray())
     return "MutableByteGapBuffer(start=$startIndex, end=$endIndex, data=[${content}])"
   }
 }
