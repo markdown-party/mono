@@ -1,7 +1,7 @@
 package io.github.alexandrepiveteau.echo.core
 
-import io.github.alexandrepiveteau.echo.core.internal.buffer.DelicateGapBufferApi
 import io.github.alexandrepiveteau.echo.core.buffer.mutableByteGapBufferOf
+import io.github.alexandrepiveteau.echo.core.buffer.mutableIntGapBufferOf
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.internal.buffer.*
 
@@ -23,10 +23,10 @@ class EventLog {
   private val identifiers = EventIdentifierGapBuffer()
 
   /**
-   * The [IntGapBuffer] in which the event sites are individually managed. This is used in
+   * The [MutableIntGapBuffer] in which the event sites are individually managed. This is used in
    * conjunction with the [events] content buffer.
    */
-  private val sizes = IntGapBuffer()
+  private val sizes = mutableIntGapBufferOf()
 
   // TODO : Use a tree-like (ev. heap-like ?) data structure instead.
   /** An array of all the acknowledged event identifiers. */
@@ -37,26 +37,26 @@ class EventLog {
   /** Moves the internal event cursor by one event to the left. */
   @DelicateGapBufferApi
   private fun left() {
-    if (sizes.cursor > 0) {
+    if (sizes.gap.startIndex > 0) {
       // If we have at least one event to the left, shift the events buffer by the size of the
       // event, and the identifiers and sizes by minus one.
-      val size = sizes[sizes.cursor - 1]
+      val size = sizes[sizes.gap.startIndex - 1]
       events.gap.shift(-size)
       identifiers.shift(-1)
-      sizes.shift(-1)
+      sizes.gap.shift(-1)
     }
   }
 
   /** Moves the internal event cursor by one event to the right. */
   @DelicateGapBufferApi
   private fun right() {
-    if (sizes.cursor < sizes.size) {
+    if (sizes.gap.startIndex < sizes.size) {
       // If we are not at the end of the buffer, shift the events buffer by the size of the event,
       // and the identifiers and sizes by one.
-      val size = sizes[sizes.cursor]
+      val size = sizes[sizes.gap.startIndex]
       events.gap.shift(size)
       identifiers.shift(1)
-      sizes.shift(1)
+      sizes.gap.shift(1)
     }
   }
 
@@ -126,13 +126,13 @@ class EventLog {
     // Move either right or left, until the right position is reached.
     // TODO : Fast placement for consecutive insertions, rather than full-fledged binary search ?
     val position = identifiers.binarySearch(seqno, site)
-    while (position > sizes.cursor) right()
-    while (position < sizes.cursor) left()
+    while (position > sizes.gap.startIndex) right()
+    while (position < sizes.gap.startIndex) left()
 
     // Find the insertion index, and add the operation.
     events.push(event, offset = events.gap.startIndex)
     identifiers.push(EventIdentifier(seqno, site), index = identifiers.cursor)
-    sizes.push(event.size, index = sizes.cursor)
+    sizes.push(event.size, offset = sizes.gap.startIndex)
     acknowledge(seqno, site)
   }
 

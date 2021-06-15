@@ -5,19 +5,19 @@ import io.github.alexandrepiveteau.echo.core.internal.requireIn
 import kotlin.math.max
 
 /**
- * An implementation of [MutableByteGapBuffer]. The class implements [Gap] to avoid additional
+ * An implementation of [MutableIntGapBuffer]. The class implements [Gap] to avoid additional
  * allocations when the buffer's [Gap] is fetched.
  *
  * This implementation is optimized to perform chunk array copies, rather than element-wise
  * operations on the underlying buffer.
  */
-internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
+internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
 
   override var startIndex: Int = 0
   override var endIndex: Int = Gap.DefaultSize
 
   // Internal visibility is defined for testing.
-  internal var buffer = ByteArray(Gap.DefaultSize)
+  internal var buffer = IntArray(Gap.DefaultSize)
 
   // HELPERS
 
@@ -50,8 +50,8 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
   }
 
   /**
-   * Grows the [MutableByteGapBuffer] backing [buffer] to the given [size]. If the provided [size]
-   * is smaller than the current backing [buffer] size, an exception will be thrown.
+   * Grows the [MutableIntGapBuffer] backing [buffer] to the given [size]. If the provided [size] is
+   * smaller than the current backing [buffer] size, an exception will be thrown.
    *
    * @throws IllegalArgumentException if the backing size is would require shrinking.
    */
@@ -63,7 +63,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     if (size == this.buffer.size) return // fast path
 
     val end = size - (this.buffer.size - this.endIndex)
-    val buffer = ByteArray(size)
+    val buffer = IntArray(size)
     this.buffer.copyInto(buffer, 0, startIndex = 0, endIndex = this.startIndex)
     this.buffer.copyInto(buffer, end, startIndex = this.endIndex, endIndex = this.buffer.size)
     this.endIndex = end
@@ -116,7 +116,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
   override val gap: Gap
     get() = this
 
-  override fun get(offset: Int): Byte {
+  override fun get(offset: Int): Int {
     // Preconditions.
     requireIn(offset, 0, this.size)
 
@@ -124,7 +124,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     return this.buffer[offsetToIndex(offset)]
   }
 
-  override fun set(offset: Int, value: Byte) {
+  override fun set(offset: Int, value: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size)
 
@@ -132,7 +132,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     this.buffer[offsetToIndex(offset)] = value
   }
 
-  override fun push(value: Byte, offset: Int) {
+  override fun push(value: Int, offset: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size + 1)
 
@@ -145,7 +145,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     this.buffer[this.startIndex++] = value
   }
 
-  override fun push(array: ByteArray, offset: Int, startIndex: Int, endIndex: Int) {
+  override fun push(array: IntArray, offset: Int, startIndex: Int, endIndex: Int) {
     // Range preconditions
     require(endIndex >= startIndex)
     requireIn(startIndex, 0, array.size + 1)
@@ -165,11 +165,11 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
   }
 
   override fun copyInto(
-    array: ByteArray,
-    destinationOffset: Int,
-    startOffset: Int,
-    endOffset: Int
-  ): ByteArray {
+      array: IntArray,
+      destinationOffset: Int,
+      startOffset: Int,
+      endOffset: Int
+  ): IntArray {
     // Preconditions.
     requireIn(destinationOffset, 0, array.size + 1)
     require(destinationOffset + endOffset - startOffset in 0..array.size)
@@ -185,7 +185,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     //
     // It's important to account for the fact that the required range may stop before the gap, and
     // that it may not extend up to the end of the buffer. Therefore, the input array has 4 indices
-    // calculated, with the following pattern when copying bytes :
+    // calculated, with the following pattern when copying ints :
 
     val before = max(0, startIndex - startOffset)
     val skipBefore = max(0, startIndex - endOffset)
@@ -215,7 +215,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     }
   }
 
-  override fun remove(offset: Int, size: Int): ByteArray {
+  override fun remove(offset: Int, size: Int): IntArray {
     // Preconditions.
     requireIn(offset, 0, this.size)
     requireIn(offset + size, 0, this.size + 1)
@@ -225,7 +225,7 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
     // returned array. Because the cursor was moved, we can simply sequentially move them.
     this.endIndex += size
     return this.buffer.copyInto(
-        destination = ByteArray(size),
+        destination = IntArray(size),
         startIndex = this.endIndex - size,
         endIndex = this.endIndex,
     )
@@ -238,11 +238,11 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
   }
 
   /**
-   * Outputs a [String] representation of the [MutableByteGapBuffer]. Bytes which are part of the
-   * gap will be prefixed by a '*' symbol.
+   * Outputs a [String] representation of the [MutableIntGapBuffer]. Ints which are part of the gap
+   * will be prefixed by a '*' symbol.
    */
   override fun toString(): String {
     val content = bufferToString(buffer.toTypedArray(), startIndex until endIndex)
-    return "MutableByteGapBuffer(start=$startIndex, end=$endIndex, data=[${content}])"
+    return "MutableIntGapBuffer(start=$startIndex, end=$endIndex, data=[${content}])"
   }
 }
