@@ -15,6 +15,12 @@ internal constructor(
 ) {
   companion object {
 
+    /** The minimum [SiteIdentifier] that could possibly exist. */
+    val Min: SiteIdentifier = SiteIdentifier(1U)
+
+    /** The maximum [SiteIdentifier] that could possibly exist. */
+    val Max: SiteIdentifier = SiteIdentifier(UInt.MAX_VALUE)
+
     /**
      * A special sentinel value that indicates that no [SiteIdentifier] has been specified. This
      * should be used when an optional [SiteIdentifier] is expected and can't be provided.

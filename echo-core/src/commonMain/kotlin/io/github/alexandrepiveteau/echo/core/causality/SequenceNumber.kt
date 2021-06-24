@@ -20,6 +20,11 @@ internal constructor(
     return SequenceNumber(index.inc())
   }
 
+  /** Adds a certain [count] to this value. */
+  operator fun plus(count: UInt): SequenceNumber {
+    return SequenceNumber(index + count)
+  }
+
   /** Compares this [SequenceNumber] with an other [SequenceNumber]. */
   operator fun compareTo(other: SequenceNumber): Int {
     return index.compareTo(other.index)

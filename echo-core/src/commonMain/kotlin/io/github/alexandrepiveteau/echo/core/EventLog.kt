@@ -119,7 +119,7 @@ class EventLog {
 
     // Move either right or left, until the right position is reached.
     // TODO : Fast placement for consecutive insertions, rather than full-fledged binary search ?
-    val position = identifiers.binarySearch(seqno, site)
+    val position = identifiers.binarySearch(EventIdentifier(seqno, site))
     while (position > sizes.gap.startIndex) right()
     while (position < sizes.gap.startIndex) left()
 

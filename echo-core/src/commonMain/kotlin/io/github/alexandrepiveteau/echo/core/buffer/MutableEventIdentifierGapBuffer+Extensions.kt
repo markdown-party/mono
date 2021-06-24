@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.buffer
 
-import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
+import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
 
 /** Creates an empty [MutableEventIdentifierGapBuffer]. */
 fun mutableEventIdentifierGapBufferOf(): MutableEventIdentifierGapBuffer =
@@ -41,21 +43,4 @@ fun MutableEventIdentifierGapBuffer.toEventIdentifierArray(): EventIdentifierArr
  */
 fun MutableEventIdentifierGapBuffer.toTypedArray(): Array<EventIdentifier> {
   return toEventIdentifierArray().toTypedArray()
-}
-
-/**
- * Uses binary search to find the insertion position of an event with the given [SequenceNumber] and
- * [SiteIdentifier].
- */
-internal fun MutableEventIdentifierGapBuffer.binarySearch(
-    seqno: SequenceNumber,
-    site: SiteIdentifier,
-): Int {
-  // TODO : Use binary search rather than linear search from start.
-  var position = 0
-  while (true) {
-    if (position == size) return size
-    if (get(position) > EventIdentifier(seqno, site)) return position
-    position++
-  }
 }
