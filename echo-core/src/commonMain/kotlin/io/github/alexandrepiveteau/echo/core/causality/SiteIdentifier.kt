@@ -12,7 +12,13 @@ import kotlin.random.nextUInt
 value class SiteIdentifier
 internal constructor(
     @PublishedApi internal val unique: UInt,
-) {
+) : Comparable<SiteIdentifier> {
+
+  /** Compares this [SiteIdentifier] with an other [SiteIdentifier]. */
+  override operator fun compareTo(other: SiteIdentifier): Int {
+    return unique.compareTo(other.unique)
+  }
+
   companion object {
 
     /** The minimum [SiteIdentifier] that could possibly exist. */
