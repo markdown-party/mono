@@ -7,9 +7,9 @@ kotlin {
     withJava()
   }
 
-  js { browser() }
+  js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
 
   sourceSets {
     val commonMain by getting { dependencies { implementation(kotlin("stdlib-common")) } }
@@ -24,6 +24,7 @@ kotlin {
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
+      languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
       languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
     }

@@ -10,14 +10,15 @@ kotlin {
     withJava()
   }
 
-  js { browser() }
+  js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
 
   sourceSets {
     val commonMain by getting {
       dependencies {
         implementation(kotlin("stdlib-common"))
+        implementation(project(":echo-core"))
         api(Deps.Kotlinx.CoroutinesCore)
         implementation(Deps.Kotlinx.ImmutableCollections)
       }

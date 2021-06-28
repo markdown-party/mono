@@ -2,9 +2,9 @@ plugins { kotlin(Plugins.KotlinMultiplatform) }
 
 kotlin {
   jvm()
-  js { browser() }
+  js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
 
   sourceSets {
     val commonMain by getting {
