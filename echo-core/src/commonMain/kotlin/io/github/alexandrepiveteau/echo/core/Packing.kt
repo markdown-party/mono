@@ -29,18 +29,18 @@ internal inline fun packBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte): Int {
 
 /** Packs two Int values into one Long value for use in inline classes. */
 @PublishedApi
-internal inline fun packInts(val1: Int, val2: Int): Long {
-  return val1.toLong().shl(32) or (val2.toLong() and 0xFFFFFFFF)
+internal fun packUInts(val1: UInt, val2: UInt): ULong {
+  return val1.toULong().shl(32) or (val2.toULong() and 0xFFFFFFFFU)
 }
 
-/** Unpacks the first Int value in [packInts] from its returned Long. */
+/** Unpacks the first Int value in [packUInts] from its returned Long. */
 @PublishedApi
-internal inline fun unpackInt1(value: Long): Int {
-  return value.shr(32).toInt()
+internal fun unpackUInt1(value: ULong): UInt {
+  return value.shr(32).toUInt()
 }
 
-/** Unpacks the second Int value in [packInts] from its returned Long. */
+/** Unpacks the second Int value in [packUInts] from its returned Long. */
 @PublishedApi
-internal inline fun unpackInt2(value: Long): Int {
-  return value.and(0xFFFFFFFF).toInt()
+internal fun unpackUInt2(value: ULong): UInt {
+  return value.and(0xFFFFFFFFU).toUInt()
 }

@@ -16,6 +16,9 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
  */
 interface MutableEventIdentifierGapBuffer {
 
+  /** The backing [EventIdentifierArray]. */
+  val backing: EventIdentifierArray
+
   /** How many items there are in the gap buffer. */
   val size: Int
 

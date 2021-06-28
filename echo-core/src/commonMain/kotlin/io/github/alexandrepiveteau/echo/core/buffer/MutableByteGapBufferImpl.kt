@@ -109,6 +109,9 @@ internal class MutableByteGapBufferImpl : MutableByteGapBuffer, Gap {
 
   // IMPLEMENTATION - BUFFER
 
+  override val backing: ByteArray
+    get() = buffer
+
   override val size: Int
     get() = this.buffer.size - capacity
 

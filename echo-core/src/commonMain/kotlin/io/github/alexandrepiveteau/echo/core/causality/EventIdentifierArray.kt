@@ -1,9 +1,11 @@
+@file:OptIn(ExperimentalUnsignedTypes::class)
+
 package io.github.alexandrepiveteau.echo.core.causality
 
 import kotlin.jvm.JvmInline
 
 /** Creates an empty [EventIdentifierArray]. */
-fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(longArrayOf())
+fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongArrayOf())
 
 /**
  * An array of event identifiers. When targeting the JVM, instances of this class are represented as
@@ -12,14 +14,14 @@ fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(longAr
 @JvmInline
 value class EventIdentifierArray
 internal constructor(
-    internal val backing: LongArray,
+    internal val backing: ULongArray,
 ) {
 
   /**
    * Creates a new array of the specified [size], with all elements initialized to
    * [EventIdentifier.Unspecified].
    */
-  constructor(size: Int) : this(LongArray(size))
+  constructor(size: Int) : this(ULongArray(size))
 
   /** Returns the number of elements in the array. */
   val size: Int
@@ -44,13 +46,15 @@ internal constructor(
   operator fun set(index: Int, value: EventIdentifier): Unit = backing.set(index, value.packed)
 
   /** Creates an iterator over the elements of the array. */
-  operator fun iterator(): EventIdentifierIterator = ActualEventIdentifier(backing.iterator())
+  operator fun iterator(): EventIdentifierIterator =
+      ActualEventIdentifier(backing.asLongArray().iterator())
 
   private class ActualEventIdentifier(
       private val backing: LongIterator,
   ) : EventIdentifierIterator() {
     override fun hasNext(): Boolean = backing.hasNext()
-    override fun nextEventIdentifier(): EventIdentifier = EventIdentifier(backing.nextLong())
+    override fun nextEventIdentifier(): EventIdentifier =
+        EventIdentifier(backing.nextLong().toULong())
   }
 }
 
@@ -92,3 +96,6 @@ fun EventIdentifierArray.copyInto(
 fun EventIdentifierArray.toTypedArray(): Array<EventIdentifier> {
   return Array(size, this::get)
 }
+
+/** Sorts the array in-place. */
+fun EventIdentifierArray.sort(): Unit = backing.sort() // ULong quicksort.

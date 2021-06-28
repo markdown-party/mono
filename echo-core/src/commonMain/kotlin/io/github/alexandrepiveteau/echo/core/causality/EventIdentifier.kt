@@ -1,8 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.causality
 
-import io.github.alexandrepiveteau.echo.core.packInts
-import io.github.alexandrepiveteau.echo.core.unpackInt1
-import io.github.alexandrepiveteau.echo.core.unpackInt2
+import io.github.alexandrepiveteau.echo.core.packUInts
+import io.github.alexandrepiveteau.echo.core.unpackUInt1
+import io.github.alexandrepiveteau.echo.core.unpackUInt2
 import kotlin.jvm.JvmInline
 
 /**
@@ -16,7 +16,7 @@ import kotlin.jvm.JvmInline
 inline fun EventIdentifier(
     seqno: SequenceNumber,
     site: SiteIdentifier,
-): EventIdentifier = EventIdentifier(packInts(seqno.index.toInt(), site.unique.toInt()))
+): EventIdentifier = EventIdentifier(packUInts(seqno.index, site.unique))
 
 /**
  * An [EventIdentifier] uniquely identifies events and their causality relationships in a
@@ -29,7 +29,7 @@ inline fun EventIdentifier(
 value class EventIdentifier
 @PublishedApi
 internal constructor(
-    internal val packed: Long,
+    internal val packed: ULong,
 ) {
 
   // Because we're using packed values and giving precedence to the sequence number, we can simply
@@ -37,13 +37,13 @@ internal constructor(
   operator fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
 
   val seqno: SequenceNumber
-    get() = SequenceNumber(unpackInt1(packed).toUInt())
+    get() = SequenceNumber(unpackUInt1(packed))
 
   val site: SiteIdentifier
-    get() = SiteIdentifier(unpackInt2(packed).toUInt())
+    get() = SiteIdentifier(unpackUInt2(packed))
 
-  operator fun component1(): SequenceNumber = SequenceNumber(unpackInt1(packed).toUInt())
-  operator fun component2(): SiteIdentifier = SiteIdentifier(unpackInt2(packed).toUInt())
+  operator fun component1(): SequenceNumber = SequenceNumber(unpackUInt1(packed))
+  operator fun component2(): SiteIdentifier = SiteIdentifier(unpackUInt2(packed))
 
   override fun toString(): String = "EventIdentifier(seqno = ${seqno.index}, site = ${site.unique})"
 
