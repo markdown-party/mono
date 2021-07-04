@@ -48,7 +48,7 @@ internal class MutableHistoryImpl<T>(
       site: SiteIdentifier,
       array: ByteArray,
       from: Int,
-      until: Int
+      until: Int,
   ) {
     requireRange(from, until, array) { "event out of range" }
 
@@ -69,7 +69,11 @@ internal class MutableHistoryImpl<T>(
    * @param from where the bytes should be read.
    * @param until where the bytes should be read.
    */
-  private fun change(array: ByteArray, from: Int, until: Int) {
+  private fun change(
+      array: ByteArray,
+      from: Int,
+      until: Int,
+  ) {
     requireRange(from, until, array) { "change out of range" }
     check(eventsIds.gap.startIndex > 0) { "missing event for change insertion" }
 
@@ -83,7 +87,10 @@ internal class MutableHistoryImpl<T>(
    * Returns true if the insertion of an event with [seqno] and [site] would require moving back in
    * the log. If the event could be inserted at the current index, `true` will be returned.
    */
-  private fun shouldInsertBefore(seqno: SequenceNumber, site: SiteIdentifier): Boolean {
+  private fun shouldInsertBefore(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): Boolean {
     if (eventsIds.gap.startIndex == 0) return false
     val id = eventsIds[eventsIds.gap.startIndex - 1]
     return EventIdentifier(seqno, site) <= id
@@ -93,7 +100,10 @@ internal class MutableHistoryImpl<T>(
    * Returns true iff the current cursor index points at an event with the given [seqno] and [site]
    * identifier.
    */
-  private fun containsAtCursor(seqno: SequenceNumber, site: SiteIdentifier): Boolean {
+  private fun containsAtCursor(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): Boolean {
     if (eventsIds.gap.startIndex == eventsIds.size) return false
     val id = eventsIds[eventsIds.gap.startIndex]
     return EventIdentifier(seqno, site) == id
@@ -103,50 +113,50 @@ internal class MutableHistoryImpl<T>(
    * Moves the event cursor back, dismissing all the changes associated with the current event if
    * needed.
    */
-  private fun backward() {
+  private fun moveCursorLeft() {
     check(eventsIds.gap.startIndex > 0) { "Can't move backward if at start." }
-    val removed = eventsIds[eventsIds.gap.startIndex - 1]
-    val size = eventsSizes[eventsSizes.gap.startIndex - 1]
-    val from = events.gap.startIndex - size
-    val until = events.gap.startIndex
-
-    // Remove the event.
-    events.remove(from, size)
-    eventsIds.remove(eventsIds.gap.startIndex - 1)
-    eventsSizes.remove(eventsSizes.gap.startIndex - 1)
 
     // Remove all the associated changes.
-    while (changesIds.gap.startIndex != 0 && changesIds[changesIds.gap.startIndex - 1] == removed) {
+    reverseChange@ while (changesIds.gap.startIndex > 0) {
+      val changeId = changesIds[changesIds.gap.startIndex - 1]
+      if (changeId != eventsIds[eventsIds.gap.startIndex - 1]) break@reverseChange
+
       val changeSize = changesSizes[changesSizes.gap.startIndex - 1]
       val changeFrom = changes.gap.startIndex - changeSize
       val changeUntil = changes.gap.startIndex
-
-      changes.remove(changeFrom, changeSize)
-      changesIds.remove(changesIds.gap.startIndex - 1)
-      changesSizes.remove(changesSizes.gap.startIndex - 1)
 
       // Update the current projection.
       current =
           projection.backward(
               model = current,
-              identifier = removed,
+              identifier = eventsIds[eventsIds.gap.startIndex - 1],
               data = events.backing,
-              from = from,
-              until = until,
+              from = events.gap.startIndex - eventsSizes[eventsSizes.gap.startIndex - 1],
+              until = events.gap.startIndex,
               changeData = changes.backing,
               changeFrom = changeFrom,
               changeUntil = changeUntil,
           )
+
+      // Only remove the change once it has been used to update the projection.
+      changes.remove(changeFrom, changeSize)
+      changesIds.remove(changesIds.gap.startIndex - 1)
+      changesSizes.remove(changesSizes.gap.startIndex - 1)
     }
+
+    // Move the event to the right of the cursor. The event cursor is shifted only after it has been
+    // reversed with all the changes, to ensure that the content is read (and not the gap, which may
+    // have unreliable data).
+    events.gap.shift(-eventsSizes[eventsSizes.gap.startIndex - 1])
+    eventsIds.gap.shift(-1)
+    eventsSizes.gap.shift(-1)
   }
 
   /**
    * Returns `true` iff there are some events at the current event cursor. In this case, the events
    * will be and changes to the projection performed.
    */
-  private fun shouldApplyChanges(): Boolean {
-    return eventsIds.size != 0 && eventsIds.gap.startIndex < eventsIds.size
-  }
+  private fun shouldApplyChanges(): Boolean = eventsIds.gap.startIndex < eventsIds.size
 
   /**
    * Moves the projection forward, meaning that the event at the current cursor index will be used
@@ -182,9 +192,7 @@ internal class MutableHistoryImpl<T>(
   override fun contains(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Boolean {
-    return acknowledged.contains(seqno, site)
-  }
+  ): Boolean = acknowledged.contains(seqno, site)
 
   override fun insert(
       seqno: SequenceNumber,
@@ -208,7 +216,8 @@ internal class MutableHistoryImpl<T>(
     if (acknowledged.contains(seqno, site)) return
 
     // Insert the event.
-    while (shouldInsertBefore(seqno, site)) backward()
+    acknowledge(seqno, site)
+    while (shouldInsertBefore(seqno, site)) moveCursorLeft()
     event(seqno, site, event, from, until)
     while (shouldApplyChanges()) forwardChanges()
   }
@@ -249,7 +258,9 @@ internal class MutableHistoryImpl<T>(
     acknowledged.acknowledge(seqno, site)
   }
 
-  override fun acknowledge(from: MutableEventLog): MutableEventLog {
+  override fun acknowledge(
+      from: MutableEventLog,
+  ): MutableEventLog {
     // TODO : Make this O(n) or O(log(n) * n) rather than O(n*n)
     val iterator = from.acknowledged().iterator()
     while (iterator.hasNext()) {
@@ -265,13 +276,20 @@ internal class MutableHistoryImpl<T>(
 
   override fun iterator(): EventIterator = Iterator()
 
-  override fun merge(from: MutableEventLog): MutableEventLog {
+  override fun merge(
+      from: EventLog,
+  ): MutableEventLog {
+
+    // Fast success.
+    if (from.size == 0) return this
+
     val iterator = from.iterator()
+    while (iterator.hasPrevious()) iterator.movePrevious()
+
     // TODO : Only reverse up to the from lower bound.
     // TODO : Optimize to avoid "backward-then-forward" for each event.
-    while (iterator.hasPrevious()) iterator.movePrevious()
-    while (iterator.hasNext()) {
-      iterator.moveNext()
+    var keepGoing = true
+    while (keepGoing) {
       insert(
           seqno = iterator.seqno,
           site = iterator.site,
@@ -279,6 +297,8 @@ internal class MutableHistoryImpl<T>(
           from = iterator.from,
           until = iterator.until,
       )
+      keepGoing = iterator.hasNext()
+      if (keepGoing) iterator.moveNext()
     }
     return this
   }

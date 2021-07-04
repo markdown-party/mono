@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.causality
 
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 /**
@@ -9,6 +10,7 @@ import kotlin.jvm.JvmInline
  * @constructor creates a [SequenceNumber], using a backing value.
  * @param index the sequence number for this [SequenceNumber].
  */
+@Serializable(with = SequenceNumberSerializer::class)
 @JvmInline
 value class SequenceNumber
 internal constructor(

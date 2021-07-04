@@ -1,7 +1,7 @@
 plugins { kotlin(Plugins.KotlinJvm) }
 
 kotlin {
-  target { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
+  target { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   dependencies {
     api(project(":echo"))

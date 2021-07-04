@@ -3,11 +3,13 @@ package io.github.alexandrepiveteau.echo.core.causality
 import kotlin.jvm.JvmInline
 import kotlin.random.Random
 import kotlin.random.nextUInt
+import kotlinx.serialization.Serializable
 
 /**
  * A [SiteIdentifier] is a unique identifier amongst all the sites in a distributed system. Two
  * sites are guaranteed to have different [SiteIdentifier].
  */
+@Serializable(with = SiteIdentifierSerializer::class)
 @JvmInline
 value class SiteIdentifier
 internal constructor(

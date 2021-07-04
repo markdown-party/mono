@@ -4,7 +4,7 @@ kotlin {
   jvm()
   js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   sourceSets {
     val commonMain by getting {

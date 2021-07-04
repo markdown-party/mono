@@ -1,12 +1,16 @@
 package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuffer
+import io.github.alexandrepiveteau.echo.core.buffer.binarySearchBySite
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.*
 import kotlin.jvm.JvmInline
 
+/** Returns an [EventIdentifier] that acknowledges the given [SequenceNumber]. */
+private fun EventIdentifier.withSequenceNumber(seqno: SequenceNumber): EventIdentifier =
+    EventIdentifier(maxOf(this.seqno, seqno), this.site)
+
 /** A [MutableAcknowledgeMap] manages a list set of acknowledgements. */
-// TODO : Use a binary tree internally, or a sorted data structure.
 @JvmInline
 internal value class MutableAcknowledgeMap
 private constructor(
@@ -28,17 +32,9 @@ private constructor(
     require(seqno.isSpecified)
     require(site.isSpecified)
 
-    // 1. Try to update an existing site identifier.
-    for (i in 0 until backing.size) {
-      val (exSeqno, exSite) = backing[i]
-      if (exSite == site) {
-        backing[i] = EventIdentifier(maxOf(exSeqno, seqno), site)
-        return
-      }
-    }
-
-    // 2. Or insert the new sequence identifier.
-    backing.push(EventIdentifier(seqno, site))
+    val i = backing.binarySearchBySite(site)
+    if (i >= 0) backing[i] = backing[i].withSequenceNumber(seqno)
+    else backing.push(EventIdentifier(seqno, site), offset = -(i + 1))
   }
 
   /**
@@ -53,17 +49,9 @@ private constructor(
     require(seqno.isSpecified)
     require(site.isSpecified)
 
-    // 1. Try to update an existing site identifier.
-    for (i in 0 until backing.size) {
-      val (_, exSite) = backing[i]
-      if (exSite == site) {
-        backing[i] = EventIdentifier(seqno, site)
-        return
-      }
-    }
-
-    // 2. Or insert the new sequence number.
-    backing.push(EventIdentifier(seqno, site))
+    val id = EventIdentifier(seqno, site)
+    val i = backing.binarySearchBySite(site)
+    if (i >= 0) backing[i] = id else backing.push(id, offset = -(i + 1))
   }
 
   /** Returns true if the given [EventIdentifier] was acknowledged. */
@@ -78,14 +66,9 @@ private constructor(
   ): Boolean {
     require(site.isSpecified) { "Site must be specified." }
     require(seqno.isSpecified) { "Sequence number must be specified." }
-    for (i in 0 until backing.size) {
-      if (backing[i].site == site) return backing[i].seqno >= seqno
-      // TODO (if sorted) : if (backing[i].site > site) return false
-    }
-    return false
+    val i = backing.binarySearchBySite(site)
+    return (i >= 0) && backing[i].seqno >= seqno
   }
-
-  //fun contains()
 
   /** Returns the next expected [SequenceNumber] for all the [SiteIdentifier]. */
   fun expected(): SequenceNumber {
@@ -98,7 +81,7 @@ private constructor(
 
   /** Returns the next expected [SequenceNumber] for the given [SiteIdentifier]. */
   fun expected(site: SiteIdentifier): SequenceNumber {
-    return get(site).inc() // Because SequenceNumber.Unspecified + 1 == SequenceNumber.Min
+    return get(site).inc() // Because SequenceNumber.Unspecified + 1U == SequenceNumber.Min
   }
 
   /**
@@ -109,11 +92,8 @@ private constructor(
       site: SiteIdentifier,
   ): SequenceNumber {
     require(site.isSpecified) { "Site must be specified." }
-    for (i in 0 until backing.size) {
-      if (backing[i].site == site) return backing[i].seqno
-      // TODO (if sorted) : if (backing[i].site > site) return SequenceNumber.Unspecified
-    }
-    return SequenceNumber.Unspecified
+    val i = backing.binarySearchBySite(site)
+    return if (i >= 0) backing[i].seqno else SequenceNumber.Unspecified
   }
 
   /**
@@ -121,6 +101,6 @@ private constructor(
    * each acknowledged site.
    */
   fun toEventIdentifierArray(): EventIdentifierArray {
-    return backing.toEventIdentifierArray().apply { sort() }
+    return backing.toEventIdentifierArray()
   }
 }

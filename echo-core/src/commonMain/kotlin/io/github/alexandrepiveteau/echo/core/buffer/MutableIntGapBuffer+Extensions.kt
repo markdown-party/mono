@@ -31,3 +31,8 @@ fun MutableIntGapBuffer.toIntArray(): IntArray {
 fun MutableIntGapBuffer.toTypedArray(): Array<Int> {
   return toIntArray().toTypedArray()
 }
+
+/** Copies the contents of this [IntArray] into a new [MutableIntGapBuffer]. */
+fun IntArray.toMutableGapBuffer(): MutableIntGapBuffer {
+  return MutableIntGapBuffer(size, this::get)
+}

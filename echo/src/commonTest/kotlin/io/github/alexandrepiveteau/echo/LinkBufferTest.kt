@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
@@ -27,8 +26,6 @@ class LinkBufferTest {
     assertEquals(listOf(123), link.talk(emptyFlow()).toList())
   }
 
-  // TODO : Remove this OptIn annotation once Kotlin 1.5 is stable.
-  @InternalCoroutinesApi
   @Test
   fun unbuffered_channelLink_cantSend() = suspendTest {
     val link =

@@ -44,3 +44,10 @@ fun MutableEventIdentifierGapBuffer.toEventIdentifierArray(): EventIdentifierArr
 fun MutableEventIdentifierGapBuffer.toTypedArray(): Array<EventIdentifier> {
   return toEventIdentifierArray().toTypedArray()
 }
+
+/**
+ * Copies the contents of this [EventIdentifierArray] into a new [MutableEventIdentifierGapBuffer].
+ */
+fun EventIdentifierArray.toMutableGapBuffer(): MutableEventIdentifierGapBuffer {
+  return MutableEventIdentifierGapBuffer(size, this::get)
+}

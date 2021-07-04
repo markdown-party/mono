@@ -1,40 +1,71 @@
 package io.github.alexandrepiveteau.echo.demo.set
 
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventLog
-import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
+import io.github.alexandrepiveteau.echo.DefaultSerializationFormat
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.mutableHistoryOf
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.projections.ChangeScope
+import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
+import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
+import kotlin.random.Random
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlinx.serialization.Serializable
 
-private sealed class GSetEvent<out T> {
-  data class Add<out T>(val item: T) : GSetEvent<T>()
+@Serializable
+private sealed class GSetEvent {
+  @Serializable data class Add(val item: Int) : GSetEvent()
 }
 
-private fun <T> gSetProjection() =
-    OneWayProjection<Set<T>, IndexedEvent<GSetEvent<T>>> { event, model ->
-      when (val body = event.body) {
-        // Add events, and duplicate insertions.
-        is GSetEvent.Add -> model + body.item
+@Serializable
+private sealed class GSetChange {
+  @Serializable data class Insert(val item: Int) : GSetChange()
+}
+
+private class GSetProjection : TwoWayProjection<Set<Int>, GSetEvent, GSetChange> {
+
+  override fun ChangeScope<GSetChange>.forward(
+      model: Set<Int>,
+      id: EventIdentifier,
+      event: GSetEvent,
+  ): Set<Int> =
+      when (event) {
+        is GSetEvent.Add ->
+            if (event.item in model) model
+            else {
+              push(GSetChange.Insert(event.item))
+              model + event.item
+            }
       }
-    }
+
+  override fun backward(
+      model: Set<Int>,
+      id: EventIdentifier,
+      event: GSetEvent,
+      change: GSetChange,
+  ): Set<Int> =
+      when (change) {
+        is GSetChange.Insert -> model - change.item
+      }
+}
 
 class GSetTest {
 
   @Test
   fun oneSite_canYieldEvents() = suspendTest {
-    val alice = SiteIdentifier.random()
+    val alice = Random.nextSiteIdentifier()
     val echo =
         mutableSite(
             identifier = alice,
-            initial = emptySet<Int>(),
-            projection = gSetProjection(),
+            initial = emptySet(),
+            projection = GSetProjection(),
         )
 
     echo.event {
@@ -48,23 +79,54 @@ class GSetTest {
   }
 
   @Test
+  fun reproducer_b84() {
+    val a = Random.nextSiteIdentifier()
+    val b = Random.nextSiteIdentifier()
+    val format = DefaultSerializationFormat
+
+    val history =
+        mutableHistoryOf(
+            emptySet(),
+            TwoWayMutableProjection(
+                GSetProjection(),
+                GSetChange.serializer(),
+                GSetEvent.serializer(),
+                format,
+            ),
+        )
+
+    val serializer = GSetEvent.serializer()
+
+    history.append(a, format.encodeToByteArray(serializer, GSetEvent.Add(1)))
+    history.append(a, format.encodeToByteArray(serializer, GSetEvent.Add(2)))
+
+    history.insert(
+        seqno = SequenceNumber.Min + 0u,
+        site = b,
+        event = format.encodeToByteArray(serializer, GSetEvent.Add(2)),
+    )
+
+    assertEquals(setOf(1, 2), history.current)
+  }
+
+  @Test
   fun twoSites_converge() = suspendTest {
     // Create Alice, our first site.
-    val alice = SiteIdentifier.random()
+    val alice = Random.nextSiteIdentifier()
     val aliceEcho =
         mutableSite(
             identifier = alice,
-            initial = emptySet<Int>(),
-            projection = gSetProjection(),
+            initial = emptySet(),
+            projection = GSetProjection(),
         )
 
     // Create Bob, our second site.
-    val bob = SiteIdentifier.random()
+    val bob = Random.nextSiteIdentifier()
     val bobEcho =
         mutableSite(
             identifier = bob,
-            initial = emptySet<Int>(),
-            projection = gSetProjection(),
+            initial = emptySet(),
+            projection = GSetProjection(),
         )
 
     // Alice adds the elements 1 and 2.

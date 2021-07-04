@@ -1,8 +1,5 @@
-package io.github.alexandrepiveteau.echo.serialization
+package io.github.alexandrepiveteau.echo.core.causality
 
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
-import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
-import io.github.alexandrepiveteau.echo.causal.toUInt
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,9 +7,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-
-/** Returns a [KSerializer] that supports [SequenceNumber] conversions. */
-fun SequenceNumber.Companion.serializer(): KSerializer<SequenceNumber> = SequenceNumberSerializer
 
 /**
  * [SequenceNumber] are represented as a [Long] in their serialized format, even though only the

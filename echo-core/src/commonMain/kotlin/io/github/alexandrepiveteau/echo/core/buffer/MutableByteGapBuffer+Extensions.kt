@@ -31,3 +31,8 @@ fun MutableByteGapBuffer.toByteArray(): ByteArray {
 fun MutableByteGapBuffer.toTypedArray(): Array<Byte> {
   return toByteArray().toTypedArray()
 }
+
+/** Copies the contents of this [ByteArray] into a new [MutableByteGapBuffer]. */
+fun ByteArray.toMutableGapBuffer(): MutableByteGapBuffer {
+  return MutableByteGapBuffer(size, this::get)
+}

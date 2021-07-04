@@ -1,35 +1,17 @@
 package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 
 /**
- * A [MutableEventLog] is a high-performance mutable log of serialized events, which are
- * concatenated after each other in some contiguous data structures. A [MutableEventLog] is
- * optimized for consecutive insertions and removals at the same index; this works particularly well
- * when many events are appended to the end of a [MutableEventLog], or when two [MutableEventLog]
- * are merged.
+ * A [MutableEventLog] is an implementation of [EventLog] optimized for consecutive insertions and
+ * removals at the same index; this works particularly well when many events are appended to the end
+ * of a [MutableEventLog], or when two [MutableEventLog] are merged.
  *
  * @see MutableHistory a variation of [MutableEventLog] which keeps a state
  */
-interface MutableEventLog {
-
-  /** Returns the count of events in the [MutableEventLog]. */
-  val size: Int
-
-  /**
-   * Returns true if the event with the event with the given [SiteIdentifier] is included in the
-   * [MutableEventLog], or if any event with the same [SiteIdentifier] and a higher [SequenceNumber]
-   * has already been integrated.
-   *
-   * @param seqno the [SequenceNumber] to check for.
-   * @param site the [SiteIdentifier] to check for.
-   *
-   * @return `true` iff the event was already integrated.
-   */
-  fun contains(seqno: SequenceNumber, site: SiteIdentifier): Boolean
+interface MutableEventLog : EventLog {
 
   /**
    * Inserts the provided event in the [MutableEventLog] at the appropriate index. If the event is
@@ -87,21 +69,8 @@ interface MutableEventLog {
    * @param from the [MutableEventLog] from which acknowledgements are merged.
    * @return this [MutableEventLog] instance (with the new acknowledgements).
    */
+  // TODO : Accept an EventLog.
   fun acknowledge(from: MutableEventLog): MutableEventLog
-
-  /**
-   * Returns an [EventIdentifierArray] with all the acknowledgements that have been issued by this
-   * [MutableEventLog]. This [EventIdentifierArray] only contains one [EventIdentifier] per
-   * [SiteIdentifier].
-   */
-  fun acknowledged(): EventIdentifierArray
-
-  /**
-   * Returns an [EventIterator]. The retrieved [EventIterator] will start at the end of the
-   * [MutableEventLog], and should not be used anymore if the underlying [MutableEventLog] is
-   * modified.
-   */
-  operator fun iterator(): EventIterator
 
   /**
    * Merges this [MutableEventLog] [from] another log. The merge operation has the following
@@ -110,10 +79,10 @@ interface MutableEventLog {
    * - Operations which occurred between this log and the [from] are merged into this log.
    * - This will [acknowledge] all the sites [from] the other [MutableEventLog].
    *
-   * @param from the [MutableEventLog] from which the operations are merged.
+   * @param from the [EventLog] from which the operations are merged.
    * @return this [MutableEventLog] instance (with the new operations inserted).
    */
-  fun merge(from: MutableEventLog): MutableEventLog
+  fun merge(from: EventLog): MutableEventLog
 
   /**
    * Clears the data of the [MutableEventLog]. This will not necessarily reset the [acknowledged]

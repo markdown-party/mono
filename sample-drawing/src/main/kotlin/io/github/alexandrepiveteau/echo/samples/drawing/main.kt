@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.flowOn
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Config
@@ -44,10 +44,11 @@ fun main(args: Array<String>) = runBlocking {
   // The single source of truth for the local site.
   val site =
       mutableSite(
-          identifier = SiteIdentifier.random(),
-          initial = persistentDrawingBoardOf(),
-          projection = DrawingBoardProjection,
-      ).flowOn(Dispatchers.Default)
+              identifier = Random.nextSiteIdentifier(),
+              initial = persistentDrawingBoardOf(),
+              projection = DrawingBoardProjection,
+          )
+          .flowOn(Dispatchers.Default)
 
   // Parse the launch configuration.
   val config = Config.parse(args) ?: exitProcess(1)

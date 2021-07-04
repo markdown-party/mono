@@ -1,5 +1,6 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
+  kotlin(Plugins.KotlinSerialization)
   id(Plugins.KotlinBinaryCompatibility) version Versions.KotlinBinaryCompatibility
 }
 
@@ -12,14 +13,16 @@ kotlin {
 
   js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   sourceSets {
     val commonMain by getting {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        implementation(project(":echo-core"))
+        api(project(":echo-core"))
         api(Deps.Kotlinx.CoroutinesCore)
+        api(Deps.Kotlinx.SerializationCore)
+        implementation(Deps.Kotlinx.SerializationProtobuf)
         implementation(Deps.Kotlinx.ImmutableCollections)
       }
     }
@@ -41,10 +44,11 @@ kotlin {
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
-      languageSettings.enableLanguageFeature("InlineClasses")
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
       languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
       languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+      languageSettings.useExperimentalAnnotation(
+          "kotlinx.serialization.ExperimentalSerializationApi")
       languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
     }
   }

@@ -2,8 +2,6 @@
 
 package io.github.alexandrepiveteau.echo.core.causality
 
-import kotlin.jvm.JvmInline
-
 /** Creates an empty [EventIdentifierArray]. */
 fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongArrayOf())
 
@@ -11,8 +9,9 @@ fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongA
  * An array of event identifiers. When targeting the JVM, instances of this class are represented as
  * `long[]`.
  */
-@JvmInline
-value class EventIdentifierArray
+// TODO : Wait for a fix of KT-35749, KT-39696
+/* @kotlin.jvm.JvmInline value */
+class EventIdentifierArray
 internal constructor(
     internal val backing: ULongArray,
 ) {
@@ -95,6 +94,13 @@ fun EventIdentifierArray.copyInto(
 /** Returns a typed object array containing all of the elements of this primitive array. */
 fun EventIdentifierArray.toTypedArray(): Array<EventIdentifier> {
   return Array(size, this::get)
+}
+
+/** Returns a primitive array from a generic [Array] of [EventIdentifier]. */
+fun Array<EventIdentifier>.toEventIdentifierArray(): EventIdentifierArray {
+  val array = EventIdentifierArray(size)
+  for (i in 0 until size) array[i] = get(i)
+  return array
 }
 
 /** Sorts the array in-place. */

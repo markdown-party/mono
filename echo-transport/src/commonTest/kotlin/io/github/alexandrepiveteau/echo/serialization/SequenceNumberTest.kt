@@ -1,13 +1,15 @@
 package io.github.alexandrepiveteau.echo.serialization
 
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
-import io.github.alexandrepiveteau.echo.causal.toSequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.toSequenceNumber
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+
+// TODO : Move this test somewhere else
 
 class SequenceNumberTest {
 
@@ -20,7 +22,7 @@ class SequenceNumberTest {
 
   @Test
   fun testZeroSerialization() {
-    testEncodingDecoding(SequenceNumber.Zero)
+    testEncodingDecoding(SequenceNumber.Min)
   }
 
   @Test

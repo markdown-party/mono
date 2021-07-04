@@ -22,7 +22,7 @@ class MutableEventIdentifierGapBufferSearchTest {
     for (i in 0u..count) {
       val id = EventIdentifier(Min + i, SiteIdentifier.Min)
       val index = i.toInt()
-      assertEquals(index, buffer.binarySearch(id))
+      assertEquals(index, -(buffer.binarySearch(id) + 1)) // inverted index
       assertEquals(index, buffer.linearSearch(id))
     }
   }

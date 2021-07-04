@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.core.packUInts
 import io.github.alexandrepiveteau.echo.core.unpackUInt1
 import io.github.alexandrepiveteau.echo.core.unpackUInt2
 import kotlin.jvm.JvmInline
+import kotlinx.serialization.Serializable
 
 /**
  * Builds a new [EventIdentifier], for a given [SequenceNumber] and a given [SiteIdentifier].
@@ -12,8 +13,7 @@ import kotlin.jvm.JvmInline
  * @param site the [SiteIdentifier] that's used.
  * @return the built [EventIdentifier].
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun EventIdentifier(
+fun EventIdentifier(
     seqno: SequenceNumber,
     site: SiteIdentifier,
 ): EventIdentifier = EventIdentifier(packUInts(seqno.index, site.unique))
@@ -25,9 +25,9 @@ inline fun EventIdentifier(
  *
  * @param packed the packed value for this identifier.
  */
+@Serializable(with = EventIdentifierSerializer::class)
 @JvmInline
 value class EventIdentifier
-@PublishedApi
 internal constructor(
     internal val packed: ULong,
 ) {

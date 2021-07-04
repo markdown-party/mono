@@ -14,12 +14,12 @@ fun interface ChangeScope {
   fun push(array: ByteArray, from: Int, until: Int)
 
   /** Pushes a single [Byte] as a change. */
-  fun ChangeScope.push(byte: Byte) {
+  fun push(byte: Byte) {
     push(byteArrayOf(byte))
   }
 
   /** Pushes the whole [ByteArray] as a change. */
-  fun ChangeScope.push(array: ByteArray) {
+  fun push(array: ByteArray) {
     push(array, from = 0, until = array.size)
   }
 }

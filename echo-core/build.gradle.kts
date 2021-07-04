@@ -1,4 +1,7 @@
-plugins { kotlin(Plugins.KotlinMultiplatform) }
+plugins {
+  kotlin(Plugins.KotlinMultiplatform)
+  kotlin(Plugins.KotlinSerialization)
+}
 
 kotlin {
   jvm {
@@ -9,10 +12,15 @@ kotlin {
 
   js(IR) { browser() }
 
-  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = false } }
+  targets.all { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   sourceSets {
-    val commonMain by getting { dependencies { implementation(kotlin("stdlib-common")) } }
+    val commonMain by getting {
+      dependencies {
+        implementation(kotlin("stdlib-common"))
+        api(Deps.Kotlinx.SerializationCore)
+      }
+    }
     val commonTest by getting {
       dependencies {
         implementation(kotlin("test-common"))

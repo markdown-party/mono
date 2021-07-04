@@ -28,7 +28,7 @@ fun CoroutineScope.runServer(
       val server =
           embeddedServer(CIO, port = config.me.port) {
             install(WebSockets)
-            routing { route("/sync") { receiver(site.encodeToFrame(DrawingEvent.serializer())) } }
+            routing { route("/sync") { receiver(site.encodeToFrame()) } }
           }
       server.start(wait = true)
     }
