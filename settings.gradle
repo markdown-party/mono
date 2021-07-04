@@ -12,6 +12,7 @@ rootProject.name = 'kotlin-echo'
 enableFeaturePreview("GRADLE_METADATA")
 
 // echo replication libraries
+include ':echo-core'
 include ':echo'
 include ':echo-ktor-client'
 include ':echo-ktor-server'
@@ -23,4 +24,5 @@ include ':markdown-backend'
 include ':markdown-frontend'
 
 // samples
-include ':sample-drawing'
+// FIXME : Re-introduce this sample when Compose for Desktop supports Kotlin 1.5.20
+// include ':sample-drawing'

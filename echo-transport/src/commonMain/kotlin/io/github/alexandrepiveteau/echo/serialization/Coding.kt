@@ -10,22 +10,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
+// TODO : Use binary serialization instead of text-based serialization, since the messages now
+//        support it out-of-the-box.
+
 /**
- * Encodes an [Exchange] of [Message] into an [Exchange] of [Frame], using the provided event
+ * Encodes an [Exchange] of [Message] into an [Exchange] of [Frame], using the default event
  * serializer. The frames can then directly be sent over websockets.
- *
- * @param serializer the [KSerializer] used to perform event mappings.
- * @param T the type of the events of this [Exchange].
  *
  * @return the encoded [Exchange]
  */
-fun <T> Exchange<Message.Incoming<T>, Message.Outgoing<T>>.encodeToFrame(
-    serializer: KSerializer<T>,
-): Exchange<Frame, Frame> =
+fun Exchange<Message.Incoming, Message.Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
     object : Exchange<Frame, Frame> {
       override fun outgoing() =
           Link<Frame, Frame> { inc ->
-            this@encodeToFrame.encodeToString(serializer)
+            this@encodeToFrame.encodeToString()
                 .outgoing()
                 .talk(inc.filterIsInstance<Frame.Text>().map(Frame.Text::readText))
                 .map(Frame::Text)
@@ -33,7 +31,7 @@ fun <T> Exchange<Message.Incoming<T>, Message.Outgoing<T>>.encodeToFrame(
 
       override fun incoming() =
           Link<Frame, Frame> { inc ->
-            this@encodeToFrame.encodeToString(serializer)
+            this@encodeToFrame.encodeToString()
                 .incoming()
                 .talk(inc.filterIsInstance<Frame.Text>().map(Frame.Text::readText))
                 .map(Frame::Text)
@@ -41,17 +39,12 @@ fun <T> Exchange<Message.Incoming<T>, Message.Outgoing<T>>.encodeToFrame(
     }
 
 /**
- * Decodes an [Exchange] of [Frame] into an [Exchange] of [Message], using the provided event
+ * Decodes an [Exchange] of [Frame] into an [Exchange] of [Message], using the default event
  * serializer.
- *
- * @param serializer the [KSerializer] used to perform event mappings.
- * @param T the type of the events of this [Exchange].
  *
  * @return the decoded [Exchange]
  */
-fun <T> Exchange<Frame, Frame>.decodeFromFrame(
-    serializer: KSerializer<T>,
-): Exchange<Message.Incoming<T>, Message.Outgoing<T>> =
+fun Exchange<Frame, Frame>.decodeFromFrame(): Exchange<Message.Incoming, Message.Outgoing> =
     object : Exchange<String, String> {
 
           override fun outgoing() =
@@ -70,39 +63,37 @@ fun <T> Exchange<Frame, Frame>.decodeFromFrame(
                     .map(Frame.Text::readText)
               }
         }
-        .decodeFromString(serializer)
+        .decodeFromString()
 
 // STRING JSON CODING
 
-internal fun <T> Exchange<String, String>.decodeFromString(
-    elementSerializer: KSerializer<T>,
-): Exchange<Message.Incoming<T>, Message.Outgoing<T>> =
-    object : Exchange<Message.Incoming<T>, Message.Outgoing<T>> {
+internal fun Exchange<String, String>.decodeFromString():
+    Exchange<Message.Incoming, Message.Outgoing> =
+    object : Exchange<Message.Incoming, Message.Outgoing> {
 
       override fun outgoing() =
           this@decodeFromString.outgoing()
               .decodeFromString(
-                  Message.Incoming.serializer(elementSerializer),
-                  Message.Outgoing.serializer<T>(),
+                  Message.Incoming.serializer(),
+                  Message.Outgoing.serializer(),
               )
 
       override fun incoming() =
           this@decodeFromString.incoming()
               .decodeFromString(
-                  Message.Outgoing.serializer<T>(),
-                  Message.Incoming.serializer(elementSerializer),
+                  Message.Outgoing.serializer(),
+                  Message.Incoming.serializer(),
               )
     }
 
-internal fun <T> Exchange<Message.Incoming<T>, Message.Outgoing<T>>.encodeToString(
-    elementSerializer: KSerializer<T>,
-): Exchange<String, String> =
+internal fun Exchange<Message.Incoming, Message.Outgoing>.encodeToString():
+    Exchange<String, String> =
     object : Exchange<String, String> {
 
       override fun outgoing() =
           this@encodeToString.outgoing()
               .encodeToString(
-                  Message.Incoming.serializer(elementSerializer),
+                  Message.Incoming.serializer(),
                   Message.Outgoing.serializer(),
               )
 
@@ -110,7 +101,7 @@ internal fun <T> Exchange<Message.Incoming<T>, Message.Outgoing<T>>.encodeToStri
           this@encodeToString.incoming()
               .encodeToString(
                   Message.Outgoing.serializer(),
-                  Message.Incoming.serializer(elementSerializer),
+                  Message.Incoming.serializer(),
               )
     }
 

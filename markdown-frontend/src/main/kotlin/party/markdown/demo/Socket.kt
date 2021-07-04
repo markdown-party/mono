@@ -1,6 +1,6 @@
 package party.markdown.demo
 
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier.Companion.random
+import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.ktor.wssExchange
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
@@ -9,9 +9,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
+import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.html.js.onClickFunction
-import party.markdown.MarkdownEvent
 import party.markdown.MarkdownEvent.Decrement
 import party.markdown.MarkdownEvent.Increment
 import party.markdown.MarkdownProjection
@@ -40,11 +40,11 @@ private val Remote =
               }
             },
         )
-        .decodeFromFrame(MarkdownEvent.serializer())
+        .decodeFromFrame()
 
 private val State =
     mutableSite(
-        identifier = random(),
+        identifier = Random.nextSiteIdentifier(),
         initial = 0,
         projection = MarkdownProjection,
     )

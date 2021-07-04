@@ -1,6 +1,6 @@
 package io.github.alexandrepiveteau.echo.events
 
-import io.github.alexandrepiveteau.echo.causal.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 
 /**
  * An interface describing the operations that can be performed when we want to issue some events.

@@ -1,6 +1,6 @@
 package io.github.alexandrepiveteau.echo
 
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
@@ -85,7 +85,7 @@ fun <I, O> Exchange<I, O>.flowOn(
 fun <T, M> MutableSite<T, M>.flowOn(
     context: CoroutineContext,
 ): MutableSite<T, M> =
-    object : MutableSite<T, M>, Exchange<Inc<T>, Out<T>> by FlowOnExchange(context, this) {
+    object : MutableSite<T, M>, Exchange<Inc, Out> by FlowOnExchange(context, this) {
 
       override val identifier: SiteIdentifier
         get() = this@flowOn.identifier
@@ -93,6 +93,7 @@ fun <T, M> MutableSite<T, M>.flowOn(
       override val value: StateFlow<M>
         get() = this@flowOn.value
 
-      override suspend fun event(scope: suspend EventScope<T>.(M) -> Unit) =
-          this@flowOn.event(scope)
+      override suspend fun event(
+          block: suspend EventScope<T>.(M) -> Unit,
+      ) = this@flowOn.event(block)
     }

@@ -4,7 +4,6 @@
 @file:UseSerializers(
     ColorSerializer::class,
     DpSerializer::class,
-    EventIdentifierSerializer::class,
 )
 
 package io.github.alexandrepiveteau.echo.samples.drawing.data.model
@@ -12,17 +11,13 @@ package io.github.alexandrepiveteau.echo.samples.drawing.data.model
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
-import io.github.alexandrepiveteau.echo.causal.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
-import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.encoding.decodeStructure
-import kotlinx.serialization.encoding.encodeStructure
+
+// EVENTS
 
 /**
  * A sealed class representing the different events which are supported in the drawing app, and
@@ -88,40 +83,38 @@ private object DpSerializer : KSerializer<Dp> {
   override fun serialize(encoder: Encoder, value: Dp) = encoder.encodeFloat(value.value)
 }
 
-@Serializer(forClass = EventIdentifier::class)
-private object EventIdentifierSerializer : KSerializer<EventIdentifier> {
+// CHANGES
 
-  override val descriptor =
-      buildClassSerialDescriptor("EventIdentifier") {
-        element<Int>("site")
-        element<Int>("seqno")
-      }
+/**
+ * A sealed class representing the different changes which are supported for the [DrawingEvent].
+ * Whenever an event is applied, the change will be stored, so it can be reversed by the site if
+ * needed.
+ *
+ * Similarly to [DrawingEvent], changes revolve around figures. They describe what operations to
+ * perform on them.
+ */
+@Serializable
+sealed class DrawingChange {
 
-  override fun deserialize(decoder: Decoder): EventIdentifier {
-    return decoder.decodeStructure(descriptor) {
-      var site: Int? = null
-      var seqno: Int? = null
+  /** A [DrawingChange] where nothing is performed. */
+  @Serializable object NoOp : DrawingChange()
 
-      loop@ while (true) {
-        when (val index = decodeElementIndex(descriptor)) {
-          DECODE_DONE -> break@loop
-          0 -> site = decodeIntElement(descriptor, 0)
-          1 -> seqno = decodeIntElement(descriptor, 1)
-          else -> error("Unexpected index $index.")
-        }
-      }
+  /** Puts a new figure, located [atX] and [atY], with the given [color]. */
+  @Serializable
+  data class PutFigure(
+      val isTombstone: Boolean,
+      val figure: FigureId,
+      val atX: Dp,
+      val atY: Dp,
+      val color: Color,
+  ) : DrawingChange()
 
-      EventIdentifier(
-          requireNotNull(seqno).toUInt().toSequenceNumber(),
-          requireNotNull(site).toSiteIdentifier(),
-      )
-    }
-  }
-
-  override fun serialize(encoder: Encoder, value: EventIdentifier) {
-    encoder.encodeStructure(descriptor) {
-      encodeIntElement(descriptor, 0, value.site.toInt())
-      encodeIntElement(descriptor, 1, value.seqno.toUInt().toInt())
-    }
-  }
+  /**
+   * Removes a figure from the board. The figure will no longer be present in the set of available
+   * figures.
+   */
+  @Serializable
+  data class RemoveFigure(
+      val figure: FigureId,
+  ) : DrawingChange()
 }

@@ -1,28 +1,29 @@
 package io.github.alexandrepiveteau.echo
 
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.MutableProjection
+import io.github.alexandrepiveteau.echo.core.log.mutableHistoryOf
 import io.github.alexandrepiveteau.echo.events.EventScope
-import io.github.alexandrepiveteau.echo.internal.history.ActualPersistentHistory
-import io.github.alexandrepiveteau.echo.internal.history.PersistentHistoryMutableSite
-import io.github.alexandrepiveteau.echo.internal.history.PersistentHistorySite
-import io.github.alexandrepiveteau.echo.logs.Change.Companion.skipped
-import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
-import io.github.alexandrepiveteau.echo.logs.ImmutableEventLog
-import io.github.alexandrepiveteau.echo.logs.PersistentEventLog
-import io.github.alexandrepiveteau.echo.logs.persistentEventLogOf
+import io.github.alexandrepiveteau.echo.projections.OneWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
+import io.github.alexandrepiveteau.echo.protocol.MutableSiteImpl
+import io.github.alexandrepiveteau.echo.protocol.SiteImpl
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.BinaryFormat
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 
 /**
  * An interface describing a [Site] in the distributed system.
  *
- * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface Site<T, out M> : Exchange<Inc<T>, Out<T>> {
+interface Site<out M> : Exchange<Inc, Out> {
   val value: StateFlow<M>
 }
 
@@ -34,7 +35,7 @@ interface Site<T, out M> : Exchange<Inc<T>, Out<T>> {
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface MutableSite<T, out M> : Site<T, M> {
+interface MutableSite<T, out M> : Site<M> {
 
   /** The globally unique [SiteIdentifier] for this [Site]. */
   val identifier: SiteIdentifier
@@ -43,50 +44,93 @@ interface MutableSite<T, out M> : Site<T, M> {
    * Creates some new events, that are generated in the [EventScope]. This function returns once the
    * events have been successfully added to the underlying [MutableSite].
    */
-  suspend fun event(scope: suspend EventScope<T>.(M) -> Unit)
+  suspend fun event(block: suspend EventScope<T>.(M) -> Unit)
 }
 
 /**
- * Creates a new [Site], which can not be manually mutated. These sites are mostly used replication
- * purposes.
+ * Creates a new [Site] for the provided [SiteIdentifier], with a backing history.
  *
- * @param log the underlying [PersistentEventLog] for this [site].
+ * @param events some initial events to populate the history.
+ *
  * @param T the type of the events managed by this [Site].
  */
-fun <T> site(
-    log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
-): Site<T, ImmutableEventLog<T, Nothing>> =
-    unorderedSite(
-        initial = persistentEventLogOf(),
-        log = log,
-    ) { entry, model ->
-      model.apply {
-        set(entry.identifier.site, entry.identifier.seqno, entry.body, change = skipped())
-      }
-    }
+inline fun <reified T> site(
+    vararg events: Pair<EventIdentifier, T>,
+): Site<Unit> =
+    site(
+        Unit,
+        UnitProjection,
+        *events,
+    )
 
 /**
- * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
+ * Creates a new [Site] for the provided [SiteIdentifier], with a backing log. Additionally, this
+ * overload takes a [OneWayProjection] and lets you specify a projection to apply to the data.
+ *
+ * @param initial the initial value for the projection aggregate.
+ * @param projection the [OneWayProjection] for this [Site].
+ * @param events some initial events to populate the history.
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ */
+inline fun <M, reified T> site(
+    initial: M,
+    projection: OneWayProjection<M, T>,
+    vararg events: Pair<EventIdentifier, T>,
+): Site<M> =
+    orderedSite(
+        initial,
+        OneWayMutableProjection(projection, serializer(), DefaultSerializationFormat),
+        serializer(),
+        DefaultSerializationFormat,
+        *events,
+    )
+
+/**
+ * Creates a new [Site] for the provided [SiteIdentifier], with a backing log. Additionally, this
+ * overload takes a [TwoWayProjection] and lets you specify a projection to apply to the data.
+ *
+ * @param initial the initial value for the projection aggregate.
+ * @param projection the [TwoWayProjection] for this [Site].
+ * @param events some initial events to populate the history.
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ * @param C the type of the changes generated by this [Site].
+ */
+inline fun <M, reified T, reified C> site(
+    initial: M,
+    projection: TwoWayProjection<M, T, C>,
+    vararg events: Pair<EventIdentifier, T>,
+): Site<M> =
+    orderedSite(
+        initial,
+        TwoWayMutableProjection(projection, serializer(), serializer(), DefaultSerializationFormat),
+        serializer(),
+        DefaultSerializationFormat,
+        *events,
+    )
+
+/**
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing history. The
+ * current model value of the site will always be [Unit], since it does not perform aggregations.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [io.github.alexandrepiveteau.echo.logs.PersistentEventLog] for this
- * [MutableSite].
+ * @param events some initial events to populate the history.
  *
  * @param T the type of the events managed by this [Site].
  */
-fun <T> mutableSite(
+inline fun <reified T> mutableSite(
     identifier: SiteIdentifier,
-    log: PersistentEventLog<T, Nothing> = persistentEventLogOf(),
-): MutableSite<T, PersistentEventLog<T, Nothing>> =
-    unorderedMutableSite(
-        identifier = identifier,
-        initial = persistentEventLogOf(),
-        log = log,
-    ) { entry, model ->
-      model.apply {
-        set(entry.identifier.site, entry.identifier.seqno, entry.body, change = skipped())
-      }
-    }
+    vararg events: Pair<EventIdentifier, T>,
+): MutableSite<T, Unit> =
+    mutableSite(
+        identifier,
+        Unit,
+        UnitProjection,
+        *events,
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -94,24 +138,26 @@ fun <T> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [PersistentEventLog] for this [MutableSite].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
+ * @param events some initial events to populate the history.
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
  */
-fun <M, T> mutableSite(
+inline fun <M, reified T> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: PersistentEventLog<T, M> = persistentEventLogOf(),
-    projection: OneWayProjection<M, IndexedEvent<T>>,
+    projection: OneWayProjection<M, T>,
+    vararg events: Pair<EventIdentifier, T>,
 ): MutableSite<T, M> =
-    unorderedMutableSite(
-        identifier = identifier,
-        initial = initial,
-        log = log,
-        projection = projection,
+    orderedMutableSite(
+        identifier,
+        initial,
+        OneWayMutableProjection(projection, serializer(), DefaultSerializationFormat),
+        serializer(),
+        DefaultSerializationFormat,
+        *events,
     )
 
 /**
@@ -120,58 +166,68 @@ fun <M, T> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
- * @param log the underlying [PersistentEventLog] for this [MutableSite].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [TwoWayProjection] for this [Site].
+ * @param events some initial events to populate the history.
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
  * @param C the type of the changes generated by this [Site].
  */
-fun <M, T, C> mutableSite(
+inline fun <M, reified T, reified C> mutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: PersistentEventLog<T, C> = persistentEventLogOf(),
-    projection: TwoWayProjection<M, IndexedEvent<T>, C>,
+    projection: TwoWayProjection<M, T, C>,
+    vararg events: Pair<EventIdentifier, T>,
 ): MutableSite<T, M> =
-    unorderedMutableSite(
-        identifier = identifier,
-        initial = initial,
-        log = log,
-        projection = projection,
+    orderedMutableSite(
+        identifier,
+        initial,
+        TwoWayMutableProjection(projection, serializer(), serializer(), DefaultSerializationFormat),
+        serializer(),
+        DefaultSerializationFormat,
+        *events,
     )
 
 // SITE BUILDERS
 
-internal fun <M, T> unorderedSite(
+@PublishedApi
+internal object UnitProjection : OneWayProjection<Unit, Any?> {
+  override fun forward(
+      model: Unit,
+      identifier: EventIdentifier,
+      event: Any?,
+  ) = model
+}
+
+@PublishedApi
+internal fun <M, T> orderedSite(
     initial: M,
-    log: PersistentEventLog<T, M> = persistentEventLogOf(),
-    projection: OneWayProjection<M, IndexedEvent<T>>,
-): Site<T, M> =
-    PersistentHistorySite(
-        initial = ActualPersistentHistory(initial, log, projection),
+    projection: MutableProjection<M>,
+    eventSerializer: KSerializer<T>,
+    format: BinaryFormat,
+    vararg events: Pair<EventIdentifier, T>,
+): Site<M> =
+    SiteImpl(
+        mutableHistoryOf(initial, projection),
+        eventSerializer,
+        format,
+        *events,
     )
 
-// MUTABLE SITE BUILDERS
-
-internal fun <M, T> unorderedMutableSite(
+@PublishedApi
+internal fun <M, T> orderedMutableSite(
     identifier: SiteIdentifier,
     initial: M,
-    log: PersistentEventLog<T, M> = persistentEventLogOf(),
-    projection: OneWayProjection<M, IndexedEvent<T>>,
+    projection: MutableProjection<M>,
+    eventSerializer: KSerializer<T>,
+    format: BinaryFormat,
+    vararg events: Pair<EventIdentifier, T>,
 ): MutableSite<T, M> =
-    PersistentHistoryMutableSite(
-        identifier = identifier,
-        initial = ActualPersistentHistory(initial, log, projection),
-    )
-
-internal fun <M, T, C> unorderedMutableSite(
-    identifier: SiteIdentifier,
-    initial: M,
-    log: PersistentEventLog<T, C> = persistentEventLogOf(),
-    projection: TwoWayProjection<M, IndexedEvent<T>, C>,
-): MutableSite<T, M> =
-    PersistentHistoryMutableSite(
-        identifier = identifier,
-        initial = ActualPersistentHistory(initial, log, projection),
+    MutableSiteImpl(
+        identifier,
+        eventSerializer,
+        mutableHistoryOf(initial, projection),
+        format,
+        *events,
     )
