@@ -13,7 +13,7 @@ kotlin {
     val commonMain by getting {
       dependencies {
         api(project(":echo"))
-        api(Deps.Kotlinx.SerializationJson)
+        api(Deps.Kotlinx.SerializationProtobuf)
         api(Deps.Ktor.CommonHttpCIO)
       }
     }
