@@ -2,14 +2,12 @@
 
 package party.markdown.react
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 import react.RDependenciesList
 import react.useEffectWithCleanup
 import react.useState
@@ -27,9 +25,13 @@ fun useCoroutineScope(): CoroutineScope {
  * Returns the latest emitted value of the given [StateFlow].
  *
  * @param flow the [StateFlow] that is collected.
+ * @param context the [CoroutineContext] on which collection occurs.
  */
-fun <T> useFlow(flow: StateFlow<T>): T {
-  return useFlow(initial = flow.value, flow)
+fun <T> useFlow(
+    flow: StateFlow<T>,
+    context: CoroutineContext = EmptyCoroutineContext,
+): T {
+  return useFlow(initial = flow.value, flow = flow, context = context)
 }
 
 /**
@@ -37,15 +39,19 @@ fun <T> useFlow(flow: StateFlow<T>): T {
  *
  * @param initial the initial value of the effect.
  * @param flow the [Flow] that is collected.
+ * @param context the [CoroutineContext] on which collection occurs.
  */
-fun <T> useFlow(initial: T, flow: Flow<T>): T {
+fun <T> useFlow(
+    initial: T,
+    flow: Flow<T>,
+    context: CoroutineContext = EmptyCoroutineContext,
+): T {
   val (state, setState) = useState(initial)
-  useEffectWithCleanup(listOf()) {
-    val scope = MainScope()
-    val job = flow.onEach { setState(it) }.launchIn(scope)
-    return@useEffectWithCleanup {
-      scope.cancel()
-      job.cancel()
+  useLaunchedEffect(listOf(flow, context)) {
+    if (context == EmptyCoroutineContext) {
+      flow.collect { setState(it) }
+    } else {
+      withContext(context) { flow.collect { setState(it) } }
     }
   }
   return state

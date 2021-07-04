@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.test.Ignore
+import kotlin.time.measureTime
 
 class ScalabilityTest {
 
@@ -49,7 +50,7 @@ class ScalabilityTest {
     // Of course, the huge performance boost comes from skipped operations from the primary, which
     // does not have to deliver intermediate log values to the replica.
 
-    val millis = measureTimeMillis {
+    val duration = measureTime {
       withContext(Dispatchers.Default) {
         val primary = mutableSite(Random.nextSiteIdentifier(), initial, projection = projection)
         val done = Channel<SiteIdentifier>()
@@ -74,7 +75,7 @@ class ScalabilityTest {
       }
     }
 
-    val speed = (sites * ops * 1000.0) / (millis)
-    println("Took $millis ms, at ${speed.roundToInt()} ops-site/sec.")
+    val speed = (sites * ops * 1000.0) / (duration.inWholeMilliseconds)
+    println("Took ${duration.inWholeMilliseconds} ms, at ${speed.roundToInt()} ops-site/sec.")
   }
 }
