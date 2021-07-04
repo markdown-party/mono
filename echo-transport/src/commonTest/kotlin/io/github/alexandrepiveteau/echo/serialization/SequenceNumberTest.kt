@@ -5,18 +5,14 @@ import io.github.alexandrepiveteau.echo.core.causality.toSequenceNumber
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
-
-// TODO : Move this test somewhere else
+import kotlinx.serialization.protobuf.ProtoBuf
 
 class SequenceNumberTest {
 
   private fun testEncodingDecoding(value: SequenceNumber) {
     val serializer = SequenceNumber.serializer()
-    val encoded = Json.encodeToString(serializer, value)
-    val decoded = Json.decodeFromString(serializer, encoded)
+    val encoded = ProtoBuf.encodeToByteArray(serializer, value)
+    val decoded = ProtoBuf.decodeFromByteArray(serializer, encoded)
     assertEquals(value, decoded)
   }
 
@@ -28,27 +24,6 @@ class SequenceNumberTest {
   @Test
   fun testMaxSerialization() {
     testEncodingDecoding(SequenceNumber.Max)
-  }
-
-  @Test
-  fun testFailsNegativeDeserialization() {
-    val encoded1 = "-1"
-    assertFailsWith<SerializationException> {
-      Json.decodeFromString(SequenceNumber.serializer(), encoded1)
-    }
-
-    val encoded2 = "${Long.MIN_VALUE}"
-    assertFailsWith<SerializationException> {
-      Json.decodeFromString(SequenceNumber.serializer(), encoded2)
-    }
-  }
-
-  @Test
-  fun testFailsTooBigDeserialization() {
-    val encoded = "${UInt.MAX_VALUE.toLong() + 1}"
-    assertFailsWith<SerializationException> {
-      Json.decodeFromString(SequenceNumber.serializer(), encoded)
-    }
   }
 
   @Ignore
