@@ -1,8 +1,9 @@
 package io.github.alexandrepiveteau.echo.demo.register
 
-import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
-import io.github.alexandrepiveteau.echo.logs.EventLog.IndexedEvent
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.isSpecified
+import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
@@ -12,37 +13,46 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.Serializable
 
 /**
  * A simple LWW register, where concurrent writes are resolved by looking at the highest absolute
  * timestamp.
  */
-private sealed class LWWRegisterEvent<out T> {
+@Serializable
+private sealed class LWWRegisterEvent {
 
   /** Sets the [value] in the register. */
-  data class Set<out T>(
-      val value: T,
-  ) : LWWRegisterEvent<T>()
+  @Serializable data class Set(val value: Int) : LWWRegisterEvent()
 }
-/** Aggregates the [LWWProjection] events. */
-private class LWWProjection<T> : OneWayProjection<T?, IndexedEvent<LWWRegisterEvent<T>>> {
 
-  override fun forward(body: IndexedEvent<LWWRegisterEvent<T>>, model: T?): T? =
-      when (val event = body.body) {
-        // Always pick the latest event value, which has the highest event identifier.
-        is LWWRegisterEvent.Set -> event.value
+/**
+ * Aggregates the [LWWProjection] events. The [LWWRegisterEvent.Set] operation is commutative,
+ * associate and idempotent, so we can use a [OneWayProjection].
+ */
+private class LWWProjection : OneWayProjection<Pair<EventIdentifier, Int>, LWWRegisterEvent> {
+
+  override fun forward(
+      model: Pair<EventIdentifier, Int>,
+      identifier: EventIdentifier,
+      event: LWWRegisterEvent,
+  ): Pair<EventIdentifier, Int> =
+      when (event) {
+        is LWWRegisterEvent.Set ->
+            if (model.first > identifier) model else identifier to event.value
       }
 }
 
 /** A class representing a [LWWRegister]. */
-private class LWWRegister<T>(
-    val exchange: MutableSite<LWWRegisterEvent<T>, T?>,
-) {
+private class LWWRegister(site: SiteIdentifier) {
+
+  /** The backing [exchange] for the [LWWRegister]. */
+  val exchange = mutableSite(site, EventIdentifier.Unspecified to 0, LWWProjection())
 
   /** The latest available value from the [LWWRegister]. */
-  val value: Flow<T?> = exchange.value
+  val value: Flow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
 
-  suspend fun set(value: T) {
+  suspend fun set(value: Int) {
     // By default, events are added with a highest seqno than whatever they've received until now.
     exchange.event { yield(LWWRegisterEvent.Set(value)) }
   }
@@ -52,11 +62,11 @@ class LWWRegisterTest {
 
   @Test
   fun twoSites_converge(): Unit = suspendTest {
-    val alice = SiteIdentifier(123)
-    val aliceRegister = LWWRegister<Int>(mutableSite(alice, null, projection = LWWProjection()))
+    val alice = 123U.toSiteIdentifier()
+    val aliceRegister = LWWRegister(alice)
 
-    val bob = SiteIdentifier(456)
-    val bobRegister = LWWRegister<Int>(mutableSite(bob, null, projection = LWWProjection()))
+    val bob = 456U.toSiteIdentifier()
+    val bobRegister = LWWRegister(bob)
 
     aliceRegister.set(123)
     bobRegister.set(456)

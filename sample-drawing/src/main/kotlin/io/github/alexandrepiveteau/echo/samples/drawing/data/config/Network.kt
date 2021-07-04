@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.samples.drawing.data.config
 
+import java.util.*
+
 /**
  * A [Participant] is a site that will participate in the collaborative editing session. It can be
  * reached through websockets as a receiver.
@@ -45,9 +47,9 @@ data class Config(
     fun parse(args: Array<String>): Config? {
       // TODO : extract config from CLI arguments instead ?
       if (args.isEmpty()) return null
-      if (args[0].toLowerCase() == "alice") return AliceConfig
-      if (args[0].toLowerCase() == "bob") return BobConfig
-      if (args[0].toLowerCase() == "charlie") return CharlieConfig
+      if (args[0].lowercase(Locale.getDefault()) == "alice") return AliceConfig
+      if (args[0].lowercase(Locale.getDefault()) == "bob") return BobConfig
+      if (args[0].lowercase(Locale.getDefault()) == "charlie") return CharlieConfig
       return null
     }
   }

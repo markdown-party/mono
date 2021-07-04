@@ -48,7 +48,7 @@ fun StatefulParticipants(
                   url { path(participant.path) }
                 }
             sync(
-                site.encodeToFrame(DrawingEvent.serializer()).outgoing(),
+                site.encodeToFrame().outgoing(),
                 receiver.incoming(),
             )
           } catch (problem: Throwable) {

@@ -1,15 +1,6 @@
 package io.github.alexandrepiveteau.echo.projections
 
-/**
- * A pair consisting of the new model ([data]) and a delta ([change]).
- *
- * @param M the type of the model.
- * @param C the type of the change.
- */
-data class Step<out M, out C>(
-    val data: M,
-    val change: C,
-)
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 
 /**
  * A [TwoWayProjection] applies a sequence of events of type [T] to a model of type [M]. This is a
@@ -27,11 +18,39 @@ data class Step<out M, out C>(
 interface TwoWayProjection<M, in T, C> {
 
   /**
-   * Applies the event [body] to the given [model], and returns a new immutable model and its
-   * associated change.
+   * Applies the event to the given [model], and returns a new immutable model. Additionally,
+   * changes should be issued using the [ChangeScope].
+   *
+   * @receiver the [ChangeScope] to issue some changes. You should note that the [backward] method
+   * will only be called for changes issued to the [ChangeScope], so unless your events are
+   * commutative, you should make sure to save them there.
+   *
+   * @param model the current model.
+   * @param id the [EventIdentifier] of the event.
+   * @param event the body of the event.
+   *
+   * @return the updated model.
    */
-  fun forward(body: T, model: M): Step<M, C>
+  fun ChangeScope<C>.forward(
+      model: M,
+      id: EventIdentifier,
+      event: T,
+  ): M
 
-  /** Reverses an event on a [model] by applying the given [change]. */
-  fun backward(change: C, model: M): M
+  /**
+   * Reverses a change issued during [forward] traversal.
+   *
+   * @param model the current model.
+   * @param id the [EventIdentifier] of the event.
+   * @param event the body of the event.
+   * @param change the body of the change.
+   *
+   * @return the updated model.
+   */
+  fun backward(
+      model: M,
+      id: EventIdentifier,
+      event: T,
+      change: C,
+  ): M
 }

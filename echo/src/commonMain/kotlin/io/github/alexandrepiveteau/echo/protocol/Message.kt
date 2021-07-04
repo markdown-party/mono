@@ -1,9 +1,10 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.causal.SequenceNumber
-import io.github.alexandrepiveteau.echo.causal.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import kotlinx.serialization.Serializable
 
 /**
  * A sealed class for all the messages defined in the protocol.
@@ -52,9 +53,10 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
  * events, but may not issue any additional request. You should send a _Done_ message right away,
  * before emptying the in-flight queue.
  */
-sealed class Message<out T> {
+sealed class Message {
 
-  sealed class Incoming<out T> : Message<T>() {
+  @Serializable
+  sealed class Incoming : Message() {
 
     /**
      * This message is sent to let the other site know that we have some events at our disposable
@@ -71,10 +73,11 @@ sealed class Message<out T> {
      * @param site the [SiteIdentifier] for the available site.
      * @param nextSeqno the next expected [SequenceNumber] for the available site.
      */
+    @Serializable
     data class Advertisement(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
-    ) : Incoming<Nothing>()
+    ) : Incoming()
 
     /**
      * This message is sent once the sender is done advertising all of its initial sites. This does
@@ -85,7 +88,7 @@ sealed class Message<out T> {
      * When you're interested in one-off syncs, this is usually a good place to start ignoring new
      * [Advertisement] messages.
      */
-    object Ready : Incoming<Nothing>()
+    @Serializable object Ready : Incoming()
 
     /**
      * Sends an event, alongside its body, to the [Outgoing] side. When sending an event, you
@@ -96,16 +99,37 @@ sealed class Message<out T> {
      * @param site the site that issued this [Event].
      * @param body the domain-specific body of the [Event].
      */
-    data class Event<out T>(
+    @Serializable
+    data class Event(
         val seqno: SequenceNumber,
         val site: SiteIdentifier,
-        val body: T,
-    ) : Incoming<T>()
+        val body: ByteArray,
+    ) : Incoming() {
+
+      override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is Event) return false
+
+        if (seqno != other.seqno) return false
+        if (site != other.site) return false
+        if (!body.contentEquals(other.body)) return false
+
+        return true
+      }
+
+      override fun hashCode(): Int {
+        var result = seqno.hashCode()
+        result = 31 * result + site.hashCode()
+        result = 31 * result + body.contentHashCode()
+        return result
+      }
+    }
 
     companion object
   }
 
-  sealed class Outgoing<out T> : Message<T>() {
+  @Serializable
+  sealed class Outgoing : Message() {
 
     /**
      * Indicates the next sequence number that is not known by the [Outgoing] side for a specific
@@ -117,10 +141,11 @@ sealed class Message<out T> {
      * @param site the identifier for the site.
      * @param nextSeqno the next expected sequence number for this site.
      */
+    @Serializable
     data class Acknowledge(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
-    ) : Outgoing<Nothing>()
+    ) : Outgoing()
 
     /**
      * Indicates that the [Outgoing] side of the [Link] is ready to receive some events. A [Request]
@@ -134,10 +159,11 @@ sealed class Message<out T> {
      * @param site the site identifier for which we're interested in this sequence number.
      * @param count how many events were requested.
      */
+    @Serializable
     data class Request(
         val site: SiteIdentifier,
         val count: UInt,
-    ) : Outgoing<Nothing>()
+    ) : Outgoing()
 
     companion object
   }
