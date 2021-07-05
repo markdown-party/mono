@@ -1,4 +1,4 @@
-package party.markdown.rga
+package party.markdown.rga.utils
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

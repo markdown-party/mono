@@ -1,8 +1,11 @@
-package party.markdown.rga
+package party.markdown.rga.utils
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import party.markdown.rga.MutableRGA
+import party.markdown.rga.RGAEvent
+import party.markdown.rga.RGAProjection
 
 /**
  * A simple aggregate of events that can be used to write some unit tests of the RGA replicated data
@@ -30,9 +33,9 @@ class RGAAggregate {
    * @param event the [RGAEvent] that is pushed.
    */
   fun event(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-      event: RGAEvent,
+    seqno: SequenceNumber,
+    site: SiteIdentifier,
+    event: RGAEvent,
   ) {
     current = projection.forward(current, EventIdentifier(seqno, site), event)
   }
@@ -54,8 +57,8 @@ class RGAAggregate {
      * @param block the test block.
      */
     fun permutations(
-        vararg events: Pair<EventIdentifier, RGAEvent>,
-        block: CharArray.() -> Unit,
+      vararg events: Pair<EventIdentifier, RGAEvent>,
+      block: CharArray.() -> Unit,
     ) {
       for (perm in events.toList().permutations()) {
         with(RGAAggregate()) {
