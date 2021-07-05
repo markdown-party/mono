@@ -1,6 +1,3 @@
-public abstract interface annotation class io/github/alexandrepiveteau/echo/EchoEventLogPreview : java/lang/annotation/Annotation {
-}
-
 public abstract interface class io/github/alexandrepiveteau/echo/Exchange : io/github/alexandrepiveteau/echo/ReceiveExchange, io/github/alexandrepiveteau/echo/SendExchange {
 }
 
@@ -54,9 +51,6 @@ public final class io/github/alexandrepiveteau/echo/UnitProjection : io/github/a
 	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/UnitProjection;
 	public synthetic fun forward-fj1MGSY (Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
 	public fun forward-fj1MGSY (Lkotlin/Unit;JLjava/lang/Object;)V
-}
-
-public abstract interface annotation class io/github/alexandrepiveteau/echo/events/EventDsl : java/lang/annotation/Annotation {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/events/EventScope {
