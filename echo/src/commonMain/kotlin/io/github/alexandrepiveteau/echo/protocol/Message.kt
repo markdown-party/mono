@@ -90,7 +90,7 @@ sealed class Message {
      * When you're interested in one-off syncs, this is usually a good place to start ignoring new
      * [Advertisement] messages.
      */
-    @SerialName("rdy") @Serializable object Ready : Incoming()
+    @Serializable @SerialName("rdy") object Ready : Incoming()
 
     /**
      * Sends an event, alongside its body, to the [Outgoing] side. When sending an event, you
