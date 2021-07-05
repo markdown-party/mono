@@ -8,7 +8,6 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  *
  * @param T the type of the application-specific event data.
  */
-@EventDsl
 // TODO : Make this a fun interface when b/KT-40165 is fixed.
 /* fun */ interface EventScope<in T> {
 
