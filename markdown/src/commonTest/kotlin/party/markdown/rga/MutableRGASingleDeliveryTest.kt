@@ -114,7 +114,7 @@ class MutableRGASingleDeliveryTest {
 
   @Test
   fun manyConsecutiveInsertions() {
-    val count = 8 // 8! = 40'320 inter-leavings to be tested.
+    val count = 6 // 6! = 720 inter-leavings to be tested.
     val expected = CharArray(count) { it.digitToChar() }
 
     val alice = SiteIdentifier.Min
