@@ -43,4 +43,28 @@ class RGAAggregate {
    * @param block the function in which you should make assertions over the RGA.
    */
   fun test(block: CharArray.() -> Unit): Unit = block(current.toCharArray())
+
+  companion object {
+
+    /**
+     * Tests that the all the permutations of the given events satisfy some conditions. The test
+     * [block] will therefore be executed `events!` times.
+     *
+     * @param events the events that will be permuted.
+     * @param block the test block.
+     */
+    fun permutations(
+        vararg events: Pair<EventIdentifier, RGAEvent>,
+        block: CharArray.() -> Unit,
+    ) {
+      for (perm in events.toList().permutations()) {
+        with(RGAAggregate()) {
+          for ((id, event) in perm) {
+            event(id.seqno, id.site, event)
+          }
+          test(block)
+        }
+      }
+    }
+  }
 }
