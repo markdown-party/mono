@@ -33,11 +33,24 @@ class RGAAggregate {
    * @param event the [RGAEvent] that is pushed.
    */
   fun event(
-    seqno: SequenceNumber,
-    site: SiteIdentifier,
-    event: RGAEvent,
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      event: RGAEvent,
   ) {
     current = projection.forward(current, EventIdentifier(seqno, site), event)
+  }
+
+  /**
+   * Pushes a [RGAEvent] to the aggregate, applying it immediately.
+   *
+   * @param identifier the [EventIdentifier] for the event.
+   * @param event the [RGAEvent] that is pushed.
+   */
+  fun event(
+      identifier: EventIdentifier,
+      event: RGAEvent,
+  ) {
+    event(identifier.seqno, identifier.site, event)
   }
 
   /**
@@ -57,15 +70,15 @@ class RGAAggregate {
      * @param block the test block.
      */
     fun permutations(
-      vararg events: Pair<EventIdentifier, RGAEvent>,
-      block: CharArray.() -> Unit,
+        vararg events: Pair<EventIdentifier, RGAEvent>,
+        block: CharArray.(List<Pair<EventIdentifier, RGAEvent>>) -> Unit,
     ) {
       for (perm in events.toList().permutations()) {
         with(RGAAggregate()) {
           for ((id, event) in perm) {
             event(id.seqno, id.site, event)
           }
-          test(block)
+          test { block(perm) }
         }
       }
     }

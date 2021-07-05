@@ -7,6 +7,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.toCharArray
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
 
 /**
  * A [MutableRGA] aggregates [RGAEvent] and mutates its internal state to compute a distributed
@@ -51,9 +52,13 @@ class MutableRGA {
   private val identifiers = MutableEventIdentifierGapBuffer(0)
   private val offsets = MutableEventIdentifierGapBuffer(0)
 
-  // A (reused) buffer that indicates the identifiers of the events that should be inserted from
-  // the pending pool.
-  private val pendingIdentifiers = MutableEventIdentifierGapBuffer(0)
+  private fun offsetInRGA(offset: EventIdentifier): Boolean {
+    var offsetInRGA = offset.isUnspecified
+    for (i in 0 until identifiers.size) {
+      if (identifiers[i] == offset) offsetInRGA = true
+    }
+    return offsetInRGA
+  }
 
   /**
    * Inserts a [Char] atom after the given [EventIdentifier] offset. The inserted [Char] has a
@@ -70,25 +75,36 @@ class MutableRGA {
       value: Char,
       offset: EventIdentifier,
   ) {
-    pendingInserts.add(site, seqno, value, offset)
-    pendingIdentifiers.push(EventIdentifier(seqno, site))
+    if (offsetInRGA(offset)) {
+      insertOne(site, seqno, value, offset)
+      insertPending(EventIdentifier(seqno, site))
+    } else {
+      pendingInserts.add(site, seqno, value, offset)
+    }
+  }
 
-    while (pendingIdentifiers.size > 0) {
-      val id = pendingIdentifiers[0]
-      allIds@ while (true) {
-        val index = pendingInserts.index(id)
-        if (index >= 0) {
-          insertOne(
-              pendingInserts.identifier(index).site,
-              pendingInserts.identifier(index).seqno,
-              pendingInserts.value(index),
-              pendingInserts.offset(index),
-          )
-          pendingIdentifiers.push(pendingInserts.identifier(index), offset = 1)
-          pendingInserts.remove(index)
-        } else break@allIds
+  // A (reused) buffer that indicates the identifiers of the events that should be inserted from
+  // the pending pool.
+  private val pendingIdentifiers = ArrayDeque<EventIdentifier>()
+
+  private fun insertPending(offset: EventIdentifier) {
+    pendingIdentifiers.addLast(offset)
+    while (pendingIdentifiers.isNotEmpty()) {
+      val currentOffset = pendingIdentifiers.first()
+      val next = pendingInserts.next(currentOffset)
+      if (next < 0) {
+        // We've exhausted all the events waiting for that offset.
+        pendingIdentifiers.removeFirst()
+        continue
       }
-      pendingIdentifiers.remove(0)
+      insertOne(
+          pendingInserts.identifier(next).site,
+          pendingInserts.identifier(next).seqno,
+          pendingInserts.value(next),
+          pendingInserts.offset(next),
+      )
+      pendingIdentifiers.addLast(pendingInserts.identifier(next))
+      pendingInserts.remove(next)
     }
   }
 
@@ -99,9 +115,9 @@ class MutableRGA {
       value: Char,
       offset: EventIdentifier,
   ) {
-    // Inspired by the Optimized RGA merge algorithm. There are some substantial changes though:
+    // Inspired by the Optimized RGA merge algorithm. There are some changes though:
     //
-    // 1. If an anchor is not (yet) known, the insertion is postponed !
+    // 1. If an anchor is not (yet) known, the insertion is postponed and this method not called !
     // 2. If the node was deleted before being inserted, the deletion is applied properly.
     // 3. No allocations are required to store the nodes.
     //
@@ -110,7 +126,7 @@ class MutableRGA {
     var insertion = NOT_FOUND
     var i = 0
 
-    while (i < chars.size && (anchor != -1 && insertion != -1)) {
+    while (i < chars.size) {
       when {
         // 1. Do not insert node duplicates.
         identifiers[i] == EventIdentifier(seqno, site) -> return
@@ -124,7 +140,10 @@ class MutableRGA {
 
         // 3. We've found the index at which we're interested in inserting the node. The most recent
         // insertions have to come directly after the current node, to guarantee good RGA semantics.
-        EventIdentifier(seqno, site) > identifiers[i] && insertion == NOT_FOUND -> insertion = i
+        EventIdentifier(seqno, site) > identifiers[i] && insertion == NOT_FOUND -> {
+          insertion = i
+          if (anchor > -1) break
+        }
       }
 
       // Increment the index.
@@ -139,7 +158,6 @@ class MutableRGA {
     // Finally, insert at the insertion point (or at the end of the buffer if more no insertion
     // point was found.
     when {
-      anchor == NOT_FOUND -> pendingInserts.add(site, seqno, insertedValue, offset)
       insertion != NOT_FOUND -> {
         identifiers.push(EventIdentifier(seqno, site), offset = insertion)
         chars.push(insertedValue, offset = insertion)
