@@ -56,6 +56,41 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBu
 	public static synthetic fun pushAtGap$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;[BIIILjava/lang/Object;)V
 }
 
+public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer {
+	public abstract fun clear ()V
+	public abstract fun copyInto ([CIII)[C
+	public abstract fun get (I)C
+	public abstract fun getBacking ()[C
+	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
+	public abstract fun getSize ()I
+	public abstract fun push (CI)V
+	public abstract fun push ([CIII)V
+	public abstract fun remove (II)[C
+	public abstract fun set (IC)V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer$DefaultImpls {
+	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CIIIILjava/lang/Object;)[C
+	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;CIILjava/lang/Object;)V
+	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CIIIILjava/lang/Object;)V
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;IIILjava/lang/Object;)[C
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer_ExtensionsKt {
+	public static final fun MutableCharGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
+	public static final fun MutableCharGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
+	public static final fun mutableCharGapBufferOf ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
+	public static final fun toCharArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;)[C
+	public static final fun toMutableGapBuffer ([C)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
+	public static final fun toTypedArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;)[Ljava/lang/Character;
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer_GapKt {
+	public static final fun pushAtGap (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;C)V
+	public static final fun pushAtGap (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CII)V
+	public static synthetic fun pushAtGap$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CIIILjava/lang/Object;)V
+}
+
 public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer {
 	public abstract fun clear ()V
 	public abstract fun copyInto (Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;III)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
