@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -74,6 +75,7 @@ sealed class Message {
      * @param nextSeqno the next expected [SequenceNumber] for the available site.
      */
     @Serializable
+    @SerialName("adv")
     data class Advertisement(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
@@ -88,7 +90,7 @@ sealed class Message {
      * When you're interested in one-off syncs, this is usually a good place to start ignoring new
      * [Advertisement] messages.
      */
-    @Serializable object Ready : Incoming()
+    @SerialName("rdy") @Serializable object Ready : Incoming()
 
     /**
      * Sends an event, alongside its body, to the [Outgoing] side. When sending an event, you
@@ -100,6 +102,7 @@ sealed class Message {
      * @param body the domain-specific body of the [Event].
      */
     @Serializable
+    @SerialName("e")
     data class Event(
         val seqno: SequenceNumber,
         val site: SiteIdentifier,
@@ -142,6 +145,7 @@ sealed class Message {
      * @param nextSeqno the next expected sequence number for this site.
      */
     @Serializable
+    @SerialName("ack")
     data class Acknowledge(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
@@ -160,6 +164,7 @@ sealed class Message {
      * @param count how many events were requested.
      */
     @Serializable
+    @SerialName("req")
     data class Request(
         val site: SiteIdentifier,
         val count: UInt,

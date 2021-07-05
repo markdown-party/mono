@@ -7,7 +7,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-// TODO : Use a human-readable representation ?
 internal object EventIdentifierSerializer : KSerializer<EventIdentifier> {
 
   override val descriptor: SerialDescriptor =
