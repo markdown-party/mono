@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 class MutableEventIdentifierGapBufferSearchTest {
 
   @Test
-  fun test_FindsRange() {
+  fun test_FindsInsertionIndex() {
     val count = 1000u
     val buffer =
         mutableEventIdentifierGapBufferOf().apply {
@@ -23,6 +23,24 @@ class MutableEventIdentifierGapBufferSearchTest {
       val id = EventIdentifier(Min + i, SiteIdentifier.Min)
       val index = i.toInt()
       assertEquals(index, -(buffer.binarySearch(id) + 1)) // inverted index
+      assertEquals(index, -(buffer.linearSearch(id) + 1)) // inverted index
+    }
+  }
+
+  @Test
+  fun test_FindsIndex() {
+    val count = 1000u
+    val buffer =
+        mutableEventIdentifierGapBufferOf().apply {
+          for (i in 0u..count) {
+            push(EventIdentifier(Min + i, SiteIdentifier.Min))
+          }
+        }
+
+    for (i in 0u..count) {
+      val id = EventIdentifier(Min + i, SiteIdentifier.Min)
+      val index = i.toInt()
+      assertEquals(index, buffer.binarySearch(id))
       assertEquals(index, buffer.linearSearch(id))
     }
   }

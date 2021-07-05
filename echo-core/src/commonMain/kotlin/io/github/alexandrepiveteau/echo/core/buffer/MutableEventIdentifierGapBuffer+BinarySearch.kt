@@ -24,10 +24,11 @@ fun MutableEventIdentifierGapBuffer.linearSearch(
   require(value.isSpecified)
   var index = 0
   while (index < size) {
-    if (get(index) > value) return index
+    if (get(index) == value) return index
+    if (get(index) > value) return -index - 1 // Inverted insertion point.
     index++
   }
-  return index
+  return -size - 1
 }
 
 // BINARY SEARCH
