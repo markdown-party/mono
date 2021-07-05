@@ -27,11 +27,12 @@ import kotlinx.coroutines.yield
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
 
-internal open class SiteImpl<T, M>(
-    private val history: MutableHistory<M>,
+internal open class SiteImpl<T, M, R>(
+    private val history: MutableHistory<R>,
     serializer: KSerializer<T>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
+    private val transform: (R) -> M,
 ) : Site<M> {
 
   // Pre-populate with the initial events of the log.
@@ -45,7 +46,7 @@ internal open class SiteImpl<T, M>(
    * The current [history] value. Accesses to set the [current] value are protected through mutual
    * exclusion via the [Mutex] variable.
    */
-  internal val current = MutableStateFlow(history.current)
+  internal val current = MutableStateFlow(transform(history.current))
 
   /** The [Mutex] that protects access to the [current] and [sentinel] variables. */
   internal val mutex = Mutex()
@@ -72,7 +73,7 @@ internal open class SiteImpl<T, M>(
   ): Link<I, O> = channelLink { inc ->
     val channel = sentinel.produceIn(this)
     val publish = {
-      current.value = history.current
+      current.value = transform(history.current)
       sentinel.value = sentinel.value + 1U
     }
     val scope = ExchangeScopeImpl(mutex, history, channel, inc, this, publish)
@@ -91,19 +92,28 @@ internal open class SiteImpl<T, M>(
   override fun incoming() = exchange<Out, Inc> { startOutgoing() }
 }
 
-internal open class MutableSiteImpl<T, M>(
+internal open class MutableSiteImpl<T, M, R>(
     override val identifier: SiteIdentifier,
     private val serializer: KSerializer<T>,
-    history: MutableHistory<M>,
+    history: MutableHistory<R>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
-) : SiteImpl<T, M>(history, serializer, format, *events), MutableSite<T, M> {
+    transform: (R) -> M,
+) :
+    SiteImpl<T, M, R>(
+        history = history,
+        serializer = serializer,
+        format = format,
+        events = events,
+        transform = transform,
+    ),
+    MutableSite<T, M> {
 
   private val scope =
       object : EventScope<T> {
         override suspend fun yield(event: T): EventIdentifier {
           val id = history.append(identifier, format.encodeToByteArray(serializer, event))
-          current.value = history.current
+          current.value = transform(history.current)
           sentinel.value = sentinel.value + 1U
           return id
         }

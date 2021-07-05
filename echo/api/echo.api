@@ -31,8 +31,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/Site : io/githu
 }
 
 public final class io/github/alexandrepiveteau/echo/SiteKt {
-	public static final fun orderedMutableSite-UQNCs_s (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun orderedSite (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun orderedMutableSite-DIH5q_I (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun orderedSite (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {
