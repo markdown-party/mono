@@ -14,7 +14,7 @@ import party.markdown.rga.RGAProjection
  * Standard usage looks as follows :
  *
  * ```kotlin
- * with(RGAAggregate) {
+ * with(RGAAggregate()) {
  *   event(RGAEvent.Remove(EventIdentifier.Unspecified))
  *   test { assertTrue(isEmpty()) }
  * }
