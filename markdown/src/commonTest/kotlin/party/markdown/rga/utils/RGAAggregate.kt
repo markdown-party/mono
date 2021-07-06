@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import party.markdown.rga.MutableRGA
 import party.markdown.rga.RGAEvent
 import party.markdown.rga.RGAProjection
+import party.markdown.utils.permutations
 
 /**
  * A simple aggregate of events that can be used to write some unit tests of the RGA replicated data
