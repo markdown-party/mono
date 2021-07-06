@@ -41,8 +41,7 @@ private class ChangeScopeAdapter<in T>(
  * @param M the type of the model.
  * @param T the type of the events.
  */
-@PublishedApi
-internal class OneWayMutableProjection<M, T>(
+class OneWayMutableProjection<M, T>(
     private val projection: OneWayProjection<M, T>,
     private val eventSerializer: KSerializer<T>,
     private val format: BinaryFormat,
@@ -87,8 +86,7 @@ internal class OneWayMutableProjection<M, T>(
  * @param T the type of the events.
  * @param C the type of the changes.
  */
-@PublishedApi
-internal class TwoWayMutableProjection<M, T, C>(
+class TwoWayMutableProjection<M, T, C>(
     private val projection: TwoWayProjection<M, T, C>,
     private val changeSerializer: KSerializer<C>,
     private val eventSerializer: KSerializer<T>,
