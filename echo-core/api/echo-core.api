@@ -200,6 +200,12 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuf
 	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;IIILjava/lang/Object;)[I
 }
 
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer_BinarySearchKt {
+	public static final fun binarySearch (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;III)I
+	public static synthetic fun binarySearch$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;IIIILjava/lang/Object;)I
+	public static final fun linearSearch (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;I)I
+}
+
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer_ExtensionsKt {
 	public static final fun MutableIntGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
 	public static final fun MutableIntGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
