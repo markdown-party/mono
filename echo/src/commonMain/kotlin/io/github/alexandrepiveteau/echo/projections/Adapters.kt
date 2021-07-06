@@ -20,7 +20,7 @@ import kotlinx.serialization.KSerializer
  */
 private class ChangeScopeAdapter<in T>(
     private val serializer: KSerializer<T>,
-    private val scope: CoreChangeScope,
+    var scope: CoreChangeScope,
     private val format: BinaryFormat,
 ) : ChangeScope<T> {
 
@@ -95,6 +95,29 @@ internal class TwoWayMutableProjection<M, T, C>(
     private val format: BinaryFormat,
 ) : MutableProjection<M> {
 
+  // Optimization : reuse a single ChangeScopeAdapter instance, rather than allocating one on each
+  // forward call.
+  private var reused: ChangeScopeAdapter<C>? = null
+
+  /**
+   * Retrieves a pooled [ChangeScopeAdapter] that may be used with the given [CoreChangeScope]. A
+   * new instance will only be created the first time the [ChangeScopeAdapter] is requested.
+   *
+   * @param scope the [CoreChangeScope] to use.
+   *
+   * @return a (not thread-safe) pooled [ChangeScopeAdapter].
+   */
+  private fun scope(scope: CoreChangeScope): ChangeScopeAdapter<C> {
+    val impl = reused ?: ChangeScopeAdapter(changeSerializer, scope, format)
+
+    // Update the required fields.
+    impl.scope = scope
+    reused = impl
+
+    // Return the reused instance.
+    return impl
+  }
+
   override fun CoreChangeScope.forward(
       model: M,
       identifier: EventIdentifier,
@@ -103,7 +126,7 @@ internal class TwoWayMutableProjection<M, T, C>(
       until: Int,
   ) =
       with(projection) {
-        ChangeScopeAdapter(changeSerializer, this@forward, format)
+        scope(this@forward)
             .forward(
                 model = model,
                 id = identifier,
