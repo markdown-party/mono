@@ -53,10 +53,6 @@ internal class MutablePendingInsertBuffer {
     return offsets.binarySearch(offset)
   }
 
-  fun index(id: EventIdentifier): Int {
-    return ids.linearSearch(id)
-  }
-
   /** Removes the value at the given [index]. */
   fun remove(index: Int) {
     offsets.remove(index)
