@@ -134,6 +134,52 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIden
 	public static final fun pushAtGap--oNUasc (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;J)V
 }
 
+public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer {
+	public abstract fun clear ()V
+	public abstract fun copyInto ([Ljava/lang/Object;III)[Ljava/lang/Object;
+	public abstract fun get (I)Ljava/lang/Object;
+	public abstract fun getBacking ()[Ljava/lang/Object;
+	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
+	public abstract fun getSize ()I
+	public abstract fun push (Ljava/lang/Object;I)V
+	public abstract fun push ([Ljava/lang/Object;III)V
+	public abstract fun remove (II)[Ljava/lang/Object;
+	public abstract fun set (ILjava/lang/Object;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer$DefaultImpls {
+	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;IIIILjava/lang/Object;)[Ljava/lang/Object;
+	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;Ljava/lang/Object;IILjava/lang/Object;)V
+	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;IIIILjava/lang/Object;)V
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;IIILjava/lang/Object;)[Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBufferImpl : io/github/alexandrepiveteau/echo/core/buffer/Gap, io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer {
+	public fun <init> ([Ljava/lang/Object;)V
+	public fun clear ()V
+	public fun copyInto ([Ljava/lang/Object;III)[Ljava/lang/Object;
+	public fun get (I)Ljava/lang/Object;
+	public fun getBacking ()[Ljava/lang/Object;
+	public fun getEndIndex ()I
+	public fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
+	public fun getSize ()I
+	public fun getStartIndex ()I
+	public fun push (Ljava/lang/Object;I)V
+	public fun push ([Ljava/lang/Object;III)V
+	public fun remove (II)[Ljava/lang/Object;
+	public fun set (ILjava/lang/Object;)V
+	public fun setEndIndex (I)V
+	public fun setStartIndex (I)V
+	public fun shift (I)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer_GapKt {
+	public static final fun pushAtGap (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;Ljava/lang/Object;)V
+	public static final fun pushAtGap (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;II)V
+	public static synthetic fun pushAtGap$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;IIILjava/lang/Object;)V
+}
+
 public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer {
 	public abstract fun clear ()V
 	public abstract fun copyInto ([IIII)[I
