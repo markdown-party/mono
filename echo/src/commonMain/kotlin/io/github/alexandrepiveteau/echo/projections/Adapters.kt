@@ -99,6 +99,25 @@ internal class TwoWayMutableProjection<M, T, C>(
   // forward call.
   private var reused: ChangeScopeAdapter<C>? = null
 
+  /**
+   * Retrieves a pooled [ChangeScopeAdapter] that may be used with the given [CoreChangeScope]. A
+   * new instance will only be created the first time the [ChangeScopeAdapter] is requested.
+   *
+   * @param scope the [CoreChangeScope] to use.
+   *
+   * @return a (not thread-safe) pooled [ChangeScopeAdapter].
+   */
+  private fun scope(scope: CoreChangeScope): ChangeScopeAdapter<C> {
+    val impl = reused ?: ChangeScopeAdapter(changeSerializer, scope, format)
+
+    // Update the required fields.
+    impl.scope = scope
+    reused = impl
+
+    // Return the reused instance.
+    return impl
+  }
+
   override fun CoreChangeScope.forward(
       model: M,
       identifier: EventIdentifier,
@@ -107,20 +126,12 @@ internal class TwoWayMutableProjection<M, T, C>(
       until: Int,
   ) =
       with(projection) {
-        val changeScopeAdapter =
-            reused?.apply { scope = this@forward }
-                ?: ChangeScopeAdapter(
-                    changeSerializer,
-                    this@forward,
-                    format,
-                )
-        reused = changeScopeAdapter
-
-        changeScopeAdapter.forward(
-            model = model,
-            id = identifier,
-            event = format.decodeFromByteArray(eventSerializer, data.copyOfRange(from, until)),
-        )
+        scope(this@forward)
+            .forward(
+                model = model,
+                id = identifier,
+                event = format.decodeFromByteArray(eventSerializer, data.copyOfRange(from, until)),
+            )
       }
 
   override fun backward(
