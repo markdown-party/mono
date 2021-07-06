@@ -3,7 +3,7 @@ package party.markdown.rga
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 
-class RGAProjection : OneWayProjection<MutableRGA, RGAEvent> {
+object RGAProjection : OneWayProjection<MutableRGA, RGAEvent> {
 
   override fun forward(
       model: MutableRGA,

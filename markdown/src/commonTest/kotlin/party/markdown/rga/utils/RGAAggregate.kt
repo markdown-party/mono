@@ -23,7 +23,6 @@ import party.markdown.rga.RGAProjection
 class RGAAggregate {
 
   private var current = MutableRGA()
-  private val projection = RGAProjection()
 
   /**
    * Pushes a [RGAEvent] to the aggregate, applying it immediately.
@@ -37,7 +36,7 @@ class RGAAggregate {
       site: SiteIdentifier,
       event: RGAEvent,
   ) {
-    current = projection.forward(current, EventIdentifier(seqno, site), event)
+    current = RGAProjection.forward(current, EventIdentifier(seqno, site), event)
   }
 
   /**
