@@ -21,7 +21,6 @@ import io.github.alexandrepiveteau.echo.core.requireIn
 fun MutableEventIdentifierGapBuffer.linearSearch(
     value: EventIdentifier,
 ): Int {
-  require(value.isSpecified)
   var index = 0
   while (index < size) {
     if (get(index) == value) return index
