@@ -90,9 +90,9 @@ class MutableTree {
   fun ChangeScope<TreeChange>.move(id: TreeNodeIdentifier, anchor: TreeNodeIdentifier) {
     // Only move if we have a vertex.
     if (!association.hasVertex(id)) return
-    if (!association.hasVertex(anchor)) return
+    if (!association.hasVertex(anchor) && anchor != TreeNodeRoot) return
     val idVertex = association.vertex(id)
-    val anchorVertex = association.vertex(anchor)
+    val anchorVertex = if (anchor == TreeNodeRoot) folder else association.vertex(anchor)
     if (type[anchorVertex] != NodeType.Folder) return // you can't move files below folders.
     move(idVertex, anchorVertex)
   }
@@ -164,14 +164,27 @@ class MutableTree {
     checkInvariants()
   }
 
-  /** Recursively aggregates the given [vertex] into a [TreeNode]. */
-  private fun toTree(vertex: Int): TreeNode {
-    when (type[vertex]) {
-      NodeType.Folder -> TODO()
-      NodeType.Text -> TODO()
-      null -> error("Unknown TreeNode type.")
-    }
+  private fun toFolder(vertex: Int): TreeNode {
+    val id = if (vertex == folder) TreeNodeRoot else association.identifier(vertex)
+    return TreeNode.Folder(
+        id = id,
+        children = graph.neighbours(vertex).map(this::toTree),
+        name = names[id],
+    )
   }
+
+  private fun toFile(vertex: Int): TreeNode {
+    val id = association.identifier(vertex)
+    return TreeNode.MarkdownFile(id, names[id])
+  }
+
+  /** Recursively aggregates the given [vertex] into a [TreeNode]. */
+  private fun toTree(vertex: Int): TreeNode =
+      when (type[vertex]) {
+        NodeType.Folder -> toFolder(vertex)
+        NodeType.Text -> toFile(vertex)
+        null -> error("Unknown TreeNode type.")
+      }
 
   /** Aggregates the tree of nodes into an immutable [TreeNode]. */
   fun toTree(): TreeNode {

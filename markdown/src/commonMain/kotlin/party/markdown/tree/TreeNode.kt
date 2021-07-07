@@ -12,7 +12,7 @@ sealed interface TreeNode {
   val id: TreeNodeIdentifier
 
   /** The display name for this [TreeNode]. */
-  val name: String
+  val name: String?
 
   /**
    * A folder that contains a [List] of [children].
@@ -24,7 +24,7 @@ sealed interface TreeNode {
   data class Folder(
       override val id: TreeNodeIdentifier,
       val children: List<TreeNode>,
-      override val name: String,
+      override val name: String?,
   ) : TreeNode
 
   /**
@@ -35,6 +35,6 @@ sealed interface TreeNode {
    */
   data class MarkdownFile(
       override val id: TreeNodeIdentifier,
-      override val name: String,
+      override val name: String?,
   ) : TreeNode
 }
