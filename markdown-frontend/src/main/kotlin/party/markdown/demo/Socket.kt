@@ -1,17 +1,14 @@
 package party.markdown.demo
 
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
-import io.github.alexandrepiveteau.echo.ktor.wssExchange
+import io.github.alexandrepiveteau.echo.ktor.EchoKtorPreview
 import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
 import io.github.alexandrepiveteau.echo.sync
-import io.ktor.client.*
-import io.ktor.client.engine.js.*
-import io.ktor.client.features.websocket.*
-import io.ktor.client.request.*
 import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.html.js.onClickFunction
+import party.markdown.data.Configuration
+import party.markdown.data.toExchange
 import party.markdown.react.useCoroutineScope
 import party.markdown.react.useFlow
 import party.markdown.react.useLaunchedEffect
@@ -20,25 +17,7 @@ import react.*
 import react.dom.button
 import react.dom.h1
 
-private val Client = HttpClient(Js) { install(WebSockets) }
-private val Remote =
-    Client.wssExchange(
-            receiver = {
-              port = 443
-              url {
-                host = "api.markdown.party"
-                path("receiver")
-              }
-            },
-            sender = {
-              port = 443
-              url {
-                host = "api.markdown.party"
-                path("sender")
-              }
-            },
-        )
-        .decodeFromFrame()
+@OptIn(EchoKtorPreview::class) private val Remote = Configuration.Default.toExchange()
 
 private val State =
     mutableSite(
