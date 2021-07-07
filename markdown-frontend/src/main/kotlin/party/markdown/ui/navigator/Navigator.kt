@@ -1,9 +1,10 @@
 package party.markdown.ui.navigator
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import kotlinx.html.classes
 import party.markdown.tree.TreeNode
 import react.*
-import react.dom.p
+import react.dom.div
 
 /**
  * Creates a new [ReactElement] that displays the file navigator, and lets the user perform some
@@ -52,13 +53,19 @@ private fun TreeNode.flatten(): List<Node> {
 private val navigator =
     functionalComponent<NavigatorProps> { props ->
       val nodes = props.tree.flatten()
-      for (node in nodes) {
-        p {
-          key = node.key.toString()
+      div {
+        attrs {
+          classes = classes + setOf("flex", "flex-col", "items-start")
+          classes = classes + setOf("bg-gray-700", "text-white")
+          classes = classes + setOf("p-2")
+        }
+        for (node in nodes) {
           file {
+            key = node.key.toString()
             name = node.name ?: "Unknown"
             isFolder = node.folder
             indentLevel = node.indent
+            selected = node.indent == 0
           }
         }
       }
