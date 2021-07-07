@@ -107,7 +107,7 @@ internal class MutableIntGraph {
    * @param vertex the vertex to remove.
    */
   fun removeVertex(vertex: Int) {
-    require(vertex != size - 1) { "Can only remove the last vertex." }
+    require(vertex == size - 1) { "Can only remove the last vertex." }
     // Remove from all the other vertices first.
     for (v in 0 until size) {
       val index = adjacency[v].binarySearch(vertex)
