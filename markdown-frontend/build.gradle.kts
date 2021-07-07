@@ -24,6 +24,12 @@ dependencies {
   implementation(npm("react", "17.0.2"))
   implementation(npm("react-dom", "17.0.2"))
   implementation(npm("react-router-dom", "5.2.0"))
+
+  // CodeMirror.
+  implementation(npm("@codemirror/state", "0.18.7"))
+  implementation(npm("@codemirror/view", "0.18.18"))
+  implementation(npm("@codemirror/language", "0.18.2"))
+  implementation(npm("@codemirror/lang-markdown", "0.18.4"))
 }
 
 kotlin { js(IR) { browser { binaries.executable() } } }
