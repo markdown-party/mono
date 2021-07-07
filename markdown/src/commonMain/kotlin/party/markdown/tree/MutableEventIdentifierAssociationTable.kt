@@ -1,6 +1,5 @@
 package party.markdown.tree
 
-import io.github.alexandrepiveteau.echo.core.buffer.mutableEventIdentifierGapBufferOf
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 
 internal class MutableEventIdentifierAssociationTable {
@@ -8,30 +7,40 @@ internal class MutableEventIdentifierAssociationTable {
   /** The map that gives the association index given the event identifier. */
   private val backward = mutableMapOf<EventIdentifier, Int>()
 
-  /** The buffer that gives the event identifier given the association identifier. */
-  private val forward = mutableEventIdentifierGapBufferOf()
+  /** The map that gives the event identifier given the association identifier. */
+  private val forward = mutableMapOf<Int, EventIdentifier>()
 
   /**
    * Associates the returned [Int] with the given [EventIdentifier]
    *
+   * @param vertex the [Int] corresponding to the vertex identifier.
    * @param identifier the [EventIdentifier] for the association.
-   * @return the next vertex.
    */
-  fun associate(identifier: EventIdentifier): Int {
-    val id = forward.size
-    forward.push(identifier)
-    backward[identifier] = id
-    return id
+  fun associate(vertex: Int, identifier: EventIdentifier) {
+    forward[vertex] = identifier
+    backward[identifier] = vertex
+  }
+
+  /**
+   * Dissociates the given [vertex] and [identifier]. If they do not match the currently set values,
+   * an exception will be thrown.
+   *
+   * @param vertex the [Int] corresponding to the vertex identifier.
+   * @param identifier the [EventIdentifier] for the association.
+   */
+  fun dissociate(vertex: Int, identifier: EventIdentifier) {
+    require(identifier == forward.remove(vertex))
+    require(vertex == backward.remove(identifier))
   }
 
   /** Returns true if the given vertex has an associated [EventIdentifier]. */
   fun hasIdentifier(vertex: Int): Boolean {
-    return vertex in 0 until forward.size
+    return forward.containsKey(vertex)
   }
 
   /** Returns the [EventIdentifier] for a certain vertex. */
   fun identifier(vertex: Int): EventIdentifier {
-    return forward[vertex]
+    return forward[vertex] ?: error("not present")
   }
 
   /** Returns true if the given [EventIdentifier] has an associated vertex. */

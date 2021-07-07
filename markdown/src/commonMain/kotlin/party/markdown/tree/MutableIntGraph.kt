@@ -99,4 +99,20 @@ internal class MutableIntGraph {
       f(list[i])
     }
   }
+
+  /**
+   * Removes the given vertex from the [MutableIntGraph]. Only the last added vertex can actually be
+   * removed; otherwise, an exception will be thrown.
+   *
+   * @param vertex the vertex to remove.
+   */
+  fun removeVertex(vertex: Int) {
+    require(vertex != size - 1) { "Can only remove the last vertex." }
+    // Remove from all the other vertices first.
+    for (v in 0 until size) {
+      val index = adjacency[v].binarySearch(vertex)
+      if (index >= 0) adjacency[v].remove(index)
+    }
+    adjacency.remove(size - 1)
+  }
 }
