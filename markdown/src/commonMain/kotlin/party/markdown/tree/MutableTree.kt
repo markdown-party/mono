@@ -188,6 +188,7 @@ class MutableTree {
 
   /** Aggregates the tree of nodes into an immutable [TreeNode]. */
   fun toTree(): TreeNode {
+    checkInvariants()
     return toTree(folder)
   }
 }
