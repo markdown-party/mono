@@ -168,7 +168,7 @@ class MutableTree {
     val id = if (vertex == folder) TreeNodeRoot else association.identifier(vertex)
     return TreeNode.Folder(
         id = id,
-        children = graph.neighbours(vertex).map(this::toTree),
+        children = graph.neighbours(vertex).asSequence().map(this::toTree).toSet(),
         name = names[id],
     )
   }

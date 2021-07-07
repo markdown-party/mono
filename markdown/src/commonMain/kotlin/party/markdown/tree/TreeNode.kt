@@ -23,7 +23,7 @@ sealed interface TreeNode {
    */
   data class Folder(
       override val id: TreeNodeIdentifier,
-      val children: List<TreeNode>,
+      val children: Set<TreeNode>,
       override val name: String?,
   ) : TreeNode
 
