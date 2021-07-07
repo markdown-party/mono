@@ -61,11 +61,11 @@ class MutableTree {
 
     val v = graph.createVertex()
     association.associate(v, id)
-    graph.createEdge(root, v)
+    graph.createEdge(folder, v)
     type[v] = t
 
     push(TreeChange.RemoveVertex(v, id))
-    push(TreeChange.RemoveEdge(root, v))
+    push(TreeChange.RemoveEdge(folder, v))
   }
 
   /** Creates a new file with the given [TreeNodeIdentifier] as identifier. */
