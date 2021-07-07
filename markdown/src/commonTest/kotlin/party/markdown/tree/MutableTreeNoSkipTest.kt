@@ -111,4 +111,23 @@ class MutableTreeNoSkipTest {
         t5 to Move(t3, t2),
     ) { assertEquals(expected, this, "Permutation $it") }
   }
+
+  @Test
+  fun concurrentMoveRemove() {
+    val alice = SiteIdentifier.Min
+    val bob = SiteIdentifier.Max
+    val t1 = EventIdentifier(Min + 0u, alice)
+    val t2 = EventIdentifier(Min + 1u, alice)
+    val t3 = EventIdentifier(Min + 2u, alice)
+    val t4 = EventIdentifier(Min + 3u, alice)
+    val t5 = EventIdentifier(Min + 3u, bob)
+    val expected = tree { file(t2) }
+    TreeAggregate.permutations(
+        t1 to NewFolder,
+        t2 to NewFile,
+        t3 to Move(t2, t1),
+        t4 to Remove(t1),
+        t5 to Move(t2, TreeNodeRoot),
+    ) { assertEquals(expected, this, "Permutation $it") }
+  }
 }
