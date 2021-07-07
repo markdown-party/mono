@@ -12,12 +12,10 @@ import io.ktor.client.request.*
 import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.html.js.onClickFunction
-import party.markdown.MarkdownEvent.Decrement
-import party.markdown.MarkdownEvent.Increment
-import party.markdown.MarkdownProjection
 import party.markdown.react.useCoroutineScope
 import party.markdown.react.useFlow
 import party.markdown.react.useLaunchedEffect
+import party.markdown.tree.*
 import react.*
 import react.dom.button
 import react.dom.h1
@@ -45,8 +43,9 @@ private val Remote =
 private val State =
     mutableSite(
         identifier = Random.nextSiteIdentifier(),
-        initial = 0,
-        projection = MarkdownProjection,
+        initial = MutableTree(),
+        projection = TreeProjection,
+        transform = MutableTree::toTree,
     )
 
 private fun useSync(
@@ -71,21 +70,41 @@ private val socket =
       val scope = useCoroutineScope()
       val (syncing, requestSync) = useSync()
 
-      val total = useFlow(0, State.value)
+      val total = useFlow(TreeNode.Folder(TreeNodeRoot, emptySet(), null), State.value)
       val title = if (syncing) "Syncing" else "Request sync"
 
       button {
         attrs { onClickFunction = { requestSync() } }
         +title
       }
-      h1 { +"Current total is $total" }
+      h1 { +"Current tree : $total" }
       button {
-        attrs { onClickFunction = { scope.launch { State.event { yield(Decrement) } } } }
-        +"Decrement"
+        attrs {
+          onClickFunction =
+              {
+                scope.launch {
+                  State.event {
+                    val id = yield(TreeEvent.NewFile)
+                    yield(TreeEvent.Name(id, "Hello file"))
+                  }
+                }
+              }
+        }
+        +"New file"
       }
       button {
-        attrs { onClickFunction = { scope.launch { State.event { yield(Increment) } } } }
-        +"Increment"
+        attrs {
+          onClickFunction =
+              {
+                scope.launch {
+                  State.event {
+                    val id = yield(TreeEvent.NewFolder)
+                    yield(TreeEvent.Name(id, "Hello folder"))
+                  }
+                }
+              }
+        }
+        +"New folder"
       }
     }
 
