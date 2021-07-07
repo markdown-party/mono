@@ -30,4 +30,11 @@ interface TreeApi {
    * to the root folder.
    */
   suspend fun createFolder(name: String, parent: TreeNode)
+
+  /**
+   * Deletes the given node, provided its identifier.
+   *
+   * If the node can't be deleted, the operation will be ignored.
+   */
+  suspend fun remove(file: TreeNode)
 }

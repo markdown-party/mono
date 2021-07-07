@@ -1,8 +1,8 @@
 package party.markdown.ui.navigator
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import kotlinx.html.classes
 import party.markdown.tree.TreeNode
+import party.markdown.tree.TreeNodeIdentifier
 import react.*
 import react.dom.div
 
@@ -25,9 +25,12 @@ external interface NavigatorProps : RProps {
 
   /** The root node that should be displayed in the navigator. */
   var tree: TreeNode
+
+  var onNodeDelete: (TreeNode) -> Unit
 }
 
 private data class Node(
+    val node: TreeNode,
     val indent: Int,
     val key: EventIdentifier,
     val name: String?,
@@ -38,9 +41,9 @@ private fun TreeNode.flatten(): List<Node> {
   // TODO : Iterative traversal.
   fun traverse(node: TreeNode, level: Int, list: MutableList<Node>) {
     when (node) {
-      is TreeNode.MarkdownFile -> list.add(Node(level, node.id, node.name, false))
+      is TreeNode.MarkdownFile -> list.add(Node(node, level, node.id, node.name, false))
       is TreeNode.Folder -> {
-        list.add(Node(level, node.id, node.name, true))
+        list.add(Node(node, level, node.id, node.name, true))
         node.children.sortedBy { it.name }.forEach { traverse(it, level + 1, list) }
       }
     }
@@ -53,19 +56,27 @@ private fun TreeNode.flatten(): List<Node> {
 private val navigator =
     functionalComponent<NavigatorProps> { props ->
       val nodes = props.tree.flatten()
-      div {
-        attrs {
-          classes = classes + setOf("flex", "flex-col", "items-start")
-          classes = classes + setOf("bg-gray-700", "text-white")
-          classes = classes + setOf("p-2")
-        }
+
+      val (open, setOpen) = useState<TreeNodeIdentifier?>(null)
+
+      div(
+          """
+          flex flex-col items-stretch
+          bg-gray-700 text-white
+          w-1/6
+          """,
+      ) {
+        navigatorActions {}
         for (node in nodes) {
           file {
             key = node.key.toString()
-            name = node.name ?: "Unknown"
-            isFolder = node.folder
-            indentLevel = node.indent
-            selected = node.indent == 0
+            displayName = node.name ?: "Unknown"
+            displayFileType = if (node.folder) FileType.FolderOpen else FileType.Markdown
+            displayIndentLevel = node.indent
+            displaySelected = node.indent == 0
+            menuOpen = node.key == open
+            onMenuClick = { if (open == node.key) setOpen(null) else setOpen(node.key) }
+            onMenuDeleteClick = { props.onNodeDelete(node.node) }
           }
         }
       }

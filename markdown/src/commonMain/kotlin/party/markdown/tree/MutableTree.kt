@@ -2,6 +2,7 @@ package party.markdown.tree
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.isSpecified
+import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
 import io.github.alexandrepiveteau.echo.projections.ChangeScope
 
 class MutableTree {
@@ -128,7 +129,8 @@ class MutableTree {
    * @param id the [TreeNodeIdentifier] to remove.
    */
   fun ChangeScope<TreeChange>.remove(id: TreeNodeIdentifier) {
-    require(id.isSpecified) { "Can't delete the root folder." }
+    // Can't delete the root folder.
+    if (id.isUnspecified) return
 
     // Conceptually, removing a node is like moving it to an unreachable root.
     if (association.hasVertex(id)) {
