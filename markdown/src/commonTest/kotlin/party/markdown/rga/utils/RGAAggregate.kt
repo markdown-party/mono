@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import party.markdown.rga.MutableRGA
 import party.markdown.rga.RGAEvent
 import party.markdown.rga.RGAProjection
+import party.markdown.utils.permutations
 
 /**
  * A simple aggregate of events that can be used to write some unit tests of the RGA replicated data
@@ -14,7 +15,7 @@ import party.markdown.rga.RGAProjection
  * Standard usage looks as follows :
  *
  * ```kotlin
- * with(RGAAggregate) {
+ * with(RGAAggregate()) {
  *   event(RGAEvent.Remove(EventIdentifier.Unspecified))
  *   test { assertTrue(isEmpty()) }
  * }

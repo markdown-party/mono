@@ -37,7 +37,7 @@ sealed class RGAEvent {
    * @param atom the [Char] that is inserted.
    */
   @Serializable
-  @SerialName("i")
+  @SerialName("t:i")
   data class Insert(
       val offset: RGANodeIdentifier,
       val atom: Char,
@@ -50,7 +50,7 @@ sealed class RGAEvent {
    * @param offset the [RGANodeIdentifier] that indicates which node was deleted.
    */
   @Serializable
-  @SerialName("r")
+  @SerialName("t:r")
   data class Remove(
       val offset: RGANodeIdentifier,
   ) : RGAEvent()
