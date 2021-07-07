@@ -13,9 +13,9 @@ import party.markdown.react.useCoroutineScope
 import party.markdown.react.useFlow
 import party.markdown.react.useLaunchedEffect
 import party.markdown.tree.*
+import party.markdown.ui.navigator.navigator
 import react.*
 import react.dom.button
-import react.dom.h1
 
 @OptIn(EchoKtorPreview::class) private val Remote = Configuration.Default.toExchange()
 
@@ -56,7 +56,7 @@ private val socket =
         attrs { onClickFunction = { requestSync() } }
         +title
       }
-      h1 { +"Current tree : $total" }
+      navigator { tree = total }
       button {
         attrs {
           onClickFunction =
