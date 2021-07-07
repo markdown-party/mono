@@ -23,11 +23,6 @@ sealed class TreeChange {
       val anchor: Int?,
   ) : TreeChange()
 
-  @Serializable
-  data class RemoveEdge(
-      val parent: Int,
-      val child: Int,
-  ) : TreeChange()
 
   @Serializable
   data class ChangeName(

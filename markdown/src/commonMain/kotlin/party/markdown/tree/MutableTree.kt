@@ -65,7 +65,6 @@ class MutableTree {
     type[v] = t
 
     push(TreeChange.RemoveVertex(v, id))
-    push(TreeChange.RemoveEdge(folder, v))
   }
 
   /** Creates a new file with the given [TreeNodeIdentifier] as identifier. */
@@ -151,9 +150,6 @@ class MutableTree {
       }
       is TreeChange.Move -> {
         graph.move(change.vertex, change.anchor)
-      }
-      is TreeChange.RemoveEdge -> {
-        graph.removeEdge(change.parent, change.child)
       }
       is TreeChange.RemoveVertex -> {
         type.remove(change.vertex)

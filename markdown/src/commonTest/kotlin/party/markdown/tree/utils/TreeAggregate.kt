@@ -87,12 +87,29 @@ class TreeAggregate {
         vararg events: Pair<EventIdentifier, TreeEvent>,
         block: TreeNode.(List<Pair<EventIdentifier, TreeEvent>>) -> Unit,
     ) {
+      // Because we're using a mutableSite internally, we have to be extra-cautious here. Indeed,
+      // events emitted by a single site may not get reordered, since mutableSite makes the
+      // assumption that events from a single site are delivered with incrementing SequenceNumber.
+      //
+      // Therefore, we store the list of all the site identifiers. If the permutation is valid,
+      // we'll test it.
+
+      val sites = events.asSequence().map { it.first.site }.toSet()
+
       for (perm in events.toList().permutations()) {
-        with(TreeAggregate()) {
-          for ((id, event) in perm) {
-            event(id.seqno, id.site, event)
+        val respectsOrder =
+            sites.all { s ->
+              val permF = perm.filter { it.first.site == s }
+              val eventsF = events.filter { it.first.site == s }
+              permF == eventsF
+            }
+        if (respectsOrder) {
+          with(TreeAggregate()) {
+            for ((id, event) in perm) {
+              event(id.seqno, id.site, event)
+            }
+            test { block(perm) }
           }
-          test { block(perm) }
         }
       }
     }
