@@ -26,7 +26,10 @@ external interface NavigatorProps : RProps {
   /** The root node that should be displayed in the navigator. */
   var tree: TreeNode
 
+  var onCreateFile: () -> Unit
+  var onCreateFolder: () -> Unit
   var onNodeDelete: (TreeNode) -> Unit
+  var onNodeRename: (TreeNode) -> Unit
 }
 
 private data class Node(
@@ -37,14 +40,20 @@ private data class Node(
     val folder: Boolean,
 )
 
-private fun TreeNode.flatten(): List<Node> {
+private fun TreeNode.flatten(
+    open: Set<EventIdentifier>,
+): List<Node> {
   // TODO : Iterative traversal.
   fun traverse(node: TreeNode, level: Int, list: MutableList<Node>) {
     when (node) {
       is TreeNode.MarkdownFile -> list.add(Node(node, level, node.id, node.name, false))
       is TreeNode.Folder -> {
         list.add(Node(node, level, node.id, node.name, true))
-        node.children.sortedBy { it.name }.forEach { traverse(it, level + 1, list) }
+
+        // Add the children, but only if this folder is open.
+        if (node.id in open) {
+          node.children.sortedBy { it.name }.forEach { traverse(it, level + 1, list) }
+        }
       }
     }
   }
@@ -55,9 +64,9 @@ private fun TreeNode.flatten(): List<Node> {
 
 private val navigator =
     functionalComponent<NavigatorProps> { props ->
-      val nodes = props.tree.flatten()
-
-      val (open, setOpen) = useState<TreeNodeIdentifier?>(null)
+      val (open, setOpen) = useState(emptySet<TreeNodeIdentifier>())
+      val nodes = props.tree.flatten(open)
+      val (dropdownOpen, setDropdownOpen) = useState<TreeNodeIdentifier?>(null)
 
       div(
           """
@@ -66,17 +75,47 @@ private val navigator =
           w-1/6
           """,
       ) {
-        navigatorActions {}
+        navigatorActions {
+          onClickNewMarkdownFile = props.onCreateFile
+          onClickNewFolder = props.onCreateFolder
+        }
         for (node in nodes) {
           file {
             key = node.key.toString()
-            displayName = node.name ?: "Unknown"
-            displayFileType = if (node.folder) FileType.FolderOpen else FileType.Markdown
+            displayName = node.name ?: "(unnamed)"
+            displayFileType =
+                when {
+                  node.folder && node.key in open -> FileType.FolderOpen
+                  node.folder -> FileType.FolderClosed
+                  else -> FileType.Markdown
+                }
             displayIndentLevel = node.indent
             displaySelected = node.indent == 0
-            menuOpen = node.key == open
-            onMenuClick = { if (open == node.key) setOpen(null) else setOpen(node.key) }
-            onMenuDeleteClick = { props.onNodeDelete(node.node) }
+            menuOpen = node.key == dropdownOpen
+            onFileClick =
+                {
+                  if (node.node is TreeNode.Folder) {
+                    if (node.key in open) {
+                      setOpen(open - node.key)
+                    } else {
+                      setOpen(open + node.key)
+                    }
+                  }
+                }
+            onMenuClick =
+                {
+                  if (dropdownOpen == node.key) setDropdownOpen(null) else setDropdownOpen(node.key)
+                }
+            onMenuDeleteClick =
+                {
+                  if (node.key == dropdownOpen) setDropdownOpen(null)
+                  props.onNodeDelete(node.node)
+                }
+            onMenuRenameClick =
+                {
+                  if (node.key == dropdownOpen) setDropdownOpen(null)
+                  props.onNodeRename(node.node)
+                }
           }
         }
       }

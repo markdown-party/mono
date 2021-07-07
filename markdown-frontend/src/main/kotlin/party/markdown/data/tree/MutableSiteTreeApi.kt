@@ -26,5 +26,8 @@ class MutableSiteTreeApi(
         yield(TreeEvent.Move(id, parent.id))
       }
 
+  override suspend fun name(name: String, file: TreeNode) =
+      site.event { yield(TreeEvent.Name(file.id, name)) }
+
   override suspend fun remove(file: TreeNode) = site.event { yield(TreeEvent.Remove(file.id)) }
 }

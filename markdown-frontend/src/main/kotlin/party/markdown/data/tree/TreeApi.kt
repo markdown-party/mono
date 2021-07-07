@@ -31,6 +31,9 @@ interface TreeApi {
    */
   suspend fun createFolder(name: String, parent: TreeNode)
 
+  /** Gives a certain name to the given node, provided its identifier. */
+  suspend fun name(name: String, file: TreeNode)
+
   /**
    * Deletes the given node, provided its identifier.
    *

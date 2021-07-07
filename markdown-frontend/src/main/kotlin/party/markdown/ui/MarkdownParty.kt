@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import kotlin.random.Random
 import kotlinx.coroutines.launch
 import kotlinx.html.js.onClickFunction
 import party.markdown.data.tree.MutableSiteTreeApi
@@ -36,6 +37,15 @@ private val app =
       }
       navigator {
         this.tree = tree
+        this.onCreateFile = { scope.launch { api.createFile("File ${Random.nextInt(10)}", tree) } }
+        this.onCreateFolder =
+            {
+              scope.launch { api.createFolder("Folder ${Random.nextInt(10)}", tree) }
+            }
+        this.onNodeRename =
+            { node ->
+              scope.launch { api.name("Named ${Random.nextInt(10)}", node) }
+            }
         this.onNodeDelete = { node -> scope.launch { api.remove(node) } }
       }
     }

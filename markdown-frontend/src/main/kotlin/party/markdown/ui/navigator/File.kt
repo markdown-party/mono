@@ -35,7 +35,7 @@ external interface FileProps : RProps {
 
   var menuOpen: Boolean
 
-  var onClick: () -> Unit
+  var onFileClick: () -> Unit
   var onMenuClick: () -> Unit
   var onMenuRenameClick: () -> Unit
   var onMenuDeleteClick: () -> Unit
@@ -62,12 +62,12 @@ private val file =
           group
           """,
       ) {
-        attrs { onClickFunction = { props.onClick() } }
+        attrs { onClickFunction = { props.onFileClick() } }
         for (i in 0 until props.displayIndentLevel) {
           div(classes = "w-4") {}
         }
         img(src = props.iconUrl()) {}
-        p(classes = "flex-grow") { +props.displayName }
+        p(classes = "flex-grow select-none") { +props.displayName }
         div("""
             inline-block
             relative
@@ -81,7 +81,15 @@ private val file =
                 rounded p-2
                 """,
               src = "/icons/navigator-more.svg",
-          ) { attrs { onClickFunction = { props.onMenuClick() } } }
+          ) {
+            attrs {
+              onClickFunction =
+                  {
+                    props.onMenuClick()
+                    it.stopPropagation()
+                  }
+            }
+          }
           if (props.menuOpen) {
             div(
                 """
