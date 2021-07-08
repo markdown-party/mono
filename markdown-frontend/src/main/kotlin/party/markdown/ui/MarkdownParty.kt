@@ -37,10 +37,13 @@ private val app =
       }
       navigator {
         this.tree = tree
-        this.onCreateFile = { scope.launch { api.createFile("File ${Random.nextInt(10)}", tree) } }
+        this.onCreateFile =
+            {
+              scope.launch { api.createFile("File ${Random.nextInt(10)}", it ?: tree) }
+            }
         this.onCreateFolder =
             {
-              scope.launch { api.createFolder("Folder ${Random.nextInt(10)}", tree) }
+              scope.launch { api.createFolder("Folder ${Random.nextInt(10)}", it ?: tree) }
             }
         this.onNodeRename =
             { node ->

@@ -26,8 +26,8 @@ external interface NavigatorProps : RProps {
   /** The root node that should be displayed in the navigator. */
   var tree: TreeNode
 
-  var onCreateFile: () -> Unit
-  var onCreateFolder: () -> Unit
+  var onCreateFile: (parent: TreeNode?) -> Unit
+  var onCreateFolder: (parent: TreeNode?) -> Unit
   var onNodeDelete: (TreeNode) -> Unit
   var onNodeRename: (TreeNode) -> Unit
 }
@@ -72,12 +72,12 @@ private val navigator =
           """
           flex flex-col items-stretch
           bg-gray-700 text-white
-          w-1/6
+          w-96
           """,
       ) {
         navigatorActions {
-          onClickNewMarkdownFile = props.onCreateFile
-          onClickNewFolder = props.onCreateFolder
+          onClickNewMarkdownFile = { props.onCreateFile(null) }
+          onClickNewFolder = { props.onCreateFolder(null) }
         }
         for (node in nodes) {
           file {
@@ -108,13 +108,24 @@ private val navigator =
                 }
             onMenuDeleteClick =
                 {
-                  if (node.key == dropdownOpen) setDropdownOpen(null)
+                  setDropdownOpen(null)
                   props.onNodeDelete(node.node)
                 }
             onMenuRenameClick =
                 {
-                  if (node.key == dropdownOpen) setDropdownOpen(null)
+                  setDropdownOpen(null)
                   props.onNodeRename(node.node)
+                }
+
+            onMenuCreateFolderClick =
+                {
+                  setDropdownOpen(null)
+                  props.onCreateFolder(node.node)
+                }
+            onMenuCreateMarkdownClick =
+                {
+                  setDropdownOpen(null)
+                  props.onCreateFile(node.node)
                 }
           }
         }
