@@ -82,3 +82,9 @@ inline val EventIdentifier.isUnspecified: Boolean
  */
 inline fun EventIdentifier.takeOrElse(block: () -> EventIdentifier): EventIdentifier =
     if (isSpecified) this else block()
+
+/** Creates an [EventIdentifier] from a [ULong]. */
+fun ULong.toEventIdentifier(): EventIdentifier = EventIdentifier(this)
+
+/** Creates an [ULong] from an [EventIdentifier]. */
+fun EventIdentifier.toULong(): ULong = packed

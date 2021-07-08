@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.MutableSite
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.tree.TreeEvent
 import party.markdown.tree.TreeNode
+import party.markdown.tree.TreeNodeIdentifier
 
 /** An implementation of the [TreeApi] backed by a [MutableSite]. */
 class MutableSiteTreeApi(
@@ -28,6 +29,9 @@ class MutableSiteTreeApi(
 
   override suspend fun name(name: String, file: TreeNode) =
       site.event { yield(TreeEvent.Name(file.id, name)) }
+
+  override suspend fun move(node: TreeNodeIdentifier, anchor: TreeNode) =
+      site.event { yield(TreeEvent.Move(element = node, anchor = anchor.id)) }
 
   override suspend fun remove(file: TreeNode) = site.event { yield(TreeEvent.Remove(file.id)) }
 }

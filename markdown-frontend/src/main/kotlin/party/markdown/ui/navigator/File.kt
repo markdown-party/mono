@@ -1,6 +1,11 @@
 package party.markdown.ui.navigator
 
+import kotlinx.html.Draggable
+import kotlinx.html.draggable
 import kotlinx.html.js.onClickFunction
+import kotlinx.html.js.onDragOverFunction
+import kotlinx.html.js.onDragStartFunction
+import kotlinx.html.js.onDropFunction
 import react.*
 import react.dom.button
 import react.dom.div
@@ -27,6 +32,7 @@ enum class FileType(val isFolder: Boolean) {
  * and be part of a folder (or not).
  */
 external interface FileProps : RProps {
+  var displayId: Long
   var displayName: String
   var displaySelected: Boolean
   var displayFileType: FileType
@@ -34,8 +40,11 @@ external interface FileProps : RProps {
 
   var menuOpen: Boolean
 
+  var onDropFile: (Long) -> Unit
+
   var onFileClick: () -> Unit
   var onMenuClick: () -> Unit
+  var onMenuMoveToParent: () -> Unit
   var onMenuRenameClick: () -> Unit
   var onMenuDeleteClick: () -> Unit
 
@@ -85,7 +94,25 @@ private val file =
           group
           """,
       ) {
-        attrs { onClickFunction = { props.onFileClick() } }
+        attrs {
+          onClickFunction = { props.onFileClick() }
+          draggable = Draggable.htmlTrue
+          onDragStartFunction =
+              { event ->
+                event.asDynamic().dataTransfer.setData("text", props.displayId.toString())
+                Unit
+              }
+          onDragOverFunction =
+              { event ->
+                if (props.displayFileType.isFolder) event.preventDefault()
+              }
+          onDropFunction =
+              { event ->
+                event.preventDefault()
+                val id = (event.asDynamic().dataTransfer.getData("text") as? String)?.toLongOrNull()
+                if (id != null) props.onDropFile(id)
+              }
+        }
         for (i in 0 until props.displayIndentLevel) {
           div(classes = "w-4") {}
         }
@@ -142,6 +169,14 @@ private val file =
                   onClick = props.onMenuRenameClick,
                   classes = "hover:bg-gray-200",
               )
+              if (props.displayIndentLevel > 0) {
+                dropdownButton(
+                    text = "Move to parent",
+                    icon = "/icons/navigator-dropdown-move-to-parent.svg",
+                    onClick = props.onMenuMoveToParent,
+                    classes = "hover:bg-gray-200",
+                )
+              }
               dropdownButton(
                   text = "Delete",
                   icon = "/icons/navigator-dropdown-delete.svg",
