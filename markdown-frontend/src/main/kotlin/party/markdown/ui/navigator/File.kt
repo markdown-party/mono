@@ -1,6 +1,5 @@
 package party.markdown.ui.navigator
 
-import kotlinx.html.classes
 import kotlinx.html.js.onClickFunction
 import react.*
 import react.dom.button
@@ -17,10 +16,10 @@ fun RBuilder.file(
     block: FileProps.() -> Unit,
 ): ReactElement = child(file) { attrs(block) }
 
-enum class FileType {
-  Markdown,
-  FolderClosed,
-  FolderOpen,
+enum class FileType(val isFolder: Boolean) {
+  Markdown(false),
+  FolderClosed(true),
+  FolderOpen(true),
 }
 
 /**
@@ -39,6 +38,10 @@ external interface FileProps : RProps {
   var onMenuClick: () -> Unit
   var onMenuRenameClick: () -> Unit
   var onMenuDeleteClick: () -> Unit
+
+  // Only displayed when the displayFileType is FolderClosed or FolderOpen
+  var onMenuCreateMarkdownClick: () -> Unit
+  var onMenuCreateFolderClick: () -> Unit
 }
 
 // COMPONENT
@@ -48,6 +51,26 @@ private fun FileProps.iconUrl(): String =
       FileType.Markdown -> "/icons/navigator-file-markdown.svg"
       FileType.FolderClosed -> "/icons/navigator-folder-closed.svg"
       FileType.FolderOpen -> "/icons/navigator-folder-open.svg"
+    }
+
+private fun RBuilder.dropdownButton(
+    text: String,
+    icon: String,
+    onClick: () -> Unit,
+    classes: String = "",
+): ReactElement =
+    button(
+        classes = "transition-all rounded p-2 $classes flex flex-row items-center",
+    ) {
+      attrs {
+        onClickFunction =
+            {
+              onClick()
+              it.stopPropagation()
+            }
+      }
+      img(src = icon, alt = text, classes = "pr-4") {}
+      +text
     }
 
 private val file =
@@ -93,26 +116,38 @@ private val file =
           if (props.menuOpen) {
             div(
                 """
-                origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white
+                origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white
                 ring-1 ring-black ring-opacity-5 focus:outline-none
                 z-10 text-black text-semibold
                 flex flex-col items-stretch text-lg p-2 space-y-1 text-left
                 """,
             ) {
-              button {
-                attrs {
-                  classes = setOf("transition-all hover:bg-gray-200 rounded p-2")
-                  onClickFunction = { props.onMenuRenameClick() }
-                }
-                +"Rename"
+              if (props.displayFileType.isFolder) {
+                dropdownButton(
+                    text = "New Markdown file",
+                    icon = "/icons/navigator-dropdown-new-text.svg",
+                    onClick = props.onMenuCreateMarkdownClick,
+                    classes = "hover:bg-gray-200",
+                )
+                dropdownButton(
+                    text = "New Folder",
+                    icon = "/icons/navigator-dropdown-new-folder.svg",
+                    onClick = props.onMenuCreateFolderClick,
+                    classes = "hover:bg-gray-200",
+                )
               }
-              button {
-                attrs {
-                  classes = setOf("transition-all hover:bg-red-200 rounded text-red-600 p-2")
-                  onClickFunction = { props.onMenuDeleteClick() }
-                }
-                +"Delete"
-              }
+              dropdownButton(
+                  text = "Rename",
+                  icon = "/icons/navigator-dropdown-rename.svg",
+                  onClick = props.onMenuRenameClick,
+                  classes = "hover:bg-gray-200",
+              )
+              dropdownButton(
+                  text = "Delete",
+                  icon = "/icons/navigator-dropdown-delete.svg",
+                  onClick = props.onMenuDeleteClick,
+                  classes = "hover:bg-red-200 text-red-600",
+              )
             }
           }
         }
