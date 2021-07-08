@@ -17,7 +17,6 @@ fun RBuilder.navigatorActions(
 external interface NavigatorActionsProps : RProps {
   var onClickNewMarkdownFile: () -> Unit
   var onClickNewFolder: () -> Unit
-  var onClickDelete: () -> Unit
 }
 
 // COMPONENT
@@ -39,6 +38,5 @@ private val navigatorActions =
         icon(src = "/icons/navigator-action-new-text.svg", "New file", props.onClickNewMarkdownFile)
         icon(src = "/icons/navigator-action-new-folder.svg", "New folder", props.onClickNewFolder)
         div("flex-grow") {}
-        icon(src = "/icons/navigator-action-delete.svg", "Delete", props.onClickDelete)
       }
     }
