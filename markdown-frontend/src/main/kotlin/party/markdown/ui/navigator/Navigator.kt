@@ -37,29 +37,60 @@ private data class Node(
     val indent: Int,
     val key: EventIdentifier,
     val name: String?,
-    val folder: Boolean,
+    val fileType: FileType,
 )
+
+private fun Set<TreeNode>.sortedByType(): List<TreeNode> {
+  val type =
+      Comparator<TreeNode> { a, b ->
+        when {
+          a is TreeNode.Folder && b is TreeNode.Folder -> 0
+          a is TreeNode.MarkdownFile && b is TreeNode.MarkdownFile -> 0
+          a is TreeNode.Folder -> 1
+          else -> -1
+        }
+      }
+  val name =
+      Comparator<TreeNode> { a, b ->
+        val x = a.name ?: ""
+        val y = b.name ?: ""
+        x.compareTo(y)
+      }
+  return sortedWith(type.then(name))
+}
 
 private fun TreeNode.flatten(
     open: Set<EventIdentifier>,
 ): List<Node> {
+
   // TODO : Iterative traversal.
   fun traverse(node: TreeNode, level: Int, list: MutableList<Node>) {
     when (node) {
-      is TreeNode.MarkdownFile -> list.add(Node(node, level, node.id, node.name, false))
+      is TreeNode.MarkdownFile -> {
+        list.add(Node(node, level, node.id, node.name, FileType.Markdown))
+      }
       is TreeNode.Folder -> {
-        list.add(Node(node, level, node.id, node.name, true))
-
-        // Add the children, but only if this folder is open.
-        if (node.id in open) {
-          node.children.sortedBy { it.name }.forEach { traverse(it, level + 1, list) }
+        val type = if (node.id in open) FileType.FolderOpen else FileType.FolderClosed
+        list.add(Node(node, level, node.id, node.name, type))
+        if (type == FileType.FolderOpen) {
+          node.children.sortedByType().forEach { traverse(it, level + 1, list) }
         }
       }
     }
   }
-  val results = mutableListOf<Node>()
-  traverse(this, level = 0, results)
-  return results
+
+  fun traverseRoot(root: TreeNode): List<Node> {
+    val results = mutableListOf<Node>()
+    when (root) {
+      is TreeNode.Folder -> {
+        root.children.sortedByType().forEach { traverse(it, 0, results) }
+      }
+      is TreeNode.MarkdownFile -> Unit // should not happen.
+    }
+    return results
+  }
+
+  return traverseRoot(this)
 }
 
 private val navigator =
@@ -83,14 +114,9 @@ private val navigator =
           file {
             key = node.key.toString()
             displayName = node.name ?: "(unnamed)"
-            displayFileType =
-                when {
-                  node.folder && node.key in open -> FileType.FolderOpen
-                  node.folder -> FileType.FolderClosed
-                  else -> FileType.Markdown
-                }
+            displayFileType = node.fileType
             displayIndentLevel = node.indent
-            displaySelected = node.indent == 0
+            displaySelected = false
             menuOpen = node.key == dropdownOpen
             onFileClick =
                 {
