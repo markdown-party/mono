@@ -16,7 +16,7 @@ fun <I, O> useSync(
     local: Exchange<I, O>,
     remote: Exchange<I, O>,
     initial: Boolean = true,
-): Pair<Boolean, () -> Unit> {
+): Triple<Boolean, () -> Unit, () -> Unit> {
   val (syncing, setSyncing) = useState(initial)
   useLaunchedEffect(listOf(local, remote, syncing)) {
     if (syncing) {
@@ -27,5 +27,9 @@ fun <I, O> useSync(
       }
     }
   }
-  return syncing to { setSyncing(true) }
+  return Triple(
+      syncing,
+      { setSyncing(true) },
+      { setSyncing(false) },
+  )
 }

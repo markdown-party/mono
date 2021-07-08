@@ -26,7 +26,7 @@ external interface MarkdownPartyProps : RProps {
 private val app =
     functionalComponent<MarkdownPartyProps> { props ->
       val tree = useFlow(props.local.value)
-      val (syncing, requestSync) = useSync(props.local, props.remote)
+      val (syncing, requestSync, stopSync) = useSync(props.local, props.remote)
       val scope = useCoroutineScope()
       val api: TreeApi = MutableSiteTreeApi(props.local) // TODO : Inject this.
 
@@ -34,6 +34,10 @@ private val app =
       button {
         attrs { onClickFunction = { requestSync() } }
         +"Sync now"
+      }
+      button {
+        attrs { onClickFunction = { stopSync() } }
+        +"Stop sync"
       }
       navigator {
         this.tree = tree
