@@ -1,7 +1,6 @@
 package party.markdown.ui
 
 import io.github.alexandrepiveteau.echo.core.causality.toEventIdentifier
-import kotlin.random.Random
 import kotlinx.coroutines.launch
 import party.markdown.data.tree.TreeApi
 import party.markdown.react.useCoroutineScope
@@ -19,6 +18,8 @@ external interface PanesProps : RProps {
   var treeApi: TreeApi
 }
 
+private fun nextName(): String = buildString { repeat(3) { append(('a'..'z').random()) } }
+
 private val panes =
     functionalComponent<PanesProps> { props ->
       val tree = useFlow(props.treeApi.current)
@@ -29,17 +30,23 @@ private val panes =
           this.tree = tree
           this.onCreateFile =
               {
-                scope.launch { props.treeApi.createFile("File ${Random.nextInt(10)}", it ?: tree) }
+                scope.launch { props.treeApi.createFile("${nextName()}.md", it ?: tree) }
               }
           this.onCreateFolder =
               {
-                scope.launch {
-                  props.treeApi.createFolder("Folder ${Random.nextInt(10)}", it ?: tree)
-                }
+                scope.launch { props.treeApi.createFolder(nextName(), it ?: tree) }
               }
           this.onNodeRename =
               { node ->
-                scope.launch { props.treeApi.name("Named ${Random.nextInt(10)}", node) }
+                scope.launch {
+                  val newName =
+                      if (node.name?.endsWith(".md") == true) {
+                        "${nextName()}.md"
+                      } else {
+                        nextName()
+                      }
+                  props.treeApi.name(newName, node)
+                }
               }
           this.onNodeDelete = { node -> scope.launch { props.treeApi.remove(node) } }
           this.onNodeMove =
