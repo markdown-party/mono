@@ -87,7 +87,7 @@ private val file =
       div(
           """
           flex flex-row justify-start items-center space-x-2
-          px-2
+          px-4 py-1
           transition-all
           cursor-pointer
           ${if (props.displaySelected) "text-blue-300 hover:text-blue-400" else "hover:text-blue-200"}
