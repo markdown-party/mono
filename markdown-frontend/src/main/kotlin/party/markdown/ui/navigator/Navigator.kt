@@ -1,6 +1,7 @@
 package party.markdown.ui.navigator
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.toULong
 import party.markdown.tree.TreeNode
 import party.markdown.tree.TreeNodeIdentifier
 import react.*
@@ -30,9 +31,11 @@ external interface NavigatorProps : RProps {
   var onCreateFolder: (parent: TreeNode?) -> Unit
   var onNodeDelete: (TreeNode) -> Unit
   var onNodeRename: (TreeNode) -> Unit
+  var onNodeMove: (Long, TreeNode) -> Unit
 }
 
 private data class Node(
+    val parent: TreeNode?,
     val node: TreeNode,
     val indent: Int,
     val key: EventIdentifier,
@@ -64,16 +67,46 @@ private fun TreeNode.flatten(
 ): List<Node> {
 
   // TODO : Iterative traversal.
-  fun traverse(node: TreeNode, level: Int, list: MutableList<Node>) {
+  fun traverse(
+      grandparent: TreeNode?,
+      parent: TreeNode?,
+      node: TreeNode,
+      level: Int,
+      list: MutableList<Node>
+  ) {
     when (node) {
       is TreeNode.MarkdownFile -> {
-        list.add(Node(node, level, node.id, node.name, FileType.Markdown))
+        list.add(
+            Node(
+                parent = grandparent,
+                node = node,
+                indent = level,
+                key = node.id,
+                name = node.name,
+                fileType = FileType.Markdown,
+            ))
       }
       is TreeNode.Folder -> {
         val type = if (node.id in open) FileType.FolderOpen else FileType.FolderClosed
-        list.add(Node(node, level, node.id, node.name, type))
+        list.add(
+            Node(
+                parent = grandparent,
+                node = node,
+                indent = level,
+                key = node.id,
+                name = node.name,
+                fileType = type,
+            ))
         if (type == FileType.FolderOpen) {
-          node.children.sortedByType().forEach { traverse(it, level + 1, list) }
+          node.children.sortedByType().forEach {
+            traverse(
+                grandparent = parent,
+                parent = node,
+                node = it,
+                level = level + 1,
+                list = list,
+            )
+          }
         }
       }
     }
@@ -83,7 +116,15 @@ private fun TreeNode.flatten(
     val results = mutableListOf<Node>()
     when (root) {
       is TreeNode.Folder -> {
-        root.children.sortedByType().forEach { traverse(it, 0, results) }
+        root.children.sortedByType().forEach {
+          traverse(
+              grandparent = null,
+              parent = root,
+              node = it,
+              level = 0,
+              list = results,
+          )
+        }
       }
       is TreeNode.MarkdownFile -> Unit // should not happen.
     }
@@ -113,11 +154,13 @@ private val navigator =
         for (node in nodes) {
           file {
             key = node.key.toString()
+            displayId = node.key.toULong().toLong()
             displayName = node.name ?: "(unnamed)"
             displayFileType = node.fileType
             displayIndentLevel = node.indent
             displaySelected = false
             menuOpen = node.key == dropdownOpen
+            onDropFile = { id -> props.onNodeMove(id, node.node) }
             onFileClick =
                 {
                   if (node.node is TreeNode.Folder) {
@@ -142,7 +185,12 @@ private val navigator =
                   setDropdownOpen(null)
                   props.onNodeRename(node.node)
                 }
-
+            onMenuMoveToParent =
+                {
+                  setDropdownOpen(null)
+                  val parent = node.parent ?: props.tree
+                  props.onNodeMove(node.key.toULong().toLong(), parent)
+                }
             onMenuCreateFolderClick =
                 {
                   setDropdownOpen(null)

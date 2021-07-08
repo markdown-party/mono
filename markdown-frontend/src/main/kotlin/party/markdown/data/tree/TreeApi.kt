@@ -2,6 +2,7 @@ package party.markdown.data.tree
 
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.tree.TreeNode
+import party.markdown.tree.TreeNodeIdentifier
 
 /**
  * An interface defining the API to interact with the tree of files, folders and documents that is
@@ -33,6 +34,12 @@ interface TreeApi {
 
   /** Gives a certain name to the given node, provided its identifier. */
   suspend fun name(name: String, file: TreeNode)
+
+  /**
+   * Moves the file with the given [TreeNodeIdentifier] to be a child of the given [anchor]. If the
+   * operation can't be performed, it will simply be skipped.
+   */
+  suspend fun move(node: TreeNodeIdentifier, anchor: TreeNode)
 
   /**
    * Deletes the given node, provided its identifier.

@@ -1,5 +1,6 @@
 package party.markdown.ui
 
+import io.github.alexandrepiveteau.echo.core.causality.toEventIdentifier
 import kotlin.random.Random
 import kotlinx.coroutines.launch
 import party.markdown.data.tree.TreeApi
@@ -41,6 +42,15 @@ private val panes =
                 scope.launch { props.treeApi.name("Named ${Random.nextInt(10)}", node) }
               }
           this.onNodeDelete = { node -> scope.launch { props.treeApi.remove(node) } }
+          this.onNodeMove =
+              { id, node ->
+                scope.launch {
+                  props.treeApi.move(
+                      id.toULong().toEventIdentifier(),
+                      node,
+                  )
+                }
+              }
         }
         editor {}
       }

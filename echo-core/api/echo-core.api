@@ -281,6 +281,8 @@ public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifi
 	public static final fun isSpecified--MgKYFQ (J)Z
 	public static final fun isUnspecified--MgKYFQ (J)Z
 	public static final fun takeOrElse-_R01Hw8 (JLkotlin/jvm/functions/Function0;)J
+	public static final fun toEventIdentifier-VKZWuLQ (J)J
+	public static final fun toULong--MgKYFQ (J)J
 }
 
 public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumber {
