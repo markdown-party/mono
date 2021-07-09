@@ -31,24 +31,32 @@ data class Configuration(
 ) {
   companion object {
 
-    /** The configuration that's used in production. */
-    val Default =
+    /**
+     * A remote configuration that's used in projection.
+     *
+     * @param session the unique session identifier for this edition.
+     */
+    fun remote(session: String): Configuration =
         Configuration(
             host = "api.markdown.party",
             port = 443,
             secure = true,
-            senderEndpoint = "sender",
-            receiverEndpoint = "receiver",
+            senderEndpoint = "v1/$session/snd",
+            receiverEndpoint = "v1/$session/rcv",
         )
 
-    /** The configuration that's used for local deployments. */
-    val Local =
+    /**
+     * A local configuration that's used for local deployments.
+     *
+     * @param session the unique session identifier for this edition.
+     */
+    fun local(session: String): Configuration =
         Configuration(
             host = "localhost",
             port = 1234,
             secure = false,
-            senderEndpoint = "sender",
-            receiverEndpoint = "receiver",
+            senderEndpoint = "v1/$session/snd",
+            receiverEndpoint = "v1/$session/rcv",
         )
   }
 }
