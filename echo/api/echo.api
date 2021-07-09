@@ -45,6 +45,7 @@ public final class io/github/alexandrepiveteau/echo/TransformsKt {
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Link;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun onEach (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lio/github/alexandrepiveteau/echo/Link;
 }
 
 public final class io/github/alexandrepiveteau/echo/UnitProjection : io/github/alexandrepiveteau/echo/projections/OneWayProjection {
