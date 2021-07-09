@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.onEach
 @EchoKtorServerPreview
 @OptIn(FlowPreview::class)
 fun Route.sender(
-    exchange: SendExchange<Frame, Frame>,
+    block: suspend DefaultWebSocketServerSession.() -> SendExchange<Frame, Frame>,
 ) {
   webSocket {
-    exchange
+    block()
         .outgoing()
         .talk(this.incoming.consumeAsFlow())
         .onEach(outgoing::send)
@@ -29,10 +29,10 @@ fun Route.sender(
 @EchoKtorServerPreview
 @OptIn(FlowPreview::class)
 fun Route.receiver(
-    exchange: ReceiveExchange<Frame, Frame>,
+    block: suspend DefaultWebSocketServerSession.() -> ReceiveExchange<Frame, Frame>,
 ) {
   webSocket {
-    exchange
+    block()
         .incoming()
         .talk(this.incoming.consumeAsFlow())
         .onEach(outgoing::send)

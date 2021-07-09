@@ -19,6 +19,8 @@ kotlin {
     // SL4J
     implementation(Deps.Slf4f.Simple)
   }
+
+  sourceSets { all { languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn") } }
 }
 
 application {
