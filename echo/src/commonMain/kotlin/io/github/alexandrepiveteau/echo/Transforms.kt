@@ -9,8 +9,21 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 
 // BUFFERING
+
+/**
+ * Invokes the given functions on each incoming and outgoing message from the given [Link].
+ * Different callbacks will be called depending on which side of the [Link] generated the message.
+ *
+ * @param incoming the callback invoked on incoming messages.
+ * @param outgoing the callback invoked on outgoing messages.
+ */
+fun <I, O> Link<I, O>.onEach(
+    incoming: suspend (I) -> Unit,
+    outgoing: suspend (O) -> Unit,
+): Link<I, O> = Link { this.talk(it.onEach(incoming)).onEach(outgoing) }
 
 /**
  * Transforms an [Link] by buffering its contents. This buffers the underlying flows in both

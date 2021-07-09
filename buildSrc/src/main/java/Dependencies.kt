@@ -5,6 +5,7 @@ object Versions {
   const val KotlinxImmutableCollections = "0.3.4"
   const val KotlinxSerialization = "1.5.0"
   const val KotlinxSerializationFormat = "1.2.1"
+  const val KotlinxDateTime = "0.2.1"
   const val Ktor = "1.6.0"
 
   const val CashAppTurbine = "0.5.2"
@@ -31,6 +32,8 @@ object Deps {
 
     const val CoroutinesTest =
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.KotlinxCoroutines}"
+
+    const val DateTime = "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.KotlinxDateTime}"
 
     const val ImmutableCollections =
         "org.jetbrains.kotlinx:kotlinx-collections-immutable:${Versions.KotlinxImmutableCollections}"

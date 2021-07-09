@@ -14,6 +14,7 @@ dependencies {
 
   implementation(Deps.Ktor.ClientEngineJs)
   implementation(Deps.Kotlinx.CoroutinesCoreJs)
+  implementation(Deps.Kotlinx.DateTime)
 
   // TODO : Reference these versions in Versions.kt
   implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.7.2")

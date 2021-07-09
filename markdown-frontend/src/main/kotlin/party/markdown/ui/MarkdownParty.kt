@@ -8,7 +8,7 @@ import party.markdown.data.tree.MutableSiteTreeApi
 import party.markdown.data.tree.TreeApi
 import party.markdown.tree.TreeEvent
 import party.markdown.tree.TreeNode
-import party.markdown.ui.debug.debugBar
+import party.markdown.ui.topBar.topBar
 import react.*
 import react.dom.div
 
@@ -22,12 +22,16 @@ private val app =
 
       // TODO : Inject this ?
       val api = useMemo<TreeApi>(listOf(props.local)) { MutableSiteTreeApi(props.local) }
+      val (debug, setDebug) = useState(false)
 
       div(classes = "flex flex-col h-screen w-screen") {
-        debugBar {
+        topBar {
           local = props.local
           remote = props.remote
+          debugEnabled = debug
+          onDebugEnabled = setDebug
         }
+        dividerVertical()
         panes { treeApi = api }
       }
     }

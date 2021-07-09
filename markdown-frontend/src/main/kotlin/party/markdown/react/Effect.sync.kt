@@ -2,6 +2,7 @@ package party.markdown.react
 
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.sync
+import react.useCallback
 import react.useState
 
 /**
@@ -29,7 +30,7 @@ fun <I, O> useSync(
   }
   return Triple(
       syncing,
-      { setSyncing(true) },
-      { setSyncing(false) },
+      useCallback({ setSyncing(true) }, arrayOf(setSyncing)),
+      useCallback({ setSyncing(false) }, arrayOf(setSyncing)),
   )
 }

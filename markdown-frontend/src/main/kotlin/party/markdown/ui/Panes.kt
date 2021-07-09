@@ -59,6 +59,7 @@ private val panes =
                 }
               }
         }
+        dividerHorizontal()
         editor {}
       }
     }
