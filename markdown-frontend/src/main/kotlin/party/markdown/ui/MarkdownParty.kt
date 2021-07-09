@@ -4,17 +4,17 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import party.markdown.MarkdownParty
+import party.markdown.MarkdownPartyEvent
 import party.markdown.data.tree.MutableSiteTreeApi
 import party.markdown.data.tree.TreeApi
-import party.markdown.tree.TreeEvent
-import party.markdown.tree.TreeNode
 import party.markdown.ui.topBar.topBar
 import react.*
 import react.dom.div
 
 external interface MarkdownPartyProps : RProps {
   var publicLink: String
-  var local: MutableSite<TreeEvent, TreeNode>
+  var local: MutableSite<MarkdownPartyEvent, MarkdownParty>
   var remote: Exchange<Incoming, Outgoing>
 }
 

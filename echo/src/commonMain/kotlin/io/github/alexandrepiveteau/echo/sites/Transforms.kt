@@ -44,7 +44,7 @@ private class MappingMutableSite<T, out M1, out M2>(
 }
 
 /** Maps a [StateFlow] with the given function [f] */
-private fun <F, T> StateFlow<F>.map(
+fun <F, T> StateFlow<F>.map(
     f: (F) -> T,
 ): StateFlow<T> = MappingStateFlow(this, f)
 

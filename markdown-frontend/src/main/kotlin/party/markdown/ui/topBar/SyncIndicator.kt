@@ -18,11 +18,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.html.js.onClickFunction
+import party.markdown.MarkdownParty
+import party.markdown.MarkdownPartyEvent
 import party.markdown.react.useFlow
 import party.markdown.react.useLaunchedEffect
 import party.markdown.react.useSync
-import party.markdown.tree.TreeEvent
-import party.markdown.tree.TreeNode
 import react.*
 import react.dom.button
 import react.dom.div
@@ -49,7 +49,7 @@ fun RBuilder.syncIndicator(
 
 /** The properties available for the [RBuilder.syncIndicator]. */
 external interface SyncIndicatorProps : RProps {
-  var local: MutableSite<TreeEvent, TreeNode>
+  var local: MutableSite<MarkdownPartyEvent, MarkdownParty>
   var remote: Exchange<Message.Incoming, Message.Outgoing>
   var debugMode: Boolean
 }
