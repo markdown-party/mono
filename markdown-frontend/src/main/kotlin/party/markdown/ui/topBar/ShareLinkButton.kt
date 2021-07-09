@@ -31,7 +31,7 @@ private val component =
       val (text, icon) =
           when (copied) {
             true -> "Copied to clipboard" to "/icons/share-done.svg"
-            false -> "Share" to "/icons/share-copy.svg"
+            false -> "Share link" to "/icons/share-copy.svg"
           }
 
       button(
@@ -39,7 +39,7 @@ private val component =
               """flex flex-row items-center
                  px-6 py-3 space-x-4
                  bg-gray-700 hover:bg-gray-500 transition
-                 shadow hover:shadow-lg 
+                 shadow hover:shadow-lg
                  rounded-lg
                  """,
       ) {
