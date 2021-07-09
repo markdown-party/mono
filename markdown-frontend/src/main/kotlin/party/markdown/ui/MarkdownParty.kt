@@ -13,6 +13,7 @@ import react.*
 import react.dom.div
 
 external interface MarkdownPartyProps : RProps {
+  var publicLink: String
   var local: MutableSite<TreeEvent, TreeNode>
   var remote: Exchange<Incoming, Outgoing>
 }
@@ -26,6 +27,7 @@ private val app =
 
       div(classes = "flex flex-col h-screen w-screen") {
         topBar {
+          publicLink = props.publicLink
           local = props.local
           remote = props.remote
           debugEnabled = debug

@@ -39,8 +39,12 @@ fun main() {
           transform = MutableTree::toTree,
       )
 
+  // Generate the information to share the document.
+  val publicLink = window.document.URL
+
   render(document.getElementById("root")) {
     markdownParty {
+      this.publicLink = publicLink
       this.remote = remote.toExchange()
       this.local = local
     }
