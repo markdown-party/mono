@@ -1,37 +1,43 @@
 package party.markdown.data.tree
 
 import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.sites.map
 import kotlinx.coroutines.flow.StateFlow
+import party.markdown.MarkdownParty
+import party.markdown.MarkdownPartyEvent
 import party.markdown.tree.TreeEvent
 import party.markdown.tree.TreeNode
 import party.markdown.tree.TreeNodeIdentifier
 
 /** An implementation of the [TreeApi] backed by a [MutableSite]. */
 class MutableSiteTreeApi(
-    private val site: MutableSite<TreeEvent, TreeNode>,
+    private val site: MutableSite<MarkdownPartyEvent, MarkdownParty>,
 ) : TreeApi {
 
-  override val current: StateFlow<TreeNode> = site.value
+  override val current: StateFlow<TreeNode> = site.value.map { it.tree }
 
   override suspend fun createFile(name: String, parent: TreeNode) =
       site.event {
-        val id = yield(TreeEvent.NewFile)
-        yield(TreeEvent.Name(id, name))
-        yield(TreeEvent.Move(id, parent.id))
+        val id = yield(MarkdownPartyEvent.Tree(TreeEvent.NewFile))
+        yield(MarkdownPartyEvent.Tree(TreeEvent.Name(id, name)))
+        yield(MarkdownPartyEvent.Tree(TreeEvent.Move(id, parent.id)))
       }
 
   override suspend fun createFolder(name: String, parent: TreeNode) =
       site.event {
-        val id = yield(TreeEvent.NewFolder)
-        yield(TreeEvent.Name(id, name))
-        yield(TreeEvent.Move(id, parent.id))
+        val id = yield(MarkdownPartyEvent.Tree(TreeEvent.NewFolder))
+        yield(MarkdownPartyEvent.Tree(TreeEvent.Name(id, name)))
+        yield(MarkdownPartyEvent.Tree(TreeEvent.Move(id, parent.id)))
       }
 
   override suspend fun name(name: String, file: TreeNode) =
-      site.event { yield(TreeEvent.Name(file.id, name)) }
+      site.event { yield(MarkdownPartyEvent.Tree(TreeEvent.Name(file.id, name))) }
 
   override suspend fun move(node: TreeNodeIdentifier, anchor: TreeNode) =
-      site.event { yield(TreeEvent.Move(element = node, anchor = anchor.id)) }
+      site.event {
+        yield(MarkdownPartyEvent.Tree(TreeEvent.Move(element = node, anchor = anchor.id)))
+      }
 
-  override suspend fun remove(file: TreeNode) = site.event { yield(TreeEvent.Remove(file.id)) }
+  override suspend fun remove(file: TreeNode) =
+      site.event { yield(MarkdownPartyEvent.Tree(TreeEvent.Remove(file.id))) }
 }

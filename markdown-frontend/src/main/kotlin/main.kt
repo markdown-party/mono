@@ -6,10 +6,10 @@ import io.github.alexandrepiveteau.echo.mutableSite
 import kotlin.random.Random
 import kotlinx.browser.document
 import kotlinx.browser.window
+import party.markdown.MarkdownPartyProjection
+import party.markdown.MutableMarkdownParty
 import party.markdown.data.Configuration
 import party.markdown.data.toExchange
-import party.markdown.tree.MutableTree
-import party.markdown.tree.TreeProjection
 import party.markdown.ui.markdownParty
 import react.dom.render
 
@@ -34,9 +34,9 @@ fun main() {
   val local =
       mutableSite(
           Random.nextSiteIdentifier(),
-          initial = MutableTree(),
-          projection = TreeProjection,
-          transform = MutableTree::toTree,
+          initial = MutableMarkdownParty(),
+          projection = MarkdownPartyProjection,
+          transform = MutableMarkdownParty::toMarkdownParty,
       )
 
   // Generate the information to share the document.

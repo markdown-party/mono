@@ -250,5 +250,6 @@ public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Re
 
 public final class io/github/alexandrepiveteau/echo/sites/TransformsKt {
 	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun map (Lkotlinx/coroutines/flow/StateFlow;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/StateFlow;
 }
 

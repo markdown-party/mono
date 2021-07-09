@@ -4,7 +4,7 @@ import io.github.alexandrepiveteau.echo.Site
 import io.github.alexandrepiveteau.echo.site
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import party.markdown.tree.TreeEvent
+import party.markdown.MarkdownPartyEvent
 
 /**
  * A [SiteMap] provides safe access to all the [Site] which are managed by this server. Each site is
@@ -29,5 +29,5 @@ class SiteMap {
    */
   suspend fun get(
       identifier: SessionIdentifier,
-  ): Site<*> = mutex.withLock { sites.getOrPut(identifier) { site<TreeEvent>() } }
+  ): Site<*> = mutex.withLock { sites.getOrPut(identifier) { site<MarkdownPartyEvent>() } }
 }

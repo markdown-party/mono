@@ -5,8 +5,8 @@ import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlinx.browser.window
 import kotlinx.html.js.onClickFunction
-import party.markdown.tree.TreeEvent
-import party.markdown.tree.TreeNode
+import party.markdown.MarkdownParty
+import party.markdown.MarkdownPartyEvent
 import react.*
 import react.dom.button
 import react.dom.div
@@ -25,7 +25,7 @@ external interface TopBarProps : RProps {
   /**
    * The local [MutableSite], aka the local source of truth on which the operations are performed.
    */
-  var local: MutableSite<TreeEvent, TreeNode>
+  var local: MutableSite<MarkdownPartyEvent, MarkdownParty>
 
   /** The remote [Exchange], with which we should sync. */
   var remote: Exchange<Message.Incoming, Message.Outgoing>
