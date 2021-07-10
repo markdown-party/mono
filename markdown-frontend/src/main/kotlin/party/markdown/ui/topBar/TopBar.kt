@@ -7,6 +7,7 @@ import kotlinx.browser.window
 import kotlinx.html.js.onClickFunction
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.data.project.ProjectApi
 import react.*
 import react.dom.button
 import react.dom.div
@@ -30,6 +31,9 @@ external interface TopBarProps : RProps {
   /** The remote [Exchange], with which we should sync. */
   var remote: Exchange<Message.Incoming, Message.Outgoing>
 
+  /** The [ProjectApi] that can be used to manage the current project. */
+  var projectApi: ProjectApi
+
   /** `true` if the debug options should be displayed. */
   var debugEnabled: Boolean
 
@@ -45,6 +49,7 @@ private val component =
             classes = "h-12 cursor-pointer hover:bg-gray-600 rounded px-2 py-1") {
           attrs { onClickFunction = { props.onDebugEnabled(!props.debugEnabled) } }
         }
+        projectName { api = props.projectApi }
         div(classes = "flex-grow") {}
         button(
             classes =
