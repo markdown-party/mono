@@ -16,7 +16,7 @@ package io.github.alexandrepiveteau.echo.core
 /** Unpacks the fourth [Byte] from a given [Int]. */
 @PublishedApi internal inline fun unpackByte4(value: Int): Byte = value.and(0xFF).toByte()
 
-/** Unpacks the fifth [Byte] from a given [Int]. */
+/** Packs the four [Byte] into a given [Int]. */
 @PublishedApi
 internal inline fun packBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte): Int {
   return (b1.toInt().and(0xFF) shl 24) or
