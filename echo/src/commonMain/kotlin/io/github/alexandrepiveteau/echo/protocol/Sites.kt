@@ -111,7 +111,7 @@ internal open class MutableSiteImpl<T, M, R>(
 
   private val scope =
       object : EventScope<T> {
-        override suspend fun yield(event: T): EventIdentifier {
+        override fun yield(event: T): EventIdentifier {
           val id = history.append(identifier, format.encodeToByteArray(serializer, event))
           current.value = transform(history.current)
           sentinel.value = sentinel.value + 1U
