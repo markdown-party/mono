@@ -5,6 +5,9 @@ package codemirror.state
 @JsModule("@codemirror/state")
 external interface TransactionSpec {
 
+  /** The changes to the document made by this transaction. */
+  @JsName("changes") var rawChanges: dynamic
+
   /**
    * When set, this transaction explicitly updates the selection. Offsets in this selection should
    * refer to the document as it is after the transaction.
@@ -50,3 +53,7 @@ fun <T> TransactionSpec.annotation(): Annotation<T> {
 fun <T> TransactionSpec.annotations(): Array<Annotation<T>> {
   return rawAnnotations.unsafeCast<Array<Annotation<T>>>()
 }
+
+fun TransactionSpec(
+    block: TransactionSpec.() -> Unit,
+): TransactionSpec = js("{}").unsafeCast<TransactionSpec>().apply(block)
