@@ -55,14 +55,14 @@ public final class io/github/alexandrepiveteau/echo/UnitProjection : io/github/a
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/events/EventScope {
-	public abstract fun yield-IoIHIs8 (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun yieldAll (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun yieldAll (Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun yield-UaA2Q5I (Ljava/lang/Object;)J
+	public abstract fun yieldAll (Ljava/lang/Iterable;)V
+	public abstract fun yieldAll (Ljava/util/Iterator;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/events/EventScope$DefaultImpls {
-	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/lang/Iterable;)V
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/util/Iterator;)V
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/ChangeScope {

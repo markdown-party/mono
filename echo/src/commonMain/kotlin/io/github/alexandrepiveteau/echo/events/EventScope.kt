@@ -24,7 +24,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
    *
    * @return the [EventIdentifier] that's issued for this new event.
    */
-  suspend fun yield(
+  fun yield(
       event: T,
   ): EventIdentifier
 
@@ -33,7 +33,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
    *
    * @param events the events that will be added to the log.
    */
-  suspend fun yieldAll(
+  fun yieldAll(
       events: Iterator<T>,
   ) {
     for (event in events) {
@@ -46,7 +46,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
    *
    * @param events the events that will be added to the log.
    */
-  suspend fun yieldAll(
+  fun yieldAll(
       events: Iterable<T>,
   ) {
     yieldAll(events.iterator())
