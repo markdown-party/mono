@@ -1,12 +1,16 @@
 package party.markdown.ui.editor
 
 import codemirror.basicSetup.basicSetup
+import codemirror.state.ChangeSpec
 import codemirror.state.EditorState
 import codemirror.state.EditorStateConfig
+import codemirror.state.TransactionSpec
 import codemirror.text.Text
 import codemirror.view.EditorView
 import codemirror.view.EditorViewConfig
+import kotlinx.coroutines.delay
 import org.w3c.dom.HTMLElement
+import party.markdown.react.useLaunchedEffect
 import react.*
 import react.dom.div
 
@@ -22,7 +26,7 @@ private val editor =
 
       // Prepare the editor as an effect.
       // TODO : Somehow provide the state based on the current MutableSite value.
-      useEffectWithCleanup(emptyList()) {
+      useLaunchedEffect(emptyList()) {
         val config = EditorViewConfig {
           state =
               EditorState.create(
@@ -32,8 +36,22 @@ private val editor =
                   })
           parent = myRef.current!!
         }
-        EditorView(config)
-        return@useEffectWithCleanup {}
+        val view = EditorView(config)
+
+        while (true) {
+          delay(10 * 1000)
+          val transaction =
+              view.state.update(
+                  TransactionSpec {
+                    rawChanges =
+                        ChangeSpec(
+                            from = 0,
+                            to = 0,
+                            insert = Text.of(arrayOf("hi! ")),
+                        )
+                  })
+          view.dispatch(transaction)
+        }
       }
 
       div(classes = "flex-grow h-full") {
