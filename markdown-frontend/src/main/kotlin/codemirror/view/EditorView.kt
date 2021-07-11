@@ -4,6 +4,8 @@
 package codemirror.view
 
 import codemirror.state.EditorState
+import codemirror.state.Transaction
+import codemirror.state.TransactionSpec
 import org.w3c.dom.HTMLElement
 
 /** See `https://codemirror.net/6/docs/ref/#view.EditorView`. */
@@ -17,4 +19,8 @@ constructor(
   val dom: HTMLElement
   val scrollDOM: HTMLElement
   val contentDOM: HTMLElement
+
+  fun dispatch(tr: Transaction)
+  fun dispatch(vararg specs: TransactionSpec)
+  fun setState(newState: EditorState)
 }
