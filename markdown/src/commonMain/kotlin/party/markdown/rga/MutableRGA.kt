@@ -1,13 +1,7 @@
 package party.markdown.rga
 
-import io.github.alexandrepiveteau.echo.core.buffer.MutableCharGapBuffer
-import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuffer
-import io.github.alexandrepiveteau.echo.core.buffer.binarySearch
-import io.github.alexandrepiveteau.echo.core.buffer.toCharArray
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
-import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
+import io.github.alexandrepiveteau.echo.core.buffer.*
+import io.github.alexandrepiveteau.echo.core.causality.*
 
 /**
  * A [MutableRGA] aggregates [RGAEvent] and mutates its internal state to compute a distributed
@@ -188,6 +182,21 @@ class MutableRGA {
     val index = pendingRemovals.binarySearch(offset)
     if (index >= 0) return // Already pending for removal
     pendingRemovals.push(offset, offset = -(index + 1))
+  }
+
+  /**
+   * Returns a new [EventIdentifierArray] with all the identifiers from the [MutableRGA],
+   * concatenated. The characters which were deleted will not see their [EventIdentifier] be
+   * included in the [EventIdentifierArray].
+   */
+  fun toEventIdentifierArray(): EventIdentifierArray {
+    val buffer = MutableEventIdentifierGapBuffer(0)
+    for (i in 0 until identifiers.size) {
+      if (chars[i] != REMOVED) {
+        buffer.push(identifiers[i])
+      }
+    }
+    return buffer.toEventIdentifierArray()
   }
 
   /**
