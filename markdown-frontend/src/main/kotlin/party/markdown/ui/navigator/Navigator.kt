@@ -27,6 +27,9 @@ external interface NavigatorProps : RProps {
   /** The root node that should be displayed in the navigator. */
   var tree: TreeNode
 
+  var selected: TreeNode?
+  var onTreeNodeSelected: (TreeNode) -> Unit
+
   var onCreateFile: (parent: TreeNode?) -> Unit
   var onCreateFolder: (parent: TreeNode?) -> Unit
   var onNodeDelete: (TreeNode) -> Unit
@@ -158,16 +161,21 @@ private val navigator =
             displayName = node.name ?: "(unnamed)"
             displayFileType = node.fileType
             displayIndentLevel = node.indent
-            displaySelected = false
+            displaySelected = node.key == props.selected?.id
             menuOpen = node.key == dropdownOpen
             onDropFile = { id -> props.onNodeMove(id, node.node) }
             onFileClick =
                 {
-                  if (node.node is TreeNode.Folder) {
-                    if (node.key in open) {
-                      setOpen(open - node.key)
-                    } else {
-                      setOpen(open + node.key)
+                  when (node.node) {
+                    is TreeNode.Folder -> {
+                      if (node.key in open) {
+                        setOpen(open - node.key)
+                      } else {
+                        setOpen(open + node.key)
+                      }
+                    }
+                    is TreeNode.MarkdownFile -> {
+                      props.onTreeNodeSelected(node.node)
                     }
                   }
                 }

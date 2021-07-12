@@ -14,6 +14,8 @@ sealed interface TreeNode {
   /** The display name for this [TreeNode]. */
   val name: String?
 
+  operator fun contains(other: TreeNode): Boolean
+
   /**
    * A folder that contains a [List] of [children].
    *
@@ -25,7 +27,12 @@ sealed interface TreeNode {
       override val id: TreeNodeIdentifier,
       val children: Set<TreeNode>,
       override val name: String?,
-  ) : TreeNode
+  ) : TreeNode {
+    override fun contains(other: TreeNode): Boolean {
+      if (other == this) return true
+      return children.any { it.contains(other) }
+    }
+  }
 
   /**
    * A document that contains some text, in Markdown.
@@ -36,5 +43,7 @@ sealed interface TreeNode {
   data class MarkdownFile(
       override val id: TreeNodeIdentifier,
       override val name: String?,
-  ) : TreeNode
+  ) : TreeNode {
+    override fun contains(other: TreeNode): Boolean = other == this
+  }
 }

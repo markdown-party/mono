@@ -2,9 +2,11 @@ package party.markdown.ui
 
 import io.github.alexandrepiveteau.echo.core.causality.toEventIdentifier
 import kotlinx.coroutines.launch
+import party.markdown.data.text.TextApi
 import party.markdown.data.tree.TreeApi
 import party.markdown.react.useCoroutineScope
 import party.markdown.react.useFlow
+import party.markdown.tree.TreeNode
 import party.markdown.ui.editor.editor
 import party.markdown.ui.navigator.navigator
 import react.*
@@ -16,6 +18,7 @@ fun RBuilder.panes(
 
 external interface PanesProps : RProps {
   var treeApi: TreeApi
+  var textApi: TextApi
 }
 
 private fun nextName(): String = buildString { repeat(3) { append(('a'..'z').random()) } }
@@ -24,9 +27,14 @@ private val panes =
     functionalComponent<PanesProps> { props ->
       val tree = useFlow(props.treeApi.current)
       val scope = useCoroutineScope()
+      val (selected, setSelected) = useState<TreeNode?>(null)
+      val nodes = useFlow(props.treeApi.current)
 
       div(classes = "h-full flex flex-row") {
         navigator {
+          this.selected = selected
+          this.onTreeNodeSelected = setSelected
+
           this.tree = tree
           this.onCreateFile =
               {
@@ -60,6 +68,9 @@ private val panes =
               }
         }
         dividerHorizontal()
-        editor {}
+        editor {
+          node = selected?.takeIf { it in nodes }
+          api = props.textApi
+        }
       }
     }

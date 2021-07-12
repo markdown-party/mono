@@ -8,6 +8,8 @@ import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.data.project.MutableSiteProjectApi
 import party.markdown.data.project.ProjectApi
+import party.markdown.data.text.MutableSiteTextApi
+import party.markdown.data.text.TextApi
 import party.markdown.data.tree.MutableSiteTreeApi
 import party.markdown.data.tree.TreeApi
 import party.markdown.ui.topBar.topBar
@@ -26,6 +28,7 @@ private val app =
       // TODO : Inject this ?
       val projectApi = useMemo<ProjectApi>(props.local) { MutableSiteProjectApi(props.local) }
       val treeApi = useMemo<TreeApi>(props.local) { MutableSiteTreeApi(props.local) }
+      val textApi = useMemo<TextApi>(props.local) { MutableSiteTextApi(props.local) }
       val (debug, setDebug) = useState(false)
 
       div(classes = "flex flex-col h-screen w-screen") {
@@ -38,7 +41,10 @@ private val app =
           onDebugEnabled = setDebug
         }
         dividerVertical()
-        panes { this.treeApi = treeApi }
+        panes {
+          this.treeApi = treeApi
+          this.textApi = textApi
+        }
       }
     }
 
