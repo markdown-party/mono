@@ -2,16 +2,12 @@ package party.markdown.ui.editor
 
 import codemirror.basicSetup.basicSetup
 import codemirror.lang.markdown.markdown
-import codemirror.state.ChangeSpec
 import codemirror.state.EditorState
 import codemirror.state.EditorStateConfig
-import codemirror.state.TransactionSpec
 import codemirror.text.Text
 import codemirror.view.EditorView
 import codemirror.view.EditorViewConfig
-import kotlinx.coroutines.delay
 import org.w3c.dom.HTMLElement
-import party.markdown.react.useLaunchedEffect
 import react.*
 import react.dom.div
 
@@ -27,35 +23,34 @@ private val editor =
 
       // Prepare the editor as an effect.
       // TODO : Somehow provide the state based on the current MutableSite value.
-      useLaunchedEffect(emptyList()) {
+      useEffectWithCleanup(emptyList()) {
+        lateinit var view: EditorView
         val config = EditorViewConfig {
           state =
               EditorState.create(
                   EditorStateConfig {
-                    doc = Text.of(arrayOf("Wait, collaboration doesn't work yet..."))
+                    doc = Text.empty
                     extensions = arrayOf(basicSetup, markdown())
                   })
+          dispatch =
+              { tr ->
+                if (tr.docChanged) {
+                  tr.changes.iterChanges(
+                      f = { fA, tA, fB, tB, txt ->
+                        println("fA: $fA, tA: $tA, fB: $fB, tB: $tB, txt: $txt")
+                      },
+                      individual = true,
+                  )
+                }
+                view.update(arrayOf(tr))
+              }
           parent = myRef.current!!
         }
-        val view = EditorView(config)
-
-        while (true) {
-          delay(10 * 1000)
-          val transaction =
-              view.state.update(
-                  TransactionSpec {
-                    rawChanges =
-                        ChangeSpec(
-                            from = 0,
-                            to = 0,
-                            insert = Text.of(arrayOf("hi! ")),
-                        )
-                  })
-          view.dispatch(transaction)
-        }
+        view = EditorView(config)
+        return@useEffectWithCleanup { view.destroy() }
       }
 
-      div(classes = "flex-grow h-full") {
+      div(classes = "flex-grow h-full min-w-0 max-h-full") {
         attrs { ref { myRef.current = it.unsafeCast<HTMLElement>() } }
       }
     }
