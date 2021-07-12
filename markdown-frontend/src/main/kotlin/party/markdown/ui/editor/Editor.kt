@@ -1,6 +1,7 @@
 package party.markdown.ui.editor
 
 import codemirror.basicSetup.basicSetup
+import codemirror.lang.markdown.markdown
 import codemirror.state.ChangeSpec
 import codemirror.state.EditorState
 import codemirror.state.EditorStateConfig
@@ -32,7 +33,7 @@ private val editor =
               EditorState.create(
                   EditorStateConfig {
                     doc = Text.of(arrayOf("Wait, collaboration doesn't work yet..."))
-                    extensions = arrayOf(basicSetup)
+                    extensions = arrayOf(basicSetup, markdown())
                   })
           parent = myRef.current!!
         }
