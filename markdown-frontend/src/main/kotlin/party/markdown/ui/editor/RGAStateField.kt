@@ -55,7 +55,7 @@ private fun update(
     if (identifiers == undefined) error("Expected annotation $RGAIdentifiers on remote op.")
 
     // Sanity checks.
-    check(identifiers.size == transaction.newDoc.length) { "Mismatching lengths !" }
+    // check(identifiers.size == transaction.newDoc.length) { "Mismatching lengths !" }
 
     // We've found out the identifiers associated with the changes.
     return RGAState(identifiers, EventIdentifierArray(0))

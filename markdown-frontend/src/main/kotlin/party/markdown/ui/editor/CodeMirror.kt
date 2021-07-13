@@ -17,13 +17,10 @@ fun RBuilder.codeMirror(
 
 external interface CodeMirrorProps : RProps {
 
+  var id: Any?
+
   /** The [Extension]s that should be run when the CodeMirror editor is started. */
   var extensions: Array<Extension>
-
-  /**
-   * The [dispatch] function that will be used whenever the [EditorView] processes a [Transaction].
-   */
-  var dispatch: (transaction: Transaction) -> Unit
 
   /**
    * A [RMutableRef] to the current [EditorView]. This will be populated by the `CodeMirror`
@@ -50,18 +47,22 @@ private val component =
       div("flex-grow h-full min-w-0 max-h-full") { ref = component }
 
       // Whenever the component is available, run the effect and update the editor from the props.
-      useEffectWithCleanup(listOf()) {
-        lateinit var view: EditorView
-        val config = EditorViewConfig {
-          state = state(props.extensions)
-          dispatch = props.dispatch
-          parent = component.current!!
-        }
-        view = EditorView(config)
-        props.view.current = view
-        return@useEffectWithCleanup {
-          view.destroy()
-          props.view.current = null
+      useEffectWithCleanup(listOf(props.id)) {
+        if (props.id != null) {
+          lateinit var view: EditorView
+          val config = EditorViewConfig {
+            state = state(props.extensions)
+            parent = component.current!!
+          }
+          view = EditorView(config)
+          props.view.current = view
+          return@useEffectWithCleanup {
+            view.destroy()
+            props.view.current = null
+          }
+        } else {
+          // Do not instantiate anything.
+          return@useEffectWithCleanup {}
         }
       }
     }

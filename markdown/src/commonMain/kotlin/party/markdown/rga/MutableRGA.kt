@@ -16,7 +16,7 @@ import io.github.alexandrepiveteau.echo.core.causality.*
  */
 class MutableRGA {
 
-  private companion object {
+  companion object {
 
     /**
      * The [Char] that indicates that a certain atom has been removed, and should not be included in
