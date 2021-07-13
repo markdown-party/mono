@@ -246,10 +246,13 @@ public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifi
 
 public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray {
 	public fun <init> (I)V
+	public fun equals (Ljava/lang/Object;)Z
 	public final fun get-UaA2Q5I (I)J
 	public final fun getSize ()I
+	public fun hashCode ()I
 	public final fun iterator ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierIterator;
 	public final fun set--oNUasc (IJ)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifierArrayKt {
