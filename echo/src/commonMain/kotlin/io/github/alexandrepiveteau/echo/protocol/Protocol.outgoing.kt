@@ -67,8 +67,9 @@ private suspend fun ExchangeScope<O, I>.outgoingSending(
 
     // Prepare the advertisements that should be sent, as well as the events.
     val available = withEventLogLock { acknowledged() }
-    enqueueAdvertisements(advertised, available, queue)
-    enqueueEvents(requestsBuffer, creditsBuffer, queue)
+
+    if (queue.isEmpty()) enqueueAdvertisements(advertised, available, queue)
+    if (queue.isEmpty()) enqueueEvents(requestsBuffer, creditsBuffer, queue)
 
     select<Unit> {
 
