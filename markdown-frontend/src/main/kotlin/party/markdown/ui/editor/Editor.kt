@@ -30,14 +30,6 @@ external interface EditorProps : RProps {
   var api: TextApi
 }
 
-private val Sample =
-    StateField.define(
-        StateFieldConfig(
-            create = { 0 },
-            update = { value, tr -> if (tr.docChanged) value + 1 else value },
-        ),
-    )
-
 /**
  * Publish the insertions currently present in the [EditorView]. This will take all the characters
  * with an unspecified event identifier, and sequentially append them to the tree. Doing the
@@ -213,7 +205,6 @@ private val editor =
             arrayOf(
                 basicSetup,
                 markdown(),
-                Sample.extension,
                 RGAStateField.extension,
             )
         this.view = view
