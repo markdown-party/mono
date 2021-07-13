@@ -189,10 +189,10 @@ class MutableRGA {
    * concatenated. The characters which were deleted will not see their [EventIdentifier] be
    * included in the [EventIdentifierArray].
    */
-  fun toEventIdentifierArray(): EventIdentifierArray {
+  fun toEventIdentifierArray(includeRemoved: Boolean = false): EventIdentifierArray {
     val buffer = MutableEventIdentifierGapBuffer(0)
     for (i in 0 until identifiers.size) {
-      if (chars[i] != REMOVED) {
+      if (includeRemoved || chars[i] != REMOVED) {
         buffer.push(identifiers[i])
       }
     }
@@ -203,10 +203,10 @@ class MutableRGA {
    * Returns a new [CharArray] built with all the characters from the [MutableRGA], concatenated.
    * The characters which were deleted will not be included in the [CharArray].
    */
-  fun toCharArray(): CharArray {
+  fun toCharArray(includeRemoved: Boolean = false): CharArray {
     val buffer = MutableCharGapBuffer(0)
     for (i in 0 until chars.size) {
-      if (chars[i] != REMOVED) {
+      if (includeRemoved || chars[i] != REMOVED) {
         buffer.push(chars[i])
       }
     }

@@ -13,7 +13,10 @@ class MutableMarkdownParty {
         tree = tree.toTree(),
         documents =
             files.toMap().mapValues { (_, rga) ->
-              rga.toCharArray() to rga.toEventIdentifierArray()
+              Pair(
+                  rga.toCharArray(includeRemoved = true),
+                  rga.toEventIdentifierArray(includeRemoved = true),
+              )
             },
     )
   }

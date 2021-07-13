@@ -18,7 +18,10 @@ external class Transaction {
   val startState: EditorState
 
   /** The document changes made by this transaction. */
-  var changes: ChangeSet
+  val changes: ChangeSet
+
+  /** The effects added to the transaction. */
+  val effects: Array<StateEffect<Any>>
 
   /** Whether the selection should be scrolled into view after this transaction is dispatched. */
   val scrollIntoView: Boolean

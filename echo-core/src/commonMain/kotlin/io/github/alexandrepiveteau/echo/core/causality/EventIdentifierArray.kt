@@ -26,6 +26,16 @@ internal constructor(
   val size: Int
     get() = backing.size
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is EventIdentifierArray) return false
+    return this.backing == other.backing
+  }
+
+  override fun hashCode(): Int {
+    return backing.hashCode()
+  }
+
   /**
    * Returns the array element at the given [index]. This method can be called using the index
    * operator.
@@ -47,6 +57,13 @@ internal constructor(
   /** Creates an iterator over the elements of the array. */
   operator fun iterator(): EventIdentifierIterator =
       ActualEventIdentifier(backing.asLongArray().iterator())
+
+  override fun toString(): String {
+    return backing.joinToString(
+        prefix = "[",
+        postfix = "]",
+    ) { EventIdentifier(it).toString() }
+  }
 
   private class ActualEventIdentifier(
       private val backing: LongIterator,
