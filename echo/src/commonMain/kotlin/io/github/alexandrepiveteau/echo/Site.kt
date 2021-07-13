@@ -24,6 +24,8 @@ import kotlinx.serialization.serializer
  * @param M the type of the underlying aggregated model for this [Site].
  */
 interface Site<out M> : Exchange<Inc, Out> {
+
+  /** A hot [StateFlow] which, when collected, will emit the latest aggregated model. */
   val value: StateFlow<M>
 }
 
