@@ -17,7 +17,7 @@ abstract external class Text {
       from: Int,
       to: Int = definedExternally,
       lineSep: String = definedExternally,
-  )
+  ): String
   fun eq(other: Text): Boolean
   fun iter(dir: Int = definedExternally): TextIterator
   fun iterRange(from: Int, to: Int = definedExternally): TextIterator

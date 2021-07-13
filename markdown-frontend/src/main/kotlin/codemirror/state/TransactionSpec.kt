@@ -46,13 +46,17 @@ fun <T> TransactionSpec.effects(): Array<StateEffect<T>> {
   return rawEffects.unsafeCast<Array<StateEffect<T>>>()
 }
 
-fun <T> TransactionSpec.annotation(): Annotation<T> {
-  return rawAnnotations.unsafeCast<Annotation<T>>()
-}
+var TransactionSpec.annotation: Annotation<Any>
+  get() = error("Unsupported operation.")
+  set(value) {
+    rawAnnotations = value
+  }
 
-fun <T> TransactionSpec.annotations(): Array<Annotation<T>> {
-  return rawAnnotations.unsafeCast<Array<Annotation<T>>>()
-}
+var TransactionSpec.annotations: Array<Annotation<*>>
+  get() = error("Unsupported operation.")
+  set(value) {
+    rawAnnotations = value
+  }
 
 fun TransactionSpec(
     block: TransactionSpec.() -> Unit,

@@ -11,6 +11,13 @@ class MutableMarkdownParty {
   fun toMarkdownParty(): MarkdownParty {
     return MarkdownParty(
         tree = tree.toTree(),
-        documents = files.toMap().mapValues { (_, rga) -> rga.toCharArray().concatToString() })
+        documents =
+            files.toMap().mapValues { (_, rga) ->
+              Pair(
+                  rga.toCharArray(includeRemoved = true),
+                  rga.toEventIdentifierArray(includeRemoved = true),
+              )
+            },
+    )
   }
 }

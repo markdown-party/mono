@@ -1,13 +1,7 @@
 package party.markdown.rga
 
-import io.github.alexandrepiveteau.echo.core.buffer.MutableCharGapBuffer
-import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuffer
-import io.github.alexandrepiveteau.echo.core.buffer.binarySearch
-import io.github.alexandrepiveteau.echo.core.buffer.toCharArray
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
-import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
+import io.github.alexandrepiveteau.echo.core.buffer.*
+import io.github.alexandrepiveteau.echo.core.causality.*
 
 /**
  * A [MutableRGA] aggregates [RGAEvent] and mutates its internal state to compute a distributed
@@ -22,7 +16,7 @@ import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
  */
 class MutableRGA {
 
-  private companion object {
+  companion object {
 
     /**
      * The [Char] that indicates that a certain atom has been removed, and should not be included in
@@ -191,13 +185,28 @@ class MutableRGA {
   }
 
   /**
+   * Returns a new [EventIdentifierArray] with all the identifiers from the [MutableRGA],
+   * concatenated. The characters which were deleted will not see their [EventIdentifier] be
+   * included in the [EventIdentifierArray].
+   */
+  fun toEventIdentifierArray(includeRemoved: Boolean = false): EventIdentifierArray {
+    val buffer = MutableEventIdentifierGapBuffer(0)
+    for (i in 0 until identifiers.size) {
+      if (includeRemoved || chars[i] != REMOVED) {
+        buffer.push(identifiers[i])
+      }
+    }
+    return buffer.toEventIdentifierArray()
+  }
+
+  /**
    * Returns a new [CharArray] built with all the characters from the [MutableRGA], concatenated.
    * The characters which were deleted will not be included in the [CharArray].
    */
-  fun toCharArray(): CharArray {
+  fun toCharArray(includeRemoved: Boolean = false): CharArray {
     val buffer = MutableCharGapBuffer(0)
     for (i in 0 until chars.size) {
-      if (chars[i] != REMOVED) {
+      if (includeRemoved || chars[i] != REMOVED) {
         buffer.push(chars[i])
       }
     }

@@ -22,5 +22,19 @@ constructor(
 
   fun dispatch(tr: Transaction)
   fun dispatch(vararg specs: TransactionSpec)
+
+  /**
+   * Update the view for the given [Array] of [Transaction]. This will update the visible document
+   * and selection to match the state produced by the transactions, and notify view plugins of the
+   * change. You should usually call [EditorView.dispatch] instead, which uses this as a primitive.
+   */
+  fun update(transactions: Array<Transaction>)
+
   fun setState(newState: EditorState)
+
+  /**
+   * Clean up this editor view, removing its element from the document, unregistering event
+   * handlers, and notifying plugins. The view instance can no longer be used after calling this.
+   */
+  fun destroy()
 }
