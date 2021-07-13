@@ -5,13 +5,17 @@ import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
+import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 
 /**
  * The [RGAState] contains an [EventIdentifierArray], where each character is individually mapped to
- * an [EventIdentifier] using its position. Characters which have only been appended locally but
- * not synced will be set to [EventIdentifier.Unspecified].
+ * an [EventIdentifier] using its position. Characters which have only been appended locally but not
+ * synced will be set to [EventIdentifier.Unspecified].
  */
-data class RGAState(val identifiers: EventIdentifierArray)
+data class RGAState(
+    val identifiers: EventIdentifierArray,
+    val removed: EventIdentifierArray,
+)
 
 /**
  * A [StateField] which contains the current identifiers associated with each character from the
@@ -36,7 +40,7 @@ private fun create(
 ): RGAState {
   // By default, the characters are unknown when they are inserted. This means that they will all
   // get appended to the MutableHistory on the next sync loop.
-  return RGAState(EventIdentifierArray(state.doc.length))
+  return RGAState(EventIdentifierArray(state.doc.length), EventIdentifierArray(0))
 }
 
 private fun update(
@@ -54,7 +58,7 @@ private fun update(
     check(identifiers.size == transaction.newDoc.length) { "Mismatching lengths !" }
 
     // We've found out the identifiers associated with the changes.
-    return RGAState(identifiers)
+    return RGAState(identifiers, EventIdentifierArray(0))
   }
 
   // Otherwise, we can look at the transaction, its changes, and insert or remove the appropriate
@@ -63,15 +67,19 @@ private fun update(
 
   // Create a MutableGapBuffer, used to perform the insertions, deletions, etc.
   val buffer = current.identifiers.toMutableGapBuffer()
+  val removedBuffer = current.removed.toMutableGapBuffer()
   transaction.changes.iterChanges({ fromA, toA, _, _, inserted ->
     // Check that the removed range is non-empty, because if the buffer is empty an
     // OutOfBoundsException will nevertheless be thrown.
-    if (toA - fromA > 0) buffer.remove(fromA, size = toA - fromA)
+    if (toA - fromA > 0) {
+      val ids = buffer.remove(fromA, size = toA - fromA)
+      for (id in ids) if (id.isSpecified) removedBuffer.push(id)
+    }
     repeat(inserted.length) { buffer.push(EventIdentifier.Unspecified, fromA) }
   })
 
   // Sanity checks.
   check(buffer.size == transaction.newDoc.length) { "Mismatching lengths !" }
 
-  return RGAState(buffer.toEventIdentifierArray())
+  return RGAState(buffer.toEventIdentifierArray(), removedBuffer.toEventIdentifierArray())
 }

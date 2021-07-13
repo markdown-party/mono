@@ -7,6 +7,7 @@ import codemirror.state.Transaction.Companion.remote
 import codemirror.view.EditorView
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
+import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -55,13 +56,24 @@ private fun handle(view: EditorView, transaction: Transaction) {
   view.update(arrayOf(transaction))
 }
 
-private suspend fun publishInsertions(
+/**
+ * Publish the insertions currently present in the [EditorView]. This will take all the characters
+ * with an unspecified event identifier, and sequentially append them to the tree. Doing the
+ * insertions sequentially, from left to right, will preserve the interleaving properties of RGA.
+ *
+ * @param document the [TreeNodeIdentifier] to which the changes are published.
+ * @param api the [TextApi] that is used to yield [RGAEvent]s.
+ * @param view the [EditorView] that owns the text.
+ */
+private suspend fun publishLocal(
     document: TreeNodeIdentifier,
     api: TextApi,
     view: EditorView,
 ): Unit =
     api.edit(document) {
       val state = view.state
+
+      // Integrate all the local insertions.
       val ids = state.field(RGAStateField).identifiers.toMutableGapBuffer()
       for (i in 0 until ids.size) {
         if (ids[i].isUnspecified) {
@@ -70,12 +82,28 @@ private suspend fun publishInsertions(
           ids[i] = yield(RGAEvent.Insert(prev, char))
         }
       }
+
+      // Integrate all the local removals.
+      val removed = state.field(RGAStateField).removed
+      for (i in 0 until removed.size) {
+        if (removed[i].isSpecified) {
+          yield(RGAEvent.Remove(removed[i]))
+        }
+      }
+
+      // Dispatch the new identifiers synchronously.
       view.dispatch(
           TransactionSpec {
             annotations = arrayOf(remote.of(true), RGAIdentifiers.of(ids.toEventIdentifierArray()))
           },
       )
     }
+
+private suspend fun publishLocalRemovesAndIntegrateRemote(
+    document: TreeNodeIdentifier,
+    api: TextApi,
+    view: EditorView,
+) {}
 
 private val editor =
     functionalComponent<EditorProps> { props ->
@@ -86,7 +114,7 @@ private val editor =
           delay(1000) // TODO : Notifications rather than loop.
           val currentView = view.current ?: continue
           val node = props.node ?: continue
-          publishInsertions(node.id, props.api, currentView)
+          publishLocal(node.id, props.api, currentView)
         }
       }
 
@@ -95,15 +123,18 @@ private val editor =
         props.api.current(node.id).collect { (txt, _) -> println("Text ${txt.concatToString()}") }
       }
 
-      codeMirror {
-        this.extensions =
-            arrayOf(
-                basicSetup,
-                markdown(),
-                Sample.extension,
-                RGAStateField.extension,
-            )
-        this.dispatch = { handle(view.current!!, it) }
-        this.view = view
+      // TODO : Start a new editor when the current node is changed.
+      if (props.node != null) {
+        codeMirror {
+          this.extensions =
+              arrayOf(
+                  basicSetup,
+                  markdown(),
+                  Sample.extension,
+                  RGAStateField.extension,
+              )
+          this.dispatch = { handle(view.current!!, it) }
+          this.view = view
+        }
       }
     }
