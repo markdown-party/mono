@@ -5,11 +5,20 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 
 internal object EmptyEventIterator : EventIterator {
 
-  override val seqno: SequenceNumber = error("Empty")
-  override val site: SiteIdentifier = error("Empty")
-  override val event: ByteArray = error("Empty")
-  override val from: Int = error("Empty")
-  override val until: Int = error("Empty")
+  override val seqno: SequenceNumber
+    get() = error("Empty")
+
+  override val site: SiteIdentifier
+    get() = error("Empty")
+
+  override val event: ByteArray
+    get() = error("Empty")
+
+  override val from: Int
+    get() = error("Empty")
+
+  override val until: Int
+    get() = error("Empty")
 
   override fun hasNext() = false
   override fun hasPrevious() = false
