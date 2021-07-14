@@ -392,6 +392,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventI
 	public abstract fun getSeqno-iWHgJgY ()I
 	public abstract fun getSite-ix6DSBw ()I
 	public abstract fun getUntil ()I
+	public abstract fun has ()Z
 	public abstract fun moveNext ()V
 	public abstract fun movePrevious ()V
 	public abstract fun next ()Lio/github/alexandrepiveteau/echo/core/log/Event;

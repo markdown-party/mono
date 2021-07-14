@@ -20,6 +20,7 @@ internal object EmptyEventIterator : EventIterator {
   override val until: Int
     get() = error("Empty")
 
+  override fun has() = false
   override fun hasNext() = false
   override fun hasPrevious() = false
 

@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.protocol
 
 import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.EventIterator
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
@@ -141,53 +142,97 @@ private object EventComparator : Comparator<I.Event> {
   ) = EventIdentifier(a.seqno, a.site).compareTo(EventIdentifier(b.seqno, b.site))
 }
 
+/**
+ * Moves the given [EventIterator] until the event identifier formed by the provided
+ * [SequenceNumber] and [SiteIdentifier] is present on the current index, or should be present if it
+ * was to be included in the log.
+ *
+ * If the iterator is empty, it will not move.
+ */
+private fun EventIterator.moveAt(
+    seqno: SequenceNumber,
+    site: SiteIdentifier,
+) {
+
+  // Start from the right hand-side.
+  while (hasNext()) moveNext()
+  if (hasPrevious()) movePrevious()
+
+  // We have an empty iterator.
+  if (!has()) return
+
+  // Iterate to the left, until we either can't move anymore, or are on an event identifier that is
+  // smaller than the given value.
+  while (true) {
+
+    // Check the current item.
+    when {
+      EventIdentifier(this.seqno, this.site) == EventIdentifier(seqno, site) -> return
+      EventIdentifier(this.seqno, this.site) < EventIdentifier(seqno, site) -> {
+        if (hasNext()) moveNext()
+        return
+      }
+      else -> {
+        // If we reached the start of the iterator, stop here. Otherwise, we can move to the
+        // previous item to check for equality.
+        if (!hasPrevious()) return
+        movePrevious()
+      }
+    }
+  }
+}
+
+/**
+ * Takes as many events as available in the [credits] (for the given [index]) and adds them to the
+ * [queue]. If an event is taken, the [requests] array is updated.
+ */
+private fun EventIterator.take(
+    index: Int,
+    requests: MutableEventIdentifierGapBuffer,
+    credits: MutableIntGapBuffer,
+    queue: MutableList<I.Event>,
+) {
+
+  if (!has()) return // Empty iterator.
+  if (EventIdentifier(seqno, site) < requests[index]) return // No interesting event.
+
+  while (true) {
+
+    // We have a valid event. Check if we have the credits for it, and if so, add it to the queue.
+    if (credits[index].toUInt() == 0U) return
+
+    // Update the credits and requests.
+    credits[index] = (credits[index].toUInt() - 1U).toInt()
+    requests[index] = EventIdentifier(seqno + 1U, site)
+
+    // Add the event to the queue.
+    queue.add(
+        I.Event(
+            seqno = seqno,
+            site = site,
+            body = event.copyOfRange(from, until),
+        ),
+    )
+
+    // Move to the next event, if possible.
+    if (!hasNext()) return
+    moveNext()
+  }
+}
+
+/** Enqueues all the available events into the [ArrayDeque] of messages. */
 private suspend fun ExchangeScope<*, *>.enqueueEvents(
     requests: MutableEventIdentifierGapBuffer,
     credits: MutableIntGapBuffer,
-    queue: MutableList<I>,
+    queue: ArrayDeque<I>,
 ) {
   val events = mutableListOf<I.Event>()
 
   withEventLogLock {
-    // TODO : Optimize this traversal.
-    // TODO : Make this O(1) in the default case, rather than O(n).
-    val iterator = iterator()
-    while (iterator.hasPrevious()) iterator.movePrevious()
-
-    // For each event, check if we have the credits.
-    var keepGoing = size > 0
-    while (keepGoing) {
-
-      // Find the site index.
-      var index = 0
-      findIndex@ while (index < requests.size) {
-        if (requests[index].site == iterator.site) break@findIndex
-        index++
-      }
-
-      // Check if there are some credits, and if the event has not been acknowledged yet.
-      val hasCredits = index != requests.size && credits[index].toUInt() > 0U
-      val isUnknown = index != requests.size && requests[index].seqno <= iterator.seqno
-
-      // Add the event to the queue.
-      if (hasCredits && isUnknown) {
-        consumeCredit(requests, credits, iterator.site)
-        val event =
-            I.Event(
-                iterator.seqno,
-                iterator.site,
-                iterator.event.copyOfRange(iterator.from, iterator.until),
-            )
-        events.add(event)
-        requests[index] = EventIdentifier(iterator.seqno + 1U, iterator.site)
-      }
-
-      if (iterator.hasNext()) {
-        keepGoing = true
-        iterator.moveNext()
-      } else {
-        keepGoing = false
-      }
+    for (i in 0 until requests.size) {
+      val (seqno, site) = requests[i]
+      val iterator = iterator(site).apply { moveAt(seqno, site) }
+      iterator.take(index = i, requests = requests, credits = credits, queue = events)
     }
   }
 
@@ -211,17 +256,13 @@ private fun acknowledge(
     site: SiteIdentifier,
     seqno: SequenceNumber,
 ) {
-  var index = 0
-  while (index < requests.size) {
-    val currentSite = requests[index].site
-    if (site == currentSite) {
-      requests[index] = EventIdentifier(maxOf(requests[index].seqno, seqno), currentSite)
-      return
-    }
-    index++
+  val index = requests.binarySearchBySite(site)
+  if (index >= 0) {
+    requests[index] = EventIdentifier(maxOf(requests[index].seqno, seqno), site)
+  } else {
+    requests.push(EventIdentifier(seqno, site), offset = -(index + 1))
+    credits.push(0, -(index + 1))
   }
-  requests.push(EventIdentifier(seqno, site))
-  credits.push(0)
 }
 
 /**
@@ -239,41 +280,13 @@ private fun request(
     site: SiteIdentifier,
     count: UInt,
 ) {
-  var index = 0
-  while (index < requests.size) {
-    val currentSize = requests[index].site
-    if (site == currentSize) {
-      var updated = credits[index].toUInt() + count
-      if (updated < count) updated = UInt.MAX_VALUE // overflow-safe
-      credits[index] = updated.toInt()
-      return
-    }
-    index++
-  }
-  requests.push(EventIdentifier(SequenceNumber.Min, site))
-  credits.push(count.toInt())
-}
-
-/**
- * Consumes one credit for the given [site] from the [requests] and [credits] buffers. This assumes
- * that both buffers aren't sorted, and are constantly kept in sync when it comes to their sizes.
- *
- * @param requests the gap buffer with the acknowledgements.
- * @param credits the gap buffer with the request counts.
- * @param site the [SiteIdentifier] for which we consume one credit.
- */
-private fun consumeCredit(
-    requests: MutableEventIdentifierGapBuffer,
-    credits: MutableIntGapBuffer,
-    site: SiteIdentifier,
-) {
-  var index = 0
-  while (index < requests.size) {
-    val currentSite = requests[index].site
-    if (site == currentSite) {
-      credits[index] = credits[index] - 1
-      return
-    }
-    index++
+  val index = requests.binarySearchBySite(site)
+  if (index >= 0) {
+    var updated = credits[index].toUInt() + count
+    if (updated < count) updated = UInt.MAX_VALUE // overflow-safe
+    credits[index] = updated.toInt()
+  } else {
+    requests.push(EventIdentifier(SequenceNumber.Min, site), offset = -(index + 1))
+    credits.push(count.toInt(), offset = -(index + 1))
   }
 }

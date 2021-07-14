@@ -22,6 +22,9 @@ interface EventIterator : ListIterator<Event> {
     return Event(seqno, site, event.copyOfRange(from, until))
   }
 
+  /** Returns true if the iterator has an item at the current index. */
+  fun has(): Boolean
+
   /**
    * Moves the [EventIterator] to the next event, without allocations.
    *

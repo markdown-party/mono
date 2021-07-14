@@ -188,6 +188,10 @@ internal class BlockLog {
     override val until: Int
       get() = from + blocksSizes[cursorIdsIndex]
 
+    override fun has(): Boolean {
+      return cursorIdsIndex >= 0 && cursorIdsIndex < blocksSizes.size
+    }
+
     override fun hasNext(): Boolean {
       return cursorIdsIndex < blocksIds.size - 1
     }
