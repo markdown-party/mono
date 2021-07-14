@@ -24,7 +24,7 @@ internal suspend fun ExchangeScope<O, I>.startOutgoing() = runCatchingTerminatio
  */
 private suspend fun ExchangeScope<O, I>.outgoingAdvertiseAll(): MutableEventIdentifierGapBuffer {
   val missing = withEventLogLock { acknowledged() }
-  val queue = mutableListOf<I>()
+  val queue = ArrayDeque<I>()
 
   // Prepare the queue of messages to send.
   for ((seqno, site) in missing) queue += I.Advertisement(site, seqno + 1U)
