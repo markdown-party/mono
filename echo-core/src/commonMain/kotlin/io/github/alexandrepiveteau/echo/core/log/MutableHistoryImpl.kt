@@ -21,6 +21,7 @@ internal class MutableHistoryImpl<T>(
 
   // Storing the events and the changes.
   private val eventStore = BlockLog()
+  private val eventStoreBySite = mutableMapOf<SiteIdentifier, BlockLog>()
   private val changeStore = BlockLog()
 
   /**
@@ -151,6 +152,14 @@ internal class MutableHistoryImpl<T>(
         from = from,
         until = until,
     )
+    eventStoreBySite
+        .getOrPut(site) { BlockLog() }
+        .pushAtId(
+            id = EventIdentifier(seqno, site),
+            array = event,
+            from = from,
+            until = until,
+        )
     while (eventStore.hasNext) forwardChanges()
   }
 
@@ -179,12 +188,7 @@ internal class MutableHistoryImpl<T>(
   override fun acknowledge(
       from: MutableEventLog,
   ): MutableEventLog {
-    // TODO : Make this O(n) or O(log(n) * n) rather than O(n*n)
-    val iterator = from.acknowledged().iterator()
-    while (iterator.hasNext()) {
-      val (seqno, site) = iterator.nextEventIdentifier()
-      acknowledge(seqno, site)
-    }
+    acknowledged.acknowledge(from.acknowledged())
     return this
   }
 
@@ -221,6 +225,7 @@ internal class MutableHistoryImpl<T>(
 
   override fun clear() {
     eventStore.clear()
+    eventStoreBySite.clear()
     changeStore.clear()
   }
 

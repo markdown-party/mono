@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.requireIn
 import io.github.alexandrepiveteau.echo.core.requireRange
 
 /**
@@ -54,9 +55,7 @@ internal class BlockLog {
 
   // END : LAST GAP POSITION
 
-  /**
-   * Removes the previous item to the left.
-   */
+  /** Removes the previous item to the left. */
   fun removeLeft() {
     check(hasPrevious) { "Can't remove left when at first index." }
     blocks.remove(blocks.gap.startIndex - lastSize, lastSize)
@@ -80,14 +79,32 @@ internal class BlockLog {
     blocks.gap.shift(lastSize)
   }
 
+  private fun moveToIndex(insertion: Int) {
+    requireIn(insertion, 0, blocksIds.size + 1)
+    while (blocksIds.gap.startIndex > insertion) moveLeft()
+    while (blocksIds.gap.startIndex < insertion) moveRight()
+  }
+
   /**
-   * Binary searches the given [SequenceNumber] and [SiteIdentifier] in the identifiers array of
-   * this [BlockLog]. This returns the index of the found item, or the inverted insertion point if
-   * it's not available.
+   * Pushes the given [ByteArray] at the gap position which better fits their event identifier.
    *
-   * The behaviour is not defined if the ids are not sorted, such as in a change store.
+   * @param id the [EventIdentifier] to push.
+   * @param array the [ByteArray] to push.
+   * @param from the start of the array range.
+   * @param until the end of the array range.
    */
-  fun binarySearchIds(id: EventIdentifier): Int = blocksIds.binarySearch(id)
+  fun pushAtId(
+      id: EventIdentifier,
+      array: ByteArray,
+      from: Int = 0,
+      until: Int = array.size,
+  ) {
+    val index = blocksIds.binarySearch(id)
+    if (index >= 0) return // Already present.
+    val insertion = -(index + 1)
+    moveToIndex(insertion)
+    pushAtGap(id, array, from, until)
+  }
 
   /**
    * Pushes the given [ByteArray] at the current gap position, and moves the gap after the inserted
