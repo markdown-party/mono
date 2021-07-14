@@ -43,4 +43,13 @@ interface EventLog {
    * modified.
    */
   operator fun iterator(): EventIterator
+
+  /**
+   * Returns an [EventIterator] specific to a single site. The retrieved [EventIdentifier] will
+   * start at the end of the [MutableEventLog], and should not be used anymore if the underlying
+   * [EventLog] is modified.
+   *
+   * @param site the [SiteIdentifier] for which the [EventIterator] is retrieved.
+   */
+  fun iterator(site: SiteIdentifier): EventIterator
 }

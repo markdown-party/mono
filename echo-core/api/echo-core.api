@@ -408,6 +408,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventL
 	public abstract fun contains-qH2TBG0 (II)Z
 	public abstract fun getSize ()I
 	public abstract fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public abstract fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/EventLog_ExtensionsKt {

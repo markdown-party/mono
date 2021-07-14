@@ -196,6 +196,13 @@ internal class MutableHistoryImpl<T>(
 
   override fun iterator(): EventIterator = eventStore.Iterator()
 
+  override fun iterator(
+      site: SiteIdentifier,
+  ): EventIterator {
+    require(site.isSpecified) { "Site must be specified." }
+    return eventStoreBySite[site]?.Iterator() ?: EmptyEventIterator
+  }
+
   override fun merge(
       from: EventLog,
   ): MutableEventLog {

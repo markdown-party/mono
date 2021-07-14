@@ -17,6 +17,12 @@ class MutableEventLogIteratorTest {
     assertFails { iterator.seqno }
     assertFails { iterator.moveNext() }
     assertFails { iterator.movePrevious() }
+    val siteIterator = log.iterator(SiteIdentifier.Min)
+    assertFalse(siteIterator.hasPrevious())
+    assertFalse(siteIterator.hasNext())
+    assertFails { siteIterator.seqno }
+    assertFails { siteIterator.moveNext() }
+    assertFails { siteIterator.movePrevious() }
   }
 
   @Test
