@@ -24,9 +24,7 @@ internal class MutableHistoryImpl<T>(
   private val acknowledged = MutableAcknowledgeMap()
 
   // Storing the events.
-  private val events = mutableByteGapBufferOf()
-  private val eventsIds = mutableEventIdentifierGapBufferOf()
-  private val eventsSizes = mutableIntGapBufferOf()
+  private val eventStore = BlockLog()
 
   // Storing the changes.
   private val changes = mutableByteGapBufferOf()
@@ -50,15 +48,12 @@ internal class MutableHistoryImpl<T>(
       from: Int,
       until: Int,
   ) {
-    requireRange(from, until, array) { "event out of range" }
-
-    val id = EventIdentifier(seqno, site)
-    events.pushAtGap(array, from, until)
-    events.gap.shift(-(until - from))
-    eventsIds.pushAtGap(id)
-    eventsIds.gap.shift(-1)
-    eventsSizes.pushAtGap(until - from)
-    eventsSizes.gap.shift(-1)
+    eventStore.pushAtGapWithoutMove(
+        id = EventIdentifier(seqno, site),
+        array = array,
+        from = from,
+        until = until,
+    )
   }
 
   /**
@@ -75,11 +70,9 @@ internal class MutableHistoryImpl<T>(
       until: Int,
   ) {
     requireRange(from, until, array) { "change out of range" }
-    check(eventsIds.gap.startIndex > 0) { "missing event for change insertion" }
 
-    val id = eventsIds[eventsIds.gap.startIndex - 1]
     changes.pushAtGap(array, from = from, until = until)
-    changesIds.pushAtGap(id)
+    changesIds.pushAtGap(eventStore.lastId)
     changesSizes.pushAtGap(until - from)
   }
 
@@ -91,22 +84,9 @@ internal class MutableHistoryImpl<T>(
       seqno: SequenceNumber,
       site: SiteIdentifier,
   ): Boolean {
-    if (eventsIds.gap.startIndex == 0) return false
-    val id = eventsIds[eventsIds.gap.startIndex - 1]
-    return EventIdentifier(seqno, site) <= id
-  }
-
-  /**
-   * Returns true iff the current cursor index points at an event with the given [seqno] and [site]
-   * identifier.
-   */
-  private fun containsAtCursor(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Boolean {
-    if (eventsIds.gap.startIndex == eventsIds.size) return false
-    val id = eventsIds[eventsIds.gap.startIndex]
-    return EventIdentifier(seqno, site) == id
+    // TODO : Make this a single condition.
+    if (!eventStore.hasPrevious) return false
+    return EventIdentifier(seqno, site) <= eventStore.lastId
   }
 
   /**
@@ -114,12 +94,12 @@ internal class MutableHistoryImpl<T>(
    * needed.
    */
   private fun moveCursorLeft() {
-    check(eventsIds.gap.startIndex > 0) { "Can't move backward if at start." }
+    check(eventStore.hasPrevious) { "Can't move backward if at start." }
 
     // Remove all the associated changes.
     reverseChange@ while (changesIds.gap.startIndex > 0) {
       val changeId = changesIds[changesIds.gap.startIndex - 1]
-      if (changeId != eventsIds[eventsIds.gap.startIndex - 1]) break@reverseChange
+      if (changeId != eventStore.lastId) break@reverseChange
 
       val changeSize = changesSizes[changesSizes.gap.startIndex - 1]
       val changeFrom = changes.gap.startIndex - changeSize
@@ -129,10 +109,10 @@ internal class MutableHistoryImpl<T>(
       current =
           projection.backward(
               model = current,
-              identifier = eventsIds[eventsIds.gap.startIndex - 1],
-              data = events.backing,
-              from = events.gap.startIndex - eventsSizes[eventsSizes.gap.startIndex - 1],
-              until = events.gap.startIndex,
+              identifier = eventStore.lastId,
+              data = eventStore.backing,
+              from = eventStore.lastFrom,
+              until = eventStore.lastUntil,
               changeData = changes.backing,
               changeFrom = changeFrom,
               changeUntil = changeUntil,
@@ -147,31 +127,25 @@ internal class MutableHistoryImpl<T>(
     // Move the event to the right of the cursor. The event cursor is shifted only after it has been
     // reversed with all the changes, to ensure that the content is read (and not the gap, which may
     // have unreliable data).
-    events.gap.shift(-eventsSizes[eventsSizes.gap.startIndex - 1])
-    eventsIds.gap.shift(-1)
-    eventsSizes.gap.shift(-1)
+    eventStore.moveLeft()
   }
 
   /**
    * Returns `true` iff there are some events at the current event cursor. In this case, the events
    * will be and changes to the projection performed.
    */
-  private fun shouldApplyChanges(): Boolean = eventsIds.gap.startIndex < eventsIds.size
+  private fun shouldApplyChanges(): Boolean = eventStore.hasNext
 
   /**
    * Moves the projection forward, meaning that the event at the current cursor index will be used
    * to generate some changes and move the aggregated value forward.
    */
   private fun forwardChanges() {
-    val id = eventsIds[eventsIds.gap.startIndex]
-    val size = eventsSizes[eventsSizes.gap.startIndex]
-    val from = events.gap.startIndex
-    val until = from + size
+    eventStore.moveRight()
 
-    // Shift the event log.
-    events.gap.shift(size)
-    eventsIds.gap.shift(1)
-    eventsSizes.gap.shift(1)
+    val id = eventStore.lastId
+    val from = eventStore.lastFrom
+    val until = eventStore.lastUntil
 
     // Update the current value.
     current =
@@ -179,7 +153,7 @@ internal class MutableHistoryImpl<T>(
           scope.forward(
               model = current,
               identifier = id,
-              data = events.backing,
+              data = eventStore.backing,
               from = from,
               until = until,
           )
@@ -187,7 +161,7 @@ internal class MutableHistoryImpl<T>(
   }
 
   override val size: Int
-    get() = eventsIds.size
+    get() = eventStore.size
 
   override fun contains(
       seqno: SequenceNumber,
@@ -208,9 +182,7 @@ internal class MutableHistoryImpl<T>(
     requireRange(from, until, event)
 
     // State checks
-    check(events.gap.startIndex == events.size) { "cursor should be at end" }
-    check(eventsIds.gap.startIndex == eventsIds.size) { "cursor should be at end" }
-    check(eventsSizes.gap.startIndex == eventsSizes.size) { "cursor should be at end" }
+    check(!eventStore.hasNext) { "cursor should be at end" }
 
     // Fast return.
     if (acknowledged.contains(seqno, site)) return
@@ -234,9 +206,7 @@ internal class MutableHistoryImpl<T>(
     requireRange(from, until, event) { "event out of bounds" }
 
     // State checks
-    check(events.gap.startIndex == events.size) { "cursor should be at end" }
-    check(eventsIds.gap.startIndex == eventsIds.size) { "cursor should be at end" }
-    check(eventsSizes.gap.startIndex == eventsSizes.size) { "cursor should be at end" }
+    check(!eventStore.hasNext) { "cursor should be at end" }
 
     // Calculate the sequence number that will be attributed to the event.
     val seqno = acknowledged.expected()
@@ -274,7 +244,7 @@ internal class MutableHistoryImpl<T>(
     return acknowledged.toEventIdentifierArray()
   }
 
-  override fun iterator(): EventIterator = Iterator()
+  override fun iterator(): EventIterator = eventStore.Iterator()
 
   override fun merge(
       from: EventLog,
@@ -304,9 +274,7 @@ internal class MutableHistoryImpl<T>(
   }
 
   override fun clear() {
-    events.clear()
-    eventsIds.clear()
-    eventsSizes.clear()
+    eventStore.clear()
     changes.clear()
     changesIds.clear()
     changesSizes.clear()
@@ -314,68 +282,4 @@ internal class MutableHistoryImpl<T>(
 
   override var current: T = initial
     private set
-
-  /**
-   * An inner class which can be used to iterate over the items from a [MutableHistoryImpl],
-   * providing list-like access to the items of the [MutableEventLog].
-   */
-  private inner class Iterator : EventIterator {
-
-    /**
-     * The current position in the event identifiers log. This lets us know "which" event we're
-     * pointing at.
-     */
-    private var cursorIdsIndex: Int = eventsIds.size
-
-    /**
-     * The current position in the event sizes identifiers. This lets us know "what data" the
-     * currently pointed event contains, since not all events have an identical size.
-     */
-    private var cursorEvents: Int = events.size
-
-    override val seqno: SequenceNumber
-      get() = eventsIds[cursorIdsIndex].seqno
-
-    override val site: SiteIdentifier
-      get() = eventsIds[cursorIdsIndex].site
-
-    override val event: ByteArray
-      get() = events.backing
-
-    override val from: Int
-      get() = cursorEvents
-
-    override val until: Int
-      get() = from + eventsSizes[cursorIdsIndex]
-
-    override fun hasNext(): Boolean {
-      return cursorIdsIndex < eventsIds.size - 1
-    }
-
-    override fun hasPrevious(): Boolean {
-      return cursorIdsIndex > 0
-    }
-
-    override fun nextIndex(): Int {
-      check(hasNext()) { "No next element." }
-      return cursorIdsIndex + 1
-    }
-
-    override fun previousIndex(): Int {
-      check(hasPrevious()) { "No previous element." }
-      return cursorIdsIndex - 1
-    }
-
-    override fun moveNext() {
-      check(hasNext()) { "No next element" }
-      cursorEvents += eventsSizes[cursorIdsIndex]
-      cursorIdsIndex++
-    }
-
-    override fun movePrevious() {
-      check(hasPrevious()) { "No previous element." }
-      cursorIdsIndex--
-      cursorEvents -= eventsSizes[cursorIdsIndex]
-    }
-  }
 }
