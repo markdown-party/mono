@@ -32,31 +32,6 @@ internal class MutableHistoryImpl<T>(
   private val changesSizes = mutableIntGapBufferOf()
 
   /**
-   * Appends the provided event to the store of events. The given event will be appended at the
-   * current index of events.
-   *
-   * @param seqno the sequence number of the event.
-   * @param site the site identifier of the event.
-   * @param array the bytes that compose the event.
-   * @param from where the bytes should be read.
-   * @param until where the bytes should be read.
-   */
-  private fun event(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-      array: ByteArray,
-      from: Int,
-      until: Int,
-  ) {
-    eventStore.pushAtGapWithoutMove(
-        id = EventIdentifier(seqno, site),
-        array = array,
-        from = from,
-        until = until,
-    )
-  }
-
-  /**
    * Appends the provided change to the store of changes. The given change will be appended at the
    * current index of changes.
    *
@@ -84,9 +59,7 @@ internal class MutableHistoryImpl<T>(
       seqno: SequenceNumber,
       site: SiteIdentifier,
   ): Boolean {
-    // TODO : Make this a single condition.
-    if (!eventStore.hasPrevious) return false
-    return EventIdentifier(seqno, site) <= eventStore.lastId
+    return eventStore.hasPrevious && EventIdentifier(seqno, site) <= eventStore.lastId
   }
 
   /**
@@ -129,12 +102,6 @@ internal class MutableHistoryImpl<T>(
     // have unreliable data).
     eventStore.moveLeft()
   }
-
-  /**
-   * Returns `true` iff there are some events at the current event cursor. In this case, the events
-   * will be and changes to the projection performed.
-   */
-  private fun shouldApplyChanges(): Boolean = eventStore.hasNext
 
   /**
    * Moves the projection forward, meaning that the event at the current cursor index will be used
@@ -190,8 +157,13 @@ internal class MutableHistoryImpl<T>(
     // Insert the event.
     acknowledge(seqno, site)
     while (shouldInsertBefore(seqno, site)) moveCursorLeft()
-    event(seqno, site, event, from, until)
-    while (shouldApplyChanges()) forwardChanges()
+    eventStore.pushAtGapWithoutMove(
+        id = EventIdentifier(seqno, site),
+        array = event,
+        from = from,
+        until = until,
+    )
+    while (eventStore.hasNext) forwardChanges()
   }
 
   override fun append(
@@ -200,33 +172,21 @@ internal class MutableHistoryImpl<T>(
       from: Int,
       until: Int
   ): EventIdentifier {
-
-    // Input requirements
-    require(site.isSpecified) { "site must be specified" }
-    requireRange(from, until, event) { "event out of bounds" }
-
-    // State checks
-    check(!eventStore.hasNext) { "cursor should be at end" }
-
-    // Calculate the sequence number that will be attributed to the event.
     val seqno = acknowledged.expected()
-    val id = EventIdentifier(seqno, site)
-
-    // Insert the event.
-    acknowledge(seqno, site)
-    event(seqno = id.seqno, site = site, array = event, from = from, until = until)
-    forwardChanges()
-
-    // Return the identifier of the inserted item.
-    return id
+    insert(
+        site = site,
+        seqno = seqno,
+        event = event,
+        from = from,
+        until = until,
+    )
+    return EventIdentifier(seqno, site)
   }
 
   override fun acknowledge(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ) {
-    acknowledged.acknowledge(seqno, site)
-  }
+  ): Unit = acknowledged.acknowledge(seqno, site)
 
   override fun acknowledge(
       from: MutableEventLog,
@@ -240,9 +200,7 @@ internal class MutableHistoryImpl<T>(
     return this
   }
 
-  override fun acknowledged(): EventIdentifierArray {
-    return acknowledged.toEventIdentifierArray()
-  }
+  override fun acknowledged(): EventIdentifierArray = acknowledged.toEventIdentifierArray()
 
   override fun iterator(): EventIterator = eventStore.Iterator()
 
