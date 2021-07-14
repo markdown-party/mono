@@ -100,20 +100,33 @@ private fun enqueueAdvertisements(
     available: EventIdentifierArray,
     queue: ArrayDeque<I>,
 ) {
-  // TODO : Make this O(n) in worst case.
-  // TODO : Make this O(1) in the general case.
   if (advertised.size == available.size) return // no update optimization.
-  for ((seqno, site) in available) {
-    // Check if the site is present in the advertised sites.
-    var present = false
-    for (adv in advertised.toEventIdentifierArray()) {
-      if (adv.site == site) present = true
+  var adI = 0
+  var avI = 0
+  // Merge the items.
+  while (adI < advertised.size && avI < available.size) {
+    val ad = advertised[adI]
+    val av = available[avI]
+    when {
+      ad.site == av.site -> {
+        adI++ // next item
+        avI++ // next item
+      }
+      ad.site > av.site -> {
+        advertised.push(av, offset = adI)
+        queue += I.Advertisement(av.site, av.seqno + 1U)
+        adI += 2 // pushed item + 1
+        avI += 1 // next item
+      }
+      else -> error("site identifier in advertised but not in available")
     }
-    // Add the site to the advertised sites.
-    if (!present) {
-      advertised.push(EventIdentifier(seqno, site))
-      queue += I.Advertisement(site, seqno + 1U)
-    }
+  }
+  // Push the remaining items.
+  while (avI < available.size) {
+    val av = available[avI]
+    advertised.push(av)
+    queue += I.Advertisement(av.site, av.seqno + 1U)
+    avI++
   }
 }
 
