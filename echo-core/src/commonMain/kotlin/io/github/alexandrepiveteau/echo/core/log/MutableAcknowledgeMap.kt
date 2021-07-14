@@ -38,6 +38,17 @@ private constructor(
   }
 
   /**
+   * Acknowledges all the identifiers in the provided [EventIdentifierArray], assuming the array is
+   * sorted.
+   */
+  fun acknowledge(ids: EventIdentifierArray) {
+    // TODO : Provide a faster path if the array is sorted.
+    for (i in 0 until ids.size) {
+      acknowledge(ids[i].seqno, ids[i].site)
+    }
+  }
+
+  /**
    * Sets the given [SequenceNumber] for the provided [SiteIdentifier]. This may decrement the
    * [SequenceNumber] at the provided [SiteIdentifier], meaning that some previous [contains] calls
    * which returned `true` may now return `false`.
