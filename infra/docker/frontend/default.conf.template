@@ -1,0 +1,14 @@
+# Taken from https://github.com/rjoonas/heroku-docker-nginx-example/blob/master/default.conf.template
+server {
+  listen $PORT default_server;
+
+  root   /usr/share/nginx/html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  location ~ \.(?!html) {
+    try_files $uri =404;
+  }
+}
