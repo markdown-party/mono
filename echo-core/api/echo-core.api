@@ -419,7 +419,7 @@ public final class io/github/alexandrepiveteau/echo/core/log/EventLog_Extensions
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableEventLog : io/github/alexandrepiveteau/echo/core/log/EventLog {
-	public abstract fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public abstract fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public abstract fun acknowledge-qH2TBG0 (II)V
 	public abstract fun append-Q0QDvhs (I[BII)J
 	public abstract fun clear ()V

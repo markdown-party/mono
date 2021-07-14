@@ -186,7 +186,7 @@ internal class MutableHistoryImpl<T>(
   ): Unit = acknowledged.acknowledge(seqno, site)
 
   override fun acknowledge(
-      from: MutableEventLog,
+      from: EventLog,
   ): MutableEventLog {
     acknowledged.acknowledge(from.acknowledged())
     return this
