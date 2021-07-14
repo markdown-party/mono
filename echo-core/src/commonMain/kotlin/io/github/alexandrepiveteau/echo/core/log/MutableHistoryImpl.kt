@@ -1,9 +1,5 @@
 package io.github.alexandrepiveteau.echo.core.log
 
-import io.github.alexandrepiveteau.echo.core.buffer.mutableByteGapBufferOf
-import io.github.alexandrepiveteau.echo.core.buffer.mutableEventIdentifierGapBufferOf
-import io.github.alexandrepiveteau.echo.core.buffer.mutableIntGapBufferOf
-import io.github.alexandrepiveteau.echo.core.buffer.pushAtGap
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.requireRange
 
@@ -23,13 +19,9 @@ internal class MutableHistoryImpl<T>(
   // Store what we've already seen.
   private val acknowledged = MutableAcknowledgeMap()
 
-  // Storing the events.
+  // Storing the events and the changes.
   private val eventStore = BlockLog()
-
-  // Storing the changes.
-  private val changes = mutableByteGapBufferOf()
-  private val changesIds = mutableEventIdentifierGapBufferOf()
-  private val changesSizes = mutableIntGapBufferOf()
+  private val changeStore = BlockLog()
 
   /**
    * Appends the provided change to the store of changes. The given change will be appended at the
@@ -44,11 +36,12 @@ internal class MutableHistoryImpl<T>(
       from: Int,
       until: Int,
   ) {
-    requireRange(from, until, array) { "change out of range" }
-
-    changes.pushAtGap(array, from = from, until = until)
-    changesIds.pushAtGap(eventStore.lastId)
-    changesSizes.pushAtGap(until - from)
+    changeStore.pushAtGap(
+        id = eventStore.lastId,
+        array = array,
+        from = from,
+        until = until,
+    )
   }
 
   /**
@@ -70,13 +63,10 @@ internal class MutableHistoryImpl<T>(
     check(eventStore.hasPrevious) { "Can't move backward if at start." }
 
     // Remove all the associated changes.
-    reverseChange@ while (changesIds.gap.startIndex > 0) {
-      val changeId = changesIds[changesIds.gap.startIndex - 1]
-      if (changeId != eventStore.lastId) break@reverseChange
+    reverseChange@ while (changeStore.hasPrevious) {
 
-      val changeSize = changesSizes[changesSizes.gap.startIndex - 1]
-      val changeFrom = changes.gap.startIndex - changeSize
-      val changeUntil = changes.gap.startIndex
+      // val changeId = changesIds[changesIds.gap.startIndex - 1]
+      if (changeStore.lastId != eventStore.lastId) break@reverseChange
 
       // Update the current projection.
       current =
@@ -86,15 +76,13 @@ internal class MutableHistoryImpl<T>(
               data = eventStore.backing,
               from = eventStore.lastFrom,
               until = eventStore.lastUntil,
-              changeData = changes.backing,
-              changeFrom = changeFrom,
-              changeUntil = changeUntil,
+              changeData = changeStore.backing,
+              changeFrom = changeStore.lastFrom,
+              changeUntil = changeStore.lastUntil,
           )
 
       // Only remove the change once it has been used to update the projection.
-      changes.remove(changeFrom, changeSize)
-      changesIds.remove(changesIds.gap.startIndex - 1)
-      changesSizes.remove(changesSizes.gap.startIndex - 1)
+      changeStore.removeLeft()
     }
 
     // Move the event to the right of the cursor. The event cursor is shifted only after it has been
@@ -233,9 +221,7 @@ internal class MutableHistoryImpl<T>(
 
   override fun clear() {
     eventStore.clear()
-    changes.clear()
-    changesIds.clear()
-    changesSizes.clear()
+    changeStore.clear()
   }
 
   override var current: T = initial

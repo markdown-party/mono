@@ -54,6 +54,16 @@ internal class BlockLog {
 
   // END : LAST GAP POSITION
 
+  /**
+   * Removes the previous item to the left.
+   */
+  fun removeLeft() {
+    check(hasPrevious) { "Can't remove left when at first index." }
+    blocks.remove(blocks.gap.startIndex - lastSize, lastSize)
+    blocksIds.remove(blocksIds.gap.startIndex - 1)
+    blocksSizes.remove(blocksSizes.gap.startIndex - 1)
+  }
+
   /** Moves the cursor to the left by one step. */
   fun moveLeft() {
     check(hasPrevious) { "Can't move left when at first index." }
@@ -129,8 +139,8 @@ internal class BlockLog {
   }
 
   /**
-   * An inner class which can be used to iterate over the items from a [BlockLog],
-   * providing list-like access to the items of the [BlockLog].
+   * An inner class which can be used to iterate over the items from a [BlockLog], providing
+   * list-like access to the items of the [BlockLog].
    */
   inner class Iterator : EventIterator {
 
