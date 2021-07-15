@@ -15,6 +15,12 @@ interface TextApi {
    */
   fun current(id: TreeNodeIdentifier): StateFlow<Pair<CharArray, EventIdentifierArray>>
 
-  // TODO : Document this.
+  /**
+   * Emits some [RGAEvent] for the replicated growable array associated with a certain
+   * [TreeNodeIdentifier]. The changes yielded in the [scope] will be emitted atomically.
+   *
+   * @param id the [TreeNodeIdentifier] that corresponds to a document.
+   * @param scope the [EventScope] where we may emit some events.
+   */
   suspend fun edit(id: TreeNodeIdentifier, scope: suspend EventScope<RGAEvent>.() -> Unit)
 }

@@ -69,8 +69,7 @@ interface MutableEventLog : EventLog {
    * @param from the [MutableEventLog] from which acknowledgements are merged.
    * @return this [MutableEventLog] instance (with the new acknowledgements).
    */
-  // TODO : Accept an EventLog.
-  fun acknowledge(from: MutableEventLog): MutableEventLog
+  fun acknowledge(from: EventLog): MutableEventLog
 
   /**
    * Merges this [MutableEventLog] [from] another log. The merge operation has the following
