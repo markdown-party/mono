@@ -14,10 +14,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - name: 🐳 Build the Docker image
+      - name: 🐳 Build the Docker images
         run: |
           ./build-image.sh
-      - name: 🚀 Publish the image to Heroku
+      - name: 🚀 Publish the images to Heroku
         env:
           HEROKU_TOKEN: ${{ secrets.HEROKU_TOKEN }}
         run: |
@@ -28,3 +28,4 @@ jobs:
         run: |
           heroku container:login
           heroku container:release -a markdown-party web
+          heroku container:release -a markdown-party-frontend web
