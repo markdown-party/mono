@@ -199,14 +199,16 @@ private val editor =
         }
       }
 
-      codeMirror {
-        this.id = props.node
-        this.extensions =
-            arrayOf(
-                basicSetup,
-                markdown(),
-                RGAStateField.extension,
-            )
-        this.view = view
+      if (props.node != null) {
+        codeMirror {
+          this.id = props.node
+          this.extensions =
+              arrayOf(
+                  basicSetup,
+                  markdown(),
+                  RGAStateField.extension,
+              )
+          this.view = view
+        }
       }
     }
