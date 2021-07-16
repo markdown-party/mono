@@ -12,6 +12,7 @@ import io.github.alexandrepiveteau.echo.core.log.MutableHistory
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
@@ -32,6 +33,7 @@ internal open class SiteImpl<T, M, R>(
     serializer: KSerializer<T>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
+    private val strategy: SyncStrategy,
     private val transform: (R) -> M,
 ) : Site<M> {
 
@@ -88,8 +90,8 @@ internal open class SiteImpl<T, M, R>(
     channel.cancel()
   }
 
-  override fun outgoing() = exchange<Inc, Out> { startIncoming() }
-  override fun incoming() = exchange<Out, Inc> { startOutgoing() }
+  override fun outgoing() = exchange<Inc, Out> { with(strategy) { outgoing() } }
+  override fun incoming() = exchange<Out, Inc> { with(strategy) { incoming() } }
 }
 
 internal open class MutableSiteImpl<T, M, R>(
@@ -98,6 +100,7 @@ internal open class MutableSiteImpl<T, M, R>(
     history: MutableHistory<R>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy,
     transform: (R) -> M,
 ) :
     SiteImpl<T, M, R>(
@@ -105,6 +108,7 @@ internal open class MutableSiteImpl<T, M, R>(
         serializer = serializer,
         format = format,
         events = events,
+        strategy = strategy,
         transform = transform,
     ),
     MutableSite<T, M> {

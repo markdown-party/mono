@@ -6,13 +6,14 @@ import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.sites.map
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 /**
@@ -47,10 +48,16 @@ private class LWWProjection : OneWayProjection<Pair<EventIdentifier, Int>, LWWRe
 private class LWWRegister(site: SiteIdentifier) {
 
   /** The backing [exchange] for the [LWWRegister]. */
-  val exchange = mutableSite(site, EventIdentifier.Unspecified to 0, LWWProjection())
+  val exchange =
+      mutableSite(
+          identifier = site,
+          initial = EventIdentifier.Unspecified to 0,
+          projection = LWWProjection(),
+          strategy = SyncStrategy.Once,
+      )
 
   /** The latest available value from the [LWWRegister]. */
-  val value: Flow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
+  val value: StateFlow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
 
   suspend fun set(value: Int) {
     // By default, events are added with a highest seqno than whatever they've received until now.
@@ -71,44 +78,31 @@ class LWWRegisterTest {
     aliceRegister.set(123)
     bobRegister.set(456)
 
-    assertEquals(123, aliceRegister.value.filterNotNull().first())
-    assertEquals(456, bobRegister.value.filterNotNull().first())
+    assertEquals(123, aliceRegister.value.value)
+    assertEquals(456, bobRegister.value.value)
 
-    // Sync for a bit.
-    withTimeoutOrNull(1000) { sync(aliceRegister.exchange, bobRegister.exchange) }
+    // Sync once.
+    sync(aliceRegister.exchange, bobRegister.exchange)
 
     // Ensure convergence over a non-null value.
-    val shared =
-        combine(
-                aliceRegister.value.filterNotNull(),
-                bobRegister.value.filterNotNull(),
-            ) { a, b -> a to b }
-            .filter { (a, b) -> a == b }
-            .map { (a, _) -> a }
-            .first()
+    val aliceValue = aliceRegister.value.value
+    val bobValue = bobRegister.value.value
+    assertEquals(aliceValue, bobValue)
 
     // Let the "other" site issue an event.
     val register =
-        when (shared) {
+        when (aliceValue) {
           123 -> bobRegister
           456 -> aliceRegister
           else -> fail("Expected convergence over 123 or 456.")
         }
 
-    // Set the shared value and sync a bit.
+    // Set the shared value and sync once.
     register.set(789)
-    withTimeoutOrNull(1000) { sync(aliceRegister.exchange, bobRegister.exchange) }
+    sync(aliceRegister.exchange, bobRegister.exchange)
 
     // Ensure convergence over a non-null value.
-    val result =
-        combine(
-                aliceRegister.value.filterNotNull(),
-                bobRegister.value.filterNotNull(),
-            ) { a, b -> a to b }
-            .filter { (a, b) -> a == b }
-            .map { (a, _) -> a }
-            .first()
-
-    assertEquals(789, result)
+    assertEquals(789, aliceRegister.value.value)
+    assertEquals(789, bobRegister.value.value)
   }
 }

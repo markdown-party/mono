@@ -9,10 +9,9 @@ import io.github.alexandrepiveteau.echo.projections.ChangeScope
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.test.Test
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeout
+import kotlin.test.assertEquals
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -49,7 +48,7 @@ class PNCounterTest {
 
   @Test
   fun twoSitesCanCreateASharedCounter_andSync(): Unit = suspendTest {
-    val alice = mutableSite(SiteIdentifier.Min, 0, PNProjection)
+    val alice = mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
     val bob = mutableSite(SiteIdentifier.Max, 0, PNProjection)
 
     alice.event {
@@ -63,15 +62,12 @@ class PNCounterTest {
       yield(Increment)
     }
 
-    // Sync both sites (with a timeout, since by default they'll keep the connection open until
-    // either side cancels).
-    try {
-      withTimeout(timeMillis = 1000) { sync(alice, bob) }
-    } catch (expect: TimeoutCancellationException) {}
+    // Sync both sites.
+    sync(alice, bob)
 
     // Finally, look at the resulting set of both sites, and make sure they eventually reach the
     // right result.
-    alice.value.first { it == 1 }
-    bob.value.first { it == 1 }
+    assertEquals(1, alice.value.value)
+    assertEquals(1, bob.value.value)
   }
 }

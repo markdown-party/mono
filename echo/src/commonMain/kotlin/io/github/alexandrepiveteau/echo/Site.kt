@@ -13,6 +13,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.protocol.MutableSiteImpl
 import io.github.alexandrepiveteau.echo.protocol.SiteImpl
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
@@ -58,11 +59,13 @@ interface MutableSite<T, out M> : Site<M> {
  */
 inline fun <reified T> site(
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<Unit> =
     site(
-        Unit,
-        UnitProjection,
-        *events,
+        initial = Unit,
+        projection = UnitProjection,
+        events = events,
+        strategy = strategy,
     )
 
 /**
@@ -72,6 +75,7 @@ inline fun <reified T> site(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
@@ -80,13 +84,19 @@ inline fun <M, reified T> site(
     initial: M,
     projection: OneWayProjection<M, T>,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
-        initial,
-        OneWayMutableProjection(projection, serializer(), DefaultSerializationFormat),
-        serializer(),
-        DefaultSerializationFormat,
-        *events,
+        initial = initial,
+        projection =
+            OneWayMutableProjection(
+                projection = projection,
+                eventSerializer = serializer(),
+                format = DefaultSerializationFormat),
+        eventSerializer = serializer(),
+        format = DefaultSerializationFormat,
+        events = events,
+        strategy = strategy,
     ) { it }
 
 /**
@@ -96,6 +106,7 @@ inline fun <M, reified T> site(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [TwoWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
@@ -105,13 +116,21 @@ inline fun <M, reified T, reified C> site(
     initial: M,
     projection: TwoWayProjection<M, T, C>,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
-        initial,
-        TwoWayMutableProjection(projection, serializer(), serializer(), DefaultSerializationFormat),
-        serializer(),
-        DefaultSerializationFormat,
-        *events,
+        initial = initial,
+        projection =
+            TwoWayMutableProjection(
+                projection = projection,
+                changeSerializer = serializer(),
+                eventSerializer = serializer(),
+                format = DefaultSerializationFormat,
+            ),
+        eventSerializer = serializer(),
+        format = DefaultSerializationFormat,
+        events = events,
+        strategy = strategy,
     ) { it }
 
 /**
@@ -120,13 +139,22 @@ inline fun <M, reified T, reified C> site(
  *
  * @param identifier the globally unique identifier for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param T the type of the events managed by this [Site].
  */
 inline fun <reified T> mutableSite(
     identifier: SiteIdentifier,
     vararg events: Pair<EventIdentifier, T>,
-): MutableSite<T, Unit> = mutableSite(identifier, Unit, UnitProjection, *events)
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): MutableSite<T, Unit> =
+    mutableSite(
+        identifier = identifier,
+        initial = Unit,
+        projection = UnitProjection,
+        events = events,
+        strategy = strategy,
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -137,6 +165,7 @@ inline fun <reified T> mutableSite(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
@@ -146,7 +175,15 @@ inline fun <M, reified T> mutableSite(
     initial: M,
     projection: OneWayProjection<M, T>,
     vararg events: Pair<EventIdentifier, T>,
-): MutableSite<T, M> = mutableSite(identifier, initial, projection, *events) { it }
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): MutableSite<T, M> =
+    mutableSite(
+        identifier = identifier,
+        initial = initial,
+        projection = projection,
+        events = events,
+        strategy = strategy,
+    ) { it }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
@@ -157,6 +194,7 @@ inline fun <M, reified T> mutableSite(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [TwoWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param M the type of the model for this [Site].
  * @param T the type of the events managed by this [Site].
@@ -167,7 +205,15 @@ inline fun <M, reified T, reified C> mutableSite(
     initial: M,
     projection: TwoWayProjection<M, T, C>,
     vararg events: Pair<EventIdentifier, T>,
-): MutableSite<T, M> = mutableSite(identifier, initial, projection, *events) { it }
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): MutableSite<T, M> =
+    mutableSite(
+        identifier = identifier,
+        initial = initial,
+        projection = projection,
+        events = events,
+        strategy = strategy,
+    ) { it }
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing mutable history.
@@ -178,6 +224,7 @@ inline fun <M, reified T, reified C> mutableSite(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  * @param transform a function mapping the backing model from type [R] to type [M].
  *
  * @param M the type of the model for this [Site].
@@ -189,15 +236,22 @@ inline fun <M, reified T, R> mutableSite(
     initial: R,
     projection: OneWayProjection<R, T>,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
     orderedMutableSite(
         identifier = identifier,
         initial = initial,
-        projection = OneWayMutableProjection(projection, serializer(), DefaultSerializationFormat),
+        projection =
+            OneWayMutableProjection(
+                projection = projection,
+                eventSerializer = serializer(),
+                format = DefaultSerializationFormat,
+            ),
         eventSerializer = serializer(),
         format = DefaultSerializationFormat,
         events = events,
+        strategy = strategy,
         transform = transform,
     )
 
@@ -210,6 +264,7 @@ inline fun <M, reified T, R> mutableSite(
  * @param initial the initial value for the projection aggregate.
  * @param projection the [TwoWayProjection] for this [Site].
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  * @param transform a function mapping the backing model from type [R] to type [M].
  *
  * @param M the type of the model for this [Site].
@@ -222,6 +277,7 @@ inline fun <M, reified T, reified C, R> mutableSite(
     initial: R,
     projection: TwoWayProjection<R, T, C>,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
     orderedMutableSite(
@@ -237,6 +293,7 @@ inline fun <M, reified T, reified C, R> mutableSite(
         eventSerializer = serializer(),
         format = DefaultSerializationFormat,
         events = events,
+        strategy = strategy,
         transform = transform,
     )
 
@@ -258,6 +315,7 @@ internal fun <M, T, R> orderedSite(
     eventSerializer: KSerializer<T>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy,
     transform: (R) -> M,
 ): Site<M> =
     SiteImpl(
@@ -265,6 +323,7 @@ internal fun <M, T, R> orderedSite(
         serializer = eventSerializer,
         format = format,
         events = events,
+        strategy = strategy,
         transform = transform,
     )
 
@@ -276,6 +335,7 @@ internal fun <M, T, R> orderedMutableSite(
     eventSerializer: KSerializer<T>,
     format: BinaryFormat,
     vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy,
     transform: (R) -> M,
 ): MutableSite<T, M> =
     MutableSiteImpl(
@@ -284,5 +344,6 @@ internal fun <M, T, R> orderedMutableSite(
         history = mutableHistoryOf(initial, projection),
         format = format,
         events = events,
+        strategy = strategy,
         transform = transform,
     )
