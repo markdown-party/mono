@@ -3,12 +3,14 @@ package io.github.alexandrepiveteau.echo
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.MutableProjection
+import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.core.log.mutableHistoryOf
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.projections.OneWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
+import io.github.alexandrepiveteau.echo.protocol.ExchangeImpl
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.protocol.MutableSiteImpl
@@ -51,9 +53,26 @@ interface MutableSite<T, out M> : Site<M> {
 }
 
 /**
- * Creates a new [Site] for the provided [SiteIdentifier], with a backing history.
+ * Creates a new [Exchange] with a backing event log.
+ *
+ * @param events some initial events to populate the event log.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline fun exchange(
+    vararg events: Pair<EventIdentifier, ByteArray>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): Exchange<Inc, Out> =
+    orderedExchange(
+        events = events,
+        strategy = strategy,
+    )
+
+/**
+ * Creates a new [Site] with a backing history.
  *
  * @param events some initial events to populate the history.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  *
  * @param T the type of the events managed by this [Site].
  */
@@ -309,6 +328,33 @@ internal object UnitProjection : OneWayProjection<Unit, Any?> {
 }
 
 @PublishedApi
+internal fun orderedExchange(
+    vararg events: Pair<EventIdentifier, ByteArray>,
+    strategy: SyncStrategy,
+): Exchange<Inc, Out> =
+    ExchangeImpl(
+        log = mutableEventLogOf(),
+        events = events,
+        strategy = strategy,
+    )
+
+/**
+ * Transforms a vararg of [Pair] of [EventIdentifier] to [T] to a map an [Array] of [Pair] of
+ * [EventIdentifier] to [ByteArray].
+ *
+ * @param serializer the [KSerializer] that is used for serialization.
+ * @param format the [BinaryFormat] used to convert to a binary format.
+ */
+private fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
+    serializer: KSerializer<T>,
+    format: BinaryFormat,
+): Array<Pair<EventIdentifier, ByteArray>> =
+    asSequence()
+        .map { (id, body) -> id to format.encodeToByteArray(serializer, body) }
+        .toList()
+        .toTypedArray()
+
+@PublishedApi
 internal fun <M, T, R> orderedSite(
     initial: R,
     projection: MutableProjection<R>,
@@ -320,9 +366,7 @@ internal fun <M, T, R> orderedSite(
 ): Site<M> =
     SiteImpl(
         history = mutableHistoryOf(initial, projection),
-        serializer = eventSerializer,
-        format = format,
-        events = events,
+        events = events.mapToBinary(eventSerializer, format),
         strategy = strategy,
         transform = transform,
     )
@@ -343,7 +387,7 @@ internal fun <M, T, R> orderedMutableSite(
         serializer = eventSerializer,
         history = mutableHistoryOf(initial, projection),
         format = format,
-        events = events,
+        events = events.mapToBinary(eventSerializer, format),
         strategy = strategy,
         transform = transform,
     )
