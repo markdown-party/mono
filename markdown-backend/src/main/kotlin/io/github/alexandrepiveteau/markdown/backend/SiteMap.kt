@@ -1,10 +1,12 @@
 package io.github.alexandrepiveteau.markdown.backend
 
+import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.Site
-import io.github.alexandrepiveteau.echo.site
+import io.github.alexandrepiveteau.echo.exchange
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import party.markdown.MarkdownPartyEvent
 
 /**
  * A [SiteMap] provides safe access to all the [Site] which are managed by this server. Each site is
@@ -19,7 +21,7 @@ class SiteMap {
   private val mutex = Mutex()
 
   /** A [MutableMap] of the [Site] associated with each [SessionIdentifier]. */
-  private val sites = mutableMapOf<SessionIdentifier, Site<*>>()
+  private val sites = mutableMapOf<SessionIdentifier, Exchange<Incoming, Outgoing>>()
 
   /**
    * Returns the [Site] associated with the given [SessionIdentifier]. This method is safe to call
@@ -29,5 +31,5 @@ class SiteMap {
    */
   suspend fun get(
       identifier: SessionIdentifier,
-  ): Site<*> = mutex.withLock { sites.getOrPut(identifier) { site<MarkdownPartyEvent>() } }
+  ): Exchange<Incoming, Outgoing> = mutex.withLock { sites.getOrPut(identifier) { exchange() } }
 }
