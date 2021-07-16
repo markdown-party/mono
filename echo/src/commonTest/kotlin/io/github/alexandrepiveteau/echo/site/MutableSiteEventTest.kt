@@ -7,10 +7,10 @@ import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.coroutines.withTimeoutOrNull
 
 class MutableSiteEventTest {
 
@@ -53,11 +53,10 @@ class MutableSiteEventTest {
 
   @Test
   fun sequential_yields_areOrdered() = suspendTest {
-    val alice = mutableSite<Int>(Random.nextSiteIdentifier())
-    val bob = mutableSite<Int>(Random.nextSiteIdentifier())
+    val alice = mutableSite<Int>(Random.nextSiteIdentifier(), strategy = SyncStrategy.Once)
+    val bob = mutableSite<Int>(Random.nextSiteIdentifier(), strategy = SyncStrategy.Once)
     alice.event { assertEquals(SequenceNumber.Min + 0u, yield(123).seqno) }
-    // TODO : Use one-shot sync when supported.
-    withTimeoutOrNull(100) { sync(alice, bob) }
+    sync(alice, bob)
     bob.event { assertEquals(SequenceNumber.Min + 1u, yield(123).seqno) }
   }
 }

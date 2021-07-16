@@ -12,20 +12,11 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
 
 /**
- * Starts the incoming side of the protocol, receiving advertisements, emitting requests and
- * receiving events as they are made available by the other site.
- */
-internal suspend fun ExchangeScope<I, O>.startIncoming() = runCatchingTermination {
-  val advertisements = awaitAdvertisements()
-  awaitEvents(advertisements)
-}
-
-/**
  * Receives all the advertising events from the other side, and awaits the first [I.Ready] message
  * before returning a [MutableEventIdentifierGapBuffer] containing all the available sites and
  * sequence numbers.
  */
-private suspend fun ExchangeScope<I, O>.awaitAdvertisements(): MutableEventIdentifierGapBuffer {
+internal suspend fun ExchangeScope<I, O>.awaitAdvertisements(): MutableEventIdentifierGapBuffer {
   val available = mutableEventIdentifierGapBufferOf()
   while (true) {
     when (val msg = receiveCatching().getOrNull()) {
@@ -43,9 +34,12 @@ private suspend fun ExchangeScope<I, O>.awaitAdvertisements(): MutableEventIdent
  *
  * @param advertisements the [MutableEventIdentifierGapBuffer] of the advertisements that have been
  * received from the other side.
+ * @param stopAfterAdvertised a [Boolean] with value `true` if only the [advertised] events should
+ * be sent.
  */
-private suspend fun ExchangeScope<I, O>.awaitEvents(
+internal suspend fun ExchangeScope<I, O>.awaitEvents(
     advertisements: MutableEventIdentifierGapBuffer,
+    stopAfterAdvertised: Boolean,
 ) {
   var requestedIndex = 0
 
@@ -54,8 +48,18 @@ private suspend fun ExchangeScope<I, O>.awaitEvents(
   val queue = ArrayDeque<O>(advertisements.size)
   val events = mutableEventLogOf()
 
+  // We are done receiving whenever we've received a message from the other side telling us that
+  // no more events should be sent. Nevertheless, we should still make sure that all the events have
+  // been properly merged into the local MutableEventLog before terminating, otherwise we may not
+  // respect strictly the sync once semantics.
+  var isDoneReceiving = false
+
   // Repeat until the channel is closed.
-  while (true) {
+  while (!isDoneReceiving || events.isNotEmpty()) {
+
+    // If we are syncing in a one-shot fashion, terminate if we have already received all the events
+    // that we were expecting in a session.
+    if (stopAfterAdvertised) terminateIfReceivedAllEvents(advertisements)
 
     // First, make sure we have some pending messages in the queue for all the sites that have been
     // advertised by the other side.
@@ -86,16 +90,6 @@ private suspend fun ExchangeScope<I, O>.awaitEvents(
         onSend(firstMsg) { queue.removeFirst() }
       }
 
-      // Receive a message from the other side.
-      onReceiveCatching { v ->
-        when (val msg = v.getOrNull()) {
-          is I.Advertisement -> advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
-          is I.Event -> events.insert(msg.seqno, msg.site, msg.body)
-          is I.Ready -> error("Unexpected duplicate Ready.")
-          null -> terminate()
-        }
-      }
-
       // Insert batches of events.
       if (events.isNotEmpty()) {
         onMutableEventLogLock { log ->
@@ -103,6 +97,39 @@ private suspend fun ExchangeScope<I, O>.awaitEvents(
           events.clear()
         }
       }
+
+      // Receive a message from the other side.
+      if (!isDoneReceiving) {
+        onReceiveCatching { v ->
+          when (val msg = v.getOrNull()) {
+            is I.Advertisement -> {
+              if (!stopAfterAdvertised)
+                  advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
+            }
+            is I.Event -> events.insert(msg.seqno, msg.site, msg.body)
+            is I.Ready -> error("Unexpected duplicate Ready.")
+            null -> isDoneReceiving = true
+          }
+        }
+      }
     }
   }
+}
+
+/**
+ * Terminates if all the events in the [advertisements] buffer have already been received in the
+ * local log. Otherwise, this function will simply return without any side effect.
+ */
+private suspend fun ExchangeScope<I, O>.terminateIfReceivedAllEvents(
+    advertisements: MutableEventIdentifierGapBuffer,
+) {
+  // This could run in O(n).
+  val acknowledged = withEventLogLock { acknowledged() }
+  for (i in 0 until advertisements.size) {
+    val expected = advertisements[i]
+    val index = acknowledged.binarySearchBySite(expected.site)
+    if (index < 0) return
+    if (acknowledged[index].seqno.inc() < expected.seqno) return
+  }
+  terminate()
 }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.selects.SelectClause1
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-internal interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
+interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
 
   /**
    * Executes the given [block] on the [EventLog] with global exclusion. Because the [EventLog] may

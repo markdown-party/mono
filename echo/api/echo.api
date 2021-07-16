@@ -28,8 +28,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/Site : io/githu
 }
 
 public final class io/github/alexandrepiveteau/echo/SiteKt {
-	public static final fun orderedMutableSite-DIH5q_I (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun orderedSite (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun orderedMutableSite-NmxoKHA (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun orderedSite (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {
@@ -88,6 +88,22 @@ public final class io/github/alexandrepiveteau/echo/projections/TwoWayMutablePro
 public abstract interface class io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
 	public abstract fun backward-xbSDizI (Ljava/lang/Object;JLjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/protocol/ExchangeScope : kotlinx/coroutines/channels/ReceiveChannel, kotlinx/coroutines/channels/SendChannel {
+	public abstract fun getOnEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
+	public abstract fun getOnEventLogUpdate ()Lkotlinx/coroutines/selects/SelectClause0;
+	public abstract fun getOnMutableEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
+	public abstract fun withEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun withMutableEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScope$DefaultImpls {
+	public static synthetic fun cancel (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;)V
+	public static fun getOnReceiveOrNull (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;)Lkotlinx/coroutines/selects/SelectClause1;
+	public static fun offer (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Ljava/lang/Object;)Z
+	public static fun poll (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;)Ljava/lang/Object;
+	public static fun receiveOrNull (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class io/github/alexandrepiveteau/echo/protocol/Message {
@@ -251,5 +267,16 @@ public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Re
 public final class io/github/alexandrepiveteau/echo/sites/TransformsKt {
 	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static final fun map (Lkotlinx/coroutines/flow/StateFlow;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/sync/SyncStrategy {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/sync/SyncStrategy$Companion;
+	public abstract fun incoming (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun outgoing (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/sync/SyncStrategy$Companion {
+	public final fun getContinuous ()Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;
+	public final fun getOnce ()Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;
 }
 
