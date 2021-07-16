@@ -15,12 +15,12 @@ import kotlin.test.assertEquals
 import kotlinx.serialization.Serializable
 
 @Serializable
-private enum class PNCounterEvent {
+enum class PNCounterEvent {
   Increment,
   Decrement,
 }
 
-private object PNProjection : TwoWayProjection<Int, PNCounterEvent, PNCounterEvent> {
+object PNProjection : TwoWayProjection<Int, PNCounterEvent, PNCounterEvent> {
 
   override fun ChangeScope<PNCounterEvent>.forward(
       model: Int,
