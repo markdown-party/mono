@@ -31,6 +31,18 @@ internal open class MutableEventLogImpl : MutableEventLog {
   }
 
   /**
+   * Returns true if the insertion of an event with [seqno] and [site] would require moving forward
+   * the log. This looks at the current log value (if available). If the event could be inserted
+   * after, `true` will be returned.
+   */
+  private fun shouldInsertAfter(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): Boolean {
+    return eventStore.hasCurrent && EventIdentifier(seqno, site) > eventStore.currentId
+  }
+
+  /**
    * Moves the event cursor back, dismissing all the changes associated with the current event if
    * needed.
    */
@@ -51,6 +63,53 @@ internal open class MutableEventLogImpl : MutableEventLog {
     eventStore.moveRight()
   }
 
+  /**
+   * Pushes the given event at the current gap position, without moving it. This also populates the
+   * site-specific [BlockLog] with the given event.
+   */
+  private fun pushAtGapWithoutMove(
+      id: EventIdentifier,
+      array: ByteArray,
+      from: Int = 0,
+      until: Int = array.size,
+  ) {
+    eventStore.pushAtGapWithoutMove(
+        id = id,
+        array = array,
+        from = from,
+        until = until,
+    )
+    eventStoreBySite
+        .getOrPut(id.site) { BlockLog() }
+        .pushAtId(
+            id = id,
+            array = array,
+            from = from,
+            until = until,
+        )
+  }
+
+  /**
+   * Partially inserts the given event, but does not move the gap afterwards. This method does not
+   * make the assumption that the event may be inserted at the current index. Rather, it will
+   * iterate to the right / left until it may insert the event, and push it without moving the gap.
+   */
+  private fun insertWithoutMove(
+      id: EventIdentifier,
+      array: ByteArray,
+      from: Int = 0,
+      until: Int = array.size
+  ) {
+    // Fast return.
+    if (contains(id.seqno, id.site)) return
+
+    // Insert the event.
+    acknowledge(id.seqno, id.site)
+    while (shouldInsertBefore(id.seqno, id.site)) moveLeft()
+    while (shouldInsertAfter(id.seqno, id.site)) moveRight()
+    pushAtGapWithoutMove(id, array, from, until)
+  }
+
   override fun insert(
       seqno: SequenceNumber,
       site: SiteIdentifier,
@@ -65,29 +124,11 @@ internal open class MutableEventLogImpl : MutableEventLog {
     requireRange(from, until, event)
 
     // State checks
-    check(!eventStore.hasNext) { "cursor should be at end" }
-
-    // Fast return.
-    if (acknowledgedMap.contains(seqno, site)) return
+    check(!eventStore.hasCurrent) { "cursor should be at end" }
 
     // Insert the event.
-    acknowledge(seqno, site)
-    while (shouldInsertBefore(seqno, site)) moveLeft()
-    eventStore.pushAtGapWithoutMove(
-        id = EventIdentifier(seqno, site),
-        array = event,
-        from = from,
-        until = until,
-    )
-    eventStoreBySite
-        .getOrPut(site) { BlockLog() }
-        .pushAtId(
-            id = EventIdentifier(seqno, site),
-            array = event,
-            from = from,
-            until = until,
-        )
-    while (eventStore.hasNext) moveRight()
+    insertWithoutMove(EventIdentifier(seqno, site), event, from, until)
+    while (eventStore.hasCurrent) moveRight()
   }
 
   override fun contains(
@@ -145,20 +186,19 @@ internal open class MutableEventLogImpl : MutableEventLog {
     val iterator = from.iterator()
     while (iterator.hasPrevious()) iterator.movePrevious()
 
-    // TODO : Only reverse up to the from lower bound.
-    // TODO : Optimize to avoid "backward-then-forward" for each event.
     var keepGoing = true
     while (keepGoing) {
-      insert(
-          seqno = iterator.seqno,
-          site = iterator.site,
-          event = iterator.event,
+      insertWithoutMove(
+          id = EventIdentifier(iterator.seqno, iterator.site),
+          array = iterator.event,
           from = iterator.from,
           until = iterator.until,
       )
       keepGoing = iterator.hasNext()
       if (keepGoing) iterator.moveNext()
     }
+
+    while (eventStore.hasCurrent) moveRight()
     return this
   }
 

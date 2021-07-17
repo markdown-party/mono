@@ -98,9 +98,12 @@ class ScalabilityTest {
         ((historyDuration.inWholeMilliseconds.toFloat() /
                 exchangeDuration.inWholeMilliseconds.toFloat()) * 100)
             .roundToInt()
+    val historyOps = ops * 1000.0 / historyDuration.inWholeMilliseconds
+    val exchangeOps = ops * 1000.0 / exchangeDuration.inWholeMilliseconds
 
-    // Measured performance : speed of 125% - 150%.
-    println("Took ${historyDuration.inWholeMilliseconds} ms for history.")
-    println("Took ${exchangeDuration.inWholeMilliseconds} ms for exchange (speed ${speed}%).")
+    // Measured performance (history)  :       25'000 ops/sec
+    // Measured performance (exchange) :       35'000 ops/sec (125% - 150%)
+    println("Took ${historyDuration.inWholeMilliseconds} ms for history, at $historyOps ops/sec.")
+    println("Took ${exchangeDuration.inWholeMilliseconds} ms for exchange (speed ${speed}%), at $exchangeOps ops/sec.")
   }
 }

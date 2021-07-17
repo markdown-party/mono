@@ -34,10 +34,17 @@ internal class BlockLog {
   val hasPrevious: Boolean
     get() = blocksIds.gap.startIndex > 0
 
-  val hasNext: Boolean
+  val hasCurrent: Boolean
     get() = blocksIds.gap.startIndex < blocksIds.size
 
   // END : POSITION
+
+  // BEGIN : CURRENT GAP POSITION
+
+  val currentId: EventIdentifier
+    get() = blocksIds[blocksIds.gap.startIndex]
+
+  // END : CURRENT GAP POSITION
 
   // BEGIN : LAST GAP POSITION
 
@@ -73,7 +80,7 @@ internal class BlockLog {
 
   /** Moves the cursor to the right by one step. */
   fun moveRight() {
-    check(hasNext) { "Can't move right when at last index." }
+    check(hasCurrent) { "Can't move right when at last index." }
     blocksIds.gap.shift(1)
     blocksSizes.gap.shift(1) // Updating lastSize for blocks.gap shift.
     blocks.gap.shift(lastSize)
