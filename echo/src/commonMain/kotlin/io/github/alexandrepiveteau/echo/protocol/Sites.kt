@@ -27,14 +27,8 @@ import kotlinx.serialization.KSerializer
 
 internal open class ExchangeImpl(
     private val log: MutableEventLog,
-    vararg events: Pair<EventIdentifier, ByteArray>,
     private val strategy: SyncStrategy,
 ) : Exchange<Inc, Out> {
-
-  init {
-    // Pre-populate with the initial events of the log.
-    for ((id, body) in events) log.insert(id.seqno, id.site, body)
-  }
 
   /** The [Mutex] that protects access to the [sentinel] variable. */
   internal val mutex = Mutex()
@@ -84,10 +78,9 @@ internal open class ExchangeImpl(
 
 internal open class SiteImpl<M, R>(
     private val history: MutableHistory<R>,
-    vararg events: Pair<EventIdentifier, ByteArray>,
     strategy: SyncStrategy,
     private val transform: (R) -> M,
-) : ExchangeImpl(history, events = events, strategy), Site<M> {
+) : ExchangeImpl(history, strategy), Site<M> {
 
   /**
    * The current [history] value. Accesses to set the [current] value are protected through mutual
@@ -108,13 +101,11 @@ internal open class MutableSiteImpl<T, M, R>(
     private val serializer: KSerializer<T>,
     history: MutableHistory<R>,
     format: BinaryFormat,
-    vararg events: Pair<EventIdentifier, ByteArray>,
     strategy: SyncStrategy,
     transform: (R) -> M,
 ) :
     SiteImpl<M, R>(
         history = history,
-        events = events,
         strategy = strategy,
         transform = transform,
     ),

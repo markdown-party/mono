@@ -28,11 +28,14 @@ public abstract interface class io/github/alexandrepiveteau/echo/Site : io/githu
 }
 
 public final class io/github/alexandrepiveteau/echo/SiteKt {
+	public static final fun exchange (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static final fun exchange ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static synthetic fun exchange$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static synthetic fun exchange$default ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static final fun orderedExchange ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static final fun orderedMutableSite-NmxoKHA (ILjava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun orderedSite (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;[Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun mapToBinary ([Lkotlin/Pair;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)[Lkotlin/Pair;
+	public static final fun orderedExchange (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun orderedMutableSite-UQNCs_s (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun orderedSite (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {
