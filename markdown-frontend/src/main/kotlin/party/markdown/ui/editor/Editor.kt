@@ -5,6 +5,7 @@ import codemirror.lang.markdown.markdown
 import codemirror.state.*
 import codemirror.state.Transaction.Companion.remote
 import codemirror.view.EditorView
+import codemirror.view.EditorView.Companion.lineWrapping
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
@@ -205,6 +206,7 @@ private val editor =
           this.extensions =
               arrayOf(
                   basicSetup,
+                  lineWrapping,
                   markdown(),
                   RGAStateField.extension,
               )

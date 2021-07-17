@@ -4,6 +4,7 @@
 package codemirror.view
 
 import codemirror.state.EditorState
+import codemirror.state.Extension
 import codemirror.state.Transaction
 import codemirror.state.TransactionSpec
 import org.w3c.dom.HTMLElement
@@ -37,4 +38,13 @@ constructor(
    * handlers, and notifying plugins. The view instance can no longer be used after calling this.
    */
   fun destroy()
+
+  companion object {
+
+    /**
+     * An extension that enables line wrapping in the editor (by setting CSS white-space to pre-wrap
+     * in the content).
+     */
+    val lineWrapping: Extension
+  }
 }
