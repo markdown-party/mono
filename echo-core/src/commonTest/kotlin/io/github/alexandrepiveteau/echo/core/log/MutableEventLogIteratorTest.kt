@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier

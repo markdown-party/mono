@@ -84,6 +84,18 @@ interface MutableEventLog : EventLog {
   fun merge(from: EventLog): MutableEventLog
 
   /**
+   * Removes the event with the given [seqno] and [site], assuming it's present in the
+   * [MutableEventLog]. An event that is not present will not be removed, and will not be marked
+   * acknowledged by the [MutableEventLog] either.
+   *
+   * @param seqno the [SequenceNumber] for the event to remove.
+   * @param site the [SiteIdentifier] for the event to remove.
+   *
+   * @return a [Boolean] with value `true` iff the event was removed.
+   */
+  fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean
+
+  /**
    * Clears the data of the [MutableEventLog]. This will not necessarily reset the [acknowledged]
    * events, which will still act as a baseline for event insertions and appends.
    *

@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.requireRange
 
@@ -90,6 +91,16 @@ internal open class MutableEventLogImpl : MutableEventLog {
   }
 
   /**
+   * Removes the event at the given gap position, without moving it. Because of the removal, the
+   * next event will then be place directly at the current cursor position.
+   */
+  private fun removeAtGapWithoutMove() {
+    val id = eventStore.currentId
+    eventStore.removeCurrent()
+    eventStoreBySite[id.site]?.removeById(id)
+  }
+
+  /**
    * Partially inserts the given event, but does not move the gap afterwards. This method does not
    * make the assumption that the event may be inserted at the current index. Rather, it will
    * iterate to the right / left until it may insert the event, and push it without moving the gap.
@@ -110,6 +121,29 @@ internal open class MutableEventLogImpl : MutableEventLog {
     pushAtGapWithoutMove(id, array, from, until)
   }
 
+  /**
+   * Partially removes the given event, but does not move the gap afterwards. This method does not
+   * make the assumption that it is correctly positioned on the event. Rather, it will move left and
+   * right until it finds the event to remove, and only then remove it without moving the gap.
+   */
+  private fun partialRemove(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): Boolean {
+    // Fast return.
+    if (!contains(seqno, site)) return false
+
+    // Move the right index.
+    while (shouldInsertBefore(seqno, site)) moveLeft()
+    while (shouldInsertAfter(seqno, site)) moveRight()
+    removeAtGapWithoutMove()
+    return true
+  }
+
+  private fun resetCursor() {
+    while (eventStore.hasCurrent) moveRight()
+  }
+
   override fun insert(
       seqno: SequenceNumber,
       site: SiteIdentifier,
@@ -126,9 +160,7 @@ internal open class MutableEventLogImpl : MutableEventLog {
     // State checks
     check(!eventStore.hasCurrent) { "cursor should be at end" }
 
-    // Insert the event.
-    insertWithoutMove(EventIdentifier(seqno, site), event, from, until)
-    while (eventStore.hasCurrent) moveRight()
+    insertWithoutMove(EventIdentifier(seqno, site), event, from, until).apply { resetCursor() }
   }
 
   override fun contains(
@@ -190,16 +222,26 @@ internal open class MutableEventLogImpl : MutableEventLog {
     while (keepGoing) {
       insertWithoutMove(
           id = EventIdentifier(iterator.seqno, iterator.site),
-          array = iterator.event,
-          from = iterator.from,
-          until = iterator.until,
+          array = iterator.event.copyOfRange(iterator.from, iterator.until),
       )
       keepGoing = iterator.hasNext()
       if (keepGoing) iterator.moveNext()
     }
 
-    while (eventStore.hasCurrent) moveRight()
+    resetCursor()
     return this
+  }
+
+  override fun remove(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+  ): Boolean {
+
+    // Input sanitization.
+    require(seqno.isSpecified)
+    require(site.isSpecified)
+
+    return partialRemove(seqno, site).apply { resetCursor() }
   }
 
   override fun clear() {

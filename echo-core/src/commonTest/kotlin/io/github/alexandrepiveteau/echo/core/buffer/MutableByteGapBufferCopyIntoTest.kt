@@ -58,4 +58,34 @@ class MutableByteGapBufferCopyIntoTest {
       assertContentEquals(byteArrayOf(1, 2), copyInto(ByteArray(2), startOffset = 1))
     }
   }
+
+  @Test
+  fun removeMiddleCopy() {
+    val log = MutableByteGapBuffer(0)
+    log.push(byteArrayOf(1, 2))
+    log.push(byteArrayOf(3, 4, 5))
+    log.push(byteArrayOf(6, 7, 8, 9))
+    log.remove(2, 3)
+    assertContentEquals(byteArrayOf(6, 7, 8, 9), log.copyInto(ByteArray(4), startOffset = 2))
+  }
+
+  @Test
+  fun removeStartCopy() {
+    val log = MutableByteGapBuffer(0)
+    log.push(byteArrayOf(1, 2))
+    log.push(byteArrayOf(3, 4, 5))
+    log.push(byteArrayOf(6, 7, 8, 9))
+    log.remove(0, 2)
+    assertContentEquals(byteArrayOf(6, 7, 8, 9), log.copyInto(ByteArray(4), startOffset = 3))
+  }
+
+  @Test
+  fun removeEndCopy() {
+    val log = MutableByteGapBuffer(0)
+    log.push(byteArrayOf(1, 2))
+    log.push(byteArrayOf(3, 4, 5))
+    log.push(byteArrayOf(6, 7, 8, 9))
+    log.remove(5, 4)
+    assertContentEquals(byteArrayOf(3, 4, 5), log.copyInto(ByteArray(3), startOffset = 2))
+  }
 }
