@@ -4,6 +4,8 @@ import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * An interface defining an iterator over a [MutableEventLog]. Efficient, allocation-free methods
@@ -67,6 +69,8 @@ interface EventIterator : ListIterator<Event> {
  * @param site the [SiteIdentifier] for this [Event].
  * @param data the [ByteArray] that contains the [Event] body.
  */
+@Serializable
+@SerialName("evt")
 data class Event(
     val seqno: SequenceNumber,
     val site: SiteIdentifier,

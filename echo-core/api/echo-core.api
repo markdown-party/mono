@@ -406,7 +406,9 @@ public final class io/github/alexandrepiveteau/echo/core/log/ChangeScope$Default
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/Event {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/core/log/Event$Companion;
 	public synthetic fun <init> (II[BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/SequenceNumber;Lio/github/alexandrepiveteau/echo/core/causality/SiteIdentifier;[BLkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-iWHgJgY ()I
 	public final fun component2-ix6DSBw ()I
 	public final fun component3 ()[B
@@ -418,6 +420,23 @@ public final class io/github/alexandrepiveteau/echo/core/log/Event {
 	public final fun getSite-ix6DSBw ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/core/log/Event;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/Event$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/core/log/Event$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/core/log/Event;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/core/log/Event;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/Event$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventIterator : java/util/ListIterator, kotlin/jvm/internal/markers/KMappedMarker {

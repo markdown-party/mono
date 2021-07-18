@@ -22,7 +22,7 @@ internal suspend fun ExchangeScope<I, O>.awaitAdvertisements(): MutableEventIden
     when (val msg = receiveCatching().getOrNull()) {
       is I.Ready -> return available
       is I.Advertisement -> available.push(EventIdentifier(msg.nextSeqno, msg.site))
-      is I.Event -> error("Didn't expect event $msg")
+      is I.Events -> error("Didn't expect events $msg")
       null -> terminate()
     }
   }
@@ -106,7 +106,18 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
               if (!stopAfterAdvertised)
                   advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
             }
-            is I.Event -> events.insert(msg.seqno, msg.site, msg.body)
+            is I.Events -> {
+
+              events.merge(
+                  mutableEventLogOf(
+                      *msg.events
+                          .asSequence()
+                          .map { (seqno, site, body) -> EventIdentifier(seqno, site) to body }
+                          .toList()
+                          .toTypedArray(),
+                  ),
+              )
+            }
             is I.Ready -> error("Unexpected duplicate Ready.")
             null -> isDoneReceiving = true
           }

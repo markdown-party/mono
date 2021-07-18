@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.protocol
 
 import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.core.log.EventIterator
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
@@ -164,10 +165,10 @@ private fun enqueueAdvertisements(
  * A comparator of I.Event messages, which sends events with a smaller identifier first. This allows
  * for more efficient sync when there are many concurrent messages.
  */
-private object EventComparator : Comparator<I.Event> {
+private object EventComparator : Comparator<Event> {
   override fun compare(
-      a: Message.Incoming.Event,
-      b: Message.Incoming.Event,
+      a: Event,
+      b: Event,
   ) = EventIdentifier(a.seqno, a.site).compareTo(EventIdentifier(b.seqno, b.site))
 }
 
@@ -219,7 +220,7 @@ private fun EventIterator.take(
     index: Int,
     requests: MutableEventIdentifierGapBuffer,
     credits: MutableIntGapBuffer,
-    queue: MutableList<I.Event>,
+    queue: MutableList<Event>,
     advertised: MutableEventIdentifierGapBuffer,
     stopAfterAdvertised: Boolean,
 ) {
@@ -245,10 +246,10 @@ private fun EventIterator.take(
 
     // Add the event to the queue.
     queue.add(
-        I.Event(
+        Event(
             seqno = seqno,
             site = site,
-            body = event.copyOfRange(from, until),
+            data = event.copyOfRange(from, until),
         ),
     )
 
@@ -266,7 +267,7 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
     advertised: MutableEventIdentifierGapBuffer,
     stopAfterAdvertised: Boolean,
 ) {
-  val events = mutableListOf<I.Event>()
+  val events = mutableListOf<Event>()
 
   withEventLogLock {
     for (i in 0 until requests.size) {
@@ -285,7 +286,7 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
 
   // Sort the events by identifier before sending them to the other side.
   events.sortWith(EventComparator)
-  queue.addAll(events)
+  if (events.isNotEmpty()) queue.addLast(I.Events(events))
 }
 
 /**
