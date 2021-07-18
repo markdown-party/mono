@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 
@@ -46,7 +48,7 @@ interface EventIterator : ListIterator<Event> {
   val site: SiteIdentifier
 
   /** The body of the events. You should only read the contents in the [from] to [until] range. */
-  val event: ByteArray
+  val event: MutableByteGapBuffer
 
   /** The start of the event body. */
   val from: Int

@@ -4,10 +4,10 @@ package io.github.alexandrepiveteau.echo.core.log
  * An implementation of a [MutableHistory], with an initial aggregate, and a projection that is used
  * to incrementally update the model.
  */
-internal class MutableHistoryImpl<T>(
+abstract class AbstractMutableHistory<T>(
     initial: T,
     private val projection: MutableProjection<T>,
-) : MutableEventLogImpl(), MutableHistory<T> {
+) : AbstractMutableEventLog(), MutableHistory<T> {
 
   // The ChangeScope that will be provided to the projection whenever some changes mush be appended
   // to the changes history.
@@ -72,6 +72,6 @@ internal class MutableHistoryImpl<T>(
     changeStore.clear()
   }
 
-  override var current: T = initial
+  final override var current: T = initial
     private set
 }

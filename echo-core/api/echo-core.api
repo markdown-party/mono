@@ -44,6 +44,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBu
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer_ExtensionsKt {
 	public static final fun MutableByteGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
 	public static final fun MutableByteGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
+	public static final fun copyOfRange (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)[B
 	public static final fun mutableByteGapBufferOf ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
 	public static final fun toByteArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;)[B
 	public static final fun toMutableGapBuffer ([B)Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
@@ -79,6 +80,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBu
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer_ExtensionsKt {
 	public static final fun MutableCharGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
 	public static final fun MutableCharGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
+	public static final fun copyOfRange (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;II)[C
 	public static final fun mutableCharGapBufferOf ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
 	public static final fun toCharArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;)[C
 	public static final fun toMutableGapBuffer ([C)Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;
@@ -122,6 +124,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIden
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer_ExtensionsKt {
 	public static final fun MutableEventIdentifierGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;
 	public static final fun MutableEventIdentifierGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;
+	public static final fun copyOfRange (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;II)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
 	public static final fun mutableEventIdentifierGapBufferOf ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;
 	public static final fun toEventIdentifierArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
 	public static final fun toMutableGapBuffer (Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;
@@ -209,6 +212,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuf
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer_ExtensionsKt {
 	public static final fun MutableIntGapBuffer (I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
 	public static final fun MutableIntGapBuffer (ILkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
+	public static final fun copyOfRange (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;II)[I
 	public static final fun mutableIntGapBufferOf ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
 	public static final fun toIntArray (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;)[I
 	public static final fun toMutableGapBuffer ([I)Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;
@@ -353,6 +357,35 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifie
 	public static final fun toUInt-C_LfJGE (I)I
 }
 
+public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog : io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
+	public fun <init> ()V
+	public fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public fun acknowledge-qH2TBG0 (II)V
+	public fun acknowledged ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	public fun append-Q0QDvhs (I[BII)J
+	public fun clear ()V
+	public fun contains-qH2TBG0 (II)Z
+	public fun getSize ()I
+	public fun insert-BnEfkuQ (II[BII)V
+	public fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public fun merge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public fun moveLeft ()V
+	public fun moveRight ()V
+	protected fun partialInsert-PdOoclA (J[BII)V
+	public static synthetic fun partialInsert-PdOoclA$default (Lio/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog;J[BIIILjava/lang/Object;)V
+	protected fun partialRemove-qH2TBG0 (II)Z
+	public fun remove-qH2TBG0 (II)Z
+}
+
+public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableHistory : io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog, io/github/alexandrepiveteau/echo/core/log/MutableHistory {
+	public fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;)V
+	public fun clear ()V
+	public final fun getCurrent ()Ljava/lang/Object;
+	public fun moveLeft ()V
+	public fun moveRight ()V
+}
+
 public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
 	public static final fun mutableEventLogOf ()Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static final fun mutableEventLogOf ([Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
@@ -387,7 +420,7 @@ public final class io/github/alexandrepiveteau/echo/core/log/Event {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventIterator : java/util/ListIterator, kotlin/jvm/internal/markers/KMappedMarker {
-	public abstract fun getEvent ()[B
+	public abstract fun getEvent ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
 	public abstract fun getFrom ()I
 	public abstract fun getSeqno-iWHgJgY ()I
 	public abstract fun getSite-ix6DSBw ()I
@@ -425,6 +458,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 	public abstract fun clear ()V
 	public abstract fun insert-BnEfkuQ (II[BII)V
 	public abstract fun merge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public abstract fun remove-qH2TBG0 (II)Z
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/MutableEventLog$DefaultImpls {

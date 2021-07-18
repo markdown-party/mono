@@ -44,6 +44,9 @@ internal class BlockLog {
   val currentId: EventIdentifier
     get() = blocksIds[blocksIds.gap.startIndex]
 
+  val currentSize: Int
+    get() = blocksSizes[blocksSizes.gap.startIndex]
+
   // END : CURRENT GAP POSITION
 
   // BEGIN : LAST GAP POSITION
@@ -68,6 +71,14 @@ internal class BlockLog {
     blocks.remove(blocks.gap.startIndex - lastSize, lastSize)
     blocksIds.remove(blocksIds.gap.startIndex - 1)
     blocksSizes.remove(blocksSizes.gap.startIndex - 1)
+  }
+
+  /** Removes the current item at the gap. */
+  fun removeCurrent() {
+    check(hasCurrent) { "Can't remove current when at a missing index." }
+    blocks.remove(blocks.gap.startIndex, currentSize)
+    blocksIds.remove(blocksIds.gap.startIndex)
+    blocksSizes.remove(blocksSizes.gap.startIndex)
   }
 
   /** Moves the cursor to the left by one step. */
@@ -155,6 +166,20 @@ internal class BlockLog {
     blocksSizes.gap.shift(-1)
   }
 
+  /**
+   * Removes the event with the given identifier, and moves the buffer to the removal point.
+   *
+   * @param id the [EventIdentifier] that points to the removed location.
+   */
+  fun removeById(
+      id: EventIdentifier,
+  ) {
+    val index = blocksIds.binarySearch(id)
+    if (index < 0) return // Not present.
+    moveToIndex(index)
+    removeCurrent()
+  }
+
   /** Clears the [BlockLog], such that it becomes completely empty. */
   fun clear() {
     blocks.clear()
@@ -186,8 +211,8 @@ internal class BlockLog {
     override val site: SiteIdentifier
       get() = blocksIds[cursorIdsIndex].site
 
-    override val event: ByteArray
-      get() = blocks.backing
+    override val event: MutableByteGapBuffer
+      get() = blocks
 
     override val from: Int
       get() = cursorEvents

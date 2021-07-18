@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 
@@ -11,7 +12,7 @@ internal object EmptyEventIterator : EventIterator {
   override val site: SiteIdentifier
     get() = error("Empty")
 
-  override val event: ByteArray
+  override val event: MutableByteGapBuffer
     get() = error("Empty")
 
   override val from: Int

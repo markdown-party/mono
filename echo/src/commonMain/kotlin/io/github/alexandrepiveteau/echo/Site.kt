@@ -2,7 +2,8 @@ package io.github.alexandrepiveteau.echo
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import io.github.alexandrepiveteau.echo.core.log.MutableProjection
+import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
+import io.github.alexandrepiveteau.echo.core.log.MutableHistory
 import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.core.log.mutableHistoryOf
 import io.github.alexandrepiveteau.echo.events.EventScope
@@ -55,18 +56,50 @@ interface MutableSite<T, out M> : Site<M> {
 /**
  * Creates a new [Exchange] with a backing event log.
  *
+ * @param log the [MutableEventLog] backing the exchange.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ */
+fun exchange(
+    log: MutableEventLog,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): Exchange<Inc, Out> =
+    orderedExchange(
+        log = log,
+        strategy = strategy,
+    )
+
+/**
+ * Creates a new [Exchange] with a backing event log.
+ *
  * @param events some initial events to populate the event log.
  * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun exchange(
+fun exchange(
     vararg events: Pair<EventIdentifier, ByteArray>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Exchange<Inc, Out> =
     orderedExchange(
-        events = events,
+        log = mutableEventLogOf(*events),
         strategy = strategy,
     )
+
+/**
+ * Creates a new [Site] with a backing history.
+ *
+ * @param history the [MutableHistory] backing the site.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ */
+inline fun <M, reified T> site(
+    history: MutableHistory<M>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): Site<M> =
+    orderedSite(
+        history = history,
+        strategy = strategy,
+    ) { it }
 
 /**
  * Creates a new [Site] with a backing history.
@@ -106,15 +139,16 @@ inline fun <M, reified T> site(
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
-        initial = initial,
-        projection =
-            OneWayMutableProjection(
-                projection = projection,
-                eventSerializer = serializer(),
-                format = DefaultSerializationFormat),
-        eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
-        events = events,
+        history =
+            mutableHistoryOf(
+                initial = initial,
+                projection =
+                    OneWayMutableProjection(
+                        projection = projection,
+                        eventSerializer = serializer(),
+                        format = DefaultSerializationFormat),
+                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
+            ),
         strategy = strategy,
     ) { it }
 
@@ -138,17 +172,18 @@ inline fun <M, reified T, reified C> site(
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
-        initial = initial,
-        projection =
-            TwoWayMutableProjection(
-                projection = projection,
-                changeSerializer = serializer(),
-                eventSerializer = serializer(),
-                format = DefaultSerializationFormat,
+        history =
+            mutableHistoryOf(
+                initial = initial,
+                projection =
+                    TwoWayMutableProjection(
+                        projection = projection,
+                        changeSerializer = serializer(),
+                        eventSerializer = serializer(),
+                        format = DefaultSerializationFormat,
+                    ),
+                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
             ),
-        eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
-        events = events,
         strategy = strategy,
     ) { it }
 
@@ -176,9 +211,34 @@ inline fun <reified T> mutableSite(
     )
 
 /**
- * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
- * Additionally, this overload takes a [OneWayProjection] and lets you specify a projection to apply
- * to the data, to have custom [MutableSite.event] arguments.
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing log. Additionally,
+ * this overload takes a [OneWayProjection] and lets you specify a projection to apply to the data,
+ * to have custom [MutableSite.event] arguments.
+ *
+ * @param identifier the globally unique identifier for this [Site].
+ * @param history the [MutableHistory] backing the site.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ */
+inline fun <M, reified T> mutableSite(
+    identifier: SiteIdentifier,
+    history: MutableHistory<M>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): MutableSite<T, M> =
+    orderedMutableSite(
+        identifier = identifier,
+        history = history,
+        strategy = strategy,
+        eventSerializer = serializer(),
+        format = DefaultSerializationFormat,
+    ) { it }
+
+/**
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing log. Additionally,
+ * this overload takes a [OneWayProjection] and lets you specify a projection to apply to the data,
+ * to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
  * @param initial the initial value for the projection aggregate.
@@ -205,9 +265,9 @@ inline fun <M, reified T> mutableSite(
     ) { it }
 
 /**
- * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing [log].
- * Additionally, this overload takes a [TwoWayProjection] and lets you specify a projection to apply
- * to the data, to have custom [MutableSite.event] arguments.
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing log. Additionally,
+ * this overload takes a [TwoWayProjection] and lets you specify a projection to apply to the data,
+ * to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
  * @param initial the initial value for the projection aggregate.
@@ -240,6 +300,35 @@ inline fun <M, reified T, reified C> mutableSite(
  * to the data, to have custom [MutableSite.event] arguments.
  *
  * @param identifier the globally unique identifier for this [Site].
+ * @param history the [MutableHistory] backing the site.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ * @param transform a function mapping the backing model from type [R] to type [M].
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ * @param R the type of the backing model for this [Site].
+ */
+inline fun <M, reified T, R> mutableSite(
+    identifier: SiteIdentifier,
+    history: MutableHistory<R>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+    noinline transform: (R) -> M,
+): MutableSite<T, M> =
+    orderedMutableSite(
+        identifier = identifier,
+        history = history,
+        eventSerializer = serializer(),
+        format = DefaultSerializationFormat,
+        strategy = strategy,
+        transform = transform,
+    )
+
+/**
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing mutable history.
+ * Additionally, this overload takes a [OneWayProjection] and lets you specify a projection to apply
+ * to the data, to have custom [MutableSite.event] arguments.
+ *
+ * @param identifier the globally unique identifier for this [Site].
  * @param initial the initial value for the projection aggregate.
  * @param projection the [OneWayProjection] for this [Site].
  * @param events some initial events to populate the history.
@@ -260,16 +349,19 @@ inline fun <M, reified T, R> mutableSite(
 ): MutableSite<T, M> =
     orderedMutableSite(
         identifier = identifier,
-        initial = initial,
-        projection =
-            OneWayMutableProjection(
-                projection = projection,
-                eventSerializer = serializer(),
-                format = DefaultSerializationFormat,
+        history =
+            mutableHistoryOf(
+                initial = initial,
+                projection =
+                    OneWayMutableProjection(
+                        projection = projection,
+                        eventSerializer = serializer(),
+                        format = DefaultSerializationFormat,
+                    ),
+                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
             ),
         eventSerializer = serializer(),
         format = DefaultSerializationFormat,
-        events = events,
         strategy = strategy,
         transform = transform,
     )
@@ -301,17 +393,20 @@ inline fun <M, reified T, reified C, R> mutableSite(
 ): MutableSite<T, M> =
     orderedMutableSite(
         identifier = identifier,
-        initial = initial,
-        projection =
-            TwoWayMutableProjection(
-                projection = projection,
-                changeSerializer = serializer(),
-                eventSerializer = serializer(),
-                format = DefaultSerializationFormat,
+        history =
+            mutableHistoryOf(
+                initial = initial,
+                projection =
+                    TwoWayMutableProjection(
+                        projection = projection,
+                        changeSerializer = serializer(),
+                        eventSerializer = serializer(),
+                        format = DefaultSerializationFormat,
+                    ),
+                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
             ),
         eventSerializer = serializer(),
         format = DefaultSerializationFormat,
-        events = events,
         strategy = strategy,
         transform = transform,
     )
@@ -329,12 +424,11 @@ internal object UnitProjection : OneWayProjection<Unit, Any?> {
 
 @PublishedApi
 internal fun orderedExchange(
-    vararg events: Pair<EventIdentifier, ByteArray>,
+    log: MutableEventLog,
     strategy: SyncStrategy,
 ): Exchange<Inc, Out> =
     ExchangeImpl(
-        log = mutableEventLogOf(),
-        events = events,
+        log = log,
         strategy = strategy,
     )
 
@@ -345,7 +439,8 @@ internal fun orderedExchange(
  * @param serializer the [KSerializer] that is used for serialization.
  * @param format the [BinaryFormat] used to convert to a binary format.
  */
-private fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
+@PublishedApi
+internal fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
     serializer: KSerializer<T>,
     format: BinaryFormat,
 ): Array<Pair<EventIdentifier, ByteArray>> =
@@ -355,18 +450,13 @@ private fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
         .toTypedArray()
 
 @PublishedApi
-internal fun <M, T, R> orderedSite(
-    initial: R,
-    projection: MutableProjection<R>,
-    eventSerializer: KSerializer<T>,
-    format: BinaryFormat,
-    vararg events: Pair<EventIdentifier, T>,
+internal fun <M, R> orderedSite(
+    history: MutableHistory<R>,
     strategy: SyncStrategy,
     transform: (R) -> M,
 ): Site<M> =
     SiteImpl(
-        history = mutableHistoryOf(initial, projection),
-        events = events.mapToBinary(eventSerializer, format),
+        history = history,
         strategy = strategy,
         transform = transform,
     )
@@ -374,20 +464,17 @@ internal fun <M, T, R> orderedSite(
 @PublishedApi
 internal fun <M, T, R> orderedMutableSite(
     identifier: SiteIdentifier,
-    initial: R,
-    projection: MutableProjection<R>,
+    history: MutableHistory<R>,
     eventSerializer: KSerializer<T>,
     format: BinaryFormat,
-    vararg events: Pair<EventIdentifier, T>,
     strategy: SyncStrategy,
     transform: (R) -> M,
 ): MutableSite<T, M> =
     MutableSiteImpl(
         identifier = identifier,
         serializer = eventSerializer,
-        history = mutableHistoryOf(initial, projection),
+        history = history,
         format = format,
-        events = events.mapToBinary(eventSerializer, format),
         strategy = strategy,
         transform = transform,
     )

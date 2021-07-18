@@ -2,6 +2,15 @@ package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 
+/** The actual implementation of [AbstractMutableHistory] used in the builders. */
+private class ActualMutableHistory<T>(
+    initial: T,
+    projection: MutableProjection<T>,
+) : AbstractMutableHistory<T>(initial, projection)
+
+/** The actual implementation of [AbstractMutableEventLog] used in the builders. */
+private class ActualMutableEventLog : AbstractMutableEventLog()
+
 /**
  * Creates a new [MutableHistory], with an aggregate with an [initial] value and a [projection] for
  * incremental changes.
@@ -14,7 +23,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 fun <T> mutableHistoryOf(
     initial: T,
     projection: MutableProjection<T>,
-): MutableHistory<T> = MutableHistoryImpl(initial, projection)
+): MutableHistory<T> = ActualMutableHistory(initial, projection)
 
 /**
  * Creates a new [MutableHistory], with an aggregate with an [initial] value and a [projection] for
@@ -31,7 +40,7 @@ fun <T> mutableHistoryOf(
     projection: MutableProjection<T>,
     vararg events: Pair<EventIdentifier, ByteArray>,
 ): MutableHistory<T> =
-    MutableHistoryImpl(initial, projection).apply {
+    ActualMutableHistory(initial, projection).apply {
       for ((id, body) in events) {
         insert(id.seqno, id.site, body)
       }
@@ -48,7 +57,7 @@ fun mutableEventLogOf(): MutableEventLog = mutableEventLogOf(*emptyArray())
 fun mutableEventLogOf(
     vararg events: Pair<EventIdentifier, ByteArray>,
 ): MutableEventLog =
-    MutableEventLogImpl().apply {
+    ActualMutableEventLog().apply {
       for ((id, body) in events) {
         insert(id.seqno, id.site, body)
       }

@@ -36,3 +36,10 @@ fun MutableIntGapBuffer.toTypedArray(): Array<Int> {
 fun IntArray.toMutableGapBuffer(): MutableIntGapBuffer {
   return MutableIntGapBuffer(size, this::get)
 }
+
+/** Copies the given range from the [MutableIntGapBuffer]. */
+fun MutableIntGapBuffer.copyOfRange(from: Int, until: Int): IntArray {
+  val size = until - from
+  require(size >= 0) { "Can't copy a negative range." }
+  return copyInto(IntArray(size), startOffset = from, endOffset = until)
+}

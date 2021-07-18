@@ -51,3 +51,10 @@ fun MutableEventIdentifierGapBuffer.toTypedArray(): Array<EventIdentifier> {
 fun EventIdentifierArray.toMutableGapBuffer(): MutableEventIdentifierGapBuffer {
   return MutableEventIdentifierGapBuffer(size, this::get)
 }
+
+/** Copies the given range from the [MutableEventIdentifierGapBuffer]. */
+fun MutableEventIdentifierGapBuffer.copyOfRange(from: Int, until: Int): EventIdentifierArray {
+    val size = until - from
+    require(size >= 0) { "Can't copy a negative range." }
+    return copyInto(EventIdentifierArray(size), startOffset = from, endOffset = until)
+}

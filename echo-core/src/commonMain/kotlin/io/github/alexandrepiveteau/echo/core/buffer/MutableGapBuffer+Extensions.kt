@@ -28,3 +28,11 @@ inline fun <reified T> MutableGapBuffer<T>.toTypedArray(): Array<T> {
 inline fun <reified T> Array<T>.toMutableGapBuffer(): MutableGapBuffer<T> {
   return MutableGapBuffer(size, this::get)
 }
+
+/** Copies the given range from the [MutableGapBuffer]. */
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> MutableGapBuffer<T>.copyOfRange(from: Int, until: Int): Array<T> {
+  val size = until - from
+  require(size >= 0) { "Can't copy a negative range." }
+  return copyInto(arrayOfNulls<T>(size) as Array<T>, startOffset = from, endOffset = until)
+}
