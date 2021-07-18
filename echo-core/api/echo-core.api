@@ -250,6 +250,7 @@ public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifi
 
 public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray {
 	public fun <init> (I)V
+	public final fun contains--MgKYFQ (J)Z
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get-UaA2Q5I (I)J
 	public final fun getSize ()I
