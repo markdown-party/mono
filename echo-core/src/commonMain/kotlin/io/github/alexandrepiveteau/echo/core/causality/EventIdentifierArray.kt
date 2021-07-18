@@ -36,6 +36,13 @@ internal constructor(
     return backing.hashCode()
   }
 
+  operator fun contains(identifier: EventIdentifier): Boolean {
+    for (i in 0 until size) {
+      if (get(i) == identifier) return true
+    }
+    return false
+  }
+
   /**
    * Returns the array element at the given [index]. This method can be called using the index
    * operator.
