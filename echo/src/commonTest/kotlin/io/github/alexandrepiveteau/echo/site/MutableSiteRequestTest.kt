@@ -5,6 +5,7 @@ import io.github.alexandrepiveteau.echo.*
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber.Companion.Min
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlin.random.Random
@@ -100,7 +101,7 @@ class MutableSiteRequestTest {
             assertEquals(Inc.Ready, expectItem())
             emit(Out.Acknowledge(id.site, Min))
             emit(Out.Request(id.site, 1U))
-            assertEquals(Inc.Event(id.seqno, id.site, encode(1)), expectItem())
+            assertEquals(Inc.Events(listOf(Event(id.seqno, id.site, encode(1)))), expectItem())
             expectNoEvents()
           }
         }
@@ -142,8 +143,8 @@ class MutableSiteRequestTest {
             // Sum two requests before expecting items.
             emit(Out.Request(id, 1U))
             emit(Out.Request(id, 1U))
-            assertEquals(Inc.Event(id1.seqno, id1.site, encode(1)), expectItem())
-            assertEquals(Inc.Event(id2.seqno, id2.site, encode(2)), expectItem())
+            assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), expectItem())
+            assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), expectItem())
             expectNoEvents()
           }
         }
@@ -166,9 +167,9 @@ class MutableSiteRequestTest {
             emit(Out.Acknowledge(id, Min))
             // Interleave item reception and requests.
             emit(Out.Request(id, 1U))
-            assertEquals(Inc.Event(id1.seqno, id1.site, encode(1)), expectItem())
+            assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), expectItem())
             emit(Out.Request(id, 1U))
-            assertEquals(Inc.Event(id2.seqno, id2.site, encode(2)), expectItem())
+            assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), expectItem())
             expectNoEvents()
           }
         }
@@ -211,8 +212,14 @@ class MutableSiteRequestTest {
             // Sum two requests such that their overflowing total is 0U before expecting items.
             emit(Out.Request(id, UInt.MAX_VALUE))
             emit(Out.Request(id, 1U))
-            assertEquals(Inc.Event(id1.seqno, id1.site, encode(1)), expectItem())
-            assertEquals(Inc.Event(id2.seqno, id2.site, encode(2)), expectItem())
+            assertEquals(
+                // The two events are available when the request is performed.
+                Inc.Events(
+                    listOf(
+                        Event(id1.seqno, id1.site, encode(1)),
+                        Event(id2.seqno, id2.site, encode(2)),
+                    )),
+                expectItem())
             expectNoEvents()
           }
         }
