@@ -2,8 +2,10 @@ package party.markdown.ui.editor
 
 import codemirror.basicSetup.basicSetup
 import codemirror.lang.markdown.markdown
-import codemirror.state.*
+import codemirror.state.ChangeSpec
 import codemirror.state.Transaction.Companion.remote
+import codemirror.state.TransactionSpec
+import codemirror.state.annotations
 import codemirror.view.EditorView
 import codemirror.view.EditorView.Companion.lineWrapping
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
@@ -81,8 +83,10 @@ private fun receiveRemote(
     view: EditorView,
 ) {
   val changes = mutableListOf<ChangeSpec>()
+  val field = view.state.field(RGAStateField)
+
   val a = ids
-  val b = view.state.field(RGAStateField).identifiers.toMutableGapBuffer()
+  val b = field.identifiers.toMutableGapBuffer()
 
   var aI = 0
   var bI = 0
@@ -100,7 +104,8 @@ private fun receiveRemote(
     // 2. Both characters do not match :
     //      a. if the [b] character is pending for insertion, skip it.
     //      b. if the [a] character is removed, skip it.
-    //      c. otherwise insert the [a] character.
+    //      c. if the [a] character is pending for removal, skip it.
+    //      d. otherwise insert the [a] character.
     if (aI != a.size && bI != b.size) {
       if (a[aI] == b[bI]) {
         if (chars[aI] != MutableRGA.REMOVED) {
@@ -114,6 +119,7 @@ private fun receiveRemote(
         when {
           b[bI].isUnspecified -> bI++
           chars[aI] == MutableRGA.REMOVED -> aI++
+          ids[aI] in field.removed -> aI++
           else -> {
             changes.add(
                 ChangeSpec(
@@ -135,7 +141,7 @@ private fun receiveRemote(
     // 1. The [a] character is not removed.
     // 2. The [a] character is removed, so skip it.
     else if (aI != a.size && bI == b.size) {
-      if (chars[aI] != MutableRGA.REMOVED) {
+      if (chars[aI] != MutableRGA.REMOVED && ids[aI] !in field.removed) {
         changes.add(
             ChangeSpec(
                 from = bI,
