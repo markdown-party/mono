@@ -10,6 +10,7 @@ import codemirror.state.StateField
 import codemirror.state.Transaction.Companion.remote
 import codemirror.state.TransactionSpec
 import codemirror.state.annotations
+import codemirror.theme.oneDark.oneDark
 import codemirror.view.EditorView
 import codemirror.view.EditorView.Companion.lineWrapping
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
@@ -272,6 +273,7 @@ private val editor =
               arrayOf(
                   basicSetup,
                   lineWrapping,
+                  oneDark,
                   markdown(),
                   RGAStateField.extension,
                   cursorTooltipBaseTheme,
