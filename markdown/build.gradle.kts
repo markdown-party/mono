@@ -9,7 +9,10 @@ kotlin {
     testRuns["test"].executionTask.configure { useJUnit() }
     withJava()
   }
-  js(IR) { browser() }
+  js(IR) {
+    browser()
+    binaries.executable()
+  }
 
   sourceSets {
     val commonMain by getting {
@@ -38,7 +41,7 @@ kotlin {
     all {
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
       languageSettings.useExperimentalAnnotation(
-        "kotlinx.serialization.ExperimentalSerializationApi")
+          "kotlinx.serialization.ExperimentalSerializationApi")
     }
   }
 }

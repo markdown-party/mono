@@ -18,8 +18,8 @@ val CursorRoot = RGANodeIdentifier.Unspecified
  * Events that the user may perform in order to move the cursor. The user may only have a single
  * cursor across all the documents.
  */
-@SerialName("e")
 @Serializable
+@SerialName("c")
 sealed class CursorEvent {
 
   /**
@@ -31,7 +31,7 @@ sealed class CursorEvent {
    * @param anchor the character after which the cursor is moved.
    */
   @Serializable
-  @SerialName("m")
+  @SerialName("c:ma")
   data class MoveAfter(
       val node: TreeNodeIdentifier,
       val anchor: CursorAnchorIdentifier,

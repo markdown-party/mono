@@ -11,19 +11,19 @@ import party.markdown.tree.TreeNodeIdentifier
 @Serializable
 sealed class MarkdownPartyEvent {
 
-  @SerialName("u")
+  @SerialName("e:c")
   @Serializable
   data class Cursor(
       val event: CursorEvent,
   ) : MarkdownPartyEvent()
 
-  @SerialName("t")
+  @SerialName("e:t")
   @Serializable
   data class Tree(
       val event: TreeEvent,
   ) : MarkdownPartyEvent()
 
-  @SerialName("c")
+  @SerialName("e:r")
   @Serializable
   data class RGA(
       val document: TreeNodeIdentifier,
