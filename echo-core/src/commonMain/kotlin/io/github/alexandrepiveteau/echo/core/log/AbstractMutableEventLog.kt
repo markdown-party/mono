@@ -136,6 +136,11 @@ abstract class AbstractMutableEventLog : MutableEventLog {
     // Move the right index.
     while (shouldInsertBefore(seqno, site)) moveLeft()
     while (shouldInsertAfter(seqno, site)) moveRight()
+
+    // Check if the item wasn't already removed.
+    if (!eventStore.hasCurrent) return false
+    if (eventStore.currentId != EventIdentifier(seqno, site)) return false
+
     removeAtGapWithoutMove()
     return true
   }
