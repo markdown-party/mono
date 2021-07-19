@@ -64,7 +64,7 @@ class MarkdownPartyHistory :
   /** Partially removes the previous operation if it is present. */
   private fun handleCursor(id: EventIdentifier) {
     val previous = current.cursors.previous(id)
-    if (previous.isUnspecified || previous > id) return // Do not remove that op.
+    if (previous.isUnspecified || previous >= id) return // Do not remove that op.
     partialRemove(previous.seqno, previous.site)
   }
 }

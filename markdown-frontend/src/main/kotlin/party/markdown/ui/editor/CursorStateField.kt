@@ -11,18 +11,34 @@ import codemirror.view.EditorView
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import party.markdown.cursors.Cursors
 
+/** An [Annotation] that lets transactions overwrite the available cursors. */
 val CursorAnnotation = Annotation.define<Set<Cursors.Cursor>>()
 
+/**
+ * The state of the [cursorsStateField]. It contains the current [actor], which will be masked from
+ * the list of cursors, and the [Set] of [Cursors.Cursor] from all the other sites, which will be
+ * displayed if they are at a known position.
+ */
 data class CursorsState(
     val actor: SiteIdentifier,
     val cursors: Set<Cursors.Cursor>,
 )
 
-fun cursorsStateField(actor: SiteIdentifier): StateField<CursorsState> {
+/**
+ * Creates a new [StateField] which will provide access to a [CursorsState]. The [StateField]
+ * accepts transactions with the [CursorAnnotation], and will update its state depending on the
+ * cursors provided in this state.
+ *
+ * Additionally, the current [actor] will be hidden from the displayed cursors.
+ */
+fun cursorsStateField(
+    actor: SiteIdentifier,
+): StateField<CursorsState> {
   return StateField.define(
       StateFieldConfig(
           create = { CursorsState(actor, emptySet()) },
@@ -40,6 +56,12 @@ fun cursorsStateField(actor: SiteIdentifier): StateField<CursorsState> {
   )
 }
 
+/**
+ * Finds the index of the given [EventIdentifier] in this [EventIdentifierArray]. The
+ * [EventIdentifierArray] might be unsorted.
+ *
+ * @param value the [EventIdentifier] that we're searching.
+ */
 private fun EventIdentifierArray.linearSearch(
     value: EventIdentifier,
 ): Int {
@@ -51,6 +73,26 @@ private fun EventIdentifierArray.linearSearch(
   return -1
 }
 
+/**
+ * Finds the index of the anchor in the provided [EventIdentifierArray]. If the index is negative, a
+ * `null` value will be returned.
+ *
+ * Additionally, if the [identifier] is [EventIdentifier.Unspecified], the index will be set to `0`,
+ * since it means that the cursor is at the beginning of the text.
+ */
+fun EventIdentifierArray.indexOfCursor(
+    identifier: EventIdentifier,
+): Int {
+  if (identifier.isUnspecified) return 0
+  return linearSearch(identifier).takeIf { it >= 0 }?.plus(1) ?: -1
+}
+
+/**
+ * Maps the current [EditorState] to the [Array] of [Tooltip] that should be displayed by the text
+ * editor.
+ *
+ * @param f the [StateField] instance on which we're acting.
+ */
 private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> {
   val rga = field(RGAStateField)
   val cursors = field(f)
@@ -62,15 +104,18 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
   return c
       .mapNotNull {
         val title = it.actor
-        val pos = rga.identifiers.linearSearch(it.anchor).takeIf { i -> i >= 0 }
-        pos?.let { p -> title to p }
+        if (it.anchor.isUnspecified) return@mapNotNull title to 0
+        val pos =
+            rga.identifiers.indexOfCursor(it.anchor).takeIf { i -> i >= 0 }
+                ?: return@mapNotNull null
+        return@mapNotNull title to pos
       }
       .map { (title, pos) ->
         Tooltip(
-            pos = pos + 1,
+            pos = pos,
             create = {
               val dom = document.createElement("div") as HTMLElement
-              dom.textContent = title.toString()
+              dom.textContent = "🎉"//title.toString()
               TooltipView { this.dom = dom }
             }) {
           above = true
@@ -81,6 +126,10 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
       .toTypedArray()
 }
 
+/**
+ * The base theme of the cursors, that will be applied to all the cursors created with the
+ * `cm-cursor-tooltip` class.
+ */
 val cursorTooltipBaseTheme =
     EditorView.baseTheme(
         js(

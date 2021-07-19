@@ -26,8 +26,12 @@ kotlin {
         implementation(kotlin("test-annotations-common"))
       }
     }
-    val jvmMain by getting
-    val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
+    val jvmTest by getting {
+      dependencies {
+        implementation(kotlin("test-junit"))
+        implementation(Deps.Kotlinx.CoroutinesTest)
+      }
+    }
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
 

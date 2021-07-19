@@ -39,7 +39,7 @@ class MutableCursors {
    */
   internal fun previous(id: EventIdentifier): EventIdentifier {
     val index = ids.binarySearchBySite(id.site)
-    if (index >= 0 && ids[index] < id && shouldCompact[index]) return ids[index]
+    if (index >= 0 && ids[index].seqno < id.seqno && shouldCompact[index]) return ids[index]
     return EventIdentifier.Unspecified
   }
 

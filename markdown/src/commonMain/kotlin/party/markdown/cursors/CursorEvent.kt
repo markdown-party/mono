@@ -30,6 +30,7 @@ sealed class CursorEvent {
    * @param node the file in which the cursor is present.
    * @param anchor the character after which the cursor is moved.
    */
+  @Serializable
   @SerialName("m")
   data class MoveAfter(
       val node: TreeNodeIdentifier,

@@ -4,14 +4,13 @@ import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.eventIdentifierArrayOf
-import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.sites.map
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.cursors.CursorEvent
 import party.markdown.cursors.Cursors
 import party.markdown.rga.RGAEvent
-import party.markdown.tree.TreeNodeIdentifier
 
 private val DefaultDocument = charArrayOf() to eventIdentifierArrayOf()
 
@@ -31,14 +30,19 @@ class MutableSiteTextApi(
 
   override suspend fun edit(
       id: EventIdentifier,
-      scope: suspend EventScope<RGAEvent>.() -> Unit,
+      scope: suspend TextCursorEventScope.() -> Unit,
   ) =
       site.event {
         val impl =
-            object : EventScope<RGAEvent> {
+            object : TextCursorEventScope {
+
               override fun yield(
                   event: RGAEvent,
               ) = yield(MarkdownPartyEvent.RGA(id, event))
+
+              override fun yield(
+                  event: CursorEvent,
+              ): EventIdentifier = yield(MarkdownPartyEvent.Cursor(event))
             }
         scope(impl)
       }

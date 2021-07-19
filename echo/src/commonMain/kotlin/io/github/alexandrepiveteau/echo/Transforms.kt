@@ -106,7 +106,7 @@ fun <T, M> MutableSite<T, M>.flowOn(
       override val value: StateFlow<M>
         get() = this@flowOn.value
 
-      override suspend fun event(
-          block: suspend EventScope<T>.(M) -> Unit,
+      override suspend fun <R> event(
+          block: suspend EventScope<T>.(M) -> R,
       ) = this@flowOn.event(block)
     }
