@@ -30,6 +30,7 @@ dependencies {
   implementation(npm("@codemirror/lang-markdown", "0.18.4"))
   implementation(npm("@codemirror/basic-setup", "0.18.2"))
   implementation(npm("@codemirror/tooltip", "0.18.4"))
+  implementation(npm("@codemirror/theme-one-dark", "0.18.1"))
 }
 
 kotlin { js(IR) { browser { binaries.executable() } } }
