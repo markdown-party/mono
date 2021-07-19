@@ -1,5 +1,6 @@
 package party.markdown.ui.topBar
 
+import SiteIdentifierContext
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message
@@ -8,6 +9,8 @@ import kotlinx.html.js.onClickFunction
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.data.project.ProjectApi
+import party.markdown.ui.editor.colorToTailwind
+import party.markdown.ui.editor.toCursor
 import react.*
 import react.dom.button
 import react.dom.div
@@ -43,6 +46,8 @@ external interface TopBarProps : RProps {
 
 private val component =
     functionalComponent<TopBarProps> { props ->
+      val (icon, color) = useContext(SiteIdentifierContext).toCursor()
+
       div("p-4 space-x-4 bg-gray-800 text-white flex flex-row items-center") {
         img(
             src = "/img/logo.svg",
@@ -69,6 +74,10 @@ private val component =
           local = props.local
           remote = props.remote
           debugMode = props.debugEnabled // Hide the sync now button.
+        }
+        player {
+          this.icon = icon
+          this.color = colorToTailwind(color)
         }
       }
     }
