@@ -1,6 +1,8 @@
 package party.markdown.cursors
 
 import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.sync
@@ -32,8 +34,8 @@ class CompactionTest {
             strategy = SyncStrategy.Once,
         )
 
-    val file = alice.event { yield(MarkdownPartyEvent.Tree(TreeEvent.NewFile)) }
     alice.event {
+      val file = yield(MarkdownPartyEvent.Tree(TreeEvent.NewFile))
       val a =
           yield(
               MarkdownPartyEvent.RGA(
@@ -62,6 +64,9 @@ class CompactionTest {
     }
     sync(alice, bob)
     assertEquals(5, aliceHistory.size)
+
+    // Infer the file identifier. We can't run it in a different block due to a Kotlin/JS bug.
+    val file = EventIdentifier(SequenceNumber.Min, SiteIdentifier.Min)
     assertContentEquals(charArrayOf('a', 'b', 'c'), bob.value.value.documents[file]?.first)
   }
 }
