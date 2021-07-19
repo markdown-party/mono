@@ -23,6 +23,26 @@ class MutableEventLogRemoveTest {
   }
 
   @Test
+  fun removeTwice() {
+    val log = mutableEventLogOf()
+    log.insert(SequenceNumber.Min + 0u, SiteIdentifier.Min, byteArrayOf(1, 2))
+    log.insert(SequenceNumber.Min + 1u, SiteIdentifier.Min, byteArrayOf(3, 4))
+    assertTrue(log.remove(SequenceNumber.Min + 0u, SiteIdentifier.Min))
+    log.remove(SequenceNumber.Min + 0u, SiteIdentifier.Min)
+    assertEquals(1, log.size)
+  }
+
+  @Test
+  fun removeTwice_bis() {
+    val log = mutableEventLogOf()
+    log.insert(SequenceNumber.Min + 0u, SiteIdentifier.Min, byteArrayOf(1, 2))
+    log.insert(SequenceNumber.Min + 1u, SiteIdentifier.Min, byteArrayOf(3, 4))
+    assertTrue(log.remove(SequenceNumber.Min + 1u, SiteIdentifier.Min))
+    assertFalse(log.remove(SequenceNumber.Min + 1u, SiteIdentifier.Min))
+    assertEquals(1, log.size)
+  }
+
+  @Test
   fun removeOne() {
     val log = mutableEventLogOf()
     log.insert(SequenceNumber.Max, SiteIdentifier.Min, byteArrayOf(1, 2, 3))
