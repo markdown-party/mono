@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package party.markdown.ui.editor
 
 import codemirror.state.Annotation
@@ -9,6 +11,8 @@ import codemirror.tooltip.TooltipView
 import codemirror.tooltip.showTooltip
 import codemirror.view.EditorView
 import io.github.alexandrepiveteau.echo.core.causality.*
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import party.markdown.cursors.Cursors
@@ -40,14 +44,16 @@ fun cursorsStateField(
       StateFieldConfig(
           create = { CursorsState(actor, emptySet()) },
           update = { tooltips, tr ->
-            if (tr.annotation(CursorAnnotation) != undefined) {
+            if (tr.annotation(CursorAnnotation) !== undefined) {
               tooltips.copy(cursors = tr.annotation(CursorAnnotation))
             } else {
               tooltips
             }
           },
           provide = {
-            showTooltip.computeN(arrayOf(it, RGAStateField)) { state -> state.toTooltips(it) }
+            showTooltip.computeN(arrayOf(it, RGAStateField, NowStateField)) { state ->
+              state.toTooltips(it)
+            }
           },
       ),
   )
@@ -96,9 +102,12 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
   if (rga == undefined) return emptyArray()
   if (cursors == undefined) return emptyArray()
 
+  val now = field(NowStateField)
+
   // Compute the position of the cursors.
   val c = cursors.cursors.filter { it.actor != cursors.actor }
   return c
+      .filter { it.timestamp + Delay >= now }
       .mapNotNull {
         val pos =
             rga.identifiers.indexOfCursor(it.anchor).takeIf { i -> i >= 0 }
@@ -126,6 +135,12 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
 
 // There are 9 possible icons and 8 colors. These numbers are relative primes, in order to maximize
 // the number of possible combinations.
+
+/** The delay before which the cursors get hidden. */
+private val Delay = Duration.seconds(5)
+
+/** The tick-rate at which the [NowStateField] should be updated. */
+val DelayTick = Duration.seconds(1)
 
 /**
  * Returns a [Pair] of of items from [CursorIcons] and [CursorColors] uniquely determined by this

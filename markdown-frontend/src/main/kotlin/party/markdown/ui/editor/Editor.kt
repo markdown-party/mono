@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package party.markdown.ui.editor
 
 import SiteIdentifierContext
@@ -15,6 +17,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
@@ -249,6 +252,19 @@ private val editor =
         }
       }
 
+      useLaunchedEffect(listOf(props.node)) {
+        props.node ?: return@useLaunchedEffect
+
+        // Update the clock from the editor, at a regular pace, and in an atomic fashion.
+        while (true) {
+          delay(DelayTick)
+          val currentView = view.current
+          currentView?.dispatch(
+              TransactionSpec { annotations = arrayOf(SetNowAnnotation.of(Clock.System.now())) },
+          )
+        }
+      }
+
       if (props.node != null) {
         codeMirror {
           this.id = props.node
@@ -260,6 +276,7 @@ private val editor =
                   RGAStateField.extension,
                   cursorTooltipBaseTheme,
                   field.extension,
+                  NowStateField.extension,
               )
           this.view = view
         }
