@@ -192,7 +192,7 @@ private val component =
         span(classes = "font-semibold uppercase") { +icon.label }
         img(alt = "Sync status", src = icon.url) {}
         if (props.debugMode) {
-          debugButton("Sync now", requestSync)
+          debugButton("Start now", requestSync)
           debugButton("Stop sync", requestStopSync)
         }
       }
