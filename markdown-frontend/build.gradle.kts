@@ -29,6 +29,7 @@ dependencies {
   // CodeMirror.
   implementation(npm("@codemirror/lang-markdown", "0.18.4"))
   implementation(npm("@codemirror/basic-setup", "0.18.2"))
+  implementation(npm("@codemirror/tooltip", "0.18.4"))
 }
 
 kotlin { js(IR) { browser { binaries.executable() } } }

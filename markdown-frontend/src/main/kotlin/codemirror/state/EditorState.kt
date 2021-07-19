@@ -8,6 +8,10 @@ import codemirror.text.Text
 /** See `https://codemirror.net/6/docs/ref/#state.EditorState`. */
 external class EditorState {
   val doc: Text
+
+  /** The current selection. */
+  val selection: EditorSelection
+
   fun <T> field(field: StateField<T>): T
   fun <T> field(field: StateField<T>, required: Boolean = definedExternally): T
   fun update(vararg specs: TransactionSpec): Transaction

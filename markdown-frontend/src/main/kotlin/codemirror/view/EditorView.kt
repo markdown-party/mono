@@ -46,5 +46,14 @@ constructor(
      * in the content).
      */
     val lineWrapping: Extension
+
+    /**
+     * Create an extension that adds styles to the base theme. Like with theme, use & to indicate
+     * the place of the editor wrapper element when directly targeting that. You can also use &dark
+     * or &light instead to only target editors with a dark or light theme.
+     *
+     * @param spec An `Object<StyleSpec>` with the base theme spec.
+     */
+    fun baseTheme(spec: dynamic): Extension
   }
 }

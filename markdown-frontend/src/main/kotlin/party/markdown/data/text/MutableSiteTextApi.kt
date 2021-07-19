@@ -9,7 +9,9 @@ import io.github.alexandrepiveteau.echo.sites.map
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.cursors.Cursors
 import party.markdown.rga.RGAEvent
+import party.markdown.tree.TreeNodeIdentifier
 
 private val DefaultDocument = charArrayOf() to eventIdentifierArrayOf()
 
@@ -20,8 +22,12 @@ class MutableSiteTextApi(
 
   override fun current(
       id: EventIdentifier,
-  ): StateFlow<Pair<CharArray, EventIdentifierArray>> =
-      site.value.map { it.documents[id] ?: DefaultDocument }
+  ): StateFlow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>> =
+      site.value.map {
+        val (char, event) = it.documents[id] ?: DefaultDocument
+        val cursors = it.cursors[id]
+        Triple(char, event, cursors)
+      }
 
   override suspend fun edit(
       id: EventIdentifier,

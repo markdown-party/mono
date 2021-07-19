@@ -17,6 +17,7 @@ kotlin {
         implementation(kotlin("stdlib-common"))
         api(project(":echo"))
         api(project(":echo-transport"))
+        api(Deps.Kotlinx.DateTime)
       }
     }
     val commonTest by getting {

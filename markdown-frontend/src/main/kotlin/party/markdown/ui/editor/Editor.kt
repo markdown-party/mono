@@ -1,5 +1,6 @@
 package party.markdown.ui.editor
 
+import SiteIdentifierContext
 import codemirror.basicSetup.basicSetup
 import codemirror.lang.markdown.markdown
 import codemirror.state.ChangeSpec
@@ -15,6 +16,7 @@ import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import party.markdown.cursors.Cursors
 import party.markdown.data.text.TextApi
 import party.markdown.react.useLaunchedEffect
 import party.markdown.rga.MutableRGA
@@ -80,6 +82,7 @@ private suspend fun publishLocal(
 private fun receiveRemote(
     chars: CharArray,
     ids: EventIdentifierArray,
+    cursors: Set<Cursors.Cursor>,
     view: EditorView,
 ) {
   val changes = mutableListOf<ChangeSpec>()
@@ -177,6 +180,7 @@ private fun receiveRemote(
               arrayOf(
                   remote.of(true), /* TODO : Identifiers. */
                   RGAIdentifiers.of(b.toEventIdentifierArray()),
+                  CursorAnnotation.of(cursors),
               )
           sequential = true
         }
@@ -188,6 +192,7 @@ private fun receiveRemote(
 private val editor =
     functionalComponent<EditorProps> { props ->
       val view = useRef<EditorView>()
+      val site = useContext(SiteIdentifierContext)
 
       useLaunchedEffect(listOf(props.node)) {
         while (true) {
@@ -200,9 +205,9 @@ private val editor =
 
       useLaunchedEffect(listOf(props.node)) {
         val node = props.node ?: return@useLaunchedEffect
-        props.api.current(node.id).collect { (txt, ids) ->
+        props.api.current(node.id).collect { (txt, ids, crs) ->
           val currentView = view.current
-          if (currentView != null) receiveRemote(txt, ids, currentView)
+          if (currentView != null) receiveRemote(txt, ids, crs, currentView)
         }
       }
 
@@ -215,6 +220,8 @@ private val editor =
                   lineWrapping,
                   markdown(),
                   RGAStateField.extension,
+                  cursorTooltipBaseTheme,
+                  cursorsStateField(site).extension,
               )
           this.view = view
         }
