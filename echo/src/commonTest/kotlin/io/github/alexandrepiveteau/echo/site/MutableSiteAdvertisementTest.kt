@@ -46,10 +46,10 @@ class MutableSiteAdvertisementTest {
     val x = mutableSite<Unit>((6u).toSiteIdentifier())
     val y = mutableSite<Unit>((7u).toSiteIdentifier())
 
-    // Timeout of 2000ms, sufficient to wait the 1000ms + 1000ms to let the crash manifest.
-    launch { withTimeout(2000) { sync(x, y) } }
+    // Timeout of 1000ms, sufficient to wait the 500ms + 500ms to let the crash manifest.
+    launch { withTimeout(500) { sync(x, y) } }
 
-    delay(1000) // Let them finish their initial exchange.
+    delay(500) // Let them finish their initial exchange.
     sync(x, aliceExchange)
     sync(y, eveExchange) // crash
   }
