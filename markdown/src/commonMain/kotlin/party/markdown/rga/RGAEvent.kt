@@ -26,7 +26,7 @@ val RGANodeRoot = RGANodeIdentifier.Unspecified
  * sequence. Insertions add a new atom after the `offset`, and removals hide the atom with the given
  * `offset`.
  */
-@SerialName("e")
+@SerialName("r")
 @Serializable
 sealed class RGAEvent {
 
@@ -38,7 +38,7 @@ sealed class RGAEvent {
    * @param atom the [Char] that is inserted.
    */
   @Serializable
-  @SerialName("i")
+  @SerialName("r:i")
   data class Insert(
       val offset: RGANodeIdentifier,
       val atom: Char,
@@ -51,7 +51,7 @@ sealed class RGAEvent {
    * @param offset the [RGANodeIdentifier] that indicates which node was deleted.
    */
   @Serializable
-  @SerialName("r")
+  @SerialName("r:r")
   data class Remove(
       val offset: RGANodeIdentifier,
   ) : RGAEvent()

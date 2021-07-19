@@ -47,10 +47,15 @@ interface MutableSite<T, out M> : Site<M> {
   val identifier: SiteIdentifier
 
   /**
-   * Creates some new events, that are generated in the [EventScope]. This function returns once the
-   * events have been successfully added to the underlying [MutableSite].
+   * Creates some new events, that are generated in the [EventScope]. This function returns an
+   * arbitrary user-provided value once the events have been successfully added to the underlying
+   * [MutableSite].
+   *
+   * The whole [block] is guaranteed to be evaluated atomically on the event log.
+   *
+   * @param R the return value of the [event] call.
    */
-  suspend fun event(block: suspend EventScope<T>.(M) -> Unit)
+  suspend fun <R> event(block: suspend EventScope<T>.(M) -> R): R
 }
 
 /**

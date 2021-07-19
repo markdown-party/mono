@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package party.markdown.ui.editor
 
+import SiteIdentifierContext
 import codemirror.basicSetup.basicSetup
 import codemirror.lang.markdown.markdown
 import codemirror.state.ChangeSpec
+import codemirror.state.StateField
 import codemirror.state.Transaction.Companion.remote
 import codemirror.state.TransactionSpec
 import codemirror.state.annotations
@@ -13,8 +17,13 @@ import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.datetime.Clock
+import party.markdown.cursors.CursorEvent
+import party.markdown.cursors.CursorRoot
+import party.markdown.cursors.Cursors
 import party.markdown.data.text.TextApi
 import party.markdown.react.useLaunchedEffect
 import party.markdown.rga.MutableRGA
@@ -38,17 +47,20 @@ external interface EditorProps : RProps {
  * with an unspecified event identifier, and sequentially append them to the tree. Doing the
  * insertions sequentially, from left to right, will preserve the interleaving properties of RGA.
  *
+ * @param cursors the [StateField] which provides access to the cursors.
  * @param document the [TreeNodeIdentifier] to which the changes are published.
  * @param api the [TextApi] that is used to yield [RGAEvent]s.
  * @param view the [EditorView] that owns the text.
  */
 private suspend fun publishLocal(
+    cursors: StateField<CursorsState>,
     document: TreeNodeIdentifier,
     api: TextApi,
     view: EditorView,
 ): Unit =
     api.edit(document) {
       val state = view.state
+      val cursorsState = view.state.field(cursors)
 
       // Integrate all the local insertions.
       val ids = state.field(RGAStateField).identifiers.toMutableGapBuffer()
@@ -68,10 +80,31 @@ private suspend fun publishLocal(
         }
       }
 
+      var cursorsSet = cursorsState.cursors
+      val actorCursor = cursorsSet.firstOrNull { it.actor == cursorsState.actor }
+      val actorPos = actorCursor?.anchor?.let { ids.toEventIdentifierArray().indexOfCursor(it) }
+      val expected = view.state.selection.main.head
+
+      if (actorPos != expected) {
+        val anchor = if (expected == 0) CursorRoot else ids[expected - 1]
+        yield(CursorEvent.MoveAfter(document, anchor))
+        cursorsSet =
+            cursorsSet
+                .asSequence()
+                .filter { it.actor != cursorsState.actor }
+                .plusElement(Cursors.Cursor(cursorsState.actor, Clock.System.now(), anchor))
+                .toSet()
+      }
+
       // Dispatch the new identifiers synchronously.
       view.dispatch(
           TransactionSpec {
-            annotations = arrayOf(remote.of(true), RGAIdentifiers.of(ids.toEventIdentifierArray()))
+            annotations =
+                arrayOf(
+                    remote.of(true),
+                    RGAIdentifiers.of(ids.toEventIdentifierArray()),
+                    CursorAnnotation.of(cursorsSet),
+                )
           },
       )
     }
@@ -80,6 +113,7 @@ private suspend fun publishLocal(
 private fun receiveRemote(
     chars: CharArray,
     ids: EventIdentifierArray,
+    cursors: Set<Cursors.Cursor>,
     view: EditorView,
 ) {
   val changes = mutableListOf<ChangeSpec>()
@@ -169,18 +203,28 @@ private fun receiveRemote(
     }
   }
 
+  // We'll always still want to update the cursors nevertheless. Indeed, if no changes were
+  // recorded, no transaction would contain the updated cursors with the move operations.
+  val updateCursor = TransactionSpec {
+    annotations = arrayOf(CursorAnnotation.of(cursors))
+    sequential = true
+  }
+
   val transactions =
-      changes.map {
-        TransactionSpec {
-          rawChanges = it
-          annotations =
-              arrayOf(
-                  remote.of(true), /* TODO : Identifiers. */
-                  RGAIdentifiers.of(b.toEventIdentifierArray()),
-              )
-          sequential = true
-        }
-      }
+      changes
+          .map {
+            TransactionSpec {
+              rawChanges = it
+              annotations =
+                  arrayOf(
+                      remote.of(true), /* TODO : Identifiers. */
+                      RGAIdentifiers.of(b.toEventIdentifierArray()),
+                      CursorAnnotation.of(cursors),
+                  )
+              sequential = true
+            }
+          }
+          .plus(updateCursor)
 
   view.dispatch(*transactions.toTypedArray())
 }
@@ -188,21 +232,36 @@ private fun receiveRemote(
 private val editor =
     functionalComponent<EditorProps> { props ->
       val view = useRef<EditorView>()
+      val site = useContext(SiteIdentifierContext)
+      val field = useMemo { cursorsStateField(site) }
 
       useLaunchedEffect(listOf(props.node)) {
         while (true) {
           delay(1000) // TODO : Notifications rather than loop.
           val currentView = view.current ?: continue
           val node = props.node ?: continue
-          publishLocal(node.id, props.api, currentView)
+          publishLocal(field, node.id, props.api, currentView)
         }
       }
 
       useLaunchedEffect(listOf(props.node)) {
         val node = props.node ?: return@useLaunchedEffect
-        props.api.current(node.id).collect { (txt, ids) ->
+        props.api.current(node.id).collect { (txt, ids, crs) ->
           val currentView = view.current
-          if (currentView != null) receiveRemote(txt, ids, currentView)
+          if (currentView != null) receiveRemote(txt, ids, crs, currentView)
+        }
+      }
+
+      useLaunchedEffect(listOf(props.node)) {
+        props.node ?: return@useLaunchedEffect
+
+        // Update the clock from the editor, at a regular pace, and in an atomic fashion.
+        while (true) {
+          delay(DelayTick)
+          val currentView = view.current
+          currentView?.dispatch(
+              TransactionSpec { annotations = arrayOf(SetNowAnnotation.of(Clock.System.now())) },
+          )
         }
       }
 
@@ -215,6 +274,9 @@ private val editor =
                   lineWrapping,
                   markdown(),
                   RGAStateField.extension,
+                  cursorTooltipBaseTheme,
+                  field.extension,
+                  NowStateField.extension,
               )
           this.view = view
         }

@@ -7,6 +7,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import party.markdown.MarkdownPartyHistory
 
 /**
  * A [SiteMap] provides safe access to all the [Site] which are managed by this server. Each site is
@@ -31,5 +32,12 @@ class SiteMap {
    */
   suspend fun get(
       identifier: SessionIdentifier,
-  ): Exchange<Incoming, Outgoing> = mutex.withLock { sites.getOrPut(identifier) { exchange() } }
+  ): Exchange<Incoming, Outgoing> =
+      mutex.withLock {
+        sites.getOrPut(identifier) {
+          exchange(
+              log = MarkdownPartyHistory(),
+          )
+        }
+      }
 }

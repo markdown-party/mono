@@ -20,6 +20,11 @@ external class Transaction {
   /** The document changes made by this transaction. */
   val changes: ChangeSet
 
+  /**
+   * The selection set by this transaction, or [undefined] if it doesn't explicitly set a selection.
+   */
+  val selection: EditorSelection
+
   /** The effects added to the transaction. */
   val effects: Array<StateEffect<Any>>
 

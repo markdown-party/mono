@@ -15,6 +15,9 @@ external class Facet<Input, Output> {
   /** Returns an extension that adds the given value for this facet. */
   fun of(value: Input): Extension
 
+  /** Create an extension that computes zero or more values for this facet from a state. */
+  fun computeN(deps: Array<dynamic>, get: (state: EditorState) -> Array<Input>): Extension
+
   /**
    * Shorthand method for registering a facet source with a state field as input. If the field's
    * type corresponds to this facet's input type, the getter function can be omitted. If given, it

@@ -137,7 +137,7 @@ abstract class AbstractMutableEventLog : MutableEventLog {
     while (shouldInsertBefore(seqno, site)) moveLeft()
     while (shouldInsertAfter(seqno, site)) moveRight()
 
-    // Check if the item wasn't already removed.
+    // Make sure we only remove an op if it's actually there with the right index.
     if (!eventStore.hasCurrent) return false
     if (eventStore.currentId != EventIdentifier(seqno, site)) return false
 

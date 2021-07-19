@@ -121,8 +121,8 @@ internal open class MutableSiteImpl<T, M, R>(
                 .apply { mutation() }
       }
 
-  override suspend fun event(
-      block: suspend EventScope<T>.(M) -> Unit,
+  override suspend fun <R> event(
+      block: suspend EventScope<T>.(M) -> R,
   ) = mutex.withLock { block(scope, value.value) }
 }
 

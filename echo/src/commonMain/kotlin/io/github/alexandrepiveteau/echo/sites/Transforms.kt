@@ -38,8 +38,8 @@ private class MappingMutableSite<T, out M1, out M2>(
   override val identifier = backing.identifier
   override val value = backing.value.map(f)
 
-  override suspend fun event(
-      block: suspend EventScope<T>.(M2) -> Unit,
+  override suspend fun <R> event(
+      block: suspend EventScope<T>.(M2) -> R,
   ) = backing.event { m -> block(this, f(m)) }
 }
 
