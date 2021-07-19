@@ -8,10 +8,7 @@ import codemirror.tooltip.Tooltip
 import codemirror.tooltip.TooltipView
 import codemirror.tooltip.showTooltip
 import codemirror.view.EditorView
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
-import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.isUnspecified
+import io.github.alexandrepiveteau.echo.core.causality.*
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import party.markdown.cursors.Cursors
@@ -103,28 +100,60 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
   val c = cursors.cursors.filter { it.actor != cursors.actor }
   return c
       .mapNotNull {
-        val title = it.actor
-        if (it.anchor.isUnspecified) return@mapNotNull title to 0
         val pos =
             rga.identifiers.indexOfCursor(it.anchor).takeIf { i -> i >= 0 }
                 ?: return@mapNotNull null
-        return@mapNotNull title to pos
+        return@mapNotNull it.actor to pos
       }
-      .map { (title, pos) ->
+      .map { (id, pos) ->
+        val (icon, color) = id.toCursor()
         Tooltip(
             pos = pos,
             create = {
               val dom = document.createElement("div") as HTMLElement
-              dom.textContent = "🎉"//title.toString()
+              dom.textContent = icon
               TooltipView { this.dom = dom }
             }) {
           above = true
           strictSide = true
-          asDynamic().`class` = "cm-cursor-tooltip"
+          asDynamic().`class` = color
         }
       }
       .toTypedArray()
 }
+
+// THEMING AND STYLING OF THE CURSORS
+
+// There are 9 possible icons and 8 colors. These numbers are relative primes, in order to maximize
+// the number of possible combinations.
+
+/**
+ * Returns a [Pair] of of items from [CursorIcons] and [CursorColors] uniquely determined by this
+ * [SiteIdentifier].
+ */
+private fun SiteIdentifier.toCursor(): Pair<String, String> {
+  val modIcon = toUInt().mod(CursorIcons.size.toUInt())
+  val modColor = toUInt().mod(CursorColors.size.toUInt())
+  val icon = CursorIcons[modIcon.toInt()]
+  val color = CursorColors[modColor.toInt()]
+  return icon to color
+}
+
+/** Some carefully selected icons. */
+private val CursorIcons = listOf("🎉", "🚀", "👁", "🎁", "🐳", "🐌", "😻", "👏", "👻")
+
+/** Some carefully selected colors. Each color corresponds is in [cursorTooltipBaseTheme]. */
+private val CursorColors =
+    listOf(
+        "cursor-red",
+        "cursor-orange",
+        "cursor-yellow",
+        "cursor-green",
+        "cursor-cyan",
+        "cursor-blue",
+        "cursor-purple",
+        "cursor-brown",
+    )
 
 /**
  * The base theme of the cursors, that will be applied to all the cursors created with the
@@ -135,8 +164,7 @@ val cursorTooltipBaseTheme =
         js(
             """
     {
-      '".cm-tooltip.cm-cursor-tooltip"': {
-        backgroundColor: "#66b",
+      '".cm-tooltip"': {
         color: "white",
         transform: "translate(-50%, -7px)",
         border: "none",
@@ -150,7 +178,54 @@ val cursorTooltipBaseTheme =
           bottom: "-5px",
           borderLeft: "5px solid transparent",
           borderRight: "5px solid transparent",
-          borderTop: "5px solid #66b"
+        }
+      },
+      '".cm-tooltip.cursor-red"': {
+        backgroundColor: "#EC5F67",
+        '"&:before"': {
+          borderTop: "5px solid #EC5F67"
+        }
+      },
+      '".cm-tooltip.cursor-orange"': {
+        backgroundColor: "#F99157",
+        '"&:before"': {
+          borderTop: "5px solid #F99157"
+        }
+      },
+      '".cm-tooltip.cursor-yellow"': {
+        backgroundColor: "#FAC863",
+        '"&:before"': {
+          borderTop: "5px solid #FAC863"
+        }
+      },
+      '".cm-tooltip.cursor-green"': {
+        backgroundColor: "#99C794",
+        '"&:before"': {
+          borderTop: "5px solid #99C794"
+        }
+      },
+      '".cm-tooltip.cursor-cyan"': {
+        backgroundColor: "#62B3B2",
+        '"&:before"': {
+          borderTop: "5px solid #62B3B2"
+        }
+      },
+      '".cm-tooltip.cursor-blue"': {
+        backgroundColor: "#6699CC",
+        '"&:before"': {
+          borderTop: "5px solid #6699CC"
+        }
+      },
+      '".cm-tooltip.cursor-purple"': {
+        backgroundColor: "#C594C5",
+        '"&:before"': {
+          borderTop: "5px solid #C594C5"
+        }
+      },
+      '".cm-tooltip.cursor-brown"': {
+        backgroundColor: "#AB7967",
+        '"&:before"': {
+          borderTop: "5px solid #AB7967"
         }
       }
     }
