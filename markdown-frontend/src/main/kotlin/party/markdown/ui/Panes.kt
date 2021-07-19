@@ -21,7 +21,33 @@ external interface PanesProps : RProps {
   var textApi: TextApi
 }
 
-private fun nextName(): String = buildString { repeat(3) { append(('a'..'z').random()) } }
+private val Names =
+    listOf(
+        "Lamport",
+        "Liskov",
+        "Naur",
+        "Pnueli",
+        "Kay",
+        "Rivest",
+        "Tarjan",
+        "Turing",
+    )
+
+private val Adjectives =
+    listOf(
+        "Friendly",
+        "Happy",
+        "Surprised",
+        "Wonderful",
+        "Amazing",
+        "Hungry",
+        "Incredible",
+        "Famous",
+    )
+
+private fun nextName(): String {
+  return "${Adjectives.random()} ${Names.random()}"
+}
 
 private val panes =
     functionalComponent<PanesProps> { props ->
@@ -45,13 +71,13 @@ private val panes =
                 scope.launch { props.treeApi.createFolder(nextName(), it ?: tree) }
               }
           this.onNodeRename =
-              { node ->
+              { node, name ->
                 scope.launch {
                   val newName =
-                      if (node.name?.endsWith(".md") == true) {
-                        "${nextName()}.md"
+                      if (name.endsWith(".md") || node is TreeNode.Folder) {
+                        name
                       } else {
-                        nextName()
+                        "$name.md"
                       }
                   props.treeApi.name(newName, node)
                 }
