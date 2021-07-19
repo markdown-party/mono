@@ -146,7 +146,7 @@ val DelayTick = Duration.seconds(1)
  * Returns a [Pair] of of items from [CursorIcons] and [CursorColors] uniquely determined by this
  * [SiteIdentifier].
  */
-private fun SiteIdentifier.toCursor(): Pair<String, String> {
+fun SiteIdentifier.toCursor(): Pair<String, String> {
   val modIcon = toUInt().mod(CursorIcons.size.toUInt())
   val modColor = toUInt().mod(CursorColors.size.toUInt())
   val icon = CursorIcons[modIcon.toInt()]
@@ -155,7 +155,7 @@ private fun SiteIdentifier.toCursor(): Pair<String, String> {
 }
 
 /** Some carefully selected icons. */
-private val CursorIcons = listOf("🎉", "🚀", "👁", "🎁", "🐳", "🐌", "😻", "👏", "👻")
+private val CursorIcons = listOf("🎃", "🚀", "🌈", "🎁", "🐳", "🐌", "🦄", "🍔", "👻")
 
 /** Some carefully selected colors. Each color corresponds is in [cursorTooltipBaseTheme]. */
 private val CursorColors =
@@ -169,6 +169,20 @@ private val CursorColors =
         "cursor-purple",
         "cursor-brown",
     )
+
+/** Maps the color from [CursorColors] to its TailwindCSS representation. */
+fun colorToTailwind(color: String): String =
+    when (color) {
+      "cursor-red" -> "bg-red-500"
+      "cursor-orange" -> "bg-yellow-700"
+      "cursor-yellow" -> "bg-yellow-500" // Adjusted to fit the default TW palette.
+      "cursor-green" -> "bg-green-500"
+      "cursor-cyan" -> "bg-blue-400" // Adjusted to fit the default TW palette
+      "cursor-blue" -> "bg-blue-500"
+      "cursor-purple" -> "bg-purple-500"
+      "cursor-brown" -> "bg-gray-500"
+      else -> "#FFFFFF"
+    }
 
 /**
  * The base theme of the cursors, that will be applied to all the cursors created with the
