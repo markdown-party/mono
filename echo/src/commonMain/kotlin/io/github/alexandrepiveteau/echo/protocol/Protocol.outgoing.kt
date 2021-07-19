@@ -146,10 +146,8 @@ private fun enqueueAdvertisements(
       ad.site > av.site -> {
         advertised.push(av, offset = adI)
         queue += I.Advertisement(av.site, av.seqno + 1U)
-        adI += 2 // pushed item + 1
-        avI += 1 // next item
       }
-      else -> error("site identifier in advertised but not in available")
+      else -> error("site identifier in advertised $advertised but not in available $available")
     }
   }
   // Push the remaining items.
