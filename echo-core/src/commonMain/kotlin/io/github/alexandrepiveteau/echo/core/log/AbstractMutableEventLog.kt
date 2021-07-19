@@ -136,7 +136,9 @@ abstract class AbstractMutableEventLog : MutableEventLog {
     // Move the right index.
     while (shouldInsertBefore(seqno, site)) moveLeft()
     while (shouldInsertAfter(seqno, site)) moveRight()
-    removeAtGapWithoutMove()
+
+    // Make sure we only remove an op if it's actually there with the right index.
+    if (eventStore.currentId == EventIdentifier(seqno, site)) removeAtGapWithoutMove()
     return true
   }
 
