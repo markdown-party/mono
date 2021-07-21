@@ -24,5 +24,4 @@ include ':markdown-backend'
 include ':markdown-frontend'
 
 // samples
-// FIXME : Re-introduce this sample when Compose for Desktop supports Kotlin 1.5.20
-// include ':sample-drawing'
+include ':sample-drawing'
