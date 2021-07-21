@@ -1,7 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinJvm)
   kotlin(Plugins.KotlinSerialization)
-  id("org.jetbrains.compose") version "0.4.0"
+  id("org.jetbrains.compose") version "0.5.0-build262"
 }
 
 repositories {
