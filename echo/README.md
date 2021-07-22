@@ -57,7 +57,7 @@ alice 42, bob 42
 
 Let's look together at what this code does.
 
-+ `GCounter` is a _one-way projection_. It aggregates a local state and events in a commutative, idempotent and associative fashion. Here, it implements the semantics of a G-Counter, a _CmRDT_which always takes the maximum value between the local state and a remote state. That's why we take the `maxOf` the local _model_, and the remote _event_.
++ `GCounter` is a _one-way projection_. It aggregates a local state and events in a commutative, idempotent and associative fashion. Here, it implements the semantics of a G-Counter, a _CmRDT_ which always takes the maximum value between the local state and a remote state. That's why we take the `maxOf` the local _model_, and the remote _event_.
 + **alice** and **bob** are some _sites_. We created both of them using the `mutableSite` _site builder_. _Site builders_ specify a unique identifier for the site, an initial state, a _projection_, and a _sync strategy_.
 + `alice.event { yield(42) }` emits a new _event_ with value `42` on the site **alice**. `event { ... }` is a suspending function - it will not resume until the events will have been stored on the site. When the call resumes, `alice.value` will have been updated by the projection with the new event. This is why `alice 42, bob 0` is printed. `bob` still has its initial value, and **alice** has aggregated the event.
 + `sync` is a suspending function takes two sites and replicate their states. It makes use of a simple protocol that will ensure that all the events on the site **alice** are sent to the site **bob**, and vice-versa. Because **alice** specified that it uses the `SyncStrategy.Once`, the `sync` call will resume once all the events present in both sites when the sync started will have been exchanged.
@@ -98,7 +98,7 @@ launch {
 
 ## Emitting events
 
-As we've seen in the g-counter example, one can emit events on instances of `MutableSite`. It's possible to emit multiple events at once :
+As we've seen in the g-counter example, one can emit events on instances of `MutableSite`. It's possible to emit multiple events at once.
 
 ```kotlin
 val alice = mutableSite(Random.nextSiteIdentifier(), 0, GCounter)
@@ -113,7 +113,7 @@ alice.event { state ->
 }
 ```
 
-All the events emitted in a single `event { }` block are added atomically to the _site_. This means that no remote events will be received, even if the _site_  is currently syncing. It's therefore possible to call `yield()` multiple times in a single block, which is useful if you want to perform multiple fine-grain operations (say, [create a tree node, move it and name it](https://github.com/markdown-party/mono/blob/walkthrough/markdown-frontend/src/main/kotlin/party/markdown/data/tree/MutableSiteTreeApi.kt#L26-L31)).
+All the events emitted in a single `event { }` block are added atomically to the _site_. This means that no remote events will be received, even if the _site_  is currently syncing. It's therefore possible to call `yield()` multiple times in a single block, which is useful if you want to perform multiple fine-grain operations (say, [create a tree node, move it and name it](https://github.com/markdown-party/mono/tree/main/markdown-frontend/src/main/kotlin/party/markdown/data/tree/MutableSiteTreeApi.kt#L26-L31)).
 
 Additionally, the current state aggregate of the _site_  is provided as a paramter. In the above example, the state value is atomically incremented by one, implementing a proper g-counter.
 
@@ -197,7 +197,7 @@ In a one-way projection, events are required to be **commutative**, **associativ
                                                         (Aggregate)
 ```
 
-In this example, it's clear that the projection applies some events multiple times. A `OneWayProjection` is therefore well suited to model any _CmRDT_, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/walkthrough/markdown/src/commonMain/kotlin/party/markdown/rga), which are relevant for text editing. Here is a simple example with a grow-only set :
+In this example, it's clear that the projection applies some events multiple times. A `OneWayProjection` is therefore well suited to model any _CmRDT_, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/rga), which are relevant for text editing. Here is a simple example with a grow-only set :
 
 ```kotlin
 class GSet<T> : OneWayProjection<Set<T>, T> {
@@ -316,4 +316,4 @@ class MyHistory :
 }
 ```
 
-You can find a real-life use-case [here](https://github.com/markdown-party/mono/blob/main/markdown/src/commonMain/kotlin/party/markdown/MarkdownPartyHistory.kt#L37-L62), where this API is used to compact cursor move events in [markdown.party](https://markdown.party)
+You can find a real-life use-case [here](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/MarkdownPartyHistory.kt#L37-L62), where this API is used to compact cursor move events in [markdown.party](https://markdown.party)
