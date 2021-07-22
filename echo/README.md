@@ -14,13 +14,13 @@ This document shows the basic use of the Echo library, and explains its core con
 
 # Introduction and basics
 
-A _site_ is an actor in a distributed system. It owns a log of events, which stores all the actions performed by all the sites in the distributed system. A _CmRDT_ is a data structure which can be replicated, and has a **commutative**, **idempotent** and **associative** merge function.
+A _site_ is an actor in a distributed system. It owns a log of events, which stores all the actions performed by all the sites in the distributed system. A _CRDT_ is a data structure which can be replicated, and has a **commutative**, **idempotent** and **associative** merge function.
 
-The [echo](https://github.com/markdown-party/mono/tree/main/echo) library provides multiple APIs to create and replicate _CmRDT_. It can be used to implement non-standard replicated data types, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/rga), or [trees](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/tree). This short tutorial walks you through some simple and advanced use-cases of the replication library.
+The [echo](https://github.com/markdown-party/mono/tree/main/echo) library provides multiple APIs to create and replicate _CRDT_. It can be used to implement non-standard replicated data types, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/rga), or [trees](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/tree). This short tutorial walks you through some simple and advanced use-cases of the replication library.
 
 ## A simple example
 
-Run the following code to create and replicate your first _CmRDT_ :
+Run the following code to create and replicate your first _CRDT_ :
 
 ```kotlin
 // a g-counter CRDT implementation
@@ -59,7 +59,7 @@ alice 42, bob 42
 
 Let's look together at what this code does.
 
-+ `GCounter` is a _one-way projection_. It aggregates a local state and events in a commutative, idempotent and associative fashion. Here, it implements the semantics of a G-Counter, a _CmRDT_ which always takes the maximum value between the local state and a remote state. That's why we take the `maxOf` the local _model_, and the remote _event_.
++ `GCounter` is a _one-way projection_. It aggregates a local state and events in a commutative, idempotent and associative fashion. Here, it implements the semantics of a G-Counter, a _CRDT_ which always takes the maximum value between the local state and a remote state. That's why we take the `maxOf` the local _model_, and the remote _event_.
 + **alice** and **bob** are some _sites_. We created both of them using the `mutableSite` _site builder_. _Site builders_ specify a unique identifier for the site, an initial state, a _projection_, and a _sync strategy_.
 + `alice.event { yield(42) }` emits a new _event_ with value `42` on the site **alice**. `event { ... }` is a suspending function - it will not resume until the events will have been stored on the site. When the call resumes, `alice.value` will have been updated by the projection with the new event. This is why `alice 42, bob 0` is printed. `bob` still has its initial value, and **alice** has aggregated the event.
 + `sync` is a suspending function takes two sites and replicate their states. It makes use of a simple protocol that will ensure that all the events on the site **alice** are sent to the site **bob**, and vice-versa. Because **alice** specified that it uses the `SyncStrategy.Once`, the `sync` call will resume once all the events present in both sites when the sync started will have been exchanged.
@@ -203,7 +203,7 @@ In a one-way projection, events are required to be **commutative**, **associativ
                                                         (Aggregate)
 ```
 
-In this example, it's clear that the projection applies some events multiple times. A `OneWayProjection` is therefore well suited to model any _CmRDT_, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/rga), which are relevant for text editing. Here is a simple example with a grow-only set :
+In this example, it's clear that the projection applies some events multiple times. A `OneWayProjection` is therefore well suited to model any _CRDT_, such as [replicated growable arrays](https://github.com/markdown-party/mono/tree/main/markdown/src/commonMain/kotlin/party/markdown/rga), which are relevant for text editing. Here is a simple example with a grow-only set :
 
 ```kotlin
 class GSet<T> : OneWayProjection<Set<T>, T> {
@@ -296,11 +296,11 @@ class TwoWaySet<T> : TwoWayProjection<MutableSet<T>, T, T> {
 
 > Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/d/main.kt).
 
-The `TwoWayProjection` guarantees eventual convergence of all the _sites_, because all the events will end up being applied in the same order on all the sites. In fact, the replicated event log can be seen as a CmRDT, whose value is simply the result of applying the projection to all the events in a deterministic order guaranteed by the Lamport timestamps.
+The `TwoWayProjection` guarantees eventual convergence of all the _sites_, because all the events will end up being applied in the same order on all the sites. In fact, the replicated event log can be seen as a _CRDT_, whose value is simply the result of applying the projection to all the events in a deterministic order guaranteed by the Lamport timestamps.
 
 ## Custom history
 
-You'll probably have noticed that in the g-counter example, the whole state of the _CmRDT_ is essentially stored in each event, and these past events could be deleted to reduce the meta-data overhead of the log.
+You'll probably have noticed that in the g-counter example, the whole state of the _CRDT_ is essentially stored in each event, and these past events could be deleted to reduce the meta-data overhead of the log.
 
 The Echo core library offers two helper classes to let you do that : `AbstractMutableEventLog` and `AbstractMutableHistory`. A mutable history is just an event log with an aggregate. By extending either of these two classes, you'll then be able to override the `fun partialInsert()` method, and eventually call `partialRemove()` to remove previously added events.
 
