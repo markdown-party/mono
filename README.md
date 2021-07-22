@@ -1,6 +1,10 @@
+[![License](https://img.shields.io/badge/license-MIT-green)](
+https://opensource.org/licenses/MIT)
+
 [![.github/workflows/frontend.yml](https://github.com/markdown-party/mono/actions/workflows/frontend.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/frontend.yml)
 [![.github/workflows/backend.yml](https://github.com/markdown-party/mono/actions/workflows/backend.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/backend.yml)
 [![.github/workflows/tests.yml](https://github.com/markdown-party/mono/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/tests.yml)
+
 
 # Welcome to :rainbow: [markdown.party](https://markdown.party/) :rainbow:
 
