@@ -292,7 +292,7 @@ The `TwoWayProjection` guarantees eventual convergence of all the _sites_, becau
 
 You'll probably have noticed that in the g-counter example, the whole state of the _CmRDT_ is essentially stored in each event, and these past events could be deleted to reduce the meta-data overhead of the log.
 
-The Echo core library offers two helper classes to let you do that : `AbstractMutableEventLog` and `AbstractMutableHistory`. A mutable history is just an event log with an aggregate. By extending either of these two classes, you'll then be able to override the `fun partialInsert()` method, and eventually call `partialDelete` to remove previously added events.
+The Echo core library offers two helper classes to let you do that : `AbstractMutableEventLog` and `AbstractMutableHistory`. A mutable history is just an event log with an aggregate. By extending either of these two classes, you'll then be able to override the `fun partialInsert()` method, and eventually call `partialRemove()` to remove previously added events.
 
 ```kotlin
 class MyHistory :
