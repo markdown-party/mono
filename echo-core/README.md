@@ -38,7 +38,7 @@ val event1: ByteArray = ..
 val event2: ByteArray = ..
 val event3: ByteArray = ..
 
-val log = mutableEventLog().apply {
+val log = mutableEventLogOf().apply {
     // Appending an event means that the event will get a higher sequence number than all the
     // previously issued events for the given site. This is usually what you'll want to do when
     // issuing some new events.
