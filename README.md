@@ -14,6 +14,8 @@ https://opensource.org/licenses/MIT)
 
 ## Library and project walkthrough
 
+> Many snippets from the walkthrough can be found in the `sample-walkthrough` module. Make sure to check them out and run them on your machine, to get a feel of how the library works !
+
 1. [Introduction and basics](echo/README.md)
 2. [The low-level event log API](echo-core/README.md)
 3. [Integrations and websockets](echo-transport/README.md)
