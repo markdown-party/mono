@@ -44,7 +44,7 @@ val log = mutableEventLogOf().apply {
     // issuing some new events.
     //
     // In this example, we have `seq1 == SequenceNumber.Min`, and `seq2 == SequenceNumber.Min + 1u`.
-    val (seq1, _) = append(site = alice, avent = event1)
+    val (seq1, _) = append(site = alice, event = event1)
     val (seq2, _) = append(site = alice, event = event2)
 
     // Inserting an event lets you specify both the site identifier and the sequence number for an
