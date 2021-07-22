@@ -47,7 +47,7 @@ suspend fun main() {
 }
 ```
 
-> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/a/main.kt).
+> Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/a/main.kt).
 
 You will see the following result :
 
@@ -98,7 +98,7 @@ launch {
 sync(bob, carol)
 ```
 
-> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt).
+> Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt).
 
 ## Emitting events
 
@@ -117,7 +117,7 @@ alice.event { state ->
 }
 ```
 
-> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt-#L21).
+> Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt#L21).
 
 All the events emitted in a single `event { }` block are added atomically to the _site_. This means that no remote events will be received, even if the _site_  is currently syncing. It's therefore possible to call `yield()` multiple times in a single block, which is useful if you want to perform multiple fine-grain operations (say, [create a tree node, move it and name it](https://github.com/markdown-party/mono/tree/main/markdown-frontend/src/main/kotlin/party/markdown/data/tree/MutableSiteTreeApi.kt#L26-L31)).
 
@@ -213,7 +213,7 @@ class GSet<T> : OneWayProjection<Set<T>, T> {
 }
 ```
 
-> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/c/main.kt).
+> Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/c/main.kt).
 
 ## Two-way projections
 
@@ -294,7 +294,7 @@ class TwoWaySet<T> : TwoWayProjection<MutableSet<T>, T, T> {
 }
 ```
 
-> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/d/main.kt).
+> Check the sample out [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/d/main.kt).
 
 The `TwoWayProjection` guarantees eventual convergence of all the _sites_, because all the events will end up being applied in the same order on all the sites. In fact, the replicated event log can be seen as a CmRDT, whose value is simply the result of applying the projection to all the events in a deterministic order guaranteed by the Lamport timestamps.
 
