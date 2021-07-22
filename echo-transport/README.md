@@ -44,8 +44,17 @@ In fact, the `ReceiveExchange` and `SendExchange` are the lowest-level APIs that
 Both `ReceiveExchange` and `SendExchange` offer a `Link` that lets them emit and send some messages :
 
 ```kotlin
+// Link.kt
 fun interface Link<in I, out O> {
   fun talk(incoming: Flow<I>): Flow<O>
+}
+
+ // Exchange.kt
+fun interface SendExchange<in I, out O> {
+  fun outgoing(): Link<I, O>
+}
+fun interface ReceiveExchange<out I, in O> {
+  fun incoming(): Link<O, I>
 }
 ```
 
