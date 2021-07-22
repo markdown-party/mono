@@ -47,6 +47,8 @@ suspend fun main() {
 }
 ```
 
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/a/main.kt).
+
 You will see the following result :
 
 ```text
@@ -86,15 +88,17 @@ You can then collect this state to observe the changes :
 val bob = mutableSite(Random.nextSiteIdentifier(), 0, GCounter)
 val carol = mutableSite(Random.nextSiteIdentifier(), 0, GCounter)
 
-bob.value.collect { model ->
+launch {
+  bob.value.collect { model ->
     println("Current model is $model") // called with the latest state
+  }
 }
 
 // somewhere else, in a different coroutine.
-launch {
-    sync(bob, carol)
-}
+sync(bob, carol)
 ```
+
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt).
 
 ## Emitting events
 
@@ -112,6 +116,8 @@ alice.event { state ->
     // yieldAll(emptyList())
 }
 ```
+
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/b/main.kt-#L21).
 
 All the events emitted in a single `event { }` block are added atomically to the _site_. This means that no remote events will be received, even if the _site_  is currently syncing. It's therefore possible to call `yield()` multiple times in a single block, which is useful if you want to perform multiple fine-grain operations (say, [create a tree node, move it and name it](https://github.com/markdown-party/mono/tree/main/markdown-frontend/src/main/kotlin/party/markdown/data/tree/MutableSiteTreeApi.kt#L26-L31)).
 
@@ -207,6 +213,8 @@ class GSet<T> : OneWayProjection<Set<T>, T> {
 }
 ```
 
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/c/main.kt).
+
 ## Two-way projections
 
 Sometimes, it's not possible to model a replicated data type with **commutative**, **idempotent** and **associative** events. However, we can still store the events in an ordered replicated log, and use a projection to aggregate these events. When an event gets inserted in the past of the log, we'll simply have to "reverse" the events up to the insertion point, and then "replay" the future events :
@@ -285,6 +293,8 @@ class TwoWaySet<T> : TwoWayProjection<MutableSet<T>, T, T> {
   }
 }
 ```
+
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/basics/d/main.kt).
 
 The `TwoWayProjection` guarantees eventual convergence of all the _sites_, because all the events will end up being applied in the same order on all the sites. In fact, the replicated event log can be seen as a CmRDT, whose value is simply the result of applying the projection to all the events in a deterministic order guaranteed by the Lamport timestamps.
 

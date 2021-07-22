@@ -25,3 +25,4 @@ include ':markdown-frontend'
 
 // samples
 include ':sample-drawing'
+include ':sample-walkthrough'
