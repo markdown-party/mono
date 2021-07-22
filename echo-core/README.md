@@ -58,6 +58,8 @@ log.contains(SequenceNumber.Min + 0U, alice) // true
 log.contains(SequenceNumber.Min + 2U, alice) // false
 ```
 
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/log/main.kt).
+
 Event logs work better with consecutive insertions of operations, since they use some gap buffers
 internally to store the events. You should therefore prefer calling `merge()` over
 consecutive `insert()` or `append()` of events.

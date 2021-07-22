@@ -98,6 +98,8 @@ fun main() {
 }
 ```
 
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/integrations/server/main.kt).
+
 In this example, a generic `Exchange`, which handles encoded events, is served through the `/snd` and `/rcv` endpoints. Note that you could also decide to specify a different `SyncStrategy` on the exchange, for instance if you'd like to enforce one-shot sync rather than continuous sync.
 
 The `sender { }` and `receiver { }` are similar to a `webSocket { }` block, and let you use the request parameters to decide which instance of `Exchange` the caller should interact with. This is particularly useful when you want to feature [multiple independent collaborative sessions](https://github.com/markdown-party/mono/blob/main/markdown-backend/src/main/kotlin/io/github/alexandrepiveteau/markdown/backend/main.kt#L26-L37).
@@ -116,5 +118,7 @@ val local = mutableSite(identifier, initial, projection)
 
 sync(remote, local.encodeToFrame()) // sync over the network
 ```
+
+> This sample is provided for running [here](https://github.com/markdown-party/mono/tree/main/sample-walkthrough/src/main/kotlin/io/github/alexandrepiveteau/echo/samples/integrations/client/main.kt).
 
 In this example, an exchange is generated over a secure websocket connection, using an `HttpClient`. It's also possible to create exchanges over insecure connections using the `HttpClient.wsExchange(...)` builder.
