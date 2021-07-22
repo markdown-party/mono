@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.protocol
 
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import kotlinx.serialization.SerialName
@@ -93,40 +94,20 @@ sealed class Message {
     @Serializable @SerialName("rdy") object Ready : Incoming()
 
     /**
-     * Sends an event, alongside its body, to the [Outgoing] side. When sending an event, you
-     * guarantee that you'll never send any [Event] for the same [SiteIdentifier] and with a smaller
-     * [SequenceNumber].
+     * Sends multiple events, alongside their body, to the [Outgoing] side. When sending an event,
+     * you guarantee that you'll never send any [Event] for the same [SiteIdentifier] and with a
+     * smaller [SequenceNumber].
      *
+     * @param events the bodies of the events that are sent.
      * @param seqno the sequence number for this [Event].
      * @param site the site that issued this [Event].
      * @param body the domain-specific body of the [Event].
      */
     @Serializable
     @SerialName("e")
-    data class Event(
-        val seqno: SequenceNumber,
-        val site: SiteIdentifier,
-        val body: ByteArray,
-    ) : Incoming() {
-
-      override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || other !is Event) return false
-
-        if (seqno != other.seqno) return false
-        if (site != other.site) return false
-        if (!body.contentEquals(other.body)) return false
-
-        return true
-      }
-
-      override fun hashCode(): Int {
-        var result = seqno.hashCode()
-        result = 31 * result + site.hashCode()
-        result = 31 * result + body.contentHashCode()
-        return result
-      }
-    }
+    data class Events(
+        val events: List<Event> = emptyList(),
+    ) : Incoming()
 
     companion object
   }

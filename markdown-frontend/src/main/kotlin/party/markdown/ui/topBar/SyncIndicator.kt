@@ -189,10 +189,10 @@ private val component =
       useRetrySync(debug = props.debugMode, syncing = syncing, request = requestSync)
 
       div(classes = "flex flex-row items-center space-x-4 justify-end select-none p-4") {
-        span(classes = "font-semibold uppercase") { +icon.label }
+        span(classes = "font-semibold uppercase w-24 text-right") { +icon.label }
         img(alt = "Sync status", src = icon.url) {}
         if (props.debugMode) {
-          debugButton("Sync now", requestSync)
+          debugButton("Start now", requestSync)
           debugButton("Stop sync", requestStopSync)
         }
       }

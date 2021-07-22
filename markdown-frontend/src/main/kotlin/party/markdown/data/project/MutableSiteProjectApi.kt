@@ -19,5 +19,5 @@ class MutableSiteProjectApi(
 
   override suspend fun name(
       value: String,
-  ) = site.event { yield(MarkdownPartyEvent.Tree(TreeEvent.Name(TreeNodeRoot, value))) }
+  ): Unit = site.event { yield(MarkdownPartyEvent.Tree(TreeEvent.Name(TreeNodeRoot, value))) }
 }

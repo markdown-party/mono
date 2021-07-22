@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import party.markdown.MarkdownPartyChange as Change
 import party.markdown.MarkdownPartyEvent as Event
 import party.markdown.MutableMarkdownParty as Model
+import party.markdown.cursors.CursorProjection
 import party.markdown.rga.MutableRGA
 import party.markdown.rga.RGAProjection
 import party.markdown.tree.TreeProjection
@@ -18,10 +19,13 @@ object MarkdownPartyProjection : TwoWayProjection<Model, Event, Change> {
       event: Event,
   ): Model {
     when (event) {
+      is Event.Cursor -> with(CursorProjection) { forward(model.cursors, id, event) }
       is Event.Tree -> with(TreeProjection) { forward(model.tree, id, event.event) }
       is Event.RGA -> {
+        // We have to process text insertions in the cursor projection too.
         val rga = model.files.getOrPut(event.document) { MutableRGA() }
         with(RGAProjection) { forward(rga, id, event.event) }
+        with(CursorProjection) { forward(model.cursors, id, event) }
       }
     }
     return model
@@ -34,6 +38,7 @@ object MarkdownPartyProjection : TwoWayProjection<Model, Event, Change> {
       change: Change,
   ): Model {
     when (event) {
+      is Event.Cursor -> Unit // No backward on CursorProjection.
       is Event.Tree ->
           TreeProjection.backward(
               model = model.tree,

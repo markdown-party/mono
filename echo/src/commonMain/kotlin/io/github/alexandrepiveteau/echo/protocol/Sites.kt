@@ -1,9 +1,6 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.Link
-import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.Site
-import io.github.alexandrepiveteau.echo.channelLink
+import io.github.alexandrepiveteau.echo.*
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
@@ -12,6 +9,7 @@ import io.github.alexandrepiveteau.echo.core.log.MutableHistory
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
@@ -27,37 +25,27 @@ import kotlinx.coroutines.yield
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
 
-internal open class SiteImpl<T, M, R>(
-    private val history: MutableHistory<R>,
-    serializer: KSerializer<T>,
-    format: BinaryFormat,
-    vararg events: Pair<EventIdentifier, T>,
-    private val transform: (R) -> M,
-) : Site<M> {
+internal open class ExchangeImpl(
+    private val log: MutableEventLog,
+    private val strategy: SyncStrategy,
+) : Exchange<Inc, Out> {
 
-  // Pre-populate with the initial events of the log.
-  init {
-    for ((id, body) in events) {
-      history.insert(id.seqno, id.site, format.encodeToByteArray(serializer, body))
-    }
-  }
-
-  /**
-   * The current [history] value. Accesses to set the [current] value are protected through mutual
-   * exclusion via the [Mutex] variable.
-   */
-  internal val current = MutableStateFlow(transform(history.current))
-
-  /** The [Mutex] that protects access to the [current] and [sentinel] variables. */
+  /** The [Mutex] that protects access to the [sentinel] variable. */
   internal val mutex = Mutex()
 
   /**
-   * A sentinel [MutableStateFlow] that can be used to observe invalidations of the [history].
-   * Whenever a site gains mutual exclusion to the []
+   * A sentinel [MutableStateFlow] that can be used to observe invalidations of the [log]. Whenever
+   * a site gains mutual exclusion to the [MutableEventLog].
    */
-  internal val sentinel = MutableStateFlow(UInt.MIN_VALUE)
+  private val sentinel = MutableStateFlow(UInt.MIN_VALUE)
 
-  override val value = current.asStateFlow()
+  /**
+   * A function that will be called whenever some mutations were performed, and some computed values
+   * or the event log should be updated.
+   */
+  open fun mutation() {
+    sentinel.value = sentinel.value + 1U
+  }
 
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
@@ -72,11 +60,7 @@ internal open class SiteImpl<T, M, R>(
       block: ExchangeBlock<I, O>,
   ): Link<I, O> = channelLink { inc ->
     val channel = sentinel.produceIn(this)
-    val publish = {
-      current.value = transform(history.current)
-      sentinel.value = sentinel.value + 1U
-    }
-    val scope = ExchangeScopeImpl(mutex, history, channel, inc, this, publish)
+    val scope = ExchangeScopeImpl(mutex, log, channel, inc, this, ::mutation)
 
     // Give the other threads a chance to run and generate some (termination ?) messages, and then
     // launch our exchange.
@@ -88,8 +72,28 @@ internal open class SiteImpl<T, M, R>(
     channel.cancel()
   }
 
-  override fun outgoing() = exchange<Inc, Out> { startIncoming() }
-  override fun incoming() = exchange<Out, Inc> { startOutgoing() }
+  override fun outgoing() = exchange<Inc, Out> { with(strategy) { outgoing() } }
+  override fun incoming() = exchange<Out, Inc> { with(strategy) { incoming() } }
+}
+
+internal open class SiteImpl<M, R>(
+    private val history: MutableHistory<R>,
+    strategy: SyncStrategy,
+    private val transform: (R) -> M,
+) : ExchangeImpl(history, strategy), Site<M> {
+
+  /**
+   * The current [history] value. Accesses to set the [current] value are protected through mutual
+   * exclusion via the [Mutex] variable.
+   */
+  internal val current = MutableStateFlow(transform(history.current))
+
+  override val value = current.asStateFlow()
+
+  override fun mutation() {
+    current.value = transform(history.current)
+    super.mutation()
+  }
 }
 
 internal open class MutableSiteImpl<T, M, R>(
@@ -97,30 +101,28 @@ internal open class MutableSiteImpl<T, M, R>(
     private val serializer: KSerializer<T>,
     history: MutableHistory<R>,
     format: BinaryFormat,
-    vararg events: Pair<EventIdentifier, T>,
+    strategy: SyncStrategy,
     transform: (R) -> M,
 ) :
-    SiteImpl<T, M, R>(
+    SiteImpl<M, R>(
         history = history,
-        serializer = serializer,
-        format = format,
-        events = events,
+        strategy = strategy,
         transform = transform,
     ),
     MutableSite<T, M> {
 
   private val scope =
       object : EventScope<T> {
-        override fun yield(event: T): EventIdentifier {
-          val id = history.append(identifier, format.encodeToByteArray(serializer, event))
-          current.value = transform(history.current)
-          sentinel.value = sentinel.value + 1U
-          return id
-        }
+        override fun yield(event: T): EventIdentifier =
+            history.append(
+                    site = identifier,
+                    event = format.encodeToByteArray(serializer, event),
+                )
+                .apply { mutation() }
       }
 
-  override suspend fun event(
-      block: suspend EventScope<T>.(M) -> Unit,
+  override suspend fun <R> event(
+      block: suspend EventScope<T>.(M) -> R,
   ) = mutex.withLock { block(scope, value.value) }
 }
 

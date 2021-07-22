@@ -25,6 +25,7 @@ val TreeNodeRoot = TreeNodeIdentifier.Unspecified
  *
  * Operations which are not compatible with the current tree structure will simply be skipped.
  */
+@SerialName("t")
 @Serializable
 sealed class TreeEvent {
 
@@ -32,13 +33,13 @@ sealed class TreeEvent {
    * Creates a new file at the root of the tree. This file will not have any parent, and will be
    * populated with a default name.
    */
-  @Serializable @SerialName("f:fi") object NewFile : TreeEvent()
+  @Serializable @SerialName("t:i") object NewFile : TreeEvent()
 
   /**
    * Creates a new folder at the root of the tree. This folder will not have any parent, and will be
    * populated with a default name.
    */
-  @Serializable @SerialName("f:fo") object NewFolder : TreeEvent()
+  @Serializable @SerialName("t:f") object NewFolder : TreeEvent()
 
   // TODO : Upload image operation
 
@@ -58,11 +59,11 @@ sealed class TreeEvent {
    * @param anchor the reference to the folder to which the file is moved.
    */
   @Serializable
-  @SerialName("f:m")
+  @SerialName("t:m")
   data class Move(
       val element: TreeNodeIdentifier,
       val anchor: TreeNodeIdentifier,
-  ): TreeEvent()
+  ) : TreeEvent()
 
   /**
    * Names the given file or folder. If multiple files or folders have the same name, an artificial
@@ -72,11 +73,11 @@ sealed class TreeEvent {
    * @param name the new name.
    */
   @Serializable
-  @SerialName("f:n")
+  @SerialName("t:n")
   data class Name(
       val element: TreeNodeIdentifier,
       val name: String,
-  ): TreeEvent()
+  ) : TreeEvent()
 
   /**
    * Deletes the given file or folder. If a folder is deleted, its children will also be deleted
@@ -87,8 +88,8 @@ sealed class TreeEvent {
    * @param element the root of the folder to remove, or the reference to the file to remove.
    */
   @Serializable
-  @SerialName("f:r")
+  @SerialName("t:r")
   data class Remove(
       val element: TreeNodeIdentifier,
-  ): TreeEvent()
+  ) : TreeEvent()
 }

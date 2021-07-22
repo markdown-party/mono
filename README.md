@@ -1,100 +1,54 @@
-# kotlin-echo
+[![License](https://img.shields.io/badge/license-MIT-green)](
+https://opensource.org/licenses/MIT)
 
-[![.github/workflows/tests.yml](https://github.com/markdown-party/kotlin-echo/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/markdown-party/kotlin-echo/actions/workflows/tests.yml)
+[![.github/workflows/frontend.yml](https://github.com/markdown-party/mono/actions/workflows/frontend.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/frontend.yml)
+[![.github/workflows/backend.yml](https://github.com/markdown-party/mono/actions/workflows/backend.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/backend.yml)
+[![.github/workflows/tests.yml](https://github.com/markdown-party/mono/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/tests.yml)
 
-`markdown-party/kotlin-echo` is a library that manages a distributed log of operations, and provides
-some simple abstractions to replicate events across multiple sites. It makes heavy use of
-[Kotlin coroutines](https://kotlinlang.org/docs/coroutines-guide.html), so concurrent communication
-with multiple sites is possible.
 
-### About
+# Welcome to :rainbow: [markdown.party](https://markdown.party/) :rainbow:
 
-I'm developing this library as part of my BSc. thesis at HEIG-VD on building a distributed Markdown
-editor. Feel free to reach out to me at
-[alexandre.piveteau@heig-vd.ch](mailto:alexandre.piveteau@heig-vd.ch).
+`markdown-party/mono` is a distributed collaborative Markdown editor, based on a replicated log of events. Multiple abstractions are implemented, which replicate events on multiple sites. The project makes heavy use of [Kotlin coroutines](https://kotlinlang.org/docs/coroutines-guide.html), to allow non-blocking concurrent communications with many replicas. It implements some tree-like and sequence CRDTs to replicate its state.
 
-## Using the library
+![Markdown Party](assets/hero.png)
 
-### Installation
+## Library and project walkthrough
 
-To be announced.
-
-### Usage example
-
-Let's implement a distributed counter, which lets sites increment and decrement a shared value. We
-start by defining the events, as well as a `OneWayProjection` that aggregates them :
-
-```kotlin
-enum class Event { Increment, Decrement }
-typealias State = Int
-
-// A simple aggregation function, which increments a value for [Increment] events, and decrements
-// the same value for [Decrement] events.
-val counter = OneWayProjection<Int, EventValue<Event>> { op, acc ->
-    when (op.value) {
-        Increment -> acc + 1
-        Decrement -> acc - 1
-    }
-}
-```
-
-We can then create a new site, and yield some new events :
-
-```kotlin
-val site = mutableSite<Event, State>(
-
-    // This is the site identifier. It's globally unique, and makes sure multiple sites can't
-    // create identical events.
-    identifier = SiteIdentifier.random(),
-
-    // This is the initial value of the aggregating function. You can see it as the "base state"
-    // of your distributed data structure, or the starting value of the data structure when nobody
-    // has touched it.
-    initial = 0,
-
-    // This is the aggregation function, that aggregates the events in a local state.
-    projection = counter,
-)
-
-// This is a suspend fun, which resumes once the event { ... } block will have been successfully
-// applied to the underlying site.
-site.event {
-    yield(Increment)
-}
-```
-
-It's then possible to observe the values of a site as a cold `Flow` :
-
-```kotlin
-val total: Flow<State> = site.value // emits [0, 1, ...]
-```
-
-As new events get `yield` in the `MutableSite`, the cold `Flow` will emit some additional elements
-which contain the distributed counter total.
-
-At some point, you may be interested in syncing multiple sites together. This can be done with a
-suspending actor pattern, which will not resume until both sites cooperatively finish :
-
-```kotlin
-suspend fun myFun() {
-    val alice = mutableSite<Event>(SiteIdentifier.random())
-    val bob = mutableSite<Event>(SiteIdentifier.random())
-
-    sync(alice, bob)
-}
-```
-
-Additional examples are available in the [demo folder](src/test/kotlin/markdown/echo/demo).
+1. [Introduction and basics](echo/README.md)
+2. [The low-level event log API](echo-core/README.md)
+3. [Integrations and websockets](echo-transport/README.md)
+4. [Example : adding a move operation for cursors](markdown/README.md)
 
 ## Local setup
 
-This project uses Kotlin 1.4.32 and is build with [Gradle](https://gradle.org). To run the unit
+This project uses Kotlin 1.5.21 and is built with [Gradle](https://gradle.org). To run the unit
 tests locally, please proceed as follows :
 
 ```bash
 # Clone the repository locally.
-> git clone git@github.com:markdown-party/kotlin-echo.git && cd kotlin-echo
+> git clone git@github.com:markdown-party/mono.git && cd mono
 
 # Run Gradle tests.
-> ./gradlew test
+> ./gradlew check
+
+# Run the markdown editor frontend and backend. You'll have to edit the configuration in the
+# file "markdown-frontend/src/main/kotlin/main.kt" to point to your localhost rather than the
+# production server.
+> ./gradlew markdown-backend:run
+> ./gradlew markdown-frontend:browserRun
 ```
+
+## Cheat sheet
+
+Here's how you should use the project :
+
+| Use-case | Relevant module(s) |
+|----------|--------------------|
+| I want to use a Markdown editor. | Go to [markdown.party](https://markdown.party) ! |
+| I want to replicate Markdown / Trees, but don't want a GUI. | `markdown`, `echo`, (`echo-core`) |
+| I want to create a custom CRDT and replicate it. | `echo-transport`, `echo-ktor-xxx`, `echo`, (`echo-core`) |
+| I only need a log of events which computes an aggregate. | `echo-core` |
+
+## About
+
+I'm developing this project as part of my Bachelor thesis at HEIG-VD. If, like me, you like distributed systems, Kotlin, coroutines or reactive UI frameworks, I'd love to hear from you at [alexandre.piveteau@heig-vd.ch](mailto:alexandre.piveteau@heig-vd.ch) :v:

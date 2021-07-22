@@ -9,7 +9,10 @@ kotlin {
     testRuns["test"].executionTask.configure { useJUnit() }
     withJava()
   }
-  js(IR) { browser() }
+  js(IR) {
+    browser()
+    binaries.executable()
+  }
 
   sourceSets {
     val commonMain by getting {
@@ -17,6 +20,7 @@ kotlin {
         implementation(kotlin("stdlib-common"))
         api(project(":echo"))
         api(project(":echo-transport"))
+        api(Deps.Kotlinx.DateTime)
       }
     }
     val commonTest by getting {
@@ -25,15 +29,19 @@ kotlin {
         implementation(kotlin("test-annotations-common"))
       }
     }
-    val jvmMain by getting
-    val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
+    val jvmTest by getting {
+      dependencies {
+        implementation(kotlin("test-junit"))
+        implementation(Deps.Kotlinx.CoroutinesTest)
+      }
+    }
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
 
     all {
       languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
       languageSettings.useExperimentalAnnotation(
-        "kotlinx.serialization.ExperimentalSerializationApi")
+          "kotlinx.serialization.ExperimentalSerializationApi")
     }
   }
 }

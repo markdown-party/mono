@@ -4,17 +4,20 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
+import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent
+import io.github.alexandrepiveteau.echo.demo.counter.PNProjection
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.test.Ignore
 import kotlin.test.Test
+import kotlin.time.measureTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.test.Ignore
-import kotlin.time.measureTime
 
 class ScalabilityTest {
 
@@ -77,5 +80,30 @@ class ScalabilityTest {
 
     val speed = (sites * ops * 1000.0) / (duration.inWholeMilliseconds)
     println("Took ${duration.inWholeMilliseconds} ms, at ${speed.roundToInt()} ops-site/sec.")
+  }
+
+  @Ignore
+  @Test
+  fun compareMutableHistoryToExchange() = suspendTest {
+    val ops = 100_000
+    val primary = mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
+    repeat(ops) { primary.event { yield(PNCounterEvent.Increment) } }
+
+    val history = mutableSite(SiteIdentifier.Max, 0, PNProjection)
+    val exchange = exchange()
+
+    val historyDuration = measureTime { sync(primary, history) }
+    val exchangeDuration = measureTime { sync(primary, exchange) }
+    val speed =
+        ((historyDuration.inWholeMilliseconds.toFloat() /
+                exchangeDuration.inWholeMilliseconds.toFloat()) * 100)
+            .roundToInt()
+    val historyOps = ops * 1000.0 / historyDuration.inWholeMilliseconds
+    val exchangeOps = ops * 1000.0 / exchangeDuration.inWholeMilliseconds
+
+    // Measured performance (history)  :       25'000 ops/sec
+    // Measured performance (exchange) :       35'000 ops/sec (125% - 150%)
+    println("Took ${historyDuration.inWholeMilliseconds} ms for history, at $historyOps ops/sec.")
+    println("Took ${exchangeDuration.inWholeMilliseconds} ms for exchange (speed ${speed}%), at $exchangeOps ops/sec.")
   }
 }

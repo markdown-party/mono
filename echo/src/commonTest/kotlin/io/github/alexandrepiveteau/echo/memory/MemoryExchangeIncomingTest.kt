@@ -5,6 +5,7 @@ package io.github.alexandrepiveteau.echo.memory
 import app.cash.turbine.test
 import io.github.alexandrepiveteau.echo.*
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlin.random.Random
@@ -108,10 +109,14 @@ class MemoryExchangeIncomingTest {
               send(O.Acknowledge(site, seqno))
               send(O.Request(site, UInt.MAX_VALUE))
               assertEquals(
-                  I.Event(
-                      seqno,
-                      site,
-                      DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
+                  I.Events(
+                      listOf(
+                          Event(
+                              seqno,
+                              site,
+                              DefaultSerializationFormat.encodeToByteArray(
+                                  Boolean.serializer(), true),
+                          )),
                   ),
                   incoming.receive(),
               )
@@ -135,11 +140,14 @@ class MemoryExchangeIncomingTest {
           send(O.Request(site, count = 0U))
           send(O.Request(site, count = 1U))
           assertEquals(
-              I.Event(
-                  seqno,
-                  site,
-                  DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
-              ),
+              I.Events(
+                  listOf(
+                      Event(
+                          seqno,
+                          site,
+                          DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
+                      ),
+                  )),
               incoming.receive(),
           )
           close()

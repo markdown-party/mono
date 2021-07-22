@@ -27,12 +27,10 @@ dependencies {
   implementation(npm("react-router-dom", "5.2.0"))
 
   // CodeMirror.
-  implementation(npm("@codemirror/text", "0.18.1"))
-  implementation(npm("@codemirror/state", "0.18.7"))
-  implementation(npm("@codemirror/view", "0.18.18"))
-  implementation(npm("@codemirror/language", "0.18.2"))
   implementation(npm("@codemirror/lang-markdown", "0.18.4"))
   implementation(npm("@codemirror/basic-setup", "0.18.2"))
+  implementation(npm("@codemirror/tooltip", "0.18.4"))
+  implementation(npm("@codemirror/theme-one-dark", "0.18.1"))
 }
 
 kotlin { js(IR) { browser { binaries.executable() } } }

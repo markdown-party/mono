@@ -65,4 +65,20 @@ class MutableHistoryInsertTest {
 
     assertContentEquals(listOf(1, 1, 1, 3, 3, 3, 2, 2), history.current)
   }
+
+  @Test
+  fun merge_reorder() {
+    val alice = 1U.toSiteIdentifier()
+    val bob = 2U.toSiteIdentifier()
+
+    val history = mutableHistoryOf(emptyList(), Projection)
+    history.insert(SequenceNumber.Min + 0u, alice, byteArrayOf(1, 1, 1))
+
+    val history2 = mutableHistoryOf(emptyList(), Projection)
+    history2.insert(SequenceNumber.Min + 1u, bob, byteArrayOf(2, 2))
+    history2.insert(SequenceNumber.Min + 1u, alice, byteArrayOf(3, 3, 3))
+    history.merge(from = history2)
+
+    assertContentEquals(listOf(1, 1, 1, 3, 3, 3, 2, 2), history.current)
+  }
 }

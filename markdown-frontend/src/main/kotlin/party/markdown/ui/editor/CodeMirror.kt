@@ -3,7 +3,6 @@ package party.markdown.ui.editor
 import codemirror.state.EditorState
 import codemirror.state.EditorStateConfig
 import codemirror.state.Extension
-import codemirror.state.Transaction
 import codemirror.text.Text
 import codemirror.view.EditorView
 import codemirror.view.EditorViewConfig
@@ -47,22 +46,19 @@ private val component =
       div("flex-grow h-full min-w-0 max-h-full") { ref = component }
 
       // Whenever the component is available, run the effect and update the editor from the props.
-      useEffectWithCleanup(listOf(props.id)) {
-        if (props.id != null) {
-          lateinit var view: EditorView
-          val config = EditorViewConfig {
-            state = state(props.extensions)
-            parent = component.current!!
-          }
-          view = EditorView(config)
-          props.view.current = view
-          return@useEffectWithCleanup {
-            view.destroy()
-            props.view.current = null
-          }
-        } else {
-          // Do not instantiate anything.
-          return@useEffectWithCleanup {}
+      useEffectWithCleanup(listOf(props.id, component.current)) {
+        if (component.current == null || props.id == null) return@useEffectWithCleanup {}
+
+        lateinit var view: EditorView
+        val config = EditorViewConfig {
+          state = state(props.extensions)
+          parent = component.current!!
+        }
+        view = EditorView(config)
+        props.view.current = view
+        return@useEffectWithCleanup {
+          view.destroy()
+          props.view.current = null
         }
       }
     }

@@ -34,10 +34,20 @@ internal class BlockLog {
   val hasPrevious: Boolean
     get() = blocksIds.gap.startIndex > 0
 
-  val hasNext: Boolean
+  val hasCurrent: Boolean
     get() = blocksIds.gap.startIndex < blocksIds.size
 
   // END : POSITION
+
+  // BEGIN : CURRENT GAP POSITION
+
+  val currentId: EventIdentifier
+    get() = blocksIds[blocksIds.gap.startIndex]
+
+  val currentSize: Int
+    get() = blocksSizes[blocksSizes.gap.startIndex]
+
+  // END : CURRENT GAP POSITION
 
   // BEGIN : LAST GAP POSITION
 
@@ -63,6 +73,14 @@ internal class BlockLog {
     blocksSizes.remove(blocksSizes.gap.startIndex - 1)
   }
 
+  /** Removes the current item at the gap. */
+  fun removeCurrent() {
+    check(hasCurrent) { "Can't remove current when at a missing index." }
+    blocks.remove(blocks.gap.startIndex, currentSize)
+    blocksIds.remove(blocksIds.gap.startIndex)
+    blocksSizes.remove(blocksSizes.gap.startIndex)
+  }
+
   /** Moves the cursor to the left by one step. */
   fun moveLeft() {
     check(hasPrevious) { "Can't move left when at first index." }
@@ -73,7 +91,7 @@ internal class BlockLog {
 
   /** Moves the cursor to the right by one step. */
   fun moveRight() {
-    check(hasNext) { "Can't move right when at last index." }
+    check(hasCurrent) { "Can't move right when at last index." }
     blocksIds.gap.shift(1)
     blocksSizes.gap.shift(1) // Updating lastSize for blocks.gap shift.
     blocks.gap.shift(lastSize)
@@ -148,6 +166,20 @@ internal class BlockLog {
     blocksSizes.gap.shift(-1)
   }
 
+  /**
+   * Removes the event with the given identifier, and moves the buffer to the removal point.
+   *
+   * @param id the [EventIdentifier] that points to the removed location.
+   */
+  fun removeById(
+      id: EventIdentifier,
+  ) {
+    val index = blocksIds.binarySearch(id)
+    if (index < 0) return // Not present.
+    moveToIndex(index)
+    removeCurrent()
+  }
+
   /** Clears the [BlockLog], such that it becomes completely empty. */
   fun clear() {
     blocks.clear()
@@ -179,8 +211,8 @@ internal class BlockLog {
     override val site: SiteIdentifier
       get() = blocksIds[cursorIdsIndex].site
 
-    override val event: ByteArray
-      get() = blocks.backing
+    override val event: MutableByteGapBuffer
+      get() = blocks
 
     override val from: Int
       get() = cursorEvents

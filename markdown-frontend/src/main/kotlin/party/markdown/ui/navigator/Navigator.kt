@@ -33,7 +33,7 @@ external interface NavigatorProps : RProps {
   var onCreateFile: (parent: TreeNode?) -> Unit
   var onCreateFolder: (parent: TreeNode?) -> Unit
   var onNodeDelete: (TreeNode) -> Unit
-  var onNodeRename: (TreeNode) -> Unit
+  var onNodeRename: (TreeNode, String) -> Unit
   var onNodeMove: (Long, TreeNode) -> Unit
 }
 
@@ -188,11 +188,7 @@ private val navigator =
                   setDropdownOpen(null)
                   props.onNodeDelete(node.node)
                 }
-            onMenuRenameClick =
-                {
-                  setDropdownOpen(null)
-                  props.onNodeRename(node.node)
-                }
+            onRenamed = { props.onNodeRename(node.node, it) }
             onMenuMoveToParent =
                 {
                   setDropdownOpen(null)

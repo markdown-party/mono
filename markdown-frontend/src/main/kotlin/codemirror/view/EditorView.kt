@@ -4,6 +4,7 @@
 package codemirror.view
 
 import codemirror.state.EditorState
+import codemirror.state.Extension
 import codemirror.state.Transaction
 import codemirror.state.TransactionSpec
 import org.w3c.dom.HTMLElement
@@ -37,4 +38,22 @@ constructor(
    * handlers, and notifying plugins. The view instance can no longer be used after calling this.
    */
   fun destroy()
+
+  companion object {
+
+    /**
+     * An extension that enables line wrapping in the editor (by setting CSS white-space to pre-wrap
+     * in the content).
+     */
+    val lineWrapping: Extension
+
+    /**
+     * Create an extension that adds styles to the base theme. Like with theme, use & to indicate
+     * the place of the editor wrapper element when directly targeting that. You can also use &dark
+     * or &light instead to only target editors with a dark or light theme.
+     *
+     * @param spec An `Object<StyleSpec>` with the base theme spec.
+     */
+    fun baseTheme(spec: dynamic): Extension
+  }
 }

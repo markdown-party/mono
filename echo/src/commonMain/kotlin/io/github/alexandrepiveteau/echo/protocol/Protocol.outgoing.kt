@@ -2,19 +2,11 @@ package io.github.alexandrepiveteau.echo.protocol
 
 import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.core.log.EventIterator
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
-
-/**
- * Starts the outgoing side of the protocol, sending advertisements, receiving requests and sending
- * events as they are made available in the local log.
- */
-internal suspend fun ExchangeScope<O, I>.startOutgoing() = runCatchingTermination {
-  val advertised = outgoingAdvertiseAll()
-  outgoingSending(advertised)
-}
 
 /**
  * Advertises all the available events, and returns an [MutableEventIdentifierGapBuffer] with the
@@ -22,7 +14,7 @@ internal suspend fun ExchangeScope<O, I>.startOutgoing() = runCatchingTerminatio
  * illegal state, which should also be reached if the outgoing channel gets closed for whatever
  * reason.
  */
-private suspend fun ExchangeScope<O, I>.outgoingAdvertiseAll(): MutableEventIdentifierGapBuffer {
+internal suspend fun ExchangeScope<O, I>.outgoingAdvertiseAll(): MutableEventIdentifierGapBuffer {
   val missing = withEventLogLock { acknowledged() }
   val queue = ArrayDeque<I>()
 
@@ -54,9 +46,12 @@ private suspend fun ExchangeScope<O, I>.outgoingAdvertiseAll(): MutableEventIden
  * Sends all the local events, depending on the requests from the other site.
  *
  * @param advertised the event identifiers that were already previously advertised.
+ * @param stopAfterAdvertised a [Boolean] with value `true` if only the [advertised] events should
+ * be sent.
  */
-private suspend fun ExchangeScope<O, I>.outgoingSending(
+internal suspend fun ExchangeScope<O, I>.outgoingSending(
     advertised: MutableEventIdentifierGapBuffer,
+    stopAfterAdvertised: Boolean,
 ) {
   // The buffers representing the minimum sequence numbers for each site that we have to send, and
   // the available credits for each site (aka how many events we're still allowed to send).
@@ -69,8 +64,21 @@ private suspend fun ExchangeScope<O, I>.outgoingSending(
     // Prepare the advertisements that should be sent, as well as the events.
     val available = withEventLogLock { acknowledged() }
 
-    if (queue.isEmpty()) enqueueAdvertisements(advertised, available, queue)
-    if (queue.isEmpty()) enqueueEvents(requestsBuffer, creditsBuffer, queue)
+    // Only check whether we're done sending all the required events after the queue is empty, as
+    // we then make sure the messages have been properly received.
+    if (queue.isEmpty() && stopAfterAdvertised)
+        terminateIfAllAdvertisedSent(requestsBuffer, advertised)
+
+    if (queue.isEmpty() && !stopAfterAdvertised) enqueueAdvertisements(advertised, available, queue)
+    if (queue.isEmpty()) {
+      enqueueEvents(
+          requests = requestsBuffer,
+          credits = creditsBuffer,
+          queue = queue,
+          advertised = advertised,
+          stopAfterAdvertised = stopAfterAdvertised,
+      )
+    }
 
     select<Unit> {
 
@@ -90,6 +98,28 @@ private suspend fun ExchangeScope<O, I>.outgoingSending(
       onEventLogUpdate {}
     }
   }
+}
+
+/**
+ * Terminates if all the advertised events can be found in the requested events. Requested events
+ * are the next event that will be sent to the site, and therefore indicate what the other side is
+ * ready to receive.
+ *
+ * @param requests the event identifiers requested by the other site.
+ * @param advertised the events advertised by this site.
+ */
+private fun terminateIfAllAdvertisedSent(
+    requests: MutableEventIdentifierGapBuffer,
+    advertised: MutableEventIdentifierGapBuffer,
+) {
+  // This could run in O(n).
+  for (i in 0 until advertised.size) {
+    val (seqno, site) = advertised[i]
+    val index = requests.binarySearchBySite(site)
+    if (index < 0) return
+    if (requests[index].seqno <= seqno) return
+  }
+  terminate()
 }
 
 /**
@@ -116,10 +146,8 @@ private fun enqueueAdvertisements(
       ad.site > av.site -> {
         advertised.push(av, offset = adI)
         queue += I.Advertisement(av.site, av.seqno + 1U)
-        adI += 2 // pushed item + 1
-        avI += 1 // next item
       }
-      else -> error("site identifier in advertised but not in available")
+      else -> error("site identifier in advertised $advertised but not in available $available")
     }
   }
   // Push the remaining items.
@@ -135,10 +163,10 @@ private fun enqueueAdvertisements(
  * A comparator of I.Event messages, which sends events with a smaller identifier first. This allows
  * for more efficient sync when there are many concurrent messages.
  */
-private object EventComparator : Comparator<I.Event> {
+private object EventComparator : Comparator<Event> {
   override fun compare(
-      a: Message.Incoming.Event,
-      b: Message.Incoming.Event,
+      a: Event,
+      b: Event,
   ) = EventIdentifier(a.seqno, a.site).compareTo(EventIdentifier(b.seqno, b.site))
 }
 
@@ -190,7 +218,9 @@ private fun EventIterator.take(
     index: Int,
     requests: MutableEventIdentifierGapBuffer,
     credits: MutableIntGapBuffer,
-    queue: MutableList<I.Event>,
+    queue: MutableList<Event>,
+    advertised: MutableEventIdentifierGapBuffer,
+    stopAfterAdvertised: Boolean,
 ) {
 
   if (!has()) return // Empty iterator.
@@ -201,16 +231,23 @@ private fun EventIterator.take(
     // We have a valid event. Check if we have the credits for it, and if so, add it to the queue.
     if (credits[index].toUInt() == 0U) return
 
+    // Do not enqueue events if we have already reached the advertised threshold.
+    if (stopAfterAdvertised) {
+      val adIndex = advertised.binarySearchBySite(site)
+      if (adIndex < 0) return
+      if (seqno > advertised[adIndex].seqno) return
+    }
+
     // Update the credits and requests.
     credits[index] = (credits[index].toUInt() - 1U).toInt()
     requests[index] = EventIdentifier(seqno + 1U, site)
 
     // Add the event to the queue.
     queue.add(
-        I.Event(
+        Event(
             seqno = seqno,
             site = site,
-            body = event.copyOfRange(from, until),
+            data = event.copyOfRange(from, until),
         ),
     )
 
@@ -225,20 +262,29 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
     requests: MutableEventIdentifierGapBuffer,
     credits: MutableIntGapBuffer,
     queue: ArrayDeque<I>,
+    advertised: MutableEventIdentifierGapBuffer,
+    stopAfterAdvertised: Boolean,
 ) {
-  val events = mutableListOf<I.Event>()
+  val events = mutableListOf<Event>()
 
   withEventLogLock {
     for (i in 0 until requests.size) {
       val (seqno, site) = requests[i]
       val iterator = iterator(site).apply { moveAt(seqno, site) }
-      iterator.take(index = i, requests = requests, credits = credits, queue = events)
+      iterator.take(
+          index = i,
+          requests = requests,
+          credits = credits,
+          queue = events,
+          advertised = advertised,
+          stopAfterAdvertised = stopAfterAdvertised,
+      )
     }
   }
 
   // Sort the events by identifier before sending them to the other side.
   events.sortWith(EventComparator)
-  queue.addAll(events)
+  if (events.isNotEmpty()) queue.addLast(I.Events(events))
 }
 
 /**

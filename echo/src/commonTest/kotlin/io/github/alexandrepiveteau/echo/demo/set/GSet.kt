@@ -11,12 +11,13 @@ import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Continuous
+import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -110,6 +111,38 @@ class GSetTest {
   }
 
   @Test
+  fun twoSites_singleOnceStrategy_converge() = suspendTest {
+    suspend fun test(a: SyncStrategy, b: SyncStrategy) {
+      val alice =
+          mutableSite(
+              identifier = Random.nextSiteIdentifier(),
+              initial = emptySet(),
+              projection = GSetProjection(),
+              strategy = a,
+          )
+      val bob =
+          mutableSite(
+              identifier = Random.nextSiteIdentifier(),
+              initial = emptySet(),
+              projection = GSetProjection(),
+              strategy = b,
+          )
+      alice.event { yield(GSetEvent.Add(123)) }
+      bob.event { yield(GSetEvent.Add(456)) }
+      bob.event { yield(GSetEvent.Add(789)) }
+
+      sync(alice, bob)
+      val expected = setOf(123, 456, 789)
+      assertEquals(expected, alice.value.value)
+      assertEquals(expected, bob.value.value)
+    }
+
+    test(Once, Continuous)
+    test(Continuous, Once)
+    test(Once, Once)
+  }
+
+  @Test
   fun twoSites_converge() = suspendTest {
     // Create Alice, our first site.
     val alice = Random.nextSiteIdentifier()
@@ -118,6 +151,7 @@ class GSetTest {
             identifier = alice,
             initial = emptySet(),
             projection = GSetProjection(),
+            strategy = Once,
         )
 
     // Create Bob, our second site.
@@ -127,6 +161,7 @@ class GSetTest {
             identifier = bob,
             initial = emptySet(),
             projection = GSetProjection(),
+            strategy = Once,
         )
 
     // Alice adds the elements 1 and 2.
@@ -149,19 +184,12 @@ class GSetTest {
     assertEquals(setOf(1, 2), aliceBeforeSync)
     assertEquals(setOf(2, 3, 4), bobBeforeSync)
 
-    // Sync both sites (with a timeout, since by default they'll keep the connection open until
-    // either side cancels).
-    try {
-      withTimeout(timeMillis = 1000) { sync(aliceEcho, bobEcho) }
-    } catch (expect: TimeoutCancellationException) {}
-
-    // Finally, look at the resulting set of both sites.
-    val aliceAfterSync = aliceEcho.value.first { it.size == 4 }
-    val bobAfterSync = aliceEcho.value.first { it.size == 4 }
+    // Sync both sites.
+    sync(aliceEcho, bobEcho)
 
     // All the events are properly synced.
     val expected = setOf(1, 2, 3, 4)
-    assertEquals(expected, aliceAfterSync)
-    assertEquals(expected, bobAfterSync)
+    assertEquals(expected, aliceEcho.value.value)
+    assertEquals(expected, bobEcho.value.value)
   }
 }
