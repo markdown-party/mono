@@ -98,7 +98,7 @@ launch {
 
 ## Emitting events
 
-As we've seen in the g-counter example, one can emit events on instances of `MutableSite`. It's possible to emit multiple events at once :
+As we've seen in the g-counter example, one can emit events on instances of `MutableSite`. It's possible to emit multiple events at once.
 
 ```kotlin
 val alice = mutableSite(Random.nextSiteIdentifier(), 0, GCounter)
