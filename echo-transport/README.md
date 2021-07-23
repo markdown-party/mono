@@ -97,6 +97,8 @@ suspend fun <I, O> sync(
 }
 ```
 
+> The complete source is available [here](https://github.com/markdown-party/mono/tree/main/echo/src/commonMain/kotlin/io/github/alexandrepiveteau/echo/Sync.kt).
+
 As we've seen, an `Exchange` simply implements both `SendExchange` and `ReceiveExchange`. What's the difference with a `Site` then ?
 
 _Sites_ have two additional properties : they provide access to an **observable aggregated model** from the events, and they do not manage generic messages (instead, they use the [echo protocol messages, which are necessary to replicate events](https://github.com/markdown-party/mono/tree/main/echo/src/commonMain/kotlin/io/github/alexandrepiveteau/echo/protocol/Message.kt)). The aggregated value is the `Site.value` flow that we have been using throughout the examples. On the other hand, _exchanges_ are a great abstraction for the replication protocol, since they do not care about the type of the underlying events, as they do not try to aggregate them.
