@@ -39,8 +39,8 @@ public final class io/github/alexandrepiveteau/echo/SiteKt {
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {
-	public static final fun sync (Lio/github/alexandrepiveteau/echo/Exchange;[Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun sync (Lio/github/alexandrepiveteau/echo/Link;Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sync ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/alexandrepiveteau/echo/TransformsKt {

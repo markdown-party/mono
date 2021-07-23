@@ -14,7 +14,7 @@ This document features multiple integrations of the Echo library, and explains h
 
 Up until now, all the interactions we had with a _site_ occurred on a single machine. Additionally, we didn't really look at the API surface that lets _sites_ communicate with each other, and how we may use it to replicate content across multiple physical machines.
 
-However, you've been slightly lied to - while _sites_ do, indeed, offer replication, they're not the lowest level abstraction. Let's look at the interface hierarchy of `MutableSite` :
+Until now, you've been slightly misled - while _sites_ do, indeed, offer replication, they're not the lowest level abstraction that does do. Let's look at the inheritance hierarchy of `MutableSite` :
 
 ```text
 The Site and MutableSite inheritance hierarchy:
@@ -39,7 +39,7 @@ The Site and MutableSite inheritance hierarchy:
             +-------------+       
 ```
 
-In fact, the `ReceiveExchange` and `SendExchange` are the lowest-level APIs that can sync content. The replication protocol is asymmetric : a `ReceiveExchange` will receive requests from other _sites_, and respond with the events it has. A `SendExchange` starts by sending some requests, and will then receive the events from a `ReceiveExchange`.
+In fact, the `ReceiveExchange` and `SendExchange` interfaces are the lowest-level components that can sync content. The replication protocol is asymmetric : a `ReceiveExchange` will receive requests from other _sites_, and respond with the events it has. A `SendExchange` starts by sending some requests, and will then receive the events from a `ReceiveExchange`.
 
 Both `ReceiveExchange` and `SendExchange` offer a `Link` that lets them emit and send some messages :
 
@@ -58,13 +58,52 @@ fun interface ReceiveExchange<out I, in O> {
 }
 ```
 
-A `Link` exposes a cold asymmetric communication channel, based on flows. The protocol messages will then flow on the links.
+A `Link` exposes a cold asymmetric communication channel, based on flows. The protocol messages will then flow on the links. The two `sync()` method overloads then simply "glue" two opposite `Link` together, or two compatible `Exchange<I, O>` :
 
-Finally, an `Exchange` simply implements both `SendExchange` and `ReceiveExchange`. What's the difference with a `Site` then ? _Sites_ have an additional property : they provide access to an **observable aggregated model** from the events. This is the `Site.value` flow that we have been using throughout the examples. On the other hand, _exchanges_ are a great abstraction for the replication protocol, since they do not care about the type of the underlying events, as they do not try to aggregate them.
+```kotlin
+// The first sync overload makes use of some rendez-vous channels to establish
+// communication between two opposing Link.
+suspend fun <I, O> sync(
+    first: Link<I, O>,
+    second: Link<O, I>,
+): Unit = coroutineScope {
+  val fToS = Channel<O>()
+  val sToF = Channel<I>()
+  launch {
+    first
+        .talk(sToF.consumeAsFlow())
+        .onEach { fToS.send(it) }
+        .onCompletion { fToS.close() }
+        .collect()
+  }
+  launch {
+    second
+        .talk(fToS.consumeAsFlow())
+        .onEach { sToF.send(it) }
+        .onCompletion { sToF.close() }
+        .collect()
+  }
+}
+
+// The second sync overload groups exchanges by pairs, and establishes the sync
+// process for each pair <incoming(), outgoing()>.
+suspend fun <I, O> sync(
+    vararg exchanges: Exchange<I, O>,
+): Unit = coroutineScope {
+  exchanges.asSequence().windowed(2).forEach { (left, right) ->
+    launch { sync(left.incoming(), right.outgoing()) }
+    launch { sync(left.outgoing(), right.incoming()) }
+  }
+}
+```
+
+As we've seen, an `Exchange` simply implements both `SendExchange` and `ReceiveExchange`. What's the difference with a `Site` then ?
+
+_Sites_ have two additional properties : they provide access to an **observable aggregated model** from the events, and they do not manage generic messages (instead, they use the [echo protocol messages, which are necessary to replicate events](https://github.com/markdown-party/mono/tree/main/echo/src/commonMain/kotlin/io/github/alexandrepiveteau/echo/protocol/Message.kt)). The aggregated value is the `Site.value` flow that we have been using throughout the examples. On the other hand, _exchanges_ are a great abstraction for the replication protocol, since they do not care about the type of the underlying events, as they do not try to aggregate them.
 
 ## Websocket replication
 
-Now that we've seen that the communication protocol is implemented with flows of messages, it becomes clear that it will be easy to replicate _sites_ across different machines, assuming we can transmit the protocol messages. For example, to send messages over websockets, two steps are needed :
+Now that we've seen that the communication protocol is implemented with flows of messages, and that the `sync()` function can work with generic messages, it becomes clear that it will be easy to replicate _sites_ across different machines, assuming we can transmit the protocol messages. For example, to send messages over websockets, two steps are needed :
 
 1. Transform the protocol messages to websocket frames
 2. Send the websocket frames through a dedicated websocket library

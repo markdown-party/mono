@@ -55,13 +55,9 @@ suspend fun <I, O> sync(
  * @param O the type of the outgoing messages.
  */
 suspend fun <I, O> sync(
-    first: Exchange<I, O>,
-    vararg others: Exchange<I, O>,
+    vararg exchanges: Exchange<I, O>,
 ): Unit = coroutineScope {
-  for (index in others.indices) {
-    val left = if (index == 0) first else others[index - 1]
-    val right = others[index]
-
+  exchanges.asSequence().windowed(2).forEach { (left, right) ->
     launch { sync(left.incoming(), right.outgoing()) }
     launch { sync(left.outgoing(), right.incoming()) }
   }
