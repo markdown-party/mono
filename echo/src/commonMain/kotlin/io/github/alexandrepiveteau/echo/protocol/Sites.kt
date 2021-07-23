@@ -11,8 +11,10 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.produceIn
@@ -30,22 +32,17 @@ internal open class ExchangeImpl(
     private val strategy: SyncStrategy,
 ) : Exchange<Inc, Out> {
 
-  /** The [Mutex] that protects access to the [sentinel] variable. */
+  /** The [Mutex] that protects access to the [log] variable. */
   internal val mutex = Mutex()
 
-  /**
-   * A sentinel [MutableStateFlow] that can be used to observe invalidations of the [log]. Whenever
-   * a site gains mutual exclusion to the [MutableEventLog].
-   */
-  private val sentinel = MutableStateFlow(UInt.MIN_VALUE)
+  /** A [MutableSharedFlow] that is used to mark that a mutation has occurred in the log. */
+  private val mutations = MutableSharedFlow<Boolean>(replay = 1, onBufferOverflow = DROP_OLDEST)
 
   /**
    * A function that will be called whenever some mutations were performed, and some computed values
    * or the event log should be updated.
    */
-  open fun mutation() {
-    sentinel.value = sentinel.value + 1U
-  }
+  open suspend fun mutation() = mutations.emit(true)
 
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
@@ -59,7 +56,7 @@ internal open class ExchangeImpl(
   private fun <I, O> exchange(
       block: ExchangeBlock<I, O>,
   ): Link<I, O> = channelLink { inc ->
-    val channel = sentinel.produceIn(this)
+    val channel = mutations.produceIn(this)
     val scope = ExchangeScopeImpl(mutex, log, channel, inc, this, ::mutation)
 
     // Give the other threads a chance to run and generate some (termination ?) messages, and then
@@ -90,7 +87,7 @@ internal open class SiteImpl<M, R>(
 
   override val value = current.asStateFlow()
 
-  override fun mutation() {
+  override suspend fun mutation() {
     current.value = transform(history.current)
     super.mutation()
   }
@@ -115,15 +112,14 @@ internal open class MutableSiteImpl<T, M, R>(
       object : EventScope<T> {
         override fun yield(event: T): EventIdentifier =
             history.append(
-                    site = identifier,
-                    event = format.encodeToByteArray(serializer, event),
-                )
-                .apply { mutation() }
+                site = identifier,
+                event = format.encodeToByteArray(serializer, event),
+            )
       }
 
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M) -> R,
-  ) = mutex.withLock { block(scope, value.value) }
+  ) = mutex.withLock { block(scope, value.value).apply { mutation() } }
 }
 
 /**
@@ -147,7 +143,7 @@ private class ExchangeScopeImpl<I, O>(
     private val sentinel: ReceiveChannel<*>,
     incoming: ReceiveChannel<I>,
     outgoing: SendChannel<O>,
-    private val mutation: () -> Unit,
+    private val mutation: suspend () -> Unit,
 ) : ExchangeScope<I, O>, ReceiveChannel<I> by incoming, SendChannel<O> by outgoing {
 
   override suspend fun <R> withEventLogLock(
