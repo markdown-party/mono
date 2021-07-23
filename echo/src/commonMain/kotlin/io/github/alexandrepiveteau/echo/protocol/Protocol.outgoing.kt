@@ -61,15 +61,19 @@ internal suspend fun ExchangeScope<O, I>.outgoingSending(
 
   while (true) {
 
-    // Prepare the advertisements that should be sent, as well as the events.
-    val available = withEventLogLock { acknowledged() }
-
     // Only check whether we're done sending all the required events after the queue is empty, as
     // we then make sure the messages have been properly received.
-    if (queue.isEmpty() && stopAfterAdvertised)
-        terminateIfAllAdvertisedSent(requestsBuffer, advertised)
+    if (queue.isEmpty() && stopAfterAdvertised) {
+      terminateIfAllAdvertisedSent(requestsBuffer, advertised)
+    }
 
-    if (queue.isEmpty() && !stopAfterAdvertised) enqueueAdvertisements(advertised, available, queue)
+    // Prepare the advertisements that should be sent.
+    if (queue.isEmpty() && !stopAfterAdvertised) {
+      val available = withEventLogLock { acknowledged() }
+      enqueueAdvertisements(advertised, available, queue)
+    }
+
+    // Prepare some events.
     if (queue.isEmpty()) {
       enqueueEvents(
           requests = requestsBuffer,
