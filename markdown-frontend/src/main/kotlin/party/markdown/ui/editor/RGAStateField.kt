@@ -23,6 +23,12 @@ data class RGAState(
  */
 val RGAStateField = StateField.define(StateFieldConfig(create = ::create, update = ::update))
 
+/**
+ * The body that will be contained in the [RGAIdentifiers] annotated transactions.
+ *
+ * @param ids the [EventIdentifierArray] with the current identifier for each character.
+ * @param removed the [EventIdentifierArray] with the removed identifiers, not commited to the site.
+ */
 data class RGAIdentifiersData(
     val ids: EventIdentifierArray,
     val removed: EventIdentifierArray,
