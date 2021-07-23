@@ -103,7 +103,11 @@ private suspend fun publishLocal(
             annotations =
                 arrayOf(
                     remote.of(true),
-                    RGAIdentifiers.of(ids.toEventIdentifierArray()),
+                    RGAIdentifiers.of(
+                        RGAIdentifiersData(
+                            ids = ids.toEventIdentifierArray(),
+                            removed = EventIdentifierArray(0),
+                        )),
                     CursorAnnotation.of(cursorsSet),
                 )
           },
@@ -143,7 +147,7 @@ private fun receiveRemote(
     //      d. otherwise insert the [a] character.
     if (aI != a.size && bI != b.size) {
       if (a[aI] == b[bI]) {
-        if (chars[aI] != MutableRGA.REMOVED) {
+        if (chars[aI] != MutableRGA.REMOVED && a[aI] !in field.removed) {
           aI++
           bI++
         } else {
@@ -154,7 +158,7 @@ private fun receiveRemote(
         when {
           b[bI].isUnspecified -> bI++
           chars[aI] == MutableRGA.REMOVED -> aI++
-          ids[aI] in field.removed -> aI++
+          a[aI] in field.removed -> aI++
           else -> {
             changes.add(
                 ChangeSpec(
@@ -176,7 +180,7 @@ private fun receiveRemote(
     // 1. The [a] character is not removed.
     // 2. The [a] character is removed, so skip it.
     else if (aI != a.size && bI == b.size) {
-      if (chars[aI] != MutableRGA.REMOVED && ids[aI] !in field.removed) {
+      if (chars[aI] != MutableRGA.REMOVED && a[aI] !in field.removed) {
         changes.add(
             ChangeSpec(
                 from = bI,
@@ -219,7 +223,11 @@ private fun receiveRemote(
               annotations =
                   arrayOf(
                       remote.of(true), /* TODO : Identifiers. */
-                      RGAIdentifiers.of(b.toEventIdentifierArray()),
+                      RGAIdentifiers.of(
+                          RGAIdentifiersData(
+                              ids = b.toEventIdentifierArray(),
+                              removed = field.removed,
+                          )),
                       CursorAnnotation.of(cursors),
                   )
               sequential = true

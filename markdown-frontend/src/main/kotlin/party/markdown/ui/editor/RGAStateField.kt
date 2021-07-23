@@ -23,11 +23,16 @@ data class RGAState(
  */
 val RGAStateField = StateField.define(StateFieldConfig(create = ::create, update = ::update))
 
+data class RGAIdentifiersData(
+    val ids: EventIdentifierArray,
+    val removed: EventIdentifierArray,
+)
+
 /**
  * An [Annotation] which indicates what the identifiers of the final text are. This annotation is
  * required for all remote transactions.
  */
-val RGAIdentifiers = Annotation.define<EventIdentifierArray>()
+val RGAIdentifiers = Annotation.define<RGAIdentifiersData>()
 
 /**
  * Creates a new [RGAState] that can be accessed and managed in a lock-in fashion by the CodeMirror
@@ -58,7 +63,7 @@ private fun update(
     // check(identifiers.size == transaction.newDoc.length) { "Mismatching lengths !" }
 
     // We've found out the identifiers associated with the changes.
-    return RGAState(identifiers, EventIdentifierArray(0))
+    return RGAState(identifiers.ids, identifiers.removed)
   }
 
   // Otherwise, we can look at the transaction, its changes, and insert or remove the appropriate
