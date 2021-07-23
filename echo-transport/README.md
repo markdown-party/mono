@@ -12,9 +12,9 @@ This document features multiple integrations of the Echo library, and explains h
 
 ## Replication basics
 
-Up until now, all the interactions we had with a _site_ occurred on a single machine. Additionally, we didn't really look at the API surface that lets _sites_ communicate with each other, and how we may use it to replicate content across multiple physical machines.
+Up until now, all the interactions we had with a _site_ occurred on a single machine. Also, we didn't really look at the API surface that lets _sites_ communicate with each other, and how we may use it to replicate content across multiple physical machines.
 
-Until now, you've been slightly misled - while _sites_ do, indeed, offer replication, they're not the lowest level abstraction that does do. Let's look at the inheritance hierarchy of `MutableSite` :
+Additionally, while _sites_ do, indeed, offer replication, they're not the lowest level abstraction that does so. Let's look at the inheritance hierarchy of `MutableSite` :
 
 ```text
 The Site and MutableSite inheritance hierarchy:
@@ -58,10 +58,10 @@ fun interface ReceiveExchange<out I, in O> {
 }
 ```
 
-A `Link` exposes a cold asymmetric communication channel, based on flows. The protocol messages will then flow on the links. The two `sync()` method overloads then simply "glue" two opposite `Link` together, or two compatible `Exchange<I, O>` :
+A `Link` exposes a cold asymmetric communication channel, based on flows. The protocol messages will then flow on the links. The two `sync()` methods then simply "glue" two opposite `Link` together, or two compatible `Exchange<I, O>` :
 
 ```kotlin
-// The first sync overload makes use of some rendez-vous channels to establish
+// The first sync method makes use of some rendez-vous channels to establish
 // communication between two opposing Link.
 suspend fun <I, O> sync(
     first: Link<I, O>,
@@ -85,7 +85,7 @@ suspend fun <I, O> sync(
   }
 }
 
-// The second sync overload groups exchanges by pairs, and establishes the sync
+// The second sync method groups exchanges by pairs, and establishes the sync
 // process for each pair <incoming(), outgoing()>.
 suspend fun <I, O> sync(
     vararg exchanges: Exchange<I, O>,
