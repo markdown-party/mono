@@ -96,8 +96,8 @@ internal open class SiteImpl<M, R>(
 internal open class MutableSiteImpl<T, M, R>(
     override val identifier: SiteIdentifier,
     private val serializer: KSerializer<T>,
-    history: MutableHistory<R>,
-    format: BinaryFormat,
+    private val history: MutableHistory<R>,
+    private val format: BinaryFormat,
     strategy: SyncStrategy,
     transform: (R) -> M,
 ) :
@@ -108,18 +108,22 @@ internal open class MutableSiteImpl<T, M, R>(
     ),
     MutableSite<T, M> {
 
-  private val scope =
-      object : EventScope<T> {
-        override fun yield(event: T): EventIdentifier =
-            history.append(
-                site = identifier,
-                event = format.encodeToByteArray(serializer, event),
-            )
-      }
-
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M) -> R,
-  ) = mutex.withLock { block(scope, value.value).apply { mutation() } }
+  ): R {
+    var mutated = false
+    val scope =
+        object : EventScope<T> {
+          override fun yield(event: T): EventIdentifier {
+            return history.append(
+                    site = identifier,
+                    event = format.encodeToByteArray(serializer, event),
+                )
+                .apply { mutated = true }
+          }
+        }
+    return mutex.withLock { block(scope, value.value).apply { if (mutated) mutation() } }
+  }
 }
 
 /**
