@@ -1,7 +1,6 @@
 package io.github.alexandrepiveteau.echo.protocol
 
 import io.github.alexandrepiveteau.echo.*
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
@@ -106,24 +105,18 @@ internal open class MutableSiteImpl<T, M, R>(
         strategy = strategy,
         transform = transform,
     ),
-    MutableSite<T, M> {
+    MutableSite<T, M>,
+    EventScope<T> {
+
+  override fun yield(event: T) =
+      history.append(
+          site = identifier,
+          event = format.encodeToByteArray(serializer, event),
+      )
 
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M) -> R,
-  ): R {
-    var mutated = false
-    val scope =
-        object : EventScope<T> {
-          override fun yield(event: T): EventIdentifier {
-            return history.append(
-                    site = identifier,
-                    event = format.encodeToByteArray(serializer, event),
-                )
-                .apply { mutated = true }
-          }
-        }
-    return mutex.withLock { block(scope, value.value).apply { if (mutated) mutation() } }
-  }
+  ) = mutex.withLock { block(this, value.value).apply { mutation() } }
 }
 
 /**
