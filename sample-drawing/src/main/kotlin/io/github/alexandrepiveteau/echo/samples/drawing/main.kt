@@ -2,7 +2,6 @@
 
 package io.github.alexandrepiveteau.echo.samples.drawing
 
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,10 +14,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.window.awaitApplication
+import androidx.compose.ui.window.rememberWindowState
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.flowOn
 import io.github.alexandrepiveteau.echo.mutableSite
@@ -34,12 +37,13 @@ import kotlin.random.Random
 import kotlin.system.exitProcess
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /** The main entry point of the demo program. */
-fun main(args: Array<String>) = runBlocking {
+@ExperimentalComposeUiApi
+suspend fun main(args: Array<String>) = coroutineScope {
 
   // The single source of truth for the local site.
   val site =
@@ -58,54 +62,61 @@ fun main(args: Array<String>) = runBlocking {
 
   // Run the GUI.
   val figures = site.value.map { it.figures }
-  Window(title = "Echo - Drawing (${config.me.name})", size = IntSize(400, 400)) {
-    MaterialTheme {
-      Box(Modifier.fillMaxSize().dashed()) {
-        val current by figures.collectAsState(persistentSetOf())
-        val scope = rememberCoroutineScope()
 
-        // Display the participants board.
-        StatefulParticipants(
-            site = site,
-            participants = config.participant,
-            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
-        )
+  awaitApplication {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Echo - Drawing (${config.me.name})",
+        state = rememberWindowState(size = WindowSize(400.dp, 400.dp)),
+    ) {
+      MaterialTheme {
+        Box(Modifier.fillMaxSize().dashed()) {
+          val current by figures.collectAsState(persistentSetOf())
+          val scope = rememberCoroutineScope()
 
-        // Let the user add new figures.
-        FloatingActionButton(
-            onClick = { scope.launch { site.event { yield(DrawingEvent.AddFigure) } } },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-        ) { Icon(Icons.Outlined.AddBox, null) }
+          // Display the participants board.
+          StatefulParticipants(
+              site = site,
+              participants = config.participant,
+              modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+          )
 
-        // Display the figure board, and handle figure modifications.
-        Board(
-            figures = current,
-            onFigureClick = {
-              scope.launch {
-                val event =
-                    DrawingEvent.Move(
-                        it.id,
-                        toX = Random.nextInt(from = -144, until = 144).dp,
-                        toY = Random.nextInt(from = -144, until = 144).dp,
-                    )
-                site.event { yield(event) }
-              }
-            },
-            onFigureChangeColor = {
-              scope.launch {
-                val event =
-                    DrawingEvent.SetColor(
-                        it.id,
-                        color = (FiguresColors - it.color).random(),
-                    )
-                site.event { yield(event) }
-              }
-            },
-            onFigureDelete = { fig ->
-              scope.launch { site.event { yield(DrawingEvent.Delete(fig.id)) } }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
+          // Let the user add new figures.
+          FloatingActionButton(
+              onClick = { scope.launch { site.event { yield(DrawingEvent.AddFigure) } } },
+              modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+          ) { Icon(Icons.Outlined.AddBox, null) }
+
+          // Display the figure board, and handle figure modifications.
+          Board(
+              figures = current,
+              onFigureClick = {
+                scope.launch {
+                  val event =
+                      DrawingEvent.Move(
+                          it.id,
+                          toX = Random.nextInt(from = -144, until = 144).dp,
+                          toY = Random.nextInt(from = -144, until = 144).dp,
+                      )
+                  site.event { yield(event) }
+                }
+              },
+              onFigureChangeColor = {
+                scope.launch {
+                  val event =
+                      DrawingEvent.SetColor(
+                          it.id,
+                          color = (FiguresColors - it.color).random(),
+                      )
+                  site.event { yield(event) }
+                }
+              },
+              onFigureDelete = { fig ->
+                scope.launch { site.event { yield(DrawingEvent.Delete(fig.id)) } }
+              },
+              modifier = Modifier.fillMaxSize(),
+          )
+        }
       }
     }
   }
