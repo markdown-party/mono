@@ -121,7 +121,7 @@ alice.event { state ->
 
 All the events emitted in a single `event { }` block are added atomically to the _site_. This means that no remote events will be received, even if the _site_  is currently syncing. It's therefore possible to call `yield()` multiple times in a single block, which is useful if you want to perform multiple fine-grain operations (say, [create a tree node, move it and name it](https://github.com/markdown-party/mono/tree/main/markdown-frontend/src/main/kotlin/party/markdown/data/tree/MutableSiteTreeApi.kt#L26-L31)).
 
-Additionally, the current state aggregate of the _site_  is provided as a paramter. In the above example, the state value is atomically incremented by one, implementing a proper g-counter.
+Additionally, the current state aggregate of the _site_  is provided as a parameter. In the above example, the state value is atomically incremented by one, implementing a proper g-counter.
 
 When an event is emitted, its identifier is returned. This identifier is globally unique, and corresponds to the Lamport timestamp of emission of the event.
 
