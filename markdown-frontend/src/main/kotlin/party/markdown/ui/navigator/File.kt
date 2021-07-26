@@ -26,6 +26,7 @@ enum class FileType(val isFolder: Boolean) {
  * and be part of a folder (or not).
  */
 external interface FileProps : RProps {
+  var name: String
   var displayId: Long
   var displayName: String
   var displaySelected: Boolean
@@ -193,7 +194,7 @@ private val file =
                     icon = "/icons/navigator-dropdown-rename.svg",
                     onClick = {
                       props.onMenuClick()
-                      setEditedName(props.displayName)
+                      setEditedName(props.name)
                     },
                     classes = "hover:bg-gray-200",
                 )

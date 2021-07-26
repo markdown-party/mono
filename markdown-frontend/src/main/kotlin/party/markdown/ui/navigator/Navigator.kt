@@ -43,6 +43,7 @@ private data class Node(
     val indent: Int,
     val key: EventIdentifier,
     val name: String?,
+    val displayName: String?,
     val fileType: FileType,
 )
 
@@ -86,6 +87,7 @@ private fun TreeNode.flatten(
                 indent = level,
                 key = node.id,
                 name = node.name,
+                displayName = "${node.name}.md",
                 fileType = FileType.Markdown,
             ))
       }
@@ -98,6 +100,7 @@ private fun TreeNode.flatten(
                 indent = level,
                 key = node.id,
                 name = node.name,
+                displayName = node.name,
                 fileType = type,
             ))
         if (type == FileType.FolderOpen) {
@@ -158,7 +161,8 @@ private val navigator =
           file {
             key = node.key.toString()
             displayId = node.key.toULong().toLong()
-            displayName = node.name ?: "(unnamed)"
+            name = node.name ?: "(unnamed)"
+            displayName = node.displayName ?: "(unnamed)"
             displayFileType = node.fileType
             displayIndentLevel = node.indent
             displaySelected = node.key == props.selected?.id

@@ -45,7 +45,7 @@ private val Adjectives =
         "Famous",
     )
 
-private fun nextName(): String {
+private fun name(): String {
   return "${Adjectives.random()} ${Names.random()}"
 }
 
@@ -62,26 +62,9 @@ private val panes =
           this.onTreeNodeSelected = setSelected
 
           this.tree = tree
-          this.onCreateFile =
-              {
-                scope.launch { props.treeApi.createFile("${nextName()}.md", it ?: tree) }
-              }
-          this.onCreateFolder =
-              {
-                scope.launch { props.treeApi.createFolder(nextName(), it ?: tree) }
-              }
-          this.onNodeRename =
-              { node, name ->
-                scope.launch {
-                  val newName =
-                      if (name.endsWith(".md") || node is TreeNode.Folder) {
-                        name
-                      } else {
-                        "$name.md"
-                      }
-                  props.treeApi.name(newName, node)
-                }
-              }
+          this.onCreateFile = { scope.launch { props.treeApi.createFile(name(), it ?: tree) } }
+          this.onCreateFolder = { scope.launch { props.treeApi.createFolder(name(), it ?: tree) } }
+          this.onNodeRename = { node, name -> scope.launch { props.treeApi.name(name, node) } }
           this.onNodeDelete = { node -> scope.launch { props.treeApi.remove(node) } }
           this.onNodeMove =
               { id, node ->
