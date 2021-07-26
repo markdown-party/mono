@@ -76,7 +76,8 @@ private fun TreeNode.flatten(
       parent: TreeNode?,
       node: TreeNode,
       level: Int,
-      list: MutableList<Node>
+      list: MutableList<Node>,
+      similar: Int,
   ) {
     when (node) {
       is TreeNode.MarkdownFile -> {
@@ -87,7 +88,7 @@ private fun TreeNode.flatten(
                 indent = level,
                 key = node.id,
                 name = node.name,
-                displayName = "${node.name}.md",
+                displayName = if (similar == 0) "${node.name}.md" else "${node.name} ($similar).md",
                 fileType = FileType.Markdown,
             ))
       }
@@ -100,7 +101,7 @@ private fun TreeNode.flatten(
                 indent = level,
                 key = node.id,
                 name = node.name,
-                displayName = node.name,
+                displayName = if (similar == 0) node.name else "${node.name} ($similar)",
                 fileType = type,
             ))
         if (type == FileType.FolderOpen) {
@@ -111,6 +112,12 @@ private fun TreeNode.flatten(
                 node = it,
                 level = level + 1,
                 list = list,
+                similar = node.children.asSequence()
+                    .minus(node)
+                    .filter { n -> n::class == it::class }
+                    .filter { n -> n.id < it.id }
+                    .filter { n -> n.name == it.name }
+                    .count()
             )
           }
         }
@@ -129,6 +136,12 @@ private fun TreeNode.flatten(
               node = it,
               level = 0,
               list = results,
+              similar = root.children.asSequence()
+                  .minus(it)
+                  .filter { n -> n::class == it::class }
+                  .filter { n -> n.id < it.id }
+                  .filter { n -> n.name == it.name }
+                  .count()
           )
         }
       }
