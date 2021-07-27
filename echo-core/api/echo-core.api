@@ -225,10 +225,12 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuf
 	public static synthetic fun pushAtGap$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;[IIIILjava/lang/Object;)V
 }
 
-public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifier {
+public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifier : java/lang/Comparable {
 	public static final field Companion Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifier$Companion;
 	public static final synthetic fun box-impl (J)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;
-	public static final fun compareTo--MgKYFQ (JJ)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo--MgKYFQ (J)I
+	public static fun compareTo--MgKYFQ (JJ)I
 	public static final fun component1-iWHgJgY (J)I
 	public static final fun component2-ix6DSBw (J)I
 	public fun equals (Ljava/lang/Object;)Z
@@ -322,6 +324,7 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumbe
 	public static final fun maxOf-VlF6aSQ (III)I
 	public static final fun maxOf-k25hgY8 (II)I
 	public static final fun takeOrElse-kC0Vv3Q (ILkotlin/jvm/functions/Function0;)I
+	public static final fun toSequenceNumber (Lkotlinx/datetime/Instant;)I
 	public static final fun toSequenceNumber-WZ4Q5Ns (I)I
 	public static final fun toUInt-PmzKtwM (I)I
 }
@@ -360,6 +363,8 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifie
 
 public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog : io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
 	public fun <init> ()V
+	public fun <init> (Lkotlinx/datetime/Clock;)V
+	public synthetic fun <init> (Lkotlinx/datetime/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public fun acknowledge-qH2TBG0 (II)V
 	public fun acknowledged ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
@@ -380,7 +385,8 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableE
 }
 
 public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableHistory : io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog, io/github/alexandrepiveteau/echo/core/log/MutableHistory {
-	public fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;)V
+	public fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;)V
+	public synthetic fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun clear ()V
 	public final fun getCurrent ()Ljava/lang/Object;
 	public fun moveLeft ()V
@@ -388,10 +394,14 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableH
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
-	public static final fun mutableEventLogOf ()Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public static final fun mutableEventLogOf ([Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
-	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+	public static final fun mutableEventLogOf (Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun mutableEventLogOf ([Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableEventLogOf$default (Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableEventLogOf$default ([Lkotlin/Pair;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+	public static synthetic fun mutableHistoryOf$default (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+	public static synthetic fun mutableHistoryOf$default (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/ChangeScope {

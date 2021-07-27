@@ -1,16 +1,11 @@
 package io.github.alexandrepiveteau.echo.site
 
-import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
-import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.suspendTest
-import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
-import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class MutableSiteEventTest {
 
@@ -35,9 +30,7 @@ class MutableSiteEventTest {
   @Test
   fun singleYield_terminates() = suspendTest {
     val site = 145U.toSiteIdentifier()
-    with(mutableSite<Int>(site)) {
-      event { assertEquals(EventIdentifier(SequenceNumber.Min, site), yield(123)) }
-    }
+    with(mutableSite<Int>(site)) { event { assertEquals(site, yield(123).site) } }
   }
 
   @Test
@@ -45,18 +38,12 @@ class MutableSiteEventTest {
     val site = 145U.toSiteIdentifier()
     with(mutableSite<Int>(site)) {
       event {
-        assertEquals(EventIdentifier(SequenceNumber.Min + 0u, site), yield(123))
-        assertEquals(EventIdentifier(SequenceNumber.Min + 1u, site), yield(456))
+        val a = yield(123)
+        val b = yield(456)
+        assertEquals(site, a.site)
+        assertEquals(site, b.site)
+        assertTrue(a.seqno < b.seqno)
       }
     }
-  }
-
-  @Test
-  fun sequential_yields_areOrdered() = suspendTest {
-    val alice = mutableSite<Int>(Random.nextSiteIdentifier(), strategy = SyncStrategy.Once)
-    val bob = mutableSite<Int>(Random.nextSiteIdentifier(), strategy = SyncStrategy.Once)
-    alice.event { assertEquals(SequenceNumber.Min + 0u, yield(123).seqno) }
-    sync(alice, bob)
-    bob.event { assertEquals(SequenceNumber.Min + 1u, yield(123).seqno) }
   }
 }

@@ -3,15 +3,20 @@ package io.github.alexandrepiveteau.echo.core.log
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.requireRange
+import kotlinx.datetime.Clock
 
 /**
  * An implementation of [MutableEventLog], which stores events by site as well as in a linear
  * fashion, allowing for faster queries.
+ *
+ * @param clock the [Clock] used to integrate new events.
  */
-abstract class AbstractMutableEventLog : MutableEventLog {
+abstract class AbstractMutableEventLog(
+    clock: Clock = Clock.System,
+) : MutableEventLog {
 
   // Store what we've already seen.
-  private val acknowledgedMap = MutableAcknowledgeMap()
+  private val acknowledgedMap = MutableAcknowledgeMap(clock)
 
   // Storing the events and the changes.
   internal val eventStore = BlockLog()
