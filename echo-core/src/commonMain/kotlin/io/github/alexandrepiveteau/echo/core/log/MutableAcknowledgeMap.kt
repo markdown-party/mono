@@ -4,21 +4,21 @@ import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuf
 import io.github.alexandrepiveteau.echo.core.buffer.binarySearchBySite
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.*
-import kotlin.jvm.JvmInline
+import kotlinx.datetime.Clock
 
 /** Returns an [EventIdentifier] that acknowledges the given [SequenceNumber]. */
 private fun EventIdentifier.withSequenceNumber(seqno: SequenceNumber): EventIdentifier =
     EventIdentifier(maxOf(this.seqno, seqno), this.site)
 
 /** A [MutableAcknowledgeMap] manages a list set of acknowledgements. */
-@JvmInline
-internal value class MutableAcknowledgeMap
+internal class MutableAcknowledgeMap
 private constructor(
+    private val clock: Clock,
     private val backing: MutableEventIdentifierGapBuffer,
 ) {
 
   /** Creates a new [MutableAcknowledgeMap]. */
-  constructor() : this(MutableEventIdentifierGapBuffer(size = 0))
+  constructor(clock: Clock) : this(clock, MutableEventIdentifierGapBuffer(size = 0))
 
   /**
    * Acknowledges the given [SequenceNumber] for the provided [SiteIdentifier]. Future calls to the
@@ -83,16 +83,18 @@ private constructor(
 
   /** Returns the next expected [SequenceNumber] for all the [SiteIdentifier]. */
   fun expected(): SequenceNumber {
-    var max = SequenceNumber.Min
+    var max = clock.now().toSequenceNumber()
     for (i in 0 until backing.size) {
       max = maxOf(max, backing[i].seqno.inc())
     }
-    return max
+    return maxOf(max, SequenceNumber.Min)
   }
 
   /** Returns the next expected [SequenceNumber] for the given [SiteIdentifier]. */
   fun expected(site: SiteIdentifier): SequenceNumber {
-    return get(site).inc() // Because SequenceNumber.Unspecified + 1U == SequenceNumber.Min
+    val physical = clock.now().toSequenceNumber()
+    val logical = get(site).inc() // Because SequenceNumber.Unspecified + 1U == SequenceNumber.Min
+    return maxOf(physical, logical)
   }
 
   /**

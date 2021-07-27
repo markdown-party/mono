@@ -1,13 +1,18 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import kotlinx.datetime.Clock
+
 /**
  * An implementation of a [MutableHistory], with an initial aggregate, and a projection that is used
  * to incrementally update the model.
+ *
+ * @param clock the [Clock] used to integrate new events.
  */
 abstract class AbstractMutableHistory<T>(
     initial: T,
     private val projection: MutableProjection<T>,
-) : AbstractMutableEventLog(), MutableHistory<T> {
+    clock: Clock = Clock.System,
+) : AbstractMutableEventLog(clock), MutableHistory<T> {
 
   // The ChangeScope that will be provided to the projection whenever some changes mush be appended
   // to the changes history.

@@ -1,7 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.causality
 
-import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 /**
  * A sequence number is a monotonically increasing value defined for a site. It can be seen as a
@@ -78,3 +79,8 @@ fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)
 
 /** Creates a [UInt] from a [SequenceNumber]. */
 fun SequenceNumber.toUInt(): UInt = index
+
+fun Instant.toSequenceNumber(): SequenceNumber {
+  // TODO : Not naive sequence numbers.
+  return SequenceNumber(this.epochSeconds.toUInt())
+}

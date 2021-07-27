@@ -20,6 +20,7 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-common"))
         api(Deps.Kotlinx.SerializationCore)
+        api(Deps.Kotlinx.DateTime)
       }
     }
     val commonTest by getting {

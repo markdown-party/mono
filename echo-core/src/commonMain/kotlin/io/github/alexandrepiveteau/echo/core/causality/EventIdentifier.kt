@@ -30,11 +30,11 @@ fun EventIdentifier(
 value class EventIdentifier
 internal constructor(
     internal val packed: ULong,
-) {
+): Comparable<EventIdentifier> {
 
   // Because we're using packed values and giving precedence to the sequence number, we can simply
   // compare event identifiers as longs to find a total order.
-  operator fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
+  override operator fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
 
   val seqno: SequenceNumber
     get() = SequenceNumber(unpackUInt1(packed))
