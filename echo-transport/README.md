@@ -119,7 +119,7 @@ val local = mutableSite(identifier, initial, projection)
 sync(remote, local.encodeToFrame()) // sync over the network
 ```
 
-Internally, the `encodeToFrame()` and `decodeToFrame()` functions make use of Protobufs to efficiently store the messages in binary format, which are then mapped to binary websocket frames.
+Internally, the `encodeToFrame()` and `decodeFromFrame()` functions make use of Protobufs to efficiently store the messages in binary format, which are then mapped to binary websocket frames.
 
 ### Server
 
