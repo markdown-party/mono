@@ -176,7 +176,7 @@ class MutableCursors {
 
 The cursor for a given _site_ could then be extracted as follows :
 
-1. Check whether the `ids` buffer contains the site identifier
+1. Check whether the `ids` buffer contains the site identifier.
 2. If so, access the associated anchor identifier. This is where the cursor points.
 3. Finally, look at the RGA to find the anchor identifier, and return the cursor position.
 
