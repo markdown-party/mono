@@ -232,7 +232,7 @@ internal class MutableCharGapBufferImpl : MutableCharGapBuffer, Gap {
     return array
   }
 
-  override fun remove(offset: Int, size: Int): CharArray {
+  override fun remove(offset: Int, size: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size)
     requireIn(offset + size, 0, this.size + 1)
@@ -241,11 +241,6 @@ internal class MutableCharGapBufferImpl : MutableCharGapBuffer, Gap {
     // Increment the endIndex, and then copy the previous size elements from the buffer into the
     // returned array. Because the cursor was moved, we can simply sequentially move them.
     this.endIndex += size
-    return this.buffer.copyInto(
-        destination = CharArray(size),
-        startIndex = this.endIndex - size,
-        endIndex = this.endIndex,
-    )
   }
 
   override fun clear() {

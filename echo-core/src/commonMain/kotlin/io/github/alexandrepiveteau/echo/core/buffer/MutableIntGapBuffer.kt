@@ -87,7 +87,7 @@ interface MutableIntGapBuffer {
   fun remove(
       offset: Int,
       size: Int = 1,
-  ): IntArray
+  )
 
   /**
    * Removes the whole gap buffer, clearing the current data. This operation takes a constant time

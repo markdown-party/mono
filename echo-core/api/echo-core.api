@@ -30,7 +30,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun getSize ()I
 	public abstract fun push (BI)V
 	public abstract fun push ([BIII)V
-	public abstract fun remove (II)[B
+	public abstract fun remove (II)V
 	public abstract fun set (IB)V
 }
 
@@ -38,7 +38,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBu
 	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;[BIIIILjava/lang/Object;)[B
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;BIILjava/lang/Object;)V
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;[BIIIILjava/lang/Object;)V
-	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IIILjava/lang/Object;)[B
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IIILjava/lang/Object;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer_ExtensionsKt {
@@ -66,7 +66,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun getSize ()I
 	public abstract fun push (CI)V
 	public abstract fun push ([CIII)V
-	public abstract fun remove (II)[C
+	public abstract fun remove (II)V
 	public abstract fun set (IC)V
 }
 
@@ -74,7 +74,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBu
 	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CIIIILjava/lang/Object;)[C
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;CIILjava/lang/Object;)V
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;[CIIIILjava/lang/Object;)V
-	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;IIILjava/lang/Object;)[C
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer;IIILjava/lang/Object;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableCharGapBuffer_ExtensionsKt {
@@ -102,7 +102,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun getSize ()I
 	public abstract fun push (Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;III)V
 	public abstract fun push-_R01Hw8 (JI)V
-	public abstract fun remove (II)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	public abstract fun remove (II)V
 	public abstract fun set--oNUasc (IJ)V
 }
 
@@ -110,7 +110,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIden
 	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;IIIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;IIIILjava/lang/Object;)V
 	public static synthetic fun push-_R01Hw8$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;JIILjava/lang/Object;)V
-	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer;IIILjava/lang/Object;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableEventIdentifierGapBuffer_BinarySearchKt {
@@ -146,7 +146,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun getSize ()I
 	public abstract fun push (Ljava/lang/Object;I)V
 	public abstract fun push ([Ljava/lang/Object;III)V
-	public abstract fun remove (II)[Ljava/lang/Object;
+	public abstract fun remove (II)V
 	public abstract fun set (ILjava/lang/Object;)V
 }
 
@@ -154,7 +154,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer
 	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;IIIILjava/lang/Object;)[Ljava/lang/Object;
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;Ljava/lang/Object;IILjava/lang/Object;)V
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;[Ljava/lang/Object;IIIILjava/lang/Object;)V
-	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;IIILjava/lang/Object;)[Ljava/lang/Object;
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer;IIILjava/lang/Object;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBufferImpl : io/github/alexandrepiveteau/echo/core/buffer/Gap, io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer {
@@ -169,7 +169,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer
 	public fun getStartIndex ()I
 	public fun push (Ljava/lang/Object;I)V
 	public fun push ([Ljava/lang/Object;III)V
-	public fun remove (II)[Ljava/lang/Object;
+	public fun remove (II)V
 	public fun set (ILjava/lang/Object;)V
 	public fun setEndIndex (I)V
 	public fun setStartIndex (I)V
@@ -192,7 +192,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun getSize ()I
 	public abstract fun push (II)V
 	public abstract fun push ([IIII)V
-	public abstract fun remove (II)[I
+	public abstract fun remove (II)V
 	public abstract fun set (II)V
 }
 
@@ -200,7 +200,7 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuf
 	public static synthetic fun copyInto$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;[IIIIILjava/lang/Object;)[I
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;IIILjava/lang/Object;)V
 	public static synthetic fun push$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;[IIIIILjava/lang/Object;)V
-	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;IIILjava/lang/Object;)[I
+	public static synthetic fun remove$default (Lio/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer;IIILjava/lang/Object;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/buffer/MutableIntGapBuffer_BinarySearchKt {

@@ -1,6 +1,7 @@
 package party.markdown.ui.editor
 
 import codemirror.state.*
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.buffer.toEventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.buffer.toMutableGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
@@ -83,7 +84,8 @@ private fun update(
     // Check that the removed range is non-empty, because if the buffer is empty an
     // OutOfBoundsException will nevertheless be thrown.
     if (toA - fromA > 0) {
-      val ids = buffer.remove(fromA, size = toA - fromA)
+      val ids = buffer.copyOfRange(fromA, toA)
+      buffer.remove(fromA, size = toA - fromA)
       for (id in ids) if (id.isSpecified) removedBuffer.push(id)
     }
     repeat(inserted.length) { buffer.push(EventIdentifier.Unspecified, fromA) }
