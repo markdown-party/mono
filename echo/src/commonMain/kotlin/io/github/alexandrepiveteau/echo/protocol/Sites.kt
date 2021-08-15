@@ -35,13 +35,13 @@ internal open class ExchangeImpl(
   internal val mutex = Mutex()
 
   /** A [MutableSharedFlow] that is used to mark that a mutation has occurred in the log. */
-  private val mutations = MutableSharedFlow<Boolean>(replay = 1, onBufferOverflow = DROP_OLDEST)
+  private val mutations = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = DROP_OLDEST)
 
   /**
    * A function that will be called whenever some mutations were performed, and some computed values
    * or the event log should be updated.
    */
-  open suspend fun mutation() = mutations.emit(true)
+  open suspend fun mutation() = mutations.emit(Unit)
 
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
