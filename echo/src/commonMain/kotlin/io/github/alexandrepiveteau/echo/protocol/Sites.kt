@@ -41,7 +41,9 @@ internal open class ExchangeImpl(
    * A function that will be called whenever some mutations were performed, and some computed values
    * or the event log should be updated.
    */
-  open suspend fun mutation() = mutations.emit(Unit)
+  open fun mutation() {
+    mutations.tryEmit(Unit)
+  }
 
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
@@ -86,7 +88,7 @@ internal open class SiteImpl<M, R>(
 
   override val value = current.asStateFlow()
 
-  override suspend fun mutation() {
+  override fun mutation() {
     current.value = transform(history.current)
     super.mutation()
   }
@@ -136,20 +138,16 @@ internal open class MutableSiteImpl<T, M, R>(
 @OptIn(InternalCoroutinesApi::class)
 private class ExchangeScopeImpl<I, O>(
     private val mutex: Mutex,
-    private val log: MutableEventLog,
+    override val log: MutableEventLog,
     private val sentinel: ReceiveChannel<*>,
     incoming: ReceiveChannel<I>,
     outgoing: SendChannel<O>,
-    private val mutation: suspend () -> Unit,
+    private val mutation: () -> Unit,
 ) : ExchangeScope<I, O>, ReceiveChannel<I> by incoming, SendChannel<O> by outgoing {
 
-  override suspend fun <R> withEventLogLock(
-      block: suspend EventLog.() -> R,
-  ) = mutex.withLock { block(log) }
-
-  override suspend fun <R> withMutableEventLogLock(
-      block: suspend MutableEventLog.() -> R,
-  ) = mutex.withLock { block(log).also { mutation() } }
+  override suspend fun lock() = mutex.lock()
+  override fun unlock() = mutex.unlock()
+  override fun mutate() = mutation()
 
   override val onEventLogLock =
       object : SelectClause1<MutableEventLog> {
@@ -167,7 +165,7 @@ private class ExchangeScopeImpl<I, O>(
         ) =
             mutex.onLock.registerSelectClause2(select, null) {
               block(log).also {
-                mutation()
+                mutate()
                 mutex.unlock()
               }
             }

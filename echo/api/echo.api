@@ -97,11 +97,13 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/Two
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/protocol/ExchangeScope : kotlinx/coroutines/channels/ReceiveChannel, kotlinx/coroutines/channels/SendChannel {
+	public abstract fun getLog ()Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public abstract fun getOnEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
 	public abstract fun getOnEventLogUpdate ()Lkotlinx/coroutines/selects/SelectClause0;
 	public abstract fun getOnMutableEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
-	public abstract fun withEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun withMutableEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun lock (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun mutate ()V
+	public abstract fun unlock ()V
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScope$DefaultImpls {
@@ -110,6 +112,11 @@ public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScope$Defau
 	public static fun offer (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Ljava/lang/Object;)Z
 	public static fun poll (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;)Ljava/lang/Object;
 	public static fun receiveOrNull (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScopeKt {
+	public static final fun withEventLogLock (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun withMutableEventLogLock (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class io/github/alexandrepiveteau/echo/protocol/Message {
