@@ -279,7 +279,6 @@ public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifi
 	public static final fun EventIdentifier-qH2TBG0 (II)J
 	public static final fun isSpecified--MgKYFQ (J)Z
 	public static final fun isUnspecified--MgKYFQ (J)Z
-	public static final fun takeOrElse-_R01Hw8 (JLkotlin/jvm/functions/Function0;)J
 	public static final fun toEventIdentifier-VKZWuLQ (J)J
 	public static final fun toULong--MgKYFQ (J)J
 }
@@ -312,7 +311,6 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumbe
 	public static final fun isUnspecified-PmzKtwM (I)Z
 	public static final fun maxOf-VlF6aSQ (III)I
 	public static final fun maxOf-k25hgY8 (II)I
-	public static final fun takeOrElse-kC0Vv3Q (ILkotlin/jvm/functions/Function0;)I
 	public static final fun toSequenceNumber (Lkotlinx/datetime/Instant;)I
 	public static final fun toSequenceNumber-WZ4Q5Ns (I)I
 	public static final fun toUInt-PmzKtwM (I)I

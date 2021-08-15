@@ -72,13 +72,6 @@ inline val EventIdentifier.isUnspecified: Boolean
     return seqno.isUnspecified
   }
 
-/**
- * If this [EventIdentifier] [isSpecified] then this is returned, otherwise [block] is executed and
- * its result is returned.
- */
-inline fun EventIdentifier.takeOrElse(block: () -> EventIdentifier): EventIdentifier =
-    if (isSpecified) this else block()
-
 /** Creates an [EventIdentifier] from a [ULong]. */
 fun ULong.toEventIdentifier(): EventIdentifier = EventIdentifier(this)
 
