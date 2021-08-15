@@ -24,7 +24,7 @@ internal constructor(
   companion object {
 
     /** The minimum [SiteIdentifier] that could possibly exist. */
-    val Min: SiteIdentifier = SiteIdentifier(1U)
+    val Min: SiteIdentifier = SiteIdentifier(UInt.MIN_VALUE)
 
     /** The maximum [SiteIdentifier] that could possibly exist. */
     val Max: SiteIdentifier = SiteIdentifier(UInt.MAX_VALUE)
@@ -41,11 +41,8 @@ fun SiteIdentifier.toUInt(): UInt {
   return this.unique
 }
 
-/**
- * Gets the next random [SiteIdentifier] from the random number generator. It is guaranteed not to
- * be [SiteIdentifier.Unspecified].
- */
+/** Gets the next random [SiteIdentifier] from the random number generator. */
 fun Random.nextSiteIdentifier(): SiteIdentifier {
-  // In range [0, UInt.MAX_VALUE), then shifted right by one.
-  return SiteIdentifier(nextUInt(until = UInt.MAX_VALUE) + 1U)
+  // In range [0, UInt.MAX_VALUE]
+  return SiteIdentifier(nextUInt())
 }
