@@ -1,9 +1,3 @@
-public final class io/github/alexandrepiveteau/echo/core/PackingKt {
-	public static final fun packUInts-feOb9K0 (II)J
-	public static final fun unpackUInt1-VKZWuLQ (J)I
-	public static final fun unpackUInt2-VKZWuLQ (J)I
-}
-
 public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Gap {
 	public static final field Companion Lio/github/alexandrepiveteau/echo/core/buffer/Gap$Companion;
 	public static final field DefaultSize I
