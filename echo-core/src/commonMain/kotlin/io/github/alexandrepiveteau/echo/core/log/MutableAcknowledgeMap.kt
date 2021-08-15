@@ -30,7 +30,6 @@ private constructor(
       site: SiteIdentifier,
   ) {
     require(seqno.isSpecified)
-    require(site.isSpecified)
 
     val i = backing.binarySearchBySite(site)
     if (i >= 0) backing[i] = backing[i].withSequenceNumber(seqno)
@@ -58,7 +57,6 @@ private constructor(
       site: SiteIdentifier,
   ) {
     require(seqno.isSpecified)
-    require(site.isSpecified)
 
     val id = EventIdentifier(seqno, site)
     val i = backing.binarySearchBySite(site)
@@ -75,7 +73,6 @@ private constructor(
       seqno: SequenceNumber,
       site: SiteIdentifier,
   ): Boolean {
-    require(site.isSpecified) { "Site must be specified." }
     require(seqno.isSpecified) { "Sequence number must be specified." }
     val i = backing.binarySearchBySite(site)
     return (i >= 0) && backing[i].seqno >= seqno
@@ -104,7 +101,6 @@ private constructor(
   operator fun get(
       site: SiteIdentifier,
   ): SequenceNumber {
-    require(site.isSpecified) { "Site must be specified." }
     val i = backing.binarySearchBySite(site)
     return if (i >= 0) backing[i].seqno else SequenceNumber.Unspecified
   }

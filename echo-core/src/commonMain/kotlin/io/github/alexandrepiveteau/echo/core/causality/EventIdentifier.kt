@@ -30,7 +30,7 @@ fun EventIdentifier(
 value class EventIdentifier
 internal constructor(
     internal val packed: ULong,
-): Comparable<EventIdentifier> {
+) : Comparable<EventIdentifier> {
 
   // Because we're using packed values and giving precedence to the sequence number, we can simply
   // compare event identifiers as longs to find a total order.
@@ -53,7 +53,7 @@ internal constructor(
     val Unspecified: EventIdentifier =
         EventIdentifier(
             SequenceNumber.Unspecified,
-            SiteIdentifier.Unspecified,
+            SiteIdentifier.Min,
         )
   }
 }
@@ -62,18 +62,14 @@ internal constructor(
 inline val EventIdentifier.isSpecified: Boolean
   get() {
     // Avoid auto-boxing.
-    val seqnoSpecified = seqno.index != SequenceNumber.Unspecified.index
-    val siteSpecified = site.unique != SiteIdentifier.Unspecified.unique
-    return seqnoSpecified && siteSpecified
+    return seqno.isSpecified
   }
 
 /** `false` when this has [SiteIdentifier.Unspecified] or [SequenceNumber.Unspecified]. */
 inline val EventIdentifier.isUnspecified: Boolean
   get() {
     // Avoid auto-boxing.
-    val seqnoSpecified = seqno.index == SequenceNumber.Unspecified.index
-    val siteSpecified = site.unique == SiteIdentifier.Unspecified.unique
-    return seqnoSpecified || siteSpecified
+    return seqno.isUnspecified
   }
 
 /**

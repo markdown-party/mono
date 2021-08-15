@@ -337,15 +337,11 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifie
 public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifier$Companion {
 	public final fun getMax-ix6DSBw ()I
 	public final fun getMin-ix6DSBw ()I
-	public final fun getUnspecified-ix6DSBw ()I
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifierKt {
-	public static final fun isSpecified-C_LfJGE (I)Z
-	public static final fun isUnspecified-C_LfJGE (I)Z
 	public static final fun nextSiteIdentifier (Lkotlin/random/Random;)I
-	public static final fun takeOrElse-_36Z28E (ILkotlin/jvm/functions/Function0;)I
 	public static final fun toSiteIdentifier-WZ4Q5Ns (I)I
 	public static final fun toUInt-C_LfJGE (I)I
 }

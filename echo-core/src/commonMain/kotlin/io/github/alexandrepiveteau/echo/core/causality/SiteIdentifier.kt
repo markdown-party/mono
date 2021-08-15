@@ -28,31 +28,8 @@ internal constructor(
 
     /** The maximum [SiteIdentifier] that could possibly exist. */
     val Max: SiteIdentifier = SiteIdentifier(UInt.MAX_VALUE)
-
-    /**
-     * A special sentinel value that indicates that no [SiteIdentifier] has been specified. This
-     * should be used when an optional [SiteIdentifier] is expected and can't be provided.
-     *
-     * Using a dedicated value rather than an optional avoids auto-boxing.
-     */
-    val Unspecified: SiteIdentifier = SiteIdentifier(0U)
   }
 }
-
-/** `false` when this is [SiteIdentifier.Unspecified]. */
-inline val SiteIdentifier.isSpecified: Boolean
-  get() = unique != SiteIdentifier.Unspecified.unique
-
-/** `true` when this is [SiteIdentifier.Unspecified]. */
-inline val SiteIdentifier.isUnspecified: Boolean
-  get() = unique == SiteIdentifier.Unspecified.unique
-
-/**
- * If this [SiteIdentifier] [isSpecified] then this is returned, otherwise [block] is executed and
- * its result is returned.
- */
-inline fun SiteIdentifier.takeOrElse(block: () -> SiteIdentifier): SiteIdentifier =
-    if (isSpecified) this else block()
 
 /** Creates a [SiteIdentifier] from the current [Int]. */
 fun UInt.toSiteIdentifier(): SiteIdentifier {
