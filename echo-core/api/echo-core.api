@@ -1,10 +1,5 @@
 public final class io/github/alexandrepiveteau/echo/core/PackingKt {
-	public static final fun packBytes (BBBB)I
 	public static final fun packUInts-feOb9K0 (II)J
-	public static final fun unpackByte1 (I)B
-	public static final fun unpackByte2 (I)B
-	public static final fun unpackByte3 (I)B
-	public static final fun unpackByte4 (I)B
 	public static final fun unpackUInt1-VKZWuLQ (J)I
 	public static final fun unpackUInt2-VKZWuLQ (J)I
 }
