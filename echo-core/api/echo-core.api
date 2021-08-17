@@ -14,7 +14,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun clear ()V
 	public abstract fun copyInto ([BIII)[B
 	public abstract fun get (I)B
-	public abstract fun getBacking ()[B
 	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public abstract fun getSize ()I
 	public abstract fun push (BI)V
@@ -50,7 +49,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun clear ()V
 	public abstract fun copyInto ([CIII)[C
 	public abstract fun get (I)C
-	public abstract fun getBacking ()[C
 	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public abstract fun getSize ()I
 	public abstract fun push (CI)V
@@ -86,7 +84,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun clear ()V
 	public abstract fun copyInto (Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;III)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
 	public abstract fun get-UaA2Q5I (I)J
-	public abstract fun getBacking ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
 	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public abstract fun getSize ()I
 	public abstract fun push (Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;III)V
@@ -130,7 +127,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun clear ()V
 	public abstract fun copyInto ([Ljava/lang/Object;III)[Ljava/lang/Object;
 	public abstract fun get (I)Ljava/lang/Object;
-	public abstract fun getBacking ()[Ljava/lang/Object;
 	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public abstract fun getSize ()I
 	public abstract fun push (Ljava/lang/Object;I)V
@@ -151,7 +147,6 @@ public final class io/github/alexandrepiveteau/echo/core/buffer/MutableGapBuffer
 	public fun clear ()V
 	public fun copyInto ([Ljava/lang/Object;III)[Ljava/lang/Object;
 	public fun get (I)Ljava/lang/Object;
-	public fun getBacking ()[Ljava/lang/Object;
 	public fun getEndIndex ()I
 	public fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public fun getSize ()I
@@ -176,7 +171,6 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/buffer/Mut
 	public abstract fun clear ()V
 	public abstract fun copyInto ([IIII)[I
 	public abstract fun get (I)I
-	public abstract fun getBacking ()[I
 	public abstract fun getGap ()Lio/github/alexandrepiveteau/echo/core/buffer/Gap;
 	public abstract fun getSize ()I
 	public abstract fun push (II)V
@@ -484,7 +478,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableProjection {
-	public abstract fun backward-9x6AE2g (Ljava/lang/Object;J[BII[BII)Ljava/lang/Object;
-	public abstract fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;J[BII)Ljava/lang/Object;
+	public abstract fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public abstract fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
 }
 

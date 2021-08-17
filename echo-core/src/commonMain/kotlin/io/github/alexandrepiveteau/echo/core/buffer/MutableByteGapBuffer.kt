@@ -13,9 +13,6 @@ package io.github.alexandrepiveteau.echo.core.buffer
  */
 interface MutableByteGapBuffer {
 
-  /** The backing [ByteArray]. */
-  val backing: ByteArray
-
   /** How many items there are in the gap buffer. */
   val size: Int
 

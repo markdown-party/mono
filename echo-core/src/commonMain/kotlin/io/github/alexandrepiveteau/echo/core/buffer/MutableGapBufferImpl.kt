@@ -109,9 +109,6 @@ internal class MutableGapBufferImpl<T>(
 
   // IMPLEMENTATION - BUFFER
 
-  override val backing: Array<T>
-    get() = buffer
-
   override val size: Int
     get() = this.buffer.size - capacity
 

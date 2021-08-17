@@ -113,9 +113,6 @@ internal class MutableEventIdentifierGapBufferImpl : MutableEventIdentifierGapBu
 
   // IMPLEMENTATION - BUFFER
 
-  override val backing: EventIdentifierArray
-    get() = buffer
-
   override val size: Int
     get() = this.buffer.size - capacity
 

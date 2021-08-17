@@ -2,6 +2,8 @@
 
 package io.github.alexandrepiveteau.echo.projections
 
+import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.log.ChangeScope as CoreChangeScope
 import io.github.alexandrepiveteau.echo.core.log.MutableProjection
@@ -50,7 +52,7 @@ class OneWayMutableProjection<M, T>(
   override fun CoreChangeScope.forward(
       model: M,
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int
   ) =
@@ -63,10 +65,10 @@ class OneWayMutableProjection<M, T>(
   override fun backward(
       model: M,
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int,
-      changeData: ByteArray,
+      changeData: MutableByteGapBuffer,
       changeFrom: Int,
       changeUntil: Int
   ) = model
@@ -119,7 +121,7 @@ class TwoWayMutableProjection<M, T, C>(
   override fun CoreChangeScope.forward(
       model: M,
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int,
   ) =
@@ -135,10 +137,10 @@ class TwoWayMutableProjection<M, T, C>(
   override fun backward(
       model: M,
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int,
-      changeData: ByteArray,
+      changeData: MutableByteGapBuffer,
       changeFrom: Int,
       changeUntil: Int,
   ) =

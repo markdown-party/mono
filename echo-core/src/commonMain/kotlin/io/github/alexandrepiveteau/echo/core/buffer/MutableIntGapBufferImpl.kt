@@ -108,9 +108,6 @@ internal class MutableIntGapBufferImpl : MutableIntGapBuffer, Gap {
 
   // IMPLEMENTATION - BUFFER
 
-  override val backing: IntArray
-    get() = buffer
-
   override val size: Int
     get() = this.buffer.size - capacity
 

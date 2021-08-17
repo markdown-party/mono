@@ -13,9 +13,6 @@ package io.github.alexandrepiveteau.echo.core.buffer
  */
 interface MutableCharGapBuffer {
 
-  /** The backing [CharArray]. */
-  val backing: CharArray
-
   /** How many items there are in the gap buffer. */
   val size: Int
 

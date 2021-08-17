@@ -77,8 +77,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/Cha
 
 public final class io/github/alexandrepiveteau/echo/projections/OneWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
 	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
-	public fun backward-9x6AE2g (Ljava/lang/Object;J[BII[BII)Ljava/lang/Object;
-	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;J[BII)Ljava/lang/Object;
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/OneWayProjection {
@@ -87,8 +87,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/One
 
 public final class io/github/alexandrepiveteau/echo/projections/TwoWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
 	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
-	public fun backward-9x6AE2g (Ljava/lang/Object;J[BII[BII)Ljava/lang/Object;
-	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;J[BII)Ljava/lang/Object;
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
