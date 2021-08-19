@@ -3,7 +3,6 @@ package io.github.alexandrepiveteau.echo.ktor
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
-import io.github.alexandrepiveteau.echo.channelLink
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
@@ -53,12 +52,12 @@ private fun CoroutineScope.sender(
 @EchoKtorPreview
 fun HttpClient.wssSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
-) = SendExchange {
-  channelLink<Frame, Frame> { inc ->
+): SendExchange<Frame, Frame> = SendExchange { inc ->
+  channelFlow {
     wss(sender) {
       sender(
-              inc = inc,
-              out = this@channelLink,
+              inc = inc.produceIn(this),
+              out = this@channelFlow,
               socketInc = incoming,
               socketOut = outgoing,
           )
@@ -70,12 +69,12 @@ fun HttpClient.wssSendExchange(
 @EchoKtorPreview
 fun HttpClient.wsSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
-) = SendExchange {
-  channelLink<Frame, Frame> { inc ->
+): SendExchange<Frame, Frame> = SendExchange { inc ->
+  channelFlow {
     ws(sender) {
       sender(
-              inc = inc,
-              out = this@channelLink,
+              inc = inc.produceIn(this),
+              out = this@channelFlow,
               socketInc = incoming,
               socketOut = outgoing,
           )
@@ -111,12 +110,12 @@ private fun CoroutineScope.receiver(
 @EchoKtorPreview
 fun HttpClient.wssReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
-) = ReceiveExchange {
-  channelLink<Frame, Frame> { inc ->
+): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
+  channelFlow {
     wss(receiver) {
       receiver(
-              inc = inc,
-              out = this@channelLink,
+              inc = inc.produceIn(this),
+              out = this@channelFlow,
               socketInc = incoming,
               socketOut = outgoing,
           )
@@ -128,12 +127,12 @@ fun HttpClient.wssReceiveExchange(
 @EchoKtorPreview
 fun HttpClient.wsReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
-) = ReceiveExchange {
-  channelLink<Frame, Frame> { inc ->
+): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
+  channelFlow {
     ws(receiver) {
       receiver(
-              inc = inc,
-              out = this@channelLink,
+              inc = inc.produceIn(this),
+              out = this@channelFlow,
               socketInc = incoming,
               socketOut = outgoing,
           )

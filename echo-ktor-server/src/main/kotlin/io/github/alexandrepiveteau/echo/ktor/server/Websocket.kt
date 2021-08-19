@@ -18,8 +18,7 @@ fun Route.sender(
 ) {
   webSocket {
     block()
-        .outgoing()
-        .talk(this.incoming.consumeAsFlow())
+        .send(this.incoming.consumeAsFlow())
         .onEach(outgoing::send)
         .onCompletion { outgoing.close() }
         .collect()
@@ -33,8 +32,7 @@ fun Route.receiver(
 ) {
   webSocket {
     block()
-        .incoming()
-        .talk(this.incoming.consumeAsFlow())
+        .receive(this.incoming.consumeAsFlow())
         .onEach(outgoing::send)
         .onCompletion { outgoing.close() }
         .collect()

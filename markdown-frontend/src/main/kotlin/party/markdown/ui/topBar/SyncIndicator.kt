@@ -4,15 +4,11 @@ package party.markdown.ui.topBar
 
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.onEach
 import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
@@ -77,8 +73,12 @@ private fun <I, O> Exchange<I, O>.proxy(): Pair<Exchange<I, O>, StateFlow<Instan
     }
   }
   return object : Exchange<I, O> {
-    override fun outgoing() = this@proxy.outgoing().onEach({ update() }, { update() })
-    override fun incoming() = this@proxy.incoming().onEach({ update() }, { update() })
+    override fun receive(
+        incoming: Flow<O>,
+    ) = this@proxy.receive(incoming.onEach { update() }).onEach { update() }
+    override fun send(
+        incoming: Flow<I>,
+    ) = this@proxy.send(incoming.onEach { update() }).onEach { update() }
   } to lastMessage
 }
 

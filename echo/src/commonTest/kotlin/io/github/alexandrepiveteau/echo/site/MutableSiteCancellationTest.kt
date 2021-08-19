@@ -19,7 +19,7 @@ class MutableSiteCancellationTest {
         mutableSite<Int>(identifier = Random.nextSiteIdentifier())
             .apply { event { yield(123) } }
             .buffer(Channel.RENDEZVOUS)
-    val result = site.incoming().talk(emptyFlow()).toList()
+    val result = site.receive(emptyFlow()).toList()
     assertEquals(emptyList(), result)
   }
 }

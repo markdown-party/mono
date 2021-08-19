@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * An interface defining an asymmetrical replication site, biased towards sending data.
  *
@@ -7,7 +9,9 @@ package io.github.alexandrepiveteau.echo
  * @param O the type of the domain-specific outgoing events for this [SendExchange].
  */
 fun interface SendExchange<in I, out O> {
-  fun outgoing(): Link<I, O>
+
+  /** Sends some [O] as a response to an [incoming] [Flow] of [I]. */
+  fun send(incoming: Flow<I>): Flow<O>
 }
 
 /**
@@ -17,11 +21,13 @@ fun interface SendExchange<in I, out O> {
  * @param O the type of the domain-specific outgoing events for this [ReceiveExchange].
  */
 fun interface ReceiveExchange<out I, in O> {
-  fun incoming(): Link<O, I>
+
+  /** Sends some [I] as a response to an [incoming] [Flow] of [O]. */
+  fun receive(incoming: Flow<O>): Flow<I>
 }
 
 /**
- * An interface defining an [Exchange], which is able to generate some links that are used for
+ * An interface defining an [Exchange], which is able to generate some flows that are used for
  * bidirectional communication and transmission of data.
  *
  * @param I the type of the domain-specific incoming events for this [Exchange].

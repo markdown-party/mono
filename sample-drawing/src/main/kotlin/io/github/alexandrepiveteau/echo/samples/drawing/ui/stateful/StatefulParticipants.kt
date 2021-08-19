@@ -48,8 +48,8 @@ fun StatefulParticipants(
                   url { path(participant.path) }
                 }
             sync(
-                site.encodeToFrame().outgoing(),
-                receiver.incoming(),
+                site.encodeToFrame()::send,
+                receiver::receive,
             )
           } catch (problem: Throwable) {
             problem.printStackTrace()

@@ -1,14 +1,17 @@
 package io.github.alexandrepiveteau.echo.serialization
 
 import io.github.alexandrepiveteau.echo.Exchange
-import io.github.alexandrepiveteau.echo.Link
 import io.github.alexandrepiveteau.echo.protocol.Message
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.ktor.http.cio.websocket.*
+import io.ktor.http.cio.websocket.Frame.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.protobuf.ProtoBuf
+import kotlinx.serialization.serializer
 
 /**
  * Encodes an [Exchange] of [Message] into an [Exchange] of [Frame], using the default event
@@ -16,23 +19,16 @@ import kotlinx.serialization.protobuf.ProtoBuf
  *
  * @return the encoded [Exchange]
  */
-fun Exchange<Message.Incoming, Message.Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
+fun Exchange<Incoming, Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
     object : Exchange<Frame, Frame> {
-      override fun outgoing() =
-          Link<Frame, Frame> { inc ->
-            this@encodeToFrame.encodeToByteArray()
-                .outgoing()
-                .talk(inc.filterIsInstance<Frame.Binary>().map(Frame.Binary::readBytes))
-                .map { Frame.Binary(true, it) }
-          }
 
-      override fun incoming() =
-          Link<Frame, Frame> { inc ->
-            this@encodeToFrame.encodeToByteArray()
-                .incoming()
-                .talk(inc.filterIsInstance<Frame.Binary>().map(Frame.Binary::readBytes))
-                .map { Frame.Binary(true, it) }
-          }
+      override fun receive(
+          incoming: Flow<Frame>,
+      ) = transformFromFrame(incoming, this@encodeToFrame::receive)
+
+      override fun send(
+          incoming: Flow<Frame>,
+      ) = transformFromFrame(incoming, this@encodeToFrame::send)
     }
 
 /**
@@ -41,85 +37,42 @@ fun Exchange<Message.Incoming, Message.Outgoing>.encodeToFrame(): Exchange<Frame
  *
  * @return the decoded [Exchange]
  */
-fun Exchange<Frame, Frame>.decodeFromFrame(): Exchange<Message.Incoming, Message.Outgoing> =
-    object : Exchange<ByteArray, ByteArray> {
+fun Exchange<Frame, Frame>.decodeFromFrame(): Exchange<Incoming, Outgoing> =
+    object : Exchange<Incoming, Outgoing> {
 
-          override fun outgoing() =
-              Link<ByteArray, ByteArray> { inc ->
-                this@decodeFromFrame.outgoing()
-                    .talk(inc.map { Frame.Binary(true, it) })
-                    .filterIsInstance<Frame.Binary>()
-                    .map(Frame.Binary::readBytes)
-              }
+      override fun receive(
+          incoming: Flow<Outgoing>,
+      ): Flow<Incoming> = transformToFrame(incoming, this@decodeFromFrame::receive)
 
-          override fun incoming() =
-              Link<ByteArray, ByteArray> { inc ->
-                this@decodeFromFrame.incoming()
-                    .talk(inc.map { Frame.Binary(true, it) })
-                    .filterIsInstance<Frame.Binary>()
-                    .map(Frame.Binary::readBytes)
-              }
-        }
-        .decodeFromByteArray()
-
-// STRING JSON CODING
-
-internal fun Exchange<ByteArray, ByteArray>.decodeFromByteArray():
-    Exchange<Message.Incoming, Message.Outgoing> =
-    object : Exchange<Message.Incoming, Message.Outgoing> {
-
-      override fun outgoing() =
-          this@decodeFromByteArray.outgoing()
-              .decodeFromByteArray(
-                  Message.Incoming.serializer(),
-                  Message.Outgoing.serializer(),
-              )
-
-      override fun incoming() =
-          this@decodeFromByteArray.incoming()
-              .decodeFromByteArray(
-                  Message.Outgoing.serializer(),
-                  Message.Incoming.serializer(),
-              )
-    }
-
-internal fun Exchange<Message.Incoming, Message.Outgoing>.encodeToByteArray():
-    Exchange<ByteArray, ByteArray> =
-    object : Exchange<ByteArray, ByteArray> {
-
-      override fun outgoing() =
-          this@encodeToByteArray.outgoing()
-              .encodeToByteArray(
-                  Message.Incoming.serializer(),
-                  Message.Outgoing.serializer(),
-              )
-
-      override fun incoming() =
-          this@encodeToByteArray.incoming()
-              .encodeToByteArray(
-                  Message.Outgoing.serializer(),
-                  Message.Incoming.serializer(),
-              )
+      override fun send(
+          incoming: Flow<Incoming>,
+      ): Flow<Outgoing> = transformToFrame(incoming, this@decodeFromFrame::send)
     }
 
 // FLOW ENCODING AND DECODING
 
-private fun <T> Flow<ByteArray>.decode(
-    serializer: KSerializer<T>,
+private inline fun <reified A, reified B> transformFromFrame(
+    incoming: Flow<Frame>,
+    f: (Flow<A>) -> Flow<B>,
+): Flow<Frame> {
+  val incomingBytes = incoming.filterIsInstance<Binary>().map(Binary::readBytes)
+  val transformed = f(incomingBytes.decode())
+  return transformed.encode().map { Binary(true, it) }
+}
+
+private inline fun <reified A, reified B> transformToFrame(
+    incoming: Flow<A>,
+    f: (Flow<Frame>) -> Flow<Frame>
+): Flow<B> {
+  val incomingFrames = incoming.encode().map { Binary(true, it) }
+  val transformed = f(incomingFrames)
+  return transformed.filterIsInstance<Binary>().map(Binary::readBytes).decode()
+}
+
+private inline fun <reified T> Flow<ByteArray>.decode(
+    serializer: KSerializer<T> = serializer(),
 ) = map { msg -> ProtoBuf.decodeFromByteArray(serializer, msg) }
 
-private fun <T> Flow<T>.encode(
-    serializer: KSerializer<T>,
+private inline fun <reified T> Flow<T>.encode(
+    serializer: KSerializer<T> = serializer(),
 ) = map { msg -> ProtoBuf.encodeToByteArray(serializer, msg) }
-
-// LINK ENCODING AND DECODING
-
-private fun <I, O> Link<ByteArray, ByteArray>.decodeFromByteArray(
-    a: KSerializer<I>,
-    b: KSerializer<O>,
-) = Link<I, O> { inc -> talk(inc.encode(a)).decode(b) }
-
-private fun <I, O> Link<I, O>.encodeToByteArray(
-    a: KSerializer<I>,
-    b: KSerializer<O>,
-) = Link<ByteArray, ByteArray> { inc -> talk(inc.decode(a)).encode(b) }

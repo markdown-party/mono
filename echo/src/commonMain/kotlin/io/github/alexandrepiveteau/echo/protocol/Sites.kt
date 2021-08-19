@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.*
+import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.Site
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
@@ -13,10 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.SelectClause0
 import kotlinx.coroutines.selects.SelectClause1
 import kotlinx.coroutines.selects.SelectInstance
@@ -55,8 +54,10 @@ internal open class ExchangeImpl(
    * @param O the type of the output messages.
    */
   private fun <I, O> exchange(
+      incoming: Flow<I>,
       block: ExchangeBlock<I, O>,
-  ): Link<I, O> = channelLink { inc ->
+  ): Flow<O> = channelFlow {
+    val inc = incoming.produceIn(this)
     val channel = mutations.produceIn(this)
     val scope = ExchangeScopeImpl(mutex, log, channel, inc, this, ::mutation)
 
@@ -65,13 +66,18 @@ internal open class ExchangeImpl(
     yield()
     block(scope)
 
-    // Clear the jobs registered in channelLink, and ensure proper termination of the exchange.
+    // Clear the jobs registered in channelFlow, and ensure proper termination of the exchange.
     inc.cancel()
     channel.cancel()
   }
 
-  override fun outgoing() = exchange<Inc, Out> { with(strategy) { outgoing() } }
-  override fun incoming() = exchange<Out, Inc> { with(strategy) { incoming() } }
+  override fun send(
+      incoming: Flow<Inc>,
+  ): Flow<Out> = exchange(incoming) { with(strategy) { outgoing() } }
+
+  override fun receive(
+      incoming: Flow<Out>,
+  ): Flow<Inc> = exchange(incoming) { with(strategy) { incoming() } }
 }
 
 internal open class SiteImpl<M, R>(
