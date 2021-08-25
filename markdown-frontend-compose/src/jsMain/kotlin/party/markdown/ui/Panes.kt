@@ -7,6 +7,7 @@ import org.jetbrains.compose.web.dom.Div
 import party.markdown.data.text.TextApi
 import party.markdown.data.tree.TreeApi
 import party.markdown.tree.TreeNode
+import party.markdown.ui.editor.Editor
 import party.markdown.ui.navigator.Navigator
 
 private val Names =
@@ -62,6 +63,9 @@ fun Panes(
           scope.launch { treeApi.move(id.toULong().toEventIdentifier(), node) }
         })
     DividerHorizontal()
-    // TODO : Text editor.
+    Editor(
+        treeNode = selected?.takeIf { it in nodes },
+        api = textApi,
+    )
   }
 }
