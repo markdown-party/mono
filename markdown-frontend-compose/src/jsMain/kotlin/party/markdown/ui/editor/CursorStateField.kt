@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package party.markdown.ui.editor
 
 import codemirror.state.Annotation
@@ -95,6 +93,7 @@ fun EventIdentifierArray.indexOfCursor(
  *
  * @param f the [StateField] instance on which we're acting.
  */
+@OptIn(ExperimentalTime::class)
 private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> {
   val rga = field(RGAStateField)
   val cursors = field(f)
@@ -136,10 +135,10 @@ private fun EditorState.toTooltips(f: StateField<CursorsState>): Array<Tooltip> 
 // the number of possible combinations.
 
 /** The delay before which the cursors get hidden. */
-private val Delay = Duration.seconds(5)
+@ExperimentalTime private val Delay = Duration.seconds(5)
 
 /** The tick-rate at which the [NowStateField] should be updated. */
-val DelayTick = Duration.seconds(1)
+@ExperimentalTime val DelayTick = Duration.seconds(1)
 
 /**
  * Returns a [Pair] of of items from [CursorIcons] and [CursorColors] uniquely determined by this
