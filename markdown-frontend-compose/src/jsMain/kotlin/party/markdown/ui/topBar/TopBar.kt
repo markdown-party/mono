@@ -6,7 +6,10 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlinx.browser.window
-import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Img
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.data.project.ProjectApi
@@ -46,16 +49,10 @@ fun TopBar(
     ProjectName(api = projectApi)
     Div(attrs = { classes("flex-grow") })
     Button(
-        attrs = {
-          classes("flex", "flex-row", "items-center")
-          classes("px-6", "py-3", "space-x-4")
-          classes("bg-gray-700", "hover:bg-gray-500", "transition")
-          classes("shadow", "hover:shadow-lg")
-          classes("rounded-lg")
-          onClick { window.open(window.location.origin) }
-        }) {
+        onClick = { window.open(window.location.origin) },
+    ) {
       Img(src = "/icons/new-project.svg")
-      Span(attrs = { classes("uppercase") }) { Text("New project") }
+      Span { Text("New project") }
     }
     ShareLinkButton(publicLink)
     SyncIndicator(
