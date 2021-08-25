@@ -38,6 +38,9 @@ fun MarkdownParty(
         onDebugEnabled = setDebug,
     )
     DividerVertical()
-    // TODO : Display the panes here.
+    Panes(
+        treeApi = treeApi,
+        textApi = textApi,
+    )
   }
 }
