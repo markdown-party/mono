@@ -16,9 +16,6 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
  */
 interface MutableEventIdentifierGapBuffer {
 
-  /** The backing [EventIdentifierArray]. */
-  val backing: EventIdentifierArray
-
   /** How many items there are in the gap buffer. */
   val size: Int
 
@@ -91,7 +88,7 @@ interface MutableEventIdentifierGapBuffer {
   fun remove(
       offset: Int,
       size: Int = 1,
-  ): EventIdentifierArray
+  )
 
   /**
    * Removes the whole gap buffer, clearing the current data. This operation takes a constant time

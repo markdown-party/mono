@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
+import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
@@ -13,7 +15,7 @@ class MutableHistoryInsertTest {
     override fun ChangeScope.forward(
         model: List<Byte>,
         identifier: EventIdentifier,
-        data: ByteArray,
+        data: MutableByteGapBuffer,
         from: Int,
         until: Int
     ): List<Byte> {
@@ -25,10 +27,10 @@ class MutableHistoryInsertTest {
     override fun backward(
         model: List<Byte>,
         identifier: EventIdentifier,
-        data: ByteArray,
+        data: MutableByteGapBuffer,
         from: Int,
         until: Int,
-        changeData: ByteArray,
+        changeData: MutableByteGapBuffer,
         changeFrom: Int,
         changeUntil: Int
     ): List<Byte> {

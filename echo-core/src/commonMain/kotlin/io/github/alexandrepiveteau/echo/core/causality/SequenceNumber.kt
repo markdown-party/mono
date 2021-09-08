@@ -67,13 +67,6 @@ inline val SequenceNumber.isSpecified: Boolean
 inline val SequenceNumber.isUnspecified: Boolean
   get() = index == SequenceNumber.Unspecified.index
 
-/**
- * If this [SequenceNumber] [isSpecified] then this is returned, otherwise [block] is executed and
- * its result is returned.
- */
-inline fun SequenceNumber.takeOrElse(block: () -> SequenceNumber): SequenceNumber =
-    if (isSpecified) this else block()
-
 /** Creates a [SequenceNumber] from a [UInt]. */
 fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)
 

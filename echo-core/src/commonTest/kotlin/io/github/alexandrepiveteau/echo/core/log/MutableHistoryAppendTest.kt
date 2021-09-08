@@ -3,11 +3,8 @@ package io.github.alexandrepiveteau.echo.core.log
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 class MutableHistoryAppendTest {
@@ -48,11 +45,5 @@ class MutableHistoryAppendTest {
     log.append(SiteIdentifier.Min, byteArrayOf(3, 4, 5))
     assertEquals(3, log.size)
     assertTrue(log.contains(SequenceNumber.Min + 2u, SiteIdentifier.Min))
-  }
-
-  @Test
-  fun eventLog_unspecifiedSite() {
-    val log = mutableEventLogOf(ZeroClock)
-    assertFails { log.append(SiteIdentifier.Unspecified, byteArrayOf()) }
   }
 }

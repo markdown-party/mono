@@ -26,8 +26,8 @@ internal class BlockLog {
    * The [ByteArray] backing this [BlockLog], which may be exposed for direct access without copying
    * the underlying bytes.
    */
-  val backing: ByteArray
-    get() = blocks.backing
+  val backing: MutableByteGapBuffer
+    get() = blocks
 
   // BEGIN : POSITIONS
 

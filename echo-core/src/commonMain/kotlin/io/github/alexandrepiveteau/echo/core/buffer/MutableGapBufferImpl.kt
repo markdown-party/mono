@@ -109,9 +109,6 @@ internal class MutableGapBufferImpl<T>(
 
   // IMPLEMENTATION - BUFFER
 
-  override val backing: Array<T>
-    get() = buffer
-
   override val size: Int
     get() = this.buffer.size - capacity
 
@@ -234,7 +231,7 @@ internal class MutableGapBufferImpl<T>(
   }
 
   @Suppress("UNCHECKED_CAST")
-  override fun remove(offset: Int, size: Int): Array<T> {
+  override fun remove(offset: Int, size: Int) {
     // Preconditions.
     requireIn(offset, 0, this.size)
     requireIn(offset + size, 0, this.size + 1)
@@ -243,12 +240,6 @@ internal class MutableGapBufferImpl<T>(
     // Increment the endIndex, and then copy the previous size elements from the buffer into the
     // returned array. Because the cursor was moved, we can simply sequentially move them.
     this.endIndex += size
-    return this.buffer.copyInto(
-        destination = this.backing.copyOf(size),
-        startIndex = this.endIndex - size,
-        endIndex = this.endIndex,
-    ) as
-        Array<T>
   }
 
   override fun clear() {

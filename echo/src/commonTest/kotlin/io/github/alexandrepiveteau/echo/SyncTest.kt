@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo
 
 import kotlin.test.Test
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 class SyncTest {
 
@@ -22,6 +24,6 @@ class SyncTest {
 }
 
 object NoOpExchange : Exchange<Nothing, Nothing> {
-  override fun incoming() = link<Nothing, Nothing> {}
-  override fun outgoing() = link<Nothing, Nothing> {}
+  override fun receive(incoming: Flow<Nothing>) = emptyFlow<Nothing>()
+  override fun send(incoming: Flow<Nothing>) = emptyFlow<Nothing>()
 }

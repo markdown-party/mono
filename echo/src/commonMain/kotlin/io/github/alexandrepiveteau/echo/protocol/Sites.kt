@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.*
+import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.Site
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
@@ -13,10 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.SelectClause0
 import kotlinx.coroutines.selects.SelectClause1
 import kotlinx.coroutines.selects.SelectInstance
@@ -35,13 +34,15 @@ internal open class ExchangeImpl(
   internal val mutex = Mutex()
 
   /** A [MutableSharedFlow] that is used to mark that a mutation has occurred in the log. */
-  private val mutations = MutableSharedFlow<Boolean>(replay = 1, onBufferOverflow = DROP_OLDEST)
+  private val mutations = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = DROP_OLDEST)
 
   /**
    * A function that will be called whenever some mutations were performed, and some computed values
    * or the event log should be updated.
    */
-  open suspend fun mutation() = mutations.emit(true)
+  open fun mutation() {
+    mutations.tryEmit(Unit)
+  }
 
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
@@ -53,8 +54,10 @@ internal open class ExchangeImpl(
    * @param O the type of the output messages.
    */
   private fun <I, O> exchange(
+      incoming: Flow<I>,
       block: ExchangeBlock<I, O>,
-  ): Link<I, O> = channelLink { inc ->
+  ): Flow<O> = channelFlow {
+    val inc = incoming.produceIn(this)
     val channel = mutations.produceIn(this)
     val scope = ExchangeScopeImpl(mutex, log, channel, inc, this, ::mutation)
 
@@ -63,13 +66,18 @@ internal open class ExchangeImpl(
     yield()
     block(scope)
 
-    // Clear the jobs registered in channelLink, and ensure proper termination of the exchange.
+    // Clear the jobs registered in channelFlow, and ensure proper termination of the exchange.
     inc.cancel()
     channel.cancel()
   }
 
-  override fun outgoing() = exchange<Inc, Out> { with(strategy) { outgoing() } }
-  override fun incoming() = exchange<Out, Inc> { with(strategy) { incoming() } }
+  override fun send(
+      incoming: Flow<Inc>,
+  ): Flow<Out> = exchange(incoming) { with(strategy) { outgoing() } }
+
+  override fun receive(
+      incoming: Flow<Out>,
+  ): Flow<Inc> = exchange(incoming) { with(strategy) { incoming() } }
 }
 
 internal open class SiteImpl<M, R>(
@@ -86,7 +94,7 @@ internal open class SiteImpl<M, R>(
 
   override val value = current.asStateFlow()
 
-  override suspend fun mutation() {
+  override fun mutation() {
     current.value = transform(history.current)
     super.mutation()
   }
@@ -136,20 +144,16 @@ internal open class MutableSiteImpl<T, M, R>(
 @OptIn(InternalCoroutinesApi::class)
 private class ExchangeScopeImpl<I, O>(
     private val mutex: Mutex,
-    private val log: MutableEventLog,
+    override val log: MutableEventLog,
     private val sentinel: ReceiveChannel<*>,
     incoming: ReceiveChannel<I>,
     outgoing: SendChannel<O>,
-    private val mutation: suspend () -> Unit,
+    private val mutation: () -> Unit,
 ) : ExchangeScope<I, O>, ReceiveChannel<I> by incoming, SendChannel<O> by outgoing {
 
-  override suspend fun <R> withEventLogLock(
-      block: suspend EventLog.() -> R,
-  ) = mutex.withLock { block(log) }
-
-  override suspend fun <R> withMutableEventLogLock(
-      block: suspend MutableEventLog.() -> R,
-  ) = mutex.withLock { block(log).also { mutation() } }
+  override suspend fun lock() = mutex.lock()
+  override fun unlock() = mutex.unlock()
+  override fun mutate() = mutation()
 
   override val onEventLogLock =
       object : SelectClause1<MutableEventLog> {
@@ -167,7 +171,7 @@ private class ExchangeScopeImpl<I, O>(
         ) =
             mutex.onLock.registerSelectClause2(select, null) {
               block(log).also {
-                mutation()
+                mutate()
                 mutex.unlock()
               }
             }

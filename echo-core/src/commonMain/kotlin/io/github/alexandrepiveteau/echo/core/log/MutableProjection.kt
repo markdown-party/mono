@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 
 /**
@@ -28,7 +29,7 @@ interface MutableProjection<T> {
       model: T,
       // Event.
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int,
   ): T
@@ -52,11 +53,11 @@ interface MutableProjection<T> {
       model: T,
       // Event.
       identifier: EventIdentifier,
-      data: ByteArray,
+      data: MutableByteGapBuffer,
       from: Int,
       until: Int,
       // Change.
-      changeData: ByteArray,
+      changeData: MutableByteGapBuffer,
       changeFrom: Int,
       changeUntil: Int,
   ): T

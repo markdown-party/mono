@@ -27,7 +27,7 @@ class MutableByteGapBufferEmptyTest {
         assertEquals(1, size)
         assertEquals(4, get(0))
         assertFails { get(1) }
-        assertEquals(4, remove(0)[0])
+        remove(0)
         assertEquals(0, size)
         assertContentEquals(byteArrayOf(), toByteArray())
       }

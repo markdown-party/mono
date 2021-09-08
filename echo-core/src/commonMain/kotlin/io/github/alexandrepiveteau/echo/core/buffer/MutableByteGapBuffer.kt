@@ -13,9 +13,6 @@ package io.github.alexandrepiveteau.echo.core.buffer
  */
 interface MutableByteGapBuffer {
 
-  /** The backing [ByteArray]. */
-  val backing: ByteArray
-
   /** How many items there are in the gap buffer. */
   val size: Int
 
@@ -87,7 +84,7 @@ interface MutableByteGapBuffer {
   fun remove(
       offset: Int,
       size: Int = 1,
-  ): ByteArray
+  )
 
   /**
    * Removes the whole gap buffer, clearing the current data. This operation takes a constant time

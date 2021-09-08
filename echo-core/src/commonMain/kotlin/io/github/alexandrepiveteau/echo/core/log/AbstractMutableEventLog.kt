@@ -164,7 +164,6 @@ abstract class AbstractMutableEventLog(
 
     // Input sanitization.
     require(seqno.isSpecified)
-    require(site.isSpecified)
     requireRange(from, until, event)
 
     // State checks
@@ -214,7 +213,6 @@ abstract class AbstractMutableEventLog(
   override fun iterator(
       site: SiteIdentifier,
   ): EventIterator {
-    require(site.isSpecified) { "Site must be specified." }
     return eventStoreBySite[site]?.Iterator() ?: EmptyEventIterator
   }
 
@@ -249,7 +247,6 @@ abstract class AbstractMutableEventLog(
 
     // Input sanitization.
     require(seqno.isSpecified)
-    require(site.isSpecified)
 
     return partialRemove(seqno, site).apply { resetCursor() }
   }

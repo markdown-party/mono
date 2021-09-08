@@ -2,7 +2,10 @@ package io.github.alexandrepiveteau.echo.sites
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.events.EventScope
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,8 +35,8 @@ private class MappingMutableSite<T, out M1, out M2>(
     private val backing: MutableSite<T, M1>
 ) : MutableSite<T, M2> {
 
-  override fun outgoing() = backing.outgoing()
-  override fun incoming() = backing.incoming()
+  override fun receive(incoming: Flow<Out>) = backing.receive(incoming)
+  override fun send(incoming: Flow<Inc>) = backing.send(incoming)
 
   override val identifier = backing.identifier
   override val value = backing.value.map(f)

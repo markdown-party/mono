@@ -1,26 +1,17 @@
 public abstract interface class io/github/alexandrepiveteau/echo/Exchange : io/github/alexandrepiveteau/echo/ReceiveExchange, io/github/alexandrepiveteau/echo/SendExchange {
 }
 
-public abstract interface class io/github/alexandrepiveteau/echo/Link {
-	public abstract fun talk (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
-}
-
-public final class io/github/alexandrepiveteau/echo/LinkKt {
-	public static final fun channelLink (Lkotlin/jvm/functions/Function3;)Lio/github/alexandrepiveteau/echo/Link;
-	public static final fun link (Lkotlin/jvm/functions/Function3;)Lio/github/alexandrepiveteau/echo/Link;
-}
-
 public abstract interface class io/github/alexandrepiveteau/echo/MutableSite : io/github/alexandrepiveteau/echo/Site {
 	public abstract fun event (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getIdentifier-ix6DSBw ()I
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/ReceiveExchange {
-	public abstract fun incoming ()Lio/github/alexandrepiveteau/echo/Link;
+	public abstract fun receive (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/SendExchange {
-	public abstract fun outgoing ()Lio/github/alexandrepiveteau/echo/Link;
+	public abstract fun send (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/Site : io/github/alexandrepiveteau/echo/Exchange {
@@ -39,19 +30,15 @@ public final class io/github/alexandrepiveteau/echo/SiteKt {
 }
 
 public final class io/github/alexandrepiveteau/echo/SyncKt {
-	public static final fun sync (Lio/github/alexandrepiveteau/echo/Link;Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sync (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun sync ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/alexandrepiveteau/echo/TransformsKt {
 	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Exchange;I)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Link;I)Lio/github/alexandrepiveteau/echo/Link;
 	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Exchange;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Link;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Link;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Link;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun onEach (Lio/github/alexandrepiveteau/echo/Link;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lio/github/alexandrepiveteau/echo/Link;
 }
 
 public final class io/github/alexandrepiveteau/echo/UnitProjection : io/github/alexandrepiveteau/echo/projections/OneWayProjection {
@@ -77,8 +64,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/Cha
 
 public final class io/github/alexandrepiveteau/echo/projections/OneWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
 	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
-	public fun backward-9x6AE2g (Ljava/lang/Object;J[BII[BII)Ljava/lang/Object;
-	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;J[BII)Ljava/lang/Object;
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/OneWayProjection {
@@ -87,8 +74,8 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/One
 
 public final class io/github/alexandrepiveteau/echo/projections/TwoWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
 	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
-	public fun backward-9x6AE2g (Ljava/lang/Object;J[BII[BII)Ljava/lang/Object;
-	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;J[BII)Ljava/lang/Object;
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
@@ -97,11 +84,13 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/Two
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/protocol/ExchangeScope : kotlinx/coroutines/channels/ReceiveChannel, kotlinx/coroutines/channels/SendChannel {
+	public abstract fun getLog ()Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public abstract fun getOnEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
 	public abstract fun getOnEventLogUpdate ()Lkotlinx/coroutines/selects/SelectClause0;
 	public abstract fun getOnMutableEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
-	public abstract fun withEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun withMutableEventLogLock (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun lock (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun mutate ()V
+	public abstract fun unlock ()V
 }
 
 public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScope$DefaultImpls {
@@ -110,6 +99,11 @@ public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScope$Defau
 	public static fun offer (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Ljava/lang/Object;)Z
 	public static fun poll (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;)Ljava/lang/Object;
 	public static fun receiveOrNull (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/ExchangeScopeKt {
+	public static final fun withEventLogLock (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun withMutableEventLogLock (Lio/github/alexandrepiveteau/echo/protocol/ExchangeScope;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class io/github/alexandrepiveteau/echo/protocol/Message {

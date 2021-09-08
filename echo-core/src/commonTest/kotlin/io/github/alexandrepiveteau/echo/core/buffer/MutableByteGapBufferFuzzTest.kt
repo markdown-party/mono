@@ -41,9 +41,11 @@ class MutableByteGapBufferFuzzTest {
   }
 
   /** Removes the value at the given [index]. */
-  private class Remove(val index: Int) : Operation<Byte> {
-    override fun perform(buffer: MutableByteGapBuffer): Byte = buffer.remove(index, size = 1)[0]
-    override fun perform(list: MutableList<Byte>): Byte = list.removeAt(index)
+  private class Remove(val index: Int) : Operation<Unit> {
+    override fun perform(buffer: MutableByteGapBuffer) = buffer.remove(index, size = 1)
+    override fun perform(list: MutableList<Byte>) {
+      list.removeAt(index)
+    }
   }
 
   private class RemoveRange(val index: Int, val size: Int) : Operation<Unit> {
