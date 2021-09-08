@@ -22,6 +22,7 @@ include ':echo-transport'
 include ':markdown'
 include ':markdown-backend'
 include ':markdown-frontend'
+include ':markdown-frontend-compose'
 
 // samples
 include ':sample-drawing'
