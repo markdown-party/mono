@@ -31,7 +31,7 @@ data class Configuration(
   companion object {
 
     /**
-     * A remote configuration that's used in projection.
+     * A remote configuration that's used in production.
      *
      * @param session the unique session identifier for this edition.
      */
