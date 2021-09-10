@@ -52,7 +52,7 @@ suspend fun <I, O> sync(
 suspend fun <I, O> sync(
     vararg exchanges: Exchange<I, O>,
 ): Unit = coroutineScope {
-  exchanges.asSequence().windowed(2).forEach { (left, right) ->
+  exchanges.asSequence().zipWithNext().forEach { (left, right) ->
     launch { sync(left::send, right::receive) }
     launch { sync(left::receive, right::send) }
   }
