@@ -1,5 +1,3 @@
-@file:Suppress("DuplicatedCode")
-
 package io.github.alexandrepiveteau.echo
 
 import kotlinx.coroutines.channels.Channel
@@ -9,8 +7,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Syncs the provided bi-directional flows until they are done communicating. The [sync] operator
- * creates bidirectional communication between the two [Flow] generator functions, which communicate
- * with some [Channel] .
+ * creates bidirectional communication between the two [Flow] generator functions.
  *
  * The communication stops when both generated [Flow] are completed.
  *
@@ -29,12 +26,10 @@ suspend fun <I, O> sync(
         .onCompletion { firstToSecond.close() }
         .collect()
   }
-  launch {
-    second(firstToSecond.consumeAsFlow())
-        .onEach { secondToFirst.send(it) }
-        .onCompletion { secondToFirst.close() }
-        .collect()
-  }
+  second(firstToSecond.consumeAsFlow())
+      .onEach { secondToFirst.send(it) }
+      .onCompletion { secondToFirst.close() }
+      .collect()
 }
 
 /**
