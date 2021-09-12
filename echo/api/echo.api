@@ -85,9 +85,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/projections/Two
 
 public abstract interface class io/github/alexandrepiveteau/echo/protocol/ExchangeScope : kotlinx/coroutines/channels/ReceiveChannel, kotlinx/coroutines/channels/SendChannel {
 	public abstract fun getLog ()Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public abstract fun getOnEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
 	public abstract fun getOnEventLogUpdate ()Lkotlinx/coroutines/selects/SelectClause0;
-	public abstract fun getOnMutableEventLogLock ()Lkotlinx/coroutines/selects/SelectClause1;
 	public abstract fun lock (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun mutate ()V
 	public abstract fun unlock ()V

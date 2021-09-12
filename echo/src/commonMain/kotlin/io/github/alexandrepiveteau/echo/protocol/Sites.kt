@@ -17,7 +17,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.SelectClause0
-import kotlinx.coroutines.selects.SelectClause1
 import kotlinx.coroutines.selects.SelectInstance
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -154,28 +153,6 @@ private class ExchangeScopeImpl<I, O>(
   override suspend fun lock() = mutex.lock()
   override fun unlock() = mutex.unlock()
   override fun mutate() = mutation()
-
-  override val onEventLogLock =
-      object : SelectClause1<MutableEventLog> {
-        override fun <R> registerSelectClause1(
-            select: SelectInstance<R>,
-            block: suspend (MutableEventLog) -> R,
-        ) = mutex.onLock.registerSelectClause2(select, null) { block(log).also { mutex.unlock() } }
-      }
-
-  override val onMutableEventLogLock =
-      object : SelectClause1<MutableEventLog> {
-        override fun <R> registerSelectClause1(
-            select: SelectInstance<R>,
-            block: suspend (MutableEventLog) -> R,
-        ) =
-            mutex.onLock.registerSelectClause2(select, null) {
-              block(log).also {
-                mutate()
-                mutex.unlock()
-              }
-            }
-      }
 
   override val onEventLogUpdate =
       object : SelectClause0 {
