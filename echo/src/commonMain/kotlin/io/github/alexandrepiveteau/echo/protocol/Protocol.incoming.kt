@@ -5,8 +5,6 @@ import io.github.alexandrepiveteau.echo.core.buffer.mutableEventIdentifierGapBuf
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.binarySearchBySite
-import io.github.alexandrepiveteau.echo.core.log.isNotEmpty
-import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
@@ -46,7 +44,6 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
   // The queue of all the messages that still have to be sent to the other side. Messages are sent
   // in a FIFO fashion, and should simply be added to the queue.
   val queue = ArrayDeque<O>(advertisements.size)
-  val events = mutableEventLogOf()
 
   // We are done receiving whenever we've received a message from the other side telling us that
   // no more events should be sent. Nevertheless, we should still make sure that all the events have
@@ -55,7 +52,7 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
   var isDoneReceiving = false
 
   // Repeat until the channel is closed.
-  while (!isDoneReceiving || events.isNotEmpty()) {
+  while (!isDoneReceiving) {
 
     // If we are syncing in a one-shot fashion, terminate if we have already received all the events
     // that we were expecting in a session.
@@ -90,14 +87,6 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
         onSend(firstMsg) { queue.removeFirst() }
       }
 
-      // Insert batches of events.
-      if (events.isNotEmpty()) {
-        onMutableEventLogLock { log ->
-          log.merge(events)
-          events.clear()
-        }
-      }
-
       // Receive a message from the other side.
       if (!isDoneReceiving) {
         onReceiveCatching { v ->
@@ -106,18 +95,10 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
               if (!stopAfterAdvertised)
                   advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
             }
-            is I.Events -> {
-
-              events.merge(
-                  mutableEventLogOf(
-                      *msg.events
-                          .asSequence()
-                          .map { (seqno, site, body) -> EventIdentifier(seqno, site) to body }
-                          .toList()
-                          .toTypedArray(),
-                  ),
-              )
-            }
+            is I.Events ->
+                withMutableEventLogLock {
+                  msg.events.forEach { insert(it.seqno, it.site, it.data) }
+                }
             is I.Ready -> error("Unexpected duplicate Ready.")
             null -> isDoneReceiving = true
           }

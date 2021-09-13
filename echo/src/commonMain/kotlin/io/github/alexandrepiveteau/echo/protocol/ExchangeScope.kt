@@ -5,7 +5,6 @@ import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.selects.SelectClause0
-import kotlinx.coroutines.selects.SelectClause1
 
 /**
  * The scope in which an exchange is performed with another site. More specifically, it offers some
@@ -31,12 +30,6 @@ interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
 
   /** Atomically marks that the [MutableEventLog] has been mutated. */
   fun mutate()
-
-  /** A select clause that is made available when the log is available for reading. */
-  val onEventLogLock: SelectClause1<EventLog>
-
-  /** A select clause that is made available when the log is available for reading and writing. */
-  val onMutableEventLogLock: SelectClause1<MutableEventLog>
 
   /**
    * A [SelectClause0] that is made available when the event log is updated with some new content.
