@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "markdown-frontend/build/distributions",
+    "public": "markdown-frontend-compose/build/distributions",
     "ignore": [
       "firebase.json",
       "**/.*",
