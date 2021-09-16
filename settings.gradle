@@ -21,7 +21,6 @@ include ':echo-transport'
 // markdown-party
 include ':markdown'
 include ':markdown-backend'
-include ':markdown-frontend'
 include ':markdown-frontend-compose'
 
 // samples
