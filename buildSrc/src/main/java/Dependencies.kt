@@ -1,15 +1,17 @@
 object Versions {
-  const val Kotlin = "1.5.21"
-  const val KotlinBinaryCompatibility = "0.6.0"
-  const val KotlinxCoroutines = "1.5.1"
+  const val Kotlin = "1.5.30"
+  const val KotlinBinaryCompatibility = "0.7.1"
+  const val KotlinxCoroutines = "1.5.2"
   const val KotlinxImmutableCollections = "0.3.4"
-  const val KotlinxSerialization = "1.5.0"
-  const val KotlinxSerializationFormat = "1.2.1"
+  const val KotlinxSerialization = "1.5.30"
+  const val KotlinxSerializationFormat = "1.2.2"
   const val KotlinxDateTime = "0.2.1"
-  const val Ktor = "1.6.0"
+  const val Ktor = "1.6.3"
 
-  const val CashAppTurbine = "0.5.2"
+  const val CashAppTurbine = "0."
   const val Slf4j = "1.7.21"
+
+  const val Compose = "1.0.0-alpha4-build348"
 }
 
 object Plugins {
@@ -19,6 +21,8 @@ object Plugins {
 
   const val KotlinBinaryCompatibility = "org.jetbrains.kotlinx.binary-compatibility-validator"
   const val KotlinSerialization = "plugin.serialization"
+
+  const val Compose = "org.jetbrains.compose"
 }
 
 object Deps {
@@ -42,7 +46,7 @@ object Deps {
         "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.KotlinxSerializationFormat}"
 
     const val SerializationProtobuf =
-      "org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.KotlinxSerializationFormat}"
+        "org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.KotlinxSerializationFormat}"
 
     const val SerializationJson =
         "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinxSerializationFormat}"

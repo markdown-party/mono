@@ -1,12 +1,13 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
-  id("org.jetbrains.compose") version "1.0.0-alpha4-build321"
+  id(Plugins.Compose) version Versions.Compose
 }
 
 repositories {
   jcenter()
   mavenCentral()
   maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+  google()
 }
 
 kotlin {
