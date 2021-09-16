@@ -9,8 +9,6 @@ pluginManagement {
 
 rootProject.name = 'kotlin-echo'
 
-enableFeaturePreview("GRADLE_METADATA")
-
 // echo replication libraries
 include ':echo-core'
 include ':echo'

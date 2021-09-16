@@ -8,7 +8,7 @@ object Versions {
   const val KotlinxDateTime = "0.2.1"
   const val Ktor = "1.6.3"
 
-  const val CashAppTurbine = "0."
+  const val CashAppTurbine = "0.6.1"
   const val Slf4j = "1.7.21"
 
   const val Compose = "1.0.0-alpha4-build348"

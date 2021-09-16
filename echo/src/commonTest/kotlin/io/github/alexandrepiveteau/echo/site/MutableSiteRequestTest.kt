@@ -29,8 +29,8 @@ class MutableSiteRequestTest {
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       expectNoEvents()
     }
   }
@@ -41,8 +41,8 @@ class MutableSiteRequestTest {
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id.site, Min))
       expectNoEvents()
     }
@@ -56,8 +56,8 @@ class MutableSiteRequestTest {
     val link: (Flow<Inc>) -> Flow<Out> = { inc ->
       flow {
         inc.test {
-          assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-          assertEquals(Inc.Ready, expectItem())
+          assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+          assertEquals(Inc.Ready, awaitItem())
           emit(Out.Request(id.site, 10U))
           expectNoEvents()
         }
@@ -72,8 +72,8 @@ class MutableSiteRequestTest {
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id.site, Min))
       send(Out.Request(id.site, 0U))
       expectNoEvents()
@@ -86,11 +86,11 @@ class MutableSiteRequestTest {
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id.site, Min))
       send(Out.Request(id.site, 1U))
-      assertEquals(Inc.Events(listOf(Event(id.seqno, id.site, encode(1)))), expectItem())
+      assertEquals(Inc.Events(listOf(Event(id.seqno, id.site, encode(1)))), awaitItem())
       expectNoEvents()
     }
   }
@@ -103,8 +103,8 @@ class MutableSiteRequestTest {
     val link: (Flow<Inc>) -> Flow<Out> = { inc ->
       flow {
         inc.test {
-          assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), expectItem())
-          assertEquals(Inc.Ready, expectItem())
+          assertEquals(Inc.Advertisement(id.site, id.seqno.inc()), awaitItem())
+          assertEquals(Inc.Ready, awaitItem())
           emit(Out.Request(id.site, 1U))
           emit(Out.Acknowledge(id.site, Min))
           expectNoEvents()
@@ -123,14 +123,14 @@ class MutableSiteRequestTest {
     val event2 = id2 to 2
     val site = site(event1, event2).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id, Min))
       // Sum two requests before expecting items.
       send(Out.Request(id, 1U))
       send(Out.Request(id, 1U))
-      assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), expectItem())
-      assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), expectItem())
+      assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), awaitItem())
+      assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), awaitItem())
       expectNoEvents()
     }
   }
@@ -144,14 +144,14 @@ class MutableSiteRequestTest {
     val event2 = id2 to 2
     val site = site(event1, event2).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id, Min))
       // Interleave item reception and requests.
       send(Out.Request(id, 1U))
-      assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), expectItem())
+      assertEquals(Inc.Events(listOf(Event(id1.seqno, id1.site, encode(1)))), awaitItem())
       send(Out.Request(id, 1U))
-      assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), expectItem())
+      assertEquals(Inc.Events(listOf(Event(id2.seqno, id2.site, encode(2)))), awaitItem())
       expectNoEvents()
     }
   }
@@ -163,8 +163,8 @@ class MutableSiteRequestTest {
     site::send.test {
       send(Inc.Advertisement(id.site, id.seqno.inc()))
       send(Inc.Ready)
-      assertEquals(Out.Acknowledge(id.site, Min), expectItem())
-      val request = expectItem() as Out.Request
+      assertEquals(Out.Acknowledge(id.site, Min), awaitItem())
+      val request = awaitItem() as Out.Request
       assertTrue(request.site == id.site && request.count >= 1U)
       expectNoEvents()
     }
@@ -179,8 +179,8 @@ class MutableSiteRequestTest {
     val event2 = id2 to 2
     val site = site(event1, event2).buffer(Channel.RENDEZVOUS)
     site::receive.test {
-      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), expectItem())
-      assertEquals(Inc.Ready, expectItem())
+      assertEquals(Inc.Advertisement(id, id2.seqno.inc()), awaitItem())
+      assertEquals(Inc.Ready, awaitItem())
       send(Out.Acknowledge(id, Min))
       // Sum two requests such that their overflowing total is 0U before expecting items.
       send(Out.Request(id, UInt.MAX_VALUE))
@@ -192,7 +192,7 @@ class MutableSiteRequestTest {
                   Event(id1.seqno, id1.site, encode(1)),
                   Event(id2.seqno, id2.site, encode(2)),
               )),
-          expectItem())
+        awaitItem())
       expectNoEvents()
     }
   }
