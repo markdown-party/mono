@@ -39,9 +39,8 @@ kotlin {
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
 
     all {
-      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-      languageSettings.useExperimentalAnnotation(
-          "kotlinx.serialization.ExperimentalSerializationApi")
+      languageSettings.optIn("kotlin.RequiresOptIn")
+      languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
     }
   }
 }

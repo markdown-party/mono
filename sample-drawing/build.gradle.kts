@@ -1,13 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinJvm)
   kotlin(Plugins.KotlinSerialization)
-  id(Plugins.Compose) version Versions.Compose
-}
-
-repositories {
-  google()
-  mavenCentral()
-  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+  id(Plugins.Compose)
 }
 
 kotlin {

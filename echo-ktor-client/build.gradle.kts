@@ -19,9 +19,9 @@ kotlin {
     }
 
     all {
-      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+      languageSettings.optIn("kotlin.RequiresOptIn")
+      languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+      languageSettings.optIn("kotlinx.coroutines.FlowPreview")
     }
   }
 }

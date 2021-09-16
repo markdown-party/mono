@@ -3,8 +3,6 @@ plugins {
   kotlin(Plugins.KotlinSerialization)
 }
 
-repositories { mavenCentral() }
-
 kotlin {
   dependencies {
     implementation(project(":echo"))

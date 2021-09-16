@@ -2,6 +2,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
+import io.github.alexandrepiveteau.echo.ktor.EchoKtorPreview
 import io.github.alexandrepiveteau.echo.mutableSite
 import kotlin.random.Random
 import kotlinx.browser.window
@@ -26,6 +27,7 @@ private fun Random.nextSessionIdentifier(): String = buildString {
  */
 val LocalSiteIdentifier = compositionLocalOf<SiteIdentifier> { error("No SiteIdentifier found.") }
 
+@OptIn(EchoKtorPreview::class)
 fun main() {
 
   // Creates a new session identifier, if needed.

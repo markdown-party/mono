@@ -1,8 +1,6 @@
-// TODO : Remove this once Compose for Desktop is not in preview.
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenCentral()
         maven { url = "https://maven.pkg.jetbrains.space/public/p/compose/dev" }
     }
 }
