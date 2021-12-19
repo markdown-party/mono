@@ -21,7 +21,7 @@ class MemoryExchangeIncomingTest {
   fun only_Done_worksOnBufferedLink() = suspendTest {
     val echo = mutableSite<Unit>(123U.toSiteIdentifier())
     echo::receive.test {
-      assertEquals(I.Ready, expectItem())
+      assertEquals(I.Ready, awaitItem())
       expectNoEvents()
     }
   }
@@ -39,8 +39,8 @@ class MemoryExchangeIncomingTest {
     val site = 456U.toSiteIdentifier()
     val echo = mutableSite(site, EventIdentifier(seqno, site) to 42)
     echo::receive.test {
-      assertEquals<Any>(I.Advertisement(site, seqno.inc()), expectItem())
-      assertEquals(I.Ready, expectItem())
+      assertEquals<Any>(I.Advertisement(site, seqno.inc()), awaitItem())
+      assertEquals(I.Ready, awaitItem())
       expectNoEvents()
     }
   }
@@ -55,7 +55,7 @@ class MemoryExchangeIncomingTest {
     echo::receive.test {
       val received = mutableListOf<SiteIdentifier>()
       while (true) {
-        when (val msg = expectItem()) {
+        when (val msg = awaitItem()) {
           is I.Advertisement -> received.add(msg.site)
           is I.Ready -> break
           else -> fail("Unexpected message $msg.")
@@ -63,7 +63,7 @@ class MemoryExchangeIncomingTest {
       }
       assertTrue(received.containsAll(sites))
       close()
-      expectComplete()
+      awaitComplete()
     }
   }
 
@@ -78,8 +78,8 @@ class MemoryExchangeIncomingTest {
             )
             .buffer(RENDEZVOUS)
     echo::receive.test {
-      assertEquals(I.Advertisement(site, seqno.inc()), expectItem())
-      assertEquals(I.Ready, expectItem())
+      assertEquals(I.Advertisement(site, seqno.inc()), awaitItem())
+      assertEquals(I.Ready, awaitItem())
       send(O.Acknowledge(site, seqno))
       send(O.Request(site, UInt.MAX_VALUE))
       assertEquals(
@@ -91,10 +91,10 @@ class MemoryExchangeIncomingTest {
                       DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
                   )),
           ),
-          expectItem(),
+          awaitItem(),
       )
       close()
-      expectComplete()
+      awaitComplete()
     }
   }
 
@@ -104,8 +104,8 @@ class MemoryExchangeIncomingTest {
     val seqno = 150U.toSequenceNumber()
     val echo = mutableSite(SiteIdentifier.Min, EventIdentifier(seqno, site) to true)
     echo::receive.test {
-      assertEquals(I.Advertisement(site, seqno.inc()), expectItem())
-      assertEquals(I.Ready, expectItem())
+      assertEquals(I.Advertisement(site, seqno.inc()), awaitItem())
+      assertEquals(I.Ready, awaitItem())
       send(O.Acknowledge(site, seqno))
       send(O.Request(site, count = 0U))
       send(O.Request(site, count = 1U))
@@ -118,10 +118,10 @@ class MemoryExchangeIncomingTest {
                       DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
                   ),
               )),
-          expectItem(),
+          awaitItem(),
       )
       close()
-      expectComplete()
+      awaitComplete()
     }
   }
 }

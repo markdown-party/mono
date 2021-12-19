@@ -15,7 +15,7 @@ class MutableSiteProjectApi(
     private val site: MutableSite<MarkdownPartyEvent, MarkdownParty>,
 ) : ProjectApi {
 
-  override val currentName: StateFlow<String> = site.value.map { it.tree.name ?: DefaultName }
+  override val currentName: StateFlow<String> = site.map { it.tree.name ?: DefaultName }
 
   override suspend fun name(
       value: String,

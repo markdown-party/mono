@@ -20,7 +20,7 @@ kotlin {
     implementation(Deps.Slf4f.Simple)
   }
 
-  sourceSets { all { languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn") } }
+  sourceSets { all { languageSettings.optIn("kotlin.RequiresOptIn") } }
 }
 
 application {

@@ -76,13 +76,13 @@ fun <I, O> Exchange<I, O>.flowOn(
 fun <T, M> MutableSite<T, M>.flowOn(
     context: CoroutineContext,
 ): MutableSite<T, M> =
-    object : MutableSite<T, M>, Exchange<Inc, Out> by FlowOnExchange(context, this) {
+    object :
+        MutableSite<T, M>,
+        StateFlow<M> by this,
+        Exchange<Inc, Out> by FlowOnExchange(context, this) {
 
       override val identifier: SiteIdentifier
         get() = this@flowOn.identifier
-
-      override val value: StateFlow<M>
-        get() = this@flowOn.value
 
       override suspend fun <R> event(
           block: suspend EventScope<T>.(M) -> R,

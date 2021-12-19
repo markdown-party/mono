@@ -48,6 +48,6 @@ class Bugs {
     }
     sync(alice, bob)
     assertEquals(5, aliceHistory.size)
-    assertContentEquals(charArrayOf('a', 'b', 'c'), bob.value.value.documents[file]?.first)
+    assertContentEquals(charArrayOf('a', 'b', 'c'), bob.value.documents[file]?.first)
   }
 }

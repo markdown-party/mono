@@ -23,15 +23,12 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
 /**
- * An interface describing a [Site] in the distributed system.
+ * An interface describing a [Site] in the distributed system. When collected, it will emit the
+ * latest aggregated model.
  *
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface Site<out M> : Exchange<Inc, Out> {
-
-  /** A hot [StateFlow] which, when collected, will emit the latest aggregated model. */
-  val value: StateFlow<M>
-}
+interface Site<out M> : StateFlow<M>, Exchange<Inc, Out>
 
 /**
  * A mutable version of [Site], which allows the insertion of the events [T] through its [event]
@@ -41,7 +38,7 @@ interface Site<out M> : Exchange<Inc, Out> {
  * @param T the type of the events managed by this [Site].
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface MutableSite<T, out M> : Site<M> {
+interface MutableSite<in T, out M> : Site<M> {
 
   /** The globally unique [SiteIdentifier] for this [Site]. */
   val identifier: SiteIdentifier

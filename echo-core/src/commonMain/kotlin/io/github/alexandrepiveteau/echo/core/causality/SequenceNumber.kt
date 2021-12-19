@@ -55,7 +55,7 @@ internal constructor(
 /** Returns the maximum [SequenceNumber] in a pair. */
 fun maxOf(a: SequenceNumber, b: SequenceNumber): SequenceNumber = if (a >= b) a else b
 
-/** Returns the maximum [SequenceNumber] in a pair. */
+/** Returns the maximum [SequenceNumber] in a triple. */
 fun maxOf(a: SequenceNumber, b: SequenceNumber, c: SequenceNumber): SequenceNumber =
     maxOf(a, maxOf(b, c))
 

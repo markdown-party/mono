@@ -22,7 +22,7 @@ class MutableSiteTextApi(
   override fun current(
       id: EventIdentifier,
   ): StateFlow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>> =
-      site.value.map {
+      site.map {
         val (char, event) = it.documents[id] ?: DefaultDocument
         val cursors = it.cursors[id]
         Triple(char, event, cursors)

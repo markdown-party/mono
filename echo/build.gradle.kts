@@ -1,7 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   kotlin(Plugins.KotlinSerialization)
-  id(Plugins.KotlinBinaryCompatibility) version Versions.KotlinBinaryCompatibility
+  id(Plugins.KotlinBinaryCompatibility)
 }
 
 kotlin {
@@ -44,12 +44,11 @@ kotlin {
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
-      languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-      languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
-      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-      languageSettings.useExperimentalAnnotation(
-          "kotlinx.serialization.ExperimentalSerializationApi")
-      languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+      languageSettings.optIn("kotlin.RequiresOptIn")
+      languageSettings.optIn("kotlin.time.ExperimentalTime")
+      languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+      languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
+      languageSettings.optIn("kotlinx.coroutines.FlowPreview")
     }
   }
 }

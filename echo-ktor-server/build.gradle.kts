@@ -12,5 +12,5 @@ kotlin {
     api(Deps.Ktor.ServerWebsockets)
   }
 
-  sourceSets { all { languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn") } }
+  sourceSets { all { languageSettings.optIn("kotlin.RequiresOptIn") } }
 }

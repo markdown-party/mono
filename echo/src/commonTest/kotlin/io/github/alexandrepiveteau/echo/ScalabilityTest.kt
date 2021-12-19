@@ -64,7 +64,7 @@ class ScalabilityTest {
 
           val syncJob = launch { sync(replica, primary) }
           launch {
-            replica.value.first { (_, it) -> it == 1001 }
+            replica.first { (_, it) -> it == 1001 }
             syncJob.cancel()
             done.send(id)
           }

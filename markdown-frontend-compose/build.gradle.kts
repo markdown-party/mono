@@ -1,12 +1,15 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
-  id("org.jetbrains.compose") version "1.0.0-alpha4-build321"
+  id(Plugins.Compose)
 }
 
-repositories {
-  jcenter()
-  mavenCentral()
-  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+// FIXME : Remove once KT-48273 is fixed
+afterEvaluate {
+  rootProject.extensions.configure<NodeJsRootExtension> {
+    versions.webpackDevServer.version = "4.0.0"
+  }
 }
 
 kotlin {
@@ -39,5 +42,6 @@ kotlin {
         implementation(compose.runtime)
       }
     }
+    all { languageSettings.optIn("kotlin.RequiresOptIn") }
   }
 }

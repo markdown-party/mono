@@ -24,7 +24,7 @@ suspend fun main(): Unit = coroutineScope {
   }
 
   // Collect and observe the state of carol.
-  val j2 = launch { carol.value.collect { println("Value $it") } }
+  val j2 = launch { carol.collect { println("Value $it") } }
 
   // Continuously sync bob and carol.
   withTimeoutOrNull(10_000) { sync(bob, carol) }

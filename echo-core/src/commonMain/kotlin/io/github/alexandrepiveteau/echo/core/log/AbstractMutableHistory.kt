@@ -15,7 +15,7 @@ abstract class AbstractMutableHistory<T>(
 ) : AbstractMutableEventLog(clock), MutableHistory<T> {
 
   // The ChangeScope that will be provided to the projection whenever some changes mush be appended
-  // to the changes history.
+  // to the history of changes.
   private val scope = ChangeScope { array, from, until ->
     changeStore.pushAtGap(
         id = eventStore.lastId,

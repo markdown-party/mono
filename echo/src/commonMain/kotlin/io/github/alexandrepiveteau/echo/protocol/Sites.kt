@@ -79,19 +79,16 @@ internal open class ExchangeImpl(
   ): Flow<Inc> = exchange(incoming) { with(strategy) { incoming() } }
 }
 
+/**
+ * @param current The current [history] value. Acccess to set the [current] value are protected
+ * through mutual exclusion via the [Mutex] variable.
+ */
 internal open class SiteImpl<M, R>(
     private val history: MutableHistory<R>,
     strategy: SyncStrategy,
     private val transform: (R) -> M,
-) : ExchangeImpl(history, strategy), Site<M> {
-
-  /**
-   * The current [history] value. Accesses to set the [current] value are protected through mutual
-   * exclusion via the [Mutex] variable.
-   */
-  internal val current = MutableStateFlow(transform(history.current))
-
-  override val value = current.asStateFlow()
+    internal val current: MutableStateFlow<M> = MutableStateFlow(transform(history.current)),
+) : ExchangeImpl(history, strategy), Site<M>, StateFlow<M> by current {
 
   override fun mutation() {
     current.value = transform(history.current)
@@ -123,7 +120,7 @@ internal open class MutableSiteImpl<T, M, R>(
 
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M) -> R,
-  ) = mutex.withLock { block(this, value.value).apply { mutation() } }
+  ) = mutex.withLock { block(this, value).apply { mutation() } }
 }
 
 /**

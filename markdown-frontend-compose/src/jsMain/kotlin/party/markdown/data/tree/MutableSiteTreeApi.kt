@@ -14,7 +14,7 @@ class MutableSiteTreeApi(
     private val site: MutableSite<MarkdownPartyEvent, MarkdownParty>,
 ) : TreeApi {
 
-  override val current: StateFlow<TreeNode> = site.value.map { it.tree }
+  override val current: StateFlow<TreeNode> = site.map { it.tree }
 
   override suspend fun createFile(name: String, parent: TreeNode): Unit =
       site.event {

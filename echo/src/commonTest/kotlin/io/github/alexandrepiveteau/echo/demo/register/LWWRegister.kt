@@ -57,7 +57,7 @@ private class LWWRegister(site: SiteIdentifier) {
       )
 
   /** The latest available value from the [LWWRegister]. */
-  val value: StateFlow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
+  val value: StateFlow<Int?> = exchange.map { (id, value) -> value.takeIf { id.isSpecified } }
 
   suspend fun set(value: Int) {
     // By default, events are added with a highest seqno than whatever they've received until now.
