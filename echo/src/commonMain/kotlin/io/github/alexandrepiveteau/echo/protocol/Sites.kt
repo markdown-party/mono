@@ -26,7 +26,7 @@ import kotlinx.serialization.KSerializer
 
 internal open class ExchangeImpl(
     private val log: MutableEventLog,
-    private val strategy: SyncStrategy,
+    private val strategy: SyncStrategy<Inc, Out>,
 ) : Exchange<Inc, Out> {
 
   /** The [Mutex] that protects access to the [log] variable. */
@@ -85,7 +85,7 @@ internal open class ExchangeImpl(
  */
 internal open class SiteImpl<M, R>(
     private val history: MutableHistory<R>,
-    strategy: SyncStrategy,
+    strategy: SyncStrategy<Inc, Out>,
     private val transform: (R) -> M,
     internal val current: MutableStateFlow<M> = MutableStateFlow(transform(history.current)),
 ) : ExchangeImpl(history, strategy), Site<M>, StateFlow<M> by current {
@@ -101,7 +101,7 @@ internal open class MutableSiteImpl<T, M, R>(
     private val serializer: KSerializer<T>,
     private val history: MutableHistory<R>,
     private val format: BinaryFormat,
-    strategy: SyncStrategy,
+    strategy: SyncStrategy<Inc, Out>,
     transform: (R) -> M,
 ) :
     SiteImpl<M, R>(

@@ -49,7 +49,6 @@ private fun CoroutineScope.sender(
   }
 }
 
-@EchoKtorPreview
 fun HttpClient.wssSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ): SendExchange<Frame, Frame> = SendExchange { inc ->
@@ -66,7 +65,6 @@ fun HttpClient.wssSendExchange(
   }
 }
 
-@EchoKtorPreview
 fun HttpClient.wsSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ): SendExchange<Frame, Frame> = SendExchange { inc ->
@@ -107,7 +105,6 @@ private fun CoroutineScope.receiver(
   }
 }
 
-@EchoKtorPreview
 fun HttpClient.wssReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
@@ -124,7 +121,6 @@ fun HttpClient.wssReceiveExchange(
   }
 }
 
-@EchoKtorPreview
 fun HttpClient.wsReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
@@ -148,7 +144,6 @@ private class DelegatingExchange<I, O>(
     private val r: ReceiveExchange<I, O>,
 ) : Exchange<I, O>, SendExchange<I, O> by s, ReceiveExchange<I, O> by r
 
-@EchoKtorPreview
 fun HttpClient.wssExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
@@ -158,7 +153,6 @@ fun HttpClient.wssExchange(
         r = wssReceiveExchange(receiver),
     )
 
-@EchoKtorPreview
 fun HttpClient.wsExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,

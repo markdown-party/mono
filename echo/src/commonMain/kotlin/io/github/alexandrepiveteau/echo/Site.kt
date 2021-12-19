@@ -1,3 +1,6 @@
+@file:JvmName("Exchanges")
+@file:JvmMultifileClass
+
 package io.github.alexandrepiveteau.echo
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
@@ -21,6 +24,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 /**
  * An interface describing a [Site] in the distributed system. When collected, it will emit the
@@ -63,7 +68,7 @@ interface MutableSite<in T, out M> : Site<M> {
  */
 fun exchange(
     log: MutableEventLog,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Exchange<Inc, Out> =
     orderedExchange(
         log = log,
@@ -78,7 +83,7 @@ fun exchange(
  */
 fun exchange(
     vararg events: Pair<EventIdentifier, ByteArray>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Exchange<Inc, Out> =
     orderedExchange(
         log = mutableEventLogOf(*events),
@@ -96,7 +101,7 @@ fun exchange(
  */
 inline fun <M, reified T> site(
     history: MutableHistory<M>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
         history = history,
@@ -113,7 +118,7 @@ inline fun <M, reified T> site(
  */
 inline fun <reified T> site(
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Site<Unit> =
     site(
         initial = Unit,
@@ -138,7 +143,7 @@ inline fun <M, reified T> site(
     initial: M,
     projection: OneWayProjection<M, T>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
         history =
@@ -171,7 +176,7 @@ inline fun <M, reified T, reified C> site(
     initial: M,
     projection: TwoWayProjection<M, T, C>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): Site<M> =
     orderedSite(
         history =
@@ -202,7 +207,7 @@ inline fun <M, reified T, reified C> site(
 inline fun <reified T> mutableSite(
     identifier: SiteIdentifier,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): MutableSite<T, Unit> =
     mutableSite(
         identifier = identifier,
@@ -227,7 +232,7 @@ inline fun <reified T> mutableSite(
 inline fun <M, reified T> mutableSite(
     identifier: SiteIdentifier,
     history: MutableHistory<M>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): MutableSite<T, M> =
     orderedMutableSite(
         identifier = identifier,
@@ -256,7 +261,7 @@ inline fun <M, reified T> mutableSite(
     initial: M,
     projection: OneWayProjection<M, T>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): MutableSite<T, M> =
     mutableSite(
         identifier = identifier,
@@ -286,7 +291,7 @@ inline fun <M, reified T, reified C> mutableSite(
     initial: M,
     projection: TwoWayProjection<M, T, C>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
 ): MutableSite<T, M> =
     mutableSite(
         identifier = identifier,
@@ -313,7 +318,7 @@ inline fun <M, reified T, reified C> mutableSite(
 inline fun <M, reified T, R> mutableSite(
     identifier: SiteIdentifier,
     history: MutableHistory<R>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
     orderedMutableSite(
@@ -346,7 +351,7 @@ inline fun <M, reified T, R> mutableSite(
     initial: R,
     projection: OneWayProjection<R, T>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
     orderedMutableSite(
@@ -390,7 +395,7 @@ inline fun <M, reified T, reified C, R> mutableSite(
     initial: R,
     projection: TwoWayProjection<R, T, C>,
     vararg events: Pair<EventIdentifier, T>,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
+    strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
     orderedMutableSite(
@@ -427,7 +432,7 @@ internal object UnitProjection : OneWayProjection<Unit, Any?> {
 @PublishedApi
 internal fun orderedExchange(
     log: MutableEventLog,
-    strategy: SyncStrategy,
+    strategy: SyncStrategy<Inc, Out>,
 ): Exchange<Inc, Out> =
     ExchangeImpl(
         log = log,
@@ -454,7 +459,7 @@ internal fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
 @PublishedApi
 internal fun <M, R> orderedSite(
     history: MutableHistory<R>,
-    strategy: SyncStrategy,
+    strategy: SyncStrategy<Inc, Out>,
     transform: (R) -> M,
 ): Site<M> =
     SiteImpl(
@@ -469,7 +474,7 @@ internal fun <M, T, R> orderedMutableSite(
     history: MutableHistory<R>,
     eventSerializer: KSerializer<T>,
     format: BinaryFormat,
-    strategy: SyncStrategy,
+    strategy: SyncStrategy<Inc, Out>,
     transform: (R) -> M,
 ): MutableSite<T, M> =
     MutableSiteImpl(

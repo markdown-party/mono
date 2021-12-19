@@ -2,7 +2,6 @@
 
 package io.github.alexandrepiveteau.markdown.backend
 
-import io.github.alexandrepiveteau.echo.ktor.server.EchoKtorServerPreview
 import io.github.alexandrepiveteau.echo.ktor.server.receiver
 import io.github.alexandrepiveteau.echo.ktor.server.sender
 import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
@@ -23,7 +22,6 @@ private fun WebSocketServerSession.requireSession(): SessionIdentifier {
   return call.parameters["session"] ?: error("No session provided.")
 }
 
-@OptIn(EchoKtorServerPreview::class)
 fun main() {
   val sites = SiteMap()
   val server =
