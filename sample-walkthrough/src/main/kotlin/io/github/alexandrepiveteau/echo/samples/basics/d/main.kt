@@ -58,6 +58,6 @@ suspend fun main() {
 
   sync(alice, bob)
 
-  println("alice : ${alice.value.value}")
-  println("bob : ${bob.value.value}")
+  println("alice : ${alice.value}")
+  println("bob : ${bob.value}")
 }

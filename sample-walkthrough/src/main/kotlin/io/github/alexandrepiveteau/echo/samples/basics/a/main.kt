@@ -22,10 +22,10 @@ suspend fun main() {
     yield(42) // emit a new value to the g-counter
   }
 
-  println("alice ${alice.value.value}, bob ${bob.value.value}")
+  println("alice ${alice.value}, bob ${bob.value}")
 
   sync(alice, bob) // let both sites converge
   println("synced !")
 
-  println("alice ${alice.value.value}, bob ${bob.value.value}")
+  println("alice ${alice.value}, bob ${bob.value}")
 }

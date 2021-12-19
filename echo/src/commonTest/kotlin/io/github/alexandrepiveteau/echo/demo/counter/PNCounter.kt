@@ -67,7 +67,7 @@ class PNCounterTest {
 
     // Finally, look at the resulting set of both sites, and make sure they eventually reach the
     // right result.
-    assertEquals(1, alice.value.value)
-    assertEquals(1, bob.value.value)
+    assertEquals(1, alice.value)
+    assertEquals(1, bob.value)
   }
 }

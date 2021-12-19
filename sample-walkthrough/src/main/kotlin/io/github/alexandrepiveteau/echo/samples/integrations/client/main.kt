@@ -38,7 +38,7 @@ suspend fun main() = coroutineScope {
   val local = mutableSite(Random.nextSiteIdentifier(), initial = emptySet(), projection = GSet)
 
   val syncJob = launch { sync(local.encodeToFrame(), remote) }
-  val updateJob = launch { local.value.collect { println("Local value is $it") } }
+  val updateJob = launch { local.collect { println("Local value is $it") } }
 
   while (true) {
     when (readLine()) {

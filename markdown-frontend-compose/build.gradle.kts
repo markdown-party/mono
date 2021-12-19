@@ -1,6 +1,15 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   id(Plugins.Compose)
+}
+
+// FIXME : Remove once KT-48273 is fixed
+afterEvaluate {
+  rootProject.extensions.configure<NodeJsRootExtension> {
+    versions.webpackDevServer.version = "4.0.0"
+  }
 }
 
 kotlin {

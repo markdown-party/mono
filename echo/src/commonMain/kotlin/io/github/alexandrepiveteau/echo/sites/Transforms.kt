@@ -33,13 +33,12 @@ fun <T, M1, M2> MutableSite<T, M1>.map(
 private class MappingMutableSite<T, out M1, out M2>(
     private val f: (M1) -> M2,
     private val backing: MutableSite<T, M1>
-) : MutableSite<T, M2> {
+) : MutableSite<T, M2>, StateFlow<M2> by (backing as StateFlow<M1>).map(f) {
 
   override fun receive(incoming: Flow<Out>) = backing.receive(incoming)
   override fun send(incoming: Flow<Inc>) = backing.send(incoming)
 
   override val identifier = backing.identifier
-  override val value = backing.value.map(f)
 
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M2) -> R,

@@ -2,7 +2,6 @@ package io.github.alexandrepiveteau.echo
 
 import app.cash.turbine.FlowTurbine
 import app.cash.turbine.test
-import kotlin.time.Duration
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
@@ -16,11 +15,11 @@ import kotlinx.coroutines.flow.consumeAsFlow
  * @param validate the validation block.
  */
 suspend fun <A, B> ((Flow<A>) -> Flow<B>).test(
-    timeout: Duration = Duration.seconds(1),
+    timeoutMillis: Long = 1000,
     validate: suspend FlowTurbineSendChannel<B, A>.() -> Unit,
 ) {
   val buf = Channel<A>()
-  this(buf.consumeAsFlow()).test(timeout) { validate(FlowTurbineCollectorImpl(this, buf)) }
+  this(buf.consumeAsFlow()).test(timeoutMillis) { validate(FlowTurbineCollectorImpl(this, buf)) }
 }
 
 /**
