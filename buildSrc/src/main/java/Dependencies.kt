@@ -1,7 +1,7 @@
 object Versions {
   const val Kotlin = "1.6.10"
   const val KotlinBinaryCompatibility = "0.8.0"
-  const val KotlinxCoroutines = "1.5.2" // 1.6.0-RC3
+  const val KotlinxCoroutines = "1.6.0"
   const val KotlinxImmutableCollections = "0.3.4"
   const val KotlinxSerialization = "1.6.10"
   const val KotlinxSerializationFormat = "1.3.1"

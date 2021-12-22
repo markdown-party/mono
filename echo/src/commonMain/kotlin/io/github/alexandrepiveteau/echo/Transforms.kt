@@ -10,7 +10,6 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
@@ -146,7 +145,6 @@ private class MappingStateFlow<in F, out T>(
     private val f: (F) -> T,
 ) : StateFlow<T> {
 
-  @InternalCoroutinesApi
   override suspend fun collect(
       collector: FlowCollector<T>,
   ) =
