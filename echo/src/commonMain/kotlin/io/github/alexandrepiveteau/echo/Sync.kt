@@ -1,5 +1,10 @@
+@file:JvmName("Exchanges")
+@file:JvmMultifileClass
+
 package io.github.alexandrepiveteau.echo
 
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*

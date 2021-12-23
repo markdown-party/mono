@@ -1,7 +1,6 @@
 package party.markdown.data
 
 import io.github.alexandrepiveteau.echo.Exchange
-import io.github.alexandrepiveteau.echo.ktor.EchoKtorPreview
 import io.github.alexandrepiveteau.echo.ktor.wsExchange
 import io.github.alexandrepiveteau.echo.ktor.wssExchange
 import io.github.alexandrepiveteau.echo.protocol.Message
@@ -67,7 +66,6 @@ private val Client = HttpClient(Js) { install(WebSockets) }
  * Returns the [Exchange] that corresponds to the receiver [Configuration]. This [Exchange] can then
  * be used to sync with some sites or mutable sites locally to interpret the operations.
  */
-@EchoKtorPreview
 fun Configuration.toExchange(): Exchange<Message.Incoming, Message.Outgoing> {
   val builder = if (secure) Client::wssExchange else Client::wsExchange
   return builder(

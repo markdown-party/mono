@@ -6,7 +6,7 @@ import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
-import io.github.alexandrepiveteau.echo.sites.map
+import io.github.alexandrepiveteau.echo.map
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy

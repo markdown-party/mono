@@ -17,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.awaitApplication
 import androidx.compose.ui.window.rememberWindowState
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
@@ -67,7 +67,7 @@ suspend fun main(args: Array<String>) = coroutineScope {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Echo - Drawing (${config.me.name})",
-        state = rememberWindowState(size = WindowSize(400.dp, 400.dp)),
+        state = rememberWindowState(size = DpSize(400.dp, 400.dp)),
     ) {
       MaterialTheme {
         Box(Modifier.fillMaxSize().dashed()) {

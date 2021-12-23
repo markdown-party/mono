@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 
-@EchoKtorServerPreview
 @OptIn(FlowPreview::class)
 fun Route.sender(
     block: suspend DefaultWebSocketServerSession.() -> SendExchange<Frame, Frame>,
@@ -25,7 +24,6 @@ fun Route.sender(
   }
 }
 
-@EchoKtorServerPreview
 @OptIn(FlowPreview::class)
 fun Route.receiver(
     block: suspend DefaultWebSocketServerSession.() -> ReceiveExchange<Frame, Frame>,

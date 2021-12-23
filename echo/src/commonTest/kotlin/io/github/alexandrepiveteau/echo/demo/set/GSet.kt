@@ -9,6 +9,8 @@ import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.ChangeScope
 import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
@@ -112,7 +114,7 @@ class GSetTest {
 
   @Test
   fun twoSites_singleOnceStrategy_converge() = suspendTest {
-    suspend fun test(a: SyncStrategy, b: SyncStrategy) {
+    suspend fun test(a: SyncStrategy<Inc, Out>, b: SyncStrategy<Inc, Out>) {
       val alice =
           mutableSite(
               identifier = Random.nextSiteIdentifier(),

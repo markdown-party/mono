@@ -4,7 +4,7 @@ import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.eventIdentifierArrayOf
-import io.github.alexandrepiveteau.echo.sites.map
+import io.github.alexandrepiveteau.echo.map
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
