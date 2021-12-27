@@ -15,6 +15,7 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.serializer
 
 class MutableSiteRequestTest {
@@ -24,7 +25,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun noRequest_issuesNoEvents() = suspendTest {
+  fun noRequest_issuesNoEvents() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -36,7 +37,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun onlyAck_issuesNoEvents() = suspendTest {
+  fun onlyAck_issuesNoEvents() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -49,7 +50,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun onlyRequest_issuesNoEvents() = suspendTest {
+  fun onlyRequest_issuesNoEvents() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -67,7 +68,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun ackThenRequest_zero_issuesNoEvent() = suspendTest {
+  fun ackThenRequest_zero_issuesNoEvent() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -81,7 +82,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun ackThenRequest_issuesEvent() = suspendTest {
+  fun ackThenRequest_issuesEvent() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -96,7 +97,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun requestThenAck_issuesNoEvent() = suspendTest {
+  fun requestThenAck_issuesNoEvent() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val event = id to 1
     val site = site(event).buffer(Channel.RENDEZVOUS)
@@ -115,7 +116,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun multipleRequest_sum() = suspendTest {
+  fun multipleRequest_sum() = runTest {
     val id = Random.nextSiteIdentifier()
     val id1 = EventIdentifier(Min + 0u, id)
     val id2 = EventIdentifier(Min + 1u, id)
@@ -136,7 +137,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun multipleRequest_interleaved_sum() = suspendTest {
+  fun multipleRequest_interleaved_sum() = runTest {
     val id = Random.nextSiteIdentifier()
     val id1 = EventIdentifier(Min + 0u, id)
     val id2 = EventIdentifier(Min + 1u, id)
@@ -157,7 +158,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun ackThenRequest() = suspendTest {
+  fun ackThenRequest() = runTest {
     val id = EventIdentifier(Min, Random.nextSiteIdentifier())
     val site = site<Int>().buffer(Channel.RENDEZVOUS)
     site::send.test {
@@ -171,7 +172,7 @@ class MutableSiteRequestTest {
   }
 
   @Test
-  fun requestOverflow_isHandled() = suspendTest {
+  fun requestOverflow_isHandled() = runTest {
     val id = Random.nextSiteIdentifier()
     val id1 = EventIdentifier(Min + 0u, id)
     val id2 = EventIdentifier(Min + 1u, id)

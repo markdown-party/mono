@@ -8,6 +8,7 @@ import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlinx.coroutines.test.runTest
 import party.markdown.MarkdownPartyEvent.Cursor
 import party.markdown.MarkdownPartyEvent.RGA
 import party.markdown.cursors.CursorEvent.MoveAfter
@@ -19,7 +20,7 @@ import party.markdown.tree.TreeEvent
 class Bugs {
 
   @Test
-  fun simple() = suspendTest {
+  fun simple() = runTest {
     val aliceHistory = MarkdownPartyHistory()
     val alice: MutableSite<MarkdownPartyEvent, MarkdownParty> =
         mutableSite(

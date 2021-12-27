@@ -13,12 +13,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.serializer
 
 class MemoryExchangeIncomingTest {
 
   @Test
-  fun only_Done_worksOnBufferedLink() = suspendTest {
+  fun only_Done_worksOnBufferedLink() = runTest {
     val echo = mutableSite<Unit>(123U.toSiteIdentifier())
     echo::receive.test {
       assertEquals(I.Ready, awaitItem())
@@ -27,14 +28,14 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun noMessagesToIncomingWorks() = suspendTest {
+  fun noMessagesToIncomingWorks() = runTest {
     val echo = mutableSite<Unit>(123U.toSiteIdentifier()).buffer(RENDEZVOUS)
     val received = echo.receive(emptyFlow()).toList()
     assertEquals(emptyList(), received)
   }
 
   @Test
-  fun advertisesOneEventAndCancelsIfRendezvousAndNotEmpty() = suspendTest {
+  fun advertisesOneEventAndCancelsIfRendezvousAndNotEmpty() = runTest {
     val seqno = 123U.toSequenceNumber()
     val site = 456U.toSiteIdentifier()
     val echo = mutableSite(site, EventIdentifier(seqno, site) to 42)
@@ -46,7 +47,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun advertisesAllSitesInIncoming() = suspendTest {
+  fun advertisesAllSitesInIncoming() = runTest {
     val count = 100
     val sites = List(count) { Random.nextSiteIdentifier() }
     val seqno = SequenceNumber.Min
@@ -68,7 +69,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun issuesOneEventOnRequest() = suspendTest {
+  fun issuesOneEventOnRequest() = runTest {
     val site = 10U.toSiteIdentifier()
     val seqno = 150U.toSequenceNumber()
     val echo =
@@ -99,7 +100,7 @@ class MemoryExchangeIncomingTest {
   }
 
   @Test
-  fun anEventIsSentIfFirstRequestSizeIsZeroAndSecondIsNonZero() = suspendTest {
+  fun anEventIsSentIfFirstRequestSizeIsZeroAndSecondIsNonZero() = runTest {
     val site = 123U.toSiteIdentifier()
     val seqno = 150U.toSequenceNumber()
     val echo = mutableSite(SiteIdentifier.Min, EventIdentifier(seqno, site) to true)

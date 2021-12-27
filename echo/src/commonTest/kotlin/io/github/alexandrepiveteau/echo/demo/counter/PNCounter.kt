@@ -7,12 +7,12 @@ import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Increment
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.ChangeScope
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
-import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.serialization.Serializable
 
 @Serializable
 enum class PNCounterEvent {
@@ -47,7 +47,7 @@ object PNProjection : TwoWayProjection<Int, PNCounterEvent, PNCounterEvent> {
 class PNCounterTest {
 
   @Test
-  fun twoSitesCanCreateASharedCounter_andSync(): Unit = suspendTest {
+  fun twoSitesCanCreateASharedCounter_andSync() = runTest {
     val alice = mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
     val bob = mutableSite(SiteIdentifier.Max, 0, PNProjection)
 
