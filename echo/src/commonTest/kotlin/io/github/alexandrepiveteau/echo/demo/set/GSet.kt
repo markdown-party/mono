@@ -11,7 +11,6 @@ import io.github.alexandrepiveteau.echo.projections.TwoWayMutableProjection
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
-import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Continuous
@@ -20,6 +19,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -62,7 +62,7 @@ private class GSetProjection : TwoWayProjection<Set<Int>, GSetEvent, GSetChange>
 class GSetTest {
 
   @Test
-  fun oneSite_canYieldEvents() = suspendTest {
+  fun oneSite_canYieldEvents() = runTest {
     val alice = Random.nextSiteIdentifier()
     val echo =
         mutableSite(
@@ -113,7 +113,7 @@ class GSetTest {
   }
 
   @Test
-  fun twoSites_singleOnceStrategy_converge() = suspendTest {
+  fun twoSites_singleOnceStrategy_converge() = runTest {
     suspend fun test(a: SyncStrategy<Inc, Out>, b: SyncStrategy<Inc, Out>) {
       val alice =
           mutableSite(
@@ -145,7 +145,7 @@ class GSetTest {
   }
 
   @Test
-  fun twoSites_converge() = suspendTest {
+  fun twoSites_converge() = runTest {
     // Create Alice, our first site.
     val alice = Random.nextSiteIdentifier()
     val aliceEcho =

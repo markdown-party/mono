@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 
 class ScalabilityTest {
@@ -41,7 +42,7 @@ class ScalabilityTest {
 
   @Ignore
   @Test
-  fun testScalability() = suspendTest {
+  fun testScalability() = runTest {
     val sites = 100
     val ops = 1000
     val projection = LWWProjection<Int>()
@@ -84,7 +85,7 @@ class ScalabilityTest {
 
   @Ignore
   @Test
-  fun compareMutableHistoryToExchange() = suspendTest {
+  fun compareMutableHistoryToExchange() = runTest {
     val ops = 100_000
     val primary = mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
     repeat(ops) { primary.event { yield(PNCounterEvent.Increment) } }
@@ -104,6 +105,7 @@ class ScalabilityTest {
     // Measured performance (history)  :       25'000 ops/sec
     // Measured performance (exchange) :       35'000 ops/sec (125% - 150%)
     println("Took ${historyDuration.inWholeMilliseconds} ms for history, at $historyOps ops/sec.")
-    println("Took ${exchangeDuration.inWholeMilliseconds} ms for exchange (speed ${speed}%), at $exchangeOps ops/sec.")
+    println(
+        "Took ${exchangeDuration.inWholeMilliseconds} ms for exchange (speed ${speed}%), at $exchangeOps ops/sec.")
   }
 }

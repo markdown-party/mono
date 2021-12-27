@@ -4,16 +4,16 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
+import io.github.alexandrepiveteau.echo.map
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
-import io.github.alexandrepiveteau.echo.map
-import io.github.alexandrepiveteau.echo.suspendTest
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 
 /**
@@ -68,7 +68,7 @@ private class LWWRegister(site: SiteIdentifier) {
 class LWWRegisterTest {
 
   @Test
-  fun twoSites_converge(): Unit = suspendTest {
+  fun twoSites_converge() = runTest {
     val alice = 123U.toSiteIdentifier()
     val aliceRegister = LWWRegister(alice)
 

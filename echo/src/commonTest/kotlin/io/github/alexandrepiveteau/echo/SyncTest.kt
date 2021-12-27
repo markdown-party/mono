@@ -3,11 +3,12 @@ package io.github.alexandrepiveteau.echo
 import kotlin.test.Test
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.runTest
 
 class SyncTest {
 
   @Test
-  fun noOpSync_Terminates() = suspendTest {
+  fun noOpSync_Terminates() = runTest {
     val alice = NoOpExchange
     val bob = NoOpExchange
 
@@ -15,7 +16,7 @@ class SyncTest {
   }
 
   @Test
-  fun noOpChainSync_Terminates() = suspendTest {
+  fun noOpChainSync_Terminates() = runTest {
     val head = NoOpExchange
     val tail = Array(10) { NoOpExchange }
 
