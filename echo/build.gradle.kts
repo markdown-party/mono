@@ -20,10 +20,10 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-common"))
         api(project(":echo-core"))
-        api(Deps.Kotlinx.CoroutinesCore)
-        api(Deps.Kotlinx.SerializationCore)
-        implementation(Deps.Kotlinx.SerializationProtobuf)
-        implementation(Deps.Kotlinx.ImmutableCollections)
+        api(libs.coroutines.core.common)
+        api(libs.serialization.core)
+        implementation(libs.serialization.protobuf)
+        implementation(libs.immutablecollections)
       }
     }
     val commonTest by getting {
@@ -31,14 +31,14 @@ kotlin {
         implementation(kotlin("test-common"))
         implementation(kotlin("test-annotations-common"))
 
-        implementation(Deps.CashApp.Turbine)
+        implementation(libs.turbine)
       }
     }
     val jvmMain by getting
     val jvmTest by getting {
       dependencies {
         implementation(kotlin("test-junit"))
-        implementation(Deps.Kotlinx.CoroutinesTest)
+        implementation(libs.coroutines.test)
       }
     }
     val jsMain by getting

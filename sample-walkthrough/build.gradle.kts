@@ -11,10 +11,10 @@ kotlin {
     implementation(project(":echo-transport"))
 
     // Ktor
-    implementation(Deps.Ktor.ClientEngineCIO)
-    implementation(Deps.Ktor.ServerEngineCIO)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.server.cio)
 
     // SL4J
-    implementation(Deps.Slf4f.Simple)
+    implementation(libs.slf4j.simple)
   }
 }

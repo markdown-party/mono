@@ -12,12 +12,12 @@ kotlin {
     implementation(project(":markdown"))
 
     // Ktor
-    implementation(Deps.Ktor.ClientEngineCIO)
-    implementation(Deps.Ktor.ServerEngineCIO)
-    testImplementation(Deps.Ktor.ServerEngineTest)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.server.cio)
+    testImplementation(libs.ktor.server.test)
 
     // SL4J
-    implementation(Deps.Slf4f.Simple)
+    implementation(libs.slf4j.simple)
   }
 
   sourceSets { all { languageSettings.optIn("kotlin.RequiresOptIn") } }

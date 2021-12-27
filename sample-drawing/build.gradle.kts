@@ -12,15 +12,15 @@ kotlin {
     implementation(project(":echo-transport"))
 
     // Immutable collections
-    implementation(Deps.Kotlinx.ImmutableCollections)
+    implementation(libs.immutablecollections)
 
     // Ktor
-    implementation(Deps.Ktor.ClientEngineCIO)
-    implementation(Deps.Ktor.ServerEngineCIO)
-    testImplementation(Deps.Ktor.ServerEngineTest)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.server.cio)
+    testImplementation(libs.ktor.server.test)
 
     // SL4J
-    implementation(Deps.Slf4f.Simple)
+    implementation(libs.slf4j.simple)
 
     // Jetpack compose.
     implementation(compose.desktop.currentOs)

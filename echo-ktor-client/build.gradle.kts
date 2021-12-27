@@ -13,8 +13,8 @@ kotlin {
         api(project(":echo-transport"))
 
         // Ktor.
-        api(Deps.Ktor.ClientCore)
-        api(Deps.Ktor.ClientWebsockets)
+        api(libs.ktor.client.core)
+        api(libs.ktor.client.websockets)
       }
     }
 
