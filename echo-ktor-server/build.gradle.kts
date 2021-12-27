@@ -8,8 +8,8 @@ kotlin {
     api(project(":echo-transport"))
 
     // Ktor dependencies.
-    api(Deps.Ktor.ServerCore)
-    api(Deps.Ktor.ServerWebsockets)
+    api(libs.ktor.server.core)
+    api(libs.ktor.server.websockets)
   }
 
   sourceSets { all { languageSettings.optIn("kotlin.RequiresOptIn") } }

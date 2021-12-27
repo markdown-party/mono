@@ -27,9 +27,9 @@ kotlin {
         implementation(project(":echo-transport"))
         implementation(project(":markdown"))
 
-        implementation(Deps.Ktor.ClientEngineJs)
-        implementation(Deps.Kotlinx.CoroutinesCoreJs)
-        implementation(Deps.Kotlinx.DateTime)
+        implementation(libs.ktor.client.js)
+        implementation(libs.coroutines.core.js)
+        implementation(libs.datetime)
 
         // CodeMirror.
         implementation(npm("@codemirror/lang-markdown", "0.18.4"))

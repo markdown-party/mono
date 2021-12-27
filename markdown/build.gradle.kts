@@ -20,7 +20,7 @@ kotlin {
         implementation(kotlin("stdlib-common"))
         api(project(":echo"))
         api(project(":echo-transport"))
-        api(Deps.Kotlinx.DateTime)
+        api(libs.datetime)
       }
     }
     val commonTest by getting {
@@ -32,7 +32,7 @@ kotlin {
     val jvmTest by getting {
       dependencies {
         implementation(kotlin("test-junit"))
-        implementation(Deps.Kotlinx.CoroutinesTest)
+        implementation(libs.coroutines.test)
       }
     }
     val jsMain by getting

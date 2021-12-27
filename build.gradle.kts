@@ -5,8 +5,8 @@ buildscript {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
   dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Kotlin}")
-    classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.KotlinxSerialization}")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.get()}")
+    classpath("org.jetbrains.kotlin:kotlin-serialization:${libs.versions.kotlin.get()}")
   }
 }
 
