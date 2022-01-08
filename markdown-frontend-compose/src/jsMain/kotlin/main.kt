@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import kotlin.random.Random
+import kotlinext.js.require
 import kotlinx.browser.window
 import org.jetbrains.compose.web.renderComposable
 import party.markdown.MarkdownParty
@@ -27,6 +28,9 @@ private fun Random.nextSessionIdentifier(): String = buildString {
 val LocalSiteIdentifier = compositionLocalOf<SiteIdentifier> { error("No SiteIdentifier found.") }
 
 fun main() {
+
+  // Load CSS
+  require("./app.css")
 
   // Creates a new session identifier, if needed.
   val splits = window.location.pathname.split("/")

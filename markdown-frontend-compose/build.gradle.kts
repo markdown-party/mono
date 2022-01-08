@@ -12,9 +12,25 @@ afterEvaluate {
   }
 }
 
+rootProject.plugins.withType(
+  org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
+  rootProject.the<NodeJsRootExtension>().versions.webpackCli.version = "4.9.0"
+}
+
 kotlin {
   js(IR) {
-    browser()
+    browser {
+      // Enable tailwind configuration
+      copy {
+        from("./postcss.config.js")
+        into("${rootDir}/build/js/packages/kotlin-echo-${project.name}")
+      }
+      copy {
+        from("./tailwind.config.js")
+        into("${rootDir}/build/js/packages/kotlin-echo-${project.name}")
+      }
+      commonWebpackConfig { cssSupport.enabled = true }
+    }
     binaries.executable()
   }
 
@@ -36,6 +52,17 @@ kotlin {
         implementation(npm("@codemirror/basic-setup", "0.18.2"))
         implementation(npm("@codemirror/tooltip", "0.18.4"))
         implementation(npm("@codemirror/theme-one-dark", "0.18.1"))
+
+        // TailwindCSS
+        implementation(npm("postcss", "8.3.6"))
+        implementation(npm("postcss-loader", "6.1.1"))
+        implementation(npm("autoprefixer", "10.3.4"))
+        implementation(npm("tailwindcss", "2.2.16"))
+
+        // Kotlin JS wrappers
+        implementation(
+          "org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.282-kotlin-1.6.10",
+        )
 
         // Jetpack Compose
         implementation(compose.web.core)
