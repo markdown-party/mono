@@ -53,4 +53,4 @@ Here's how you should use the project :
 
 ## About
 
-I'm developing this project as part of my Bachelor thesis at HEIG-VD. If, like me, you like distributed systems, Kotlin, coroutines or reactive UI frameworks, I'd love to hear from you at [alexandre.piveteau@heig-vd.ch](mailto:alexandre.piveteau@heig-vd.ch) :v:
+I'm developing this project as part of my Bachelor thesis at HEIG-VD. If, like me, you like distributed systems, Kotlin, coroutines or reactive UI frameworks, I'd love to hear from you at [alexandre.piveteau@alumni-heig-vd.ch](mailto:alexandre.piveteau@alumni-heig-vd.ch) :v:
