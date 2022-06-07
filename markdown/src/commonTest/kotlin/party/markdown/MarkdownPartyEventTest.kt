@@ -9,18 +9,15 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
-import party.markdown.MarkdownPartyEvent.Cursor
-import party.markdown.MarkdownPartyEvent.RGA
-import party.markdown.cursors.CursorEvent.MoveAfter
-import party.markdown.rga.RGAEvent.Insert
+import party.markdown.cursors.CursorEvent
+import party.markdown.rga.RGAEvent
 import party.markdown.rga.RGANodeRoot
 import party.markdown.tree.TreeEvent
 
-/** All the test cases that can not run on Kotlin/JS and only target Kotlin/JVM for now. */
-class Bugs {
+class MarkdownPartyEventTest {
 
   @Test
-  fun simple() = runTest {
+  fun integration() = runTest {
     val aliceHistory = MarkdownPartyHistory()
     val alice: MutableSite<MarkdownPartyEvent, MarkdownParty> =
         mutableSite(
@@ -37,15 +34,15 @@ class Bugs {
         )
 
     val file = alice.event { yield(MarkdownPartyEvent.Tree(TreeEvent.NewFile)) }
-    val a = alice.event { yield(RGA(file, Insert(RGANodeRoot, 'a'))) }
-    val b = alice.event { yield(RGA(file, Insert(a, 'b'))) }
+    val a = alice.event { yield(MarkdownPartyEvent.RGA(file, RGAEvent.Insert(RGANodeRoot, 'a'))) }
+    val b = alice.event { yield(MarkdownPartyEvent.RGA(file, RGAEvent.Insert(a, 'b'))) }
     alice.event {
-      yield(RGA(file, Insert(b, 'c')))
-      yield(Cursor(MoveAfter(file, b)))
-      yield(Cursor(MoveAfter(file, a)))
-      yield(Cursor(MoveAfter(file, b)))
-      yield(Cursor(MoveAfter(file, a)))
-      yield(Cursor(MoveAfter(file, b)))
+      yield(MarkdownPartyEvent.RGA(file, RGAEvent.Insert(b, 'c')))
+      yield(MarkdownPartyEvent.Cursor(CursorEvent.MoveAfter(file, b)))
+      yield(MarkdownPartyEvent.Cursor(CursorEvent.MoveAfter(file, a)))
+      yield(MarkdownPartyEvent.Cursor(CursorEvent.MoveAfter(file, b)))
+      yield(MarkdownPartyEvent.Cursor(CursorEvent.MoveAfter(file, a)))
+      yield(MarkdownPartyEvent.Cursor(CursorEvent.MoveAfter(file, b)))
     }
     sync(alice, bob)
     assertEquals(5, aliceHistory.size)
