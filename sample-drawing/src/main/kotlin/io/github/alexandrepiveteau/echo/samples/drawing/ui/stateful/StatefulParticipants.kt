@@ -16,8 +16,9 @@ import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
 import io.github.alexandrepiveteau.echo.sync
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.delay
 
 private val HttpClient = HttpClient(CIO) { install(WebSockets) }

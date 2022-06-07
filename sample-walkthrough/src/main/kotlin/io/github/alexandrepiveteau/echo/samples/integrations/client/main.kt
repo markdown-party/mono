@@ -8,10 +8,10 @@ import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
 import io.github.alexandrepiveteau.echo.sync
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
 import kotlin.random.Random
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 suspend fun main() = coroutineScope {

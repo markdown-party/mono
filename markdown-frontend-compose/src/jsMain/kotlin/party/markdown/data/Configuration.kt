@@ -7,8 +7,9 @@ import io.github.alexandrepiveteau.echo.protocol.Message
 import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 
 /**
  * A data class representing the [Configuration] that should be used when communicating with a

@@ -5,11 +5,11 @@ package io.github.alexandrepiveteau.markdown.backend
 import io.github.alexandrepiveteau.echo.ktor.server.receiver
 import io.github.alexandrepiveteau.echo.ktor.server.sender
 import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
-import io.ktor.application.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.websocket.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 
 /**
  * Returns the port number to use when running the web application. Defaults to 1234 if no port is

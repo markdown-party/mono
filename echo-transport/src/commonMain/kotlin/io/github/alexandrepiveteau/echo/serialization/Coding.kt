@@ -4,8 +4,8 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.protocol.Message
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
-import io.ktor.http.cio.websocket.*
-import io.ktor.http.cio.websocket.Frame.*
+import io.ktor.websocket.*
+import io.ktor.websocket.Frame.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map

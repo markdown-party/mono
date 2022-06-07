@@ -1,8 +1,8 @@
 object Versions {
-  const val KotlinBinaryCompatibility = "0.8.0"
-  const val Ktor = "1.6.7"
+  const val KotlinBinaryCompatibility = "0.10.0"
+  const val Ktor = "2.0.2"
 
-  const val Compose = "1.0.1-rc2"
+  const val Compose = "1.2.0-alpha01-dev686"
 }
 
 object Plugins {
