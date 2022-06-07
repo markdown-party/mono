@@ -147,14 +147,7 @@ private class MappingStateFlow<in F, out T>(
 
   override suspend fun collect(
       collector: FlowCollector<T>,
-  ) =
-      backing.collect(
-          object : FlowCollector<F> {
-            override suspend fun emit(value: F) {
-              collector.emit(f(value))
-            }
-          },
-      )
+  ) = backing.collect { value -> collector.emit(f(value)) }
 
   override val replayCache: List<T>
     get() = backing.replayCache.map(f)

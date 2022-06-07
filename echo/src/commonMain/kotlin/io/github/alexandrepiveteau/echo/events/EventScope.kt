@@ -8,8 +8,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  *
  * @param T the type of the application-specific event data.
  */
-// TODO : Make this a fun interface when b/KT-40165 is fixed.
-/* fun */ interface EventScope<in T> {
+fun interface EventScope<in T> {
 
   /**
    * Append a new event to the issued operations by this site. A happens-before relationship is
