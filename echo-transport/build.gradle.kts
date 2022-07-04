@@ -14,7 +14,7 @@ kotlin {
       dependencies {
         api(project(":echo"))
         api(libs.serialization.protobuf)
-        api(libs.ktor.http.cio)
+        api(libs.ktor.websockets)
       }
     }
     val commonTest by getting {

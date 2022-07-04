@@ -55,6 +55,8 @@ fun <I, O> rememberSyncState(
     if (state.syncing) {
       try {
         sync(remote, local)
+      } catch (problem: Throwable) {
+        // Ignored.
       } finally {
         state.stop()
       }

@@ -5,7 +5,8 @@ import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -17,9 +18,9 @@ import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.rememberSyncState
 
-@ExperimentalTime private val TickDuration = Duration.milliseconds(500)
-@ExperimentalTime private val SyncIndicatorDuration = Duration.milliseconds(500)
-@ExperimentalTime private val RetryDuration = Duration.seconds(5)
+private val TickDuration = 500.milliseconds
+private val SyncIndicatorDuration = 500.milliseconds
+private val RetryDuration = 5.seconds
 
 /**
  * Proxies the [Exchange] to observe the [Instant] of the latest message to was sent or received
@@ -60,10 +61,7 @@ private fun <I, O> Exchange<I, O>.proxy(): Pair<Exchange<I, O>, StateFlow<Instan
  *
  * @return A cold [Flow] with the current [Instant].
  */
-@ExperimentalTime
-private fun every(
-    duration: Duration,
-): Flow<Instant> = flow {
+private fun every(duration: Duration): Flow<Instant> = flow {
   while (true) {
     emit(Clock.System.now())
     delay(duration)
@@ -106,7 +104,6 @@ enum class SyncIcon(
  *
  * @return the [SyncIcon] corresponding to the current state.
  */
-@ExperimentalTime
 @Composable
 private fun collectSyncIcon(
     syncing: Boolean,
@@ -127,7 +124,6 @@ private fun collectSyncIcon(
  * @param syncing whether we are currently syncing or not.
  * @param request the callback used to request sync.
  */
-@ExperimentalTime
 @Composable
 private fun RetrySync(debug: Boolean, syncing: Boolean, request: () -> Unit) {
   LaunchedEffect(debug, syncing, request) {
@@ -171,7 +167,6 @@ private fun DebugButton(
  * Please note that this component will own the sync state. Therefore, you should probably keep the
  * component present on the screen, or hoist the sync state somewhere else if required.
  */
-@OptIn(ExperimentalTime::class)
 @Composable
 fun SyncIndicator(
     local: MutableSite<MarkdownPartyEvent, MarkdownParty>,

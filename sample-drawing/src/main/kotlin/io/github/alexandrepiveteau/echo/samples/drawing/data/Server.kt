@@ -5,11 +5,11 @@ import io.github.alexandrepiveteau.echo.ktor.server.receiver
 import io.github.alexandrepiveteau.echo.samples.drawing.data.config.Config
 import io.github.alexandrepiveteau.echo.samples.drawing.data.model.DrawingEvent
 import io.github.alexandrepiveteau.echo.serialization.encodeToFrame
-import io.ktor.application.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.websocket.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

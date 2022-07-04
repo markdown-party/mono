@@ -2,16 +2,14 @@ package io.github.alexandrepiveteau.echo.ktor.server
 
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
-import io.ktor.http.cio.websocket.*
-import io.ktor.routing.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 
-@OptIn(FlowPreview::class)
 fun Route.sender(
     block: suspend DefaultWebSocketServerSession.() -> SendExchange<Frame, Frame>,
 ) {
@@ -24,7 +22,6 @@ fun Route.sender(
   }
 }
 
-@OptIn(FlowPreview::class)
 fun Route.receiver(
     block: suspend DefaultWebSocketServerSession.() -> ReceiveExchange<Frame, Frame>,
 ) {

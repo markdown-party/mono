@@ -6,20 +6,23 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.withTimeout
 
 /**
  * Tests the given [Flow] to [Flow] function. More specifically, a [FlowTurbineSendChannel] will be
  * started on the flows.
  *
- * @param timeout the [FlowTurbine] timeout.
+ * @param timeoutMillis the [FlowTurbine] timeout.
  * @param validate the validation block.
  */
 suspend fun <A, B> ((Flow<A>) -> Flow<B>).test(
     timeoutMillis: Long = 1000,
     validate: suspend FlowTurbineSendChannel<B, A>.() -> Unit,
 ) {
-  val buf = Channel<A>()
-  this(buf.consumeAsFlow()).test(timeoutMillis) { validate(FlowTurbineCollectorImpl(this, buf)) }
+  withTimeout(timeoutMillis) {
+    val buf = Channel<A>()
+    this@test(buf.consumeAsFlow()).test { validate(FlowTurbineCollectorImpl(this, buf)) }
+  }
 }
 
 /**
