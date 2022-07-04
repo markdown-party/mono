@@ -60,8 +60,8 @@ kotlin {
         implementation(npm("tailwindcss", "2.2.16"))
 
         // Kotlin JS wrappers
-        implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.349")
-        implementation("org.jetbrains.kotlin-wrappers:kotlin-webrtc:0.0.32-pre.349")
+        implementation("org.jetbrains.kotlin-wrappers:kotlin-extensions:1.0.1-pre.343")
+        implementation("org.jetbrains.kotlin-wrappers:kotlin-webrtc:0.0.32-pre.343")
 
         // Jetpack Compose
         implementation(compose.web.core)
