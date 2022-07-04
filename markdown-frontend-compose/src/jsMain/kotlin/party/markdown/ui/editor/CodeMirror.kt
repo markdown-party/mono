@@ -1,9 +1,6 @@
 package party.markdown.ui.editor
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import codemirror.state.EditorState
 import codemirror.state.EditorStateConfig
 import codemirror.state.Extension
@@ -31,10 +28,10 @@ fun rememberEditorView(
 ): State<EditorView?> {
   val view = remember(key1) { mutableStateOf<EditorView?>(null) }
   Div(attrs = attrs) {
-    DisposableRefEffect(key1) { element ->
+    DisposableEffect(key1) {
       val config = EditorViewConfig {
         state = state(extensions)
-        parent = element
+        parent = scopeElement
       }
       view.value = EditorView(config)
       onDispose {
