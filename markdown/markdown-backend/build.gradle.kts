@@ -6,10 +6,10 @@ plugins {
 
 kotlin {
   dependencies {
-    implementation(project(":echo"))
-    implementation(project(":echo-ktor-server"))
-    implementation(project(":echo-transport"))
-    implementation(project(":markdown"))
+    implementation(project(":library:echo"))
+    implementation(project(":library:echo-ktor-server"))
+    implementation(project(":library:echo-transport"))
+    implementation(project(":markdown:markdown"))
 
     // Ktor
     implementation(libs.ktor.client.cio)

@@ -18,8 +18,8 @@ kotlin {
     val commonMain by getting {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        api(project(":echo"))
-        api(project(":echo-transport"))
+        api(project(":library:echo"))
+        api(project(":library:echo-transport"))
         api(libs.datetime)
       }
     }

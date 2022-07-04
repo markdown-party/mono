@@ -19,7 +19,7 @@ kotlin {
     val commonMain by getting {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        api(project(":echo-core"))
+        api(project(":library:echo-core"))
         api(libs.coroutines.core.common)
         api(libs.serialization.core)
         implementation(libs.serialization.protobuf)

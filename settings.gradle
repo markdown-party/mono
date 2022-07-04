@@ -10,20 +10,20 @@ pluginManagement {
 rootProject.name = 'kotlin-echo'
 
 // echo replication libraries
-include ':echo-core'
-include ':echo'
-include ':echo-ktor-client'
-include ':echo-ktor-server'
-include ':echo-transport'
+include ':library:echo-core'
+include ':library:echo'
+include ':library:echo-ktor-client'
+include ':library:echo-ktor-server'
+include ':library:echo-transport'
 
 // markdown-party
-include ':markdown'
-include ':markdown-backend'
-include ':markdown-frontend-compose'
+include ':markdown:markdown'
+include ':markdown:markdown-backend'
+include ':markdown:markdown-frontend-compose'
 
 // samples
-include ':sample-drawing'
-include ':sample-walkthrough'
+include ':samples:drawing'
+include ':samples:walkthrough'
 
 // Enable Gradle's version catalog support
 // https://docs.gradle.org/current/userguide/platforms.html
