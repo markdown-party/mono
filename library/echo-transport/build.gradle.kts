@@ -12,7 +12,7 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        api(project(":echo"))
+        api(project(":library:echo"))
         api(libs.serialization.protobuf)
         api(libs.ktor.websockets)
       }

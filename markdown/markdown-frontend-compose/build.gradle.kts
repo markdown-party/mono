@@ -13,7 +13,7 @@ afterEvaluate {
 }
 
 rootProject.plugins.withType(
-  org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
+    org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
   rootProject.the<NodeJsRootExtension>().versions.webpackCli.version = "4.9.0"
 }
 
@@ -39,9 +39,9 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-js"))
 
-        implementation(project(":echo-ktor-client"))
-        implementation(project(":echo-transport"))
-        implementation(project(":markdown"))
+        implementation(project(":library:echo-ktor-client"))
+        implementation(project(":library:echo-transport"))
+        implementation(project(":markdown:markdown"))
 
         implementation(libs.ktor.client.js)
         implementation(libs.coroutines.core.js)

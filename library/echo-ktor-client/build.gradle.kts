@@ -9,8 +9,8 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        api(project(":echo"))
-        api(project(":echo-transport"))
+        api(project(":library:echo"))
+        api(project(":library:echo-transport"))
 
         // Ktor.
         api(libs.ktor.client.core)

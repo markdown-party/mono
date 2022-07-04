@@ -4,8 +4,8 @@ kotlin {
   target { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   dependencies {
-    api(project(":echo"))
-    api(project(":echo-transport"))
+    api(project(":library:echo"))
+    api(project(":library:echo-transport"))
 
     // Ktor dependencies.
     api(libs.ktor.server.core)

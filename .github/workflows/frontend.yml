@@ -16,7 +16,7 @@ jobs:
           java-version: 1.11
       - name: 🏗 Build frontend
         run: |
-          ./gradlew markdown-frontend-compose:jsBrowserDistribution
+          ./gradlew markdown:markdown-frontend-compose:jsBrowserDistribution
       - name: 🚀 Deploy on Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:

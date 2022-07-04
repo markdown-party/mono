@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build with Gradle.
-./gradlew markdown-backend:installDist
+./gradlew markdown:markdown-backend:installDist
 
 # Package in a Docker image.
 docker build -t markdown-party-backend .
