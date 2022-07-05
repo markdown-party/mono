@@ -17,10 +17,11 @@ jobs:
       - name: 🏗 Build frontend
         run: |
           ./gradlew markdown:markdown-frontend-compose:jsBrowserDistribution
+          cp ./deployment/firebase/.firebaserc .
+          cp ./deployment/firebase/firebase.json .
       - name: 🚀 Deploy on Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          entryPoint: ./deployment/firebase
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MARKDOWN_PARTY }}'
           channelId: live
