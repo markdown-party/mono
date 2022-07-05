@@ -8,7 +8,7 @@ kotlin {
     implementation(project(":library:echo"))
     implementation(project(":library:echo-ktor-client"))
     implementation(project(":library:echo-ktor-server"))
-    implementation(project(":library:echo-transport"))
+    implementation(project(":library:echo-ktor-websockets"))
 
     // Ktor
     implementation(libs.ktor.client.cio)

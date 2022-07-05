@@ -5,7 +5,7 @@ kotlin {
 
   dependencies {
     api(project(":library:echo"))
-    api(project(":library:echo-transport"))
+    api(project(":library:echo-ktor-websockets"))
 
     // Ktor dependencies.
     api(libs.ktor.server.core)
