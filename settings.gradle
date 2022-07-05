@@ -14,7 +14,7 @@ include ':library:echo-core'
 include ':library:echo'
 include ':library:echo-ktor-client'
 include ':library:echo-ktor-server'
-include ':library:echo-transport'
+include ':library:echo-ktor-websockets'
 
 // markdown-party
 include ':markdown:markdown'

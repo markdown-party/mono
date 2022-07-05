@@ -22,7 +22,7 @@ CRDTs to replicate its state.
 
 1. [Introduction and basics](library/echo/README.md)
 2. [The low-level event log API](library/echo-core/README.md)
-3. [Integrations and websockets](library/echo-transport/README.md)
+3. [Integrations and websockets](library/echo-ktor-websockets/README.md)
 4. [Example : adding a move operation for cursors](markdown/markdown/README.md)
 
 ## Local setup
@@ -48,12 +48,12 @@ tests locally, please proceed as follows :
 
 Here's how you should use the project :
 
-| Use-case                                                    | Relevant module(s)                                       |
-|-------------------------------------------------------------|----------------------------------------------------------|
-| I want to use a Markdown editor.                            | Go to [markdown.party](https://markdown.party) !         |
-| I want to replicate Markdown / Trees, but don't want a GUI. | `markdown`, `echo`, (`echo-core`)                        |
-| I want to create a custom CRDT and replicate it.            | `echo-transport`, `echo-ktor-xxx`, `echo`, (`echo-core`) |
-| I only need a log of events which computes an aggregate.    | `echo-core`                                              |
+| Use-case                                                    | Relevant module(s)                               |
+|-------------------------------------------------------------|--------------------------------------------------|
+| I want to use a Markdown editor.                            | Go to [markdown.party](https://markdown.party) ! |
+| I want to replicate Markdown / Trees, but don't want a GUI. | `markdown`, `echo`, (`echo-core`)                |
+| I want to create a custom CRDT and replicate it.            | `echo-ktor-xxx`, `echo`, (`echo-core`)           |
+| I only need a log of events which computes an aggregate.    | `echo-core`                                      |
 
 ## About
 

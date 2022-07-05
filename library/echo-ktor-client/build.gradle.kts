@@ -10,7 +10,7 @@ kotlin {
     val commonMain by getting {
       dependencies {
         api(project(":library:echo"))
-        api(project(":library:echo-transport"))
+        api(project(":library:echo-ktor-websockets"))
 
         // Ktor.
         api(libs.ktor.client.core)

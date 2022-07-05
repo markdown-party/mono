@@ -8,7 +8,7 @@ kotlin {
   dependencies {
     implementation(project(":library:echo"))
     implementation(project(":library:echo-ktor-server"))
-    implementation(project(":library:echo-transport"))
+    implementation(project(":library:echo-ktor-websockets"))
     implementation(project(":markdown:markdown"))
 
     // Ktor

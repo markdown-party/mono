@@ -19,7 +19,7 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-common"))
         api(project(":library:echo"))
-        api(project(":library:echo-transport"))
+        api(project(":library:echo-ktor-websockets"))
         api(libs.datetime)
       }
     }

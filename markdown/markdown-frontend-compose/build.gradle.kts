@@ -40,7 +40,7 @@ kotlin {
         implementation(kotlin("stdlib-js"))
 
         implementation(project(":library:echo-ktor-client"))
-        implementation(project(":library:echo-transport"))
+        implementation(project(":library:echo-ktor-websockets"))
         implementation(project(":markdown:markdown"))
 
         implementation(libs.ktor.client.js)

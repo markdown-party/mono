@@ -110,7 +110,7 @@ Now that we've seen that the communication protocol is implemented with flows of
 1. Transform the protocol messages to websocket frames
 2. Send the websocket frames through a dedicated websocket library
 
-The [echo-transport](https://github.com/markdown-party/mono/tree/main/echo-transport) library solves the first problem by offering some `encodeToFrame()` and `decodeToFrame()` methods on `Exchange` :
+The [echo-ktor-websockets](https://github.com/markdown-party/mono/tree/main/library/echo-ktor-websockets) library solves the first problem by offering some `encodeToFrame()` and `decodeToFrame()` methods on `Exchange` :
 
 ```kotlin
 val remote: Exchange<Frame, Frame> = remote() // obtained through the client or server integrations
@@ -123,7 +123,7 @@ Internally, the `encodeToFrame()` and `decodeFromFrame()` functions make use of 
 
 ### Server
 
-The [echo-ktor-server](https://github.com/markdown-party/mono/tree/main/echo-ktor-server) module provides some server-side integration to serve a websocket-based `Exchange` over a websocket connection. In fact, building a generic replication server can be done in exactly 10 lines of code:
+The [echo-ktor-server](https://github.com/markdown-party/mono/tree/main/library/echo-ktor-server) module provides some server-side integration to serve a websocket-based `Exchange` over a websocket connection. In fact, building a generic replication server can be done in exactly 10 lines of code:
 
 ```kotlin
 fun main() {
