@@ -20,6 +20,7 @@ jobs:
       - name: 🚀 Deploy on Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
+          entryPoint: ./deployment/firebase
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MARKDOWN_PARTY }}'
           channelId: live

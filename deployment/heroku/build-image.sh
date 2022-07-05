@@ -4,4 +4,4 @@
 ./gradlew markdown:markdown-backend:installDist
 
 # Package in a Docker image.
-docker build -t markdown-party-backend .
+docker build -f deployment/heroku/Dockerfile -t markdown-party-backend .
