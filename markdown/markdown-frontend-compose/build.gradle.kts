@@ -42,6 +42,7 @@ kotlin {
         implementation(project(":library:echo-ktor-client"))
         implementation(project(":library:echo-ktor-websockets"))
         implementation(project(":markdown:markdown"))
+        implementation(project(":markdown:markdown-signaling"))
 
         implementation(libs.ktor.client.js)
         implementation(libs.coroutines.core.js)

@@ -10,6 +10,7 @@ public final class io/github/alexandrepiveteau/echo/Exchanges {
 	public static synthetic fun exchange$default ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun getDefaultSerializationFormat ()Lkotlinx/serialization/BinaryFormat;
 	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static final fun mapToBinary ([Lkotlin/Pair;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)[Lkotlin/Pair;
 	public static final fun orderedExchange (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/sync/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
