@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
+
 buildscript {
   repositories {
     google()
@@ -21,4 +24,9 @@ allprojects {
 plugins {
   id(Plugins.KotlinBinaryCompatibility) version Versions.KotlinBinaryCompatibility apply false
   id(Plugins.Compose) version Versions.Compose apply false
+}
+
+// Move the `yarn.lock` file for Kotlin/JS to the `./gradle` directory.
+plugins.withType<YarnPlugin> {
+  the<YarnRootExtension>().lockFileDirectory = rootDir.resolve("gradle")
 }
