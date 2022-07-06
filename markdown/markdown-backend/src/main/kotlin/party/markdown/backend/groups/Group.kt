@@ -6,7 +6,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import party.markdown.coroutines.inOrder
 import party.markdown.signaling.PeerIdentifier
-import party.markdown.signaling.SignalingMessage
+import party.markdown.signaling.SignalingMessage.ServerToClient
+import party.markdown.signaling.SignalingMessage.ServerToClient.PeerJoined
 
 /**
  * A group represents a session of collaboration. Each participant will be granted a unique
@@ -20,7 +21,7 @@ class Group(private val scope: CoroutineScope) {
   private val inOrder = scope.inOrder()
 
   /** The [MutableMap] of all the peer identifiers, and the [Outbox] for their messages. */
-  private var peers = persistentMapOf<PeerIdentifier, Outbox<SignalingMessage.ServerToClient>>()
+  private var peers = persistentMapOf<PeerIdentifier, Outbox<ServerToClient>>()
 
   /** Returns the next [PeerIdentifier] that should be attributed. */
   private fun nextPeerIdentifier() = PeerIdentifier(peers.keys.maxOfOrNull { it.id }?.plus(1) ?: 0)
@@ -31,17 +32,15 @@ class Group(private val scope: CoroutineScope) {
    * @param outbox the [Outbox] for this participant.
    * @return the [PeerIdentifier] assigned to this participant.
    */
-  private suspend fun join(outbox: Outbox<SignalingMessage.ServerToClient>): PeerIdentifier {
+  private suspend fun join(outbox: Outbox<ServerToClient>): PeerIdentifier {
     return inOrder.schedule {
       val current = peers
       val peer = nextPeerIdentifier()
       peers = current.put(peer, outbox)
       withResult(peer) {
         for ((id, site) in current) {
-          site.sendCatching(
-              SignalingMessage.ServerToClient.PeerJoined(peer)) // Tell other sites we've joined.
-          outbox.sendCatching(
-              SignalingMessage.ServerToClient.PeerJoined(id)) // Learn all the connected sites.
+          site.sendCatching(PeerJoined(peer)) // Tell other sites we've joined.
+          outbox.sendCatching(PeerJoined(id)) // Learn all the connected sites.
         }
       }
     }
@@ -58,7 +57,7 @@ class Group(private val scope: CoroutineScope) {
       peers = withoutPeer
       withNoResult {
         for ((_, outbox) in withoutPeer) {
-          outbox.sendCatching(SignalingMessage.ServerToClient.PeerLeft(peer))
+          outbox.sendCatching(ServerToClient.PeerLeft(peer))
         }
       }
     }
@@ -70,7 +69,7 @@ class Group(private val scope: CoroutineScope) {
    * @param peer the [PeerIdentifier] to which the message is sent.
    * @param message the sent message.
    */
-  private suspend fun forward(peer: PeerIdentifier, message: SignalingMessage.ServerToClient) {
+  private suspend fun forward(peer: PeerIdentifier, message: ServerToClient) {
     inOrder.schedule {
       val outbox = peers[peer]
       withNoResult { outbox?.sendCatching(message) }
@@ -85,7 +84,7 @@ class Group(private val scope: CoroutineScope) {
    * @param block the [GroupScope] in which the participant may forward some messages.
    */
   suspend fun session(
-      outbox: Outbox<SignalingMessage.ServerToClient>,
+      outbox: Outbox<ServerToClient>,
       block: suspend GroupScope.(PeerIdentifier) -> Unit,
   ) {
     val peer = join(outbox)
