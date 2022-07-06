@@ -35,14 +35,14 @@ import kotlinx.serialization.Serializable
  * communicates new connections, and clients which dropped their connection.
  */
 @Serializable
-sealed interface SignalingMessage {
+sealed class SignalingMessage {
 
   /** A marker interface for messages sent from the browser to the server. */
   @Serializable
-  sealed interface ClientToServer : SignalingMessage {
+  sealed class ClientToServer : SignalingMessage() {
 
     /** The [PeerIdentifier] of the peer to which the message should be forwarded. */
-    val to: PeerIdentifier
+    abstract val to: PeerIdentifier
 
     /**
      * Transforms this [ClientToServer] message to a [ServerToClient] message, using the provided
@@ -51,7 +51,7 @@ sealed interface SignalingMessage {
      * @param from the originator [PeerIdentifier].
      * @return the resulting [ServerToClient].
      */
-    fun toServerToClient(from: PeerIdentifier): ServerToClient
+    abstract fun toServerToClient(from: PeerIdentifier): ServerToClient
 
     /**
      * Indicates that the server should relay this ICE candidate to the given peer.
@@ -63,7 +63,7 @@ sealed interface SignalingMessage {
     data class ForwardIceCandidate(
         override val to: PeerIdentifier,
         val iceCandidate: IceCandidate,
-    ) : ClientToServer {
+    ) : ClientToServer() {
 
       override fun toServerToClient(
           from: PeerIdentifier,
@@ -80,7 +80,7 @@ sealed interface SignalingMessage {
     data class ForwardSessionDescription(
         override val to: PeerIdentifier,
         val description: SessionDescription,
-    ) : ClientToServer {
+    ) : ClientToServer() {
 
       override fun toServerToClient(
           from: PeerIdentifier,
@@ -90,7 +90,7 @@ sealed interface SignalingMessage {
 
   /** A marker interface for messages sent from the server to the browser. */
   @Serializable
-  sealed interface ServerToClient : SignalingMessage {
+  sealed class ServerToClient : SignalingMessage() {
 
     /**
      * Indicates a session description to use when communicating with a given client.
@@ -102,7 +102,7 @@ sealed interface SignalingMessage {
     data class GotSessionDescription(
         val from: PeerIdentifier,
         val description: SessionDescription,
-    ) : ServerToClient
+    ) : ServerToClient()
 
     /**
      * Indicates an ICE candidate to use when communicating with a given client.
@@ -114,7 +114,7 @@ sealed interface SignalingMessage {
     data class GotIceCandidate(
         val from: PeerIdentifier,
         val iceCandidate: IceCandidate,
-    ) : ServerToClient
+    ) : ServerToClient()
 
     /**
      * Indicates that a peer has joined the collaboration session. The client should attempt to
@@ -125,7 +125,7 @@ sealed interface SignalingMessage {
     @Serializable
     data class PeerJoined(
         val peer: PeerIdentifier,
-    ) : ServerToClient
+    ) : ServerToClient()
 
     /**
      * Indicates that a peer has left the collaboration session. The client should stop
@@ -133,6 +133,6 @@ sealed interface SignalingMessage {
      *
      * @property peer the unique identifier of the peer.
      */
-    @Serializable data class PeerLeft(val peer: PeerIdentifier) : ServerToClient
+    @Serializable data class PeerLeft(val peer: PeerIdentifier) : ServerToClient()
   }
 }
