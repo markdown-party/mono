@@ -45,6 +45,15 @@ sealed interface SignalingMessage {
     val to: PeerIdentifier
 
     /**
+     * Transforms this [ClientToServer] message to a [ServerToClient] message, using the provided
+     * [PeerIdentifier].
+     *
+     * @param from the originator [PeerIdentifier].
+     * @return the resulting [ServerToClient].
+     */
+    fun toServerToClient(from: PeerIdentifier): ServerToClient
+
+    /**
      * Indicates that the server should relay this ICE candidate to the given peer.
      *
      * @property to the identifier of the peer who should receive the message.
@@ -54,7 +63,12 @@ sealed interface SignalingMessage {
     data class ForwardIceCandidate(
         override val to: PeerIdentifier,
         val iceCandidate: IceCandidate,
-    ) : ClientToServer
+    ) : ClientToServer {
+
+      override fun toServerToClient(
+          from: PeerIdentifier,
+      ) = ServerToClient.GotIceCandidate(from, iceCandidate)
+    }
 
     /**
      * Indicates that the server should relay the session description to the given peer.
@@ -66,7 +80,12 @@ sealed interface SignalingMessage {
     data class ForwardSessionDescription(
         override val to: PeerIdentifier,
         val description: SessionDescription,
-    ) : ClientToServer
+    ) : ClientToServer {
+
+      override fun toServerToClient(
+          from: PeerIdentifier,
+      ) = ServerToClient.GotSessionDescription(from, description)
+    }
   }
 
   /** A marker interface for messages sent from the server to the browser. */

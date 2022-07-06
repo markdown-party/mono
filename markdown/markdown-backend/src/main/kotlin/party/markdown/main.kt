@@ -1,11 +1,14 @@
 @file:JvmName("Main")
 
-package io.github.alexandrepiveteau.markdown.backend
+package party.markdown
 
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.websocket.*
+import kotlinx.coroutines.coroutineScope
+import party.markdown.backend.GroupMap
+import party.markdown.backend.signaling
 
 /**
  * Returns the port number to use when running the web application. Defaults to 1234 if no port is
@@ -13,8 +16,8 @@ import io.ktor.server.websocket.*
  */
 private val Port = System.getenv("PORT")?.toIntOrNull() ?: 1234
 
-fun main() {
-  val groups = GroupMap()
+suspend fun main(): Unit = coroutineScope {
+  val groups = GroupMap(this)
   val server =
       embeddedServer(CIO, port = Port) {
         install(WebSockets)
