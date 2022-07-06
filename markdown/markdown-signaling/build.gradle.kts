@@ -18,5 +18,7 @@ kotlin {
         api(libs.serialization.core)
       }
     }
+    val jvmMain by getting
+    val jsMain by getting
   }
 }

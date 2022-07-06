@@ -12,6 +12,9 @@ kotlin {
     implementation(project(":markdown:markdown"))
     implementation(project(":markdown:markdown-signaling"))
 
+    // Kotlinx Immutable collections
+    implementation(libs.immutablecollections)
+
     // Ktor
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.server.cio)
@@ -22,6 +25,7 @@ kotlin {
 
     testImplementation(kotlin("test-common"))
     testImplementation(kotlin("test-annotations-common"))
+    testImplementation(kotlin("test-junit"))
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)

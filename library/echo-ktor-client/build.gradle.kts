@@ -17,6 +17,8 @@ kotlin {
         api(libs.ktor.client.websockets)
       }
     }
+    val jvmMain by getting
+    val jsMain by getting
 
     all {
       languageSettings.optIn("kotlin.RequiresOptIn")
