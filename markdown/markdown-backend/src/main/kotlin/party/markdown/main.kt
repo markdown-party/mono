@@ -7,7 +7,7 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.coroutineScope
-import party.markdown.backend.GroupMap
+import party.markdown.backend.groups.GroupMap
 import party.markdown.backend.signaling
 
 /**

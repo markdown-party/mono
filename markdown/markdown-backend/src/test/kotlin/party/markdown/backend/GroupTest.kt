@@ -8,6 +8,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.test.runTest
+import party.markdown.backend.groups.Group
+import party.markdown.backend.groups.Outbox
 import party.markdown.signaling.SignalingMessage.ServerToClient
 
 class GroupTest {

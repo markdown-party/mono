@@ -6,6 +6,7 @@ import kotlin.test.assertSame
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
+import party.markdown.backend.groups.GroupMap
 
 class GroupMapTest {
 
