@@ -3,7 +3,6 @@ package party.markdown.backend.groups
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import party.markdown.coroutines.inOrder
 import party.markdown.signaling.PeerIdentifier
@@ -73,10 +72,8 @@ class Group(private val scope: CoroutineScope) {
    */
   private suspend fun forward(peer: PeerIdentifier, message: SignalingMessage.ServerToClient) {
     inOrder.schedule {
-      withNoResult {
-        val outbox = mutex.withLock { peers[peer] }
-        outbox?.sendCatching(message)
-      }
+      val outbox = peers[peer]
+      withNoResult { outbox?.sendCatching(message) }
     }
   }
 
