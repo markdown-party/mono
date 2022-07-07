@@ -31,7 +31,7 @@ fun interface Outbox<in T> {
         Outbox<T> { element ->
           try {
             channel.send(element)
-          } catch (_: ClosedSendChannelException) {
+          } catch (_: Throwable) {
             // Ignore, but propagate cancellation exceptions.
           }
         }
