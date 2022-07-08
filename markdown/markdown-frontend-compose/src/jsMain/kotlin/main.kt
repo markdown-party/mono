@@ -1,5 +1,4 @@
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
@@ -12,13 +11,11 @@ import party.markdown.MarkdownPartyEvent
 import party.markdown.MarkdownPartyHistory
 import party.markdown.MutableMarkdownParty
 import party.markdown.data.Configuration
-import party.markdown.data.toExchange
 import party.markdown.ui.MarkdownParty
 
 /** Returns the next random session identifier. */
-@Suppress("UNUSED")
 private fun Random.nextSessionIdentifier(): String = buildString {
-  repeat(32) { append(('a'..'z').random()) }
+  repeat(32) { append('a' + nextInt('z' - 'a' + 1)) }
 }
 
 /**
@@ -34,15 +31,16 @@ fun main() {
 
   // Creates a new session identifier, if needed.
   val splits = window.location.pathname.split("/")
-  var sessionOrNull = splits.getOrNull(1)
-  if (sessionOrNull == null || sessionOrNull.isBlank()) {
-    sessionOrNull = Random.nextSessionIdentifier()
-    window.history.pushState(null, "", "/$sessionOrNull")
+  var session = splits.getOrNull(1)
+  if (session == null || session.isBlank()) {
+    session = Random.nextSessionIdentifier()
+    window.history.pushState(null, "", "/$session")
   }
 
-  // Create the local and remote sites.
+  // Create the local and configuration.
   val site = Random.nextSiteIdentifier()
-  val remote = Configuration.remote(sessionOrNull).toExchange()
+  val config = Configuration.remote(session)
+
   val local =
       mutableSite<MarkdownParty, MarkdownPartyEvent, MutableMarkdownParty>(
           identifier = site,
@@ -57,7 +55,7 @@ fun main() {
     CompositionLocalProvider(LocalSiteIdentifier provides site) {
       MarkdownParty(
           link = publicLink,
-          remote = remote,
+          configuration = config,
           local = local,
       )
     }

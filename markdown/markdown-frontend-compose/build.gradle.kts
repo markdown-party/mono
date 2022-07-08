@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
+  kotlin(Plugins.KotlinSerialization)
   id(Plugins.Compose)
 }
 
@@ -44,6 +45,7 @@ kotlin {
         implementation(project(":markdown:markdown"))
         implementation(project(":markdown:markdown-signaling"))
 
+        implementation(libs.serialization.json)
         implementation(libs.ktor.client.js)
         implementation(libs.coroutines.core.js)
         implementation(libs.datetime)

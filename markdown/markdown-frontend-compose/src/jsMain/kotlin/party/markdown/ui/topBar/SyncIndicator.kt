@@ -3,7 +3,6 @@ package party.markdown.ui.topBar
 import androidx.compose.runtime.*
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -16,6 +15,7 @@ import kotlinx.datetime.Instant
 import org.jetbrains.compose.web.dom.*
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.data.Configuration
 import party.markdown.rememberSyncState
 
 private val TickDuration = 500.milliseconds
@@ -170,11 +170,12 @@ private fun DebugButton(
 @Composable
 fun SyncIndicator(
     local: MutableSite<MarkdownPartyEvent, MarkdownParty>,
-    remote: Exchange<Message.Incoming, Message.Outgoing>,
+    configuration: Configuration,
     debugMode: Boolean,
 ) {
-  val (proxy, latest) = remember(remote) { remote.proxy() }
-  val state = rememberSyncState(local, proxy)
+  // TODO : Support sync indicators.
+  val latest = remember { MutableStateFlow(Clock.System.now()) }
+  val state = rememberSyncState(local, configuration)
   val now = remember { every(TickDuration) }
   val icon = collectSyncIcon(state.syncing, now, latest)
 

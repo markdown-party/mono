@@ -2,7 +2,11 @@ package party.markdown
 
 import androidx.compose.runtime.*
 import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.sync
+import party.markdown.data.Configuration
+import party.markdown.data.sync
 
 /**
  * An interface representing the synchronisation state. Instances of [SyncState] let consumers know
@@ -41,20 +45,20 @@ private class SnapshotSyncState(initial: Boolean) : SyncState {
  * demand using the provided callbacks.
  *
  * @param local the local [Exchange] that will be synced.
- * @param remote the remove [Exchange] to which we'll be syncing.
+ * @param configuration the remote [Configuration] which is used to sync data.
  * @param initial whether sync should start right away or not.
  */
 @Composable
-fun <I, O> rememberSyncState(
-    local: Exchange<I, O>,
-    remote: Exchange<I, O>,
+fun rememberSyncState(
+    local: Exchange<Incoming, Outgoing>,
+    configuration: Configuration,
     initial: Boolean = true,
 ): SyncState {
-  val state = remember(local, remote) { SnapshotSyncState(initial) }
-  LaunchedEffect(local, remote, state.syncing) {
+  val state = remember(local, configuration) { SnapshotSyncState(initial) }
+  LaunchedEffect(local, configuration, state.syncing) {
     if (state.syncing) {
       try {
-        sync(remote, local)
+        configuration.sync(local)
       } catch (problem: Throwable) {
         // Ignored.
       } finally {
