@@ -1,8 +1,8 @@
 package party.markdown.p2p.wrappers
 
 import kotlinx.coroutines.await
-import party.markdown.p2p.IceCandidate
-import party.markdown.p2p.SessionDescription
+import party.markdown.signaling.IceCandidate
+import party.markdown.signaling.SessionDescription
 import webrtc.RTCIceCandidateInit
 import webrtc.RTCPeerConnection
 import webrtc.RTCPeerConnectionIceEvent

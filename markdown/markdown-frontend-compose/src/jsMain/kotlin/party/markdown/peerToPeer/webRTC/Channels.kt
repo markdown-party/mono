@@ -1,4 +1,4 @@
-package party.markdown.p2p
+package party.markdown.peerToPeer.webRTC
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*

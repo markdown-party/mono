@@ -1,4 +1,4 @@
-package party.markdown.p2p
+package party.markdown.peerToPeer
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel

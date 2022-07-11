@@ -21,14 +21,16 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
-import party.markdown.p2p.ktor.BufferedWebSocketSession as WsSession
-import party.markdown.p2p.ktor.bufferedWs
-import party.markdown.p2p.ktor.bufferedWss
+import ktor.BufferedWebSocketSession as WsSession
+import ktor.bufferedWs
+import ktor.bufferedWss
 import party.markdown.p2p.wrappers.*
-import party.markdown.signaling.PeerIdentifier
+import party.markdown.peerToPeer.PeerToPeerConnection
+import party.markdown.peerToPeer.webRTC.GoogleIceServers
+import party.markdown.signaling.*
+import party.markdown.signaling.ClientToClientMessage.*
 import party.markdown.signaling.SignalingMessage.ClientToServer
 import party.markdown.signaling.SignalingMessage.ServerToClient
-import webrtc.RTCIceServer
 import webrtc.RTCPeerConnection
 
 /**
@@ -94,13 +96,26 @@ private suspend fun HttpClient.socketSignalingServer(
  *
  * @receiver the [WsSession] in which the messages are sent.
  * @param to the identifier of the receiver peer.
- * @param message the [Message] that is sent.
+ * @param message the [ClientToClientMessage] that is sent.
  */
-private fun WsSession.send(to: PeerIdentifier, message: Message) {
-  val encoded = DefaultStringFormat.encodeToString(message)
-  val forward = ClientToServer.Forward(to = to, message = encoded)
+private fun WsSession.send(to: PeerIdentifier, message: ClientToClientMessage) {
+  val forward = ClientToServer.Forward(to = to, message = message)
   val frame = Binary(true, DefaultSerializationFormat.encodeToByteArray<ClientToServer>(forward))
   outgoing.trySend(frame)
+}
+
+/**
+ * Runs the given [block] for each message that is received in this [WsSession].
+ *
+ * @receiver the [WsSession] on which the messages are read.
+ * @param block the block that gets invoked on each message.
+ */
+private suspend inline fun WsSession.forEachServerToClient(block: (ServerToClient) -> Unit) {
+  for (frame in incoming) {
+    val bytes = (frame as Binary).readBytes()
+    val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)
+    block(msg)
+  }
 }
 
 private class WsSessionSignalingServer(
@@ -110,16 +125,15 @@ private class WsSessionSignalingServer(
 
   init {
     launch {
-      for (frame in incoming) {
-        val bytes = (frame as Binary).readBytes()
-        when (val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)) {
+      forEachServerToClient { msg ->
+        when (msg) {
           is ServerToClient.GotMessage -> {
             val from = msg.from
-            when (val message = DefaultStringFormat.decodeFromString<Message>(msg.message)) {
-              is Message.Answer -> handleAnswer(from, message.channel, message.answer)
-              is Message.Offer -> handleOffer(from, message.channel, message.offer)
-              is Message.IceCaller -> handleIceCaller(from, message.channel, message.ice)
-              is Message.IceCallee -> handleIceCallee(from, message.channel, message.ice)
+            when (val message = msg.message) {
+              is Answer -> handleAnswer(from, message.channel, message.answer)
+              is Offer -> handleOffer(from, message.channel, message.offer)
+              is IceCaller -> handleIceCaller(from, message.channel, message.ice)
+              is IceCallee -> handleIceCallee(from, message.channel, message.ice)
             }
           }
           is ServerToClient.PeerJoined -> addPeer(msg.peer)
@@ -189,12 +203,10 @@ private class WsSessionSignalingServer(
     with(caller.connection) {
       // Send all the Ice candidates.
       caller.forward(createDataChannel(null), caller.incoming, caller.outgoing)
-      onicecandidate { event ->
-        event.candidate?.let { send(peer, Message.IceCallee(channelId, it)) }
-      }
+      onicecandidate { event -> event.candidate?.let { send(peer, IceCallee(channelId, it)) } }
       val offer = createOfferSuspend()
       setLocalDescriptionSuspend(offer)
-      send(peer, Message.Offer(channelId, offer))
+      send(peer, Offer(channelId, offer))
     }
     return caller
   }
@@ -222,13 +234,11 @@ private class WsSessionSignalingServer(
         callee.forward(it.channel, callee.incoming, callee.outgoing)
         null
       }
-      onicecandidate { event ->
-        event.candidate?.let { send(from, Message.IceCaller(channel, it)) }
-      }
+      onicecandidate { event -> event.candidate?.let { send(from, IceCaller(channel, it)) } }
       setRemoteDescriptionSuspend(offer)
       val answer = createAnswerSuspend()
       setLocalDescriptionSuspend(answer)
-      send(from, Message.Answer(channel, answer))
+      send(from, Answer(channel, answer))
     }
   }
 
@@ -259,8 +269,5 @@ private class WsSessionSignalingServer(
     callee.connection.addIceCandidateSuspend(iceCandidate)
   }
 }
-
-/** The [Array] of [RTCIceServer] which can be used for computing the ICE candidates. */
-private val GoogleIceServers = arrayOf<RTCIceServer>(jso { urls = "stun:stun.l.google.com:19302" })
 
 data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)

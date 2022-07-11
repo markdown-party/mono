@@ -2,6 +2,7 @@ package party.markdown.p2p
 
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import kotlinx.coroutines.flow.*
+import party.markdown.peerToPeer.PeerToPeerConnection
 import party.markdown.signaling.PeerIdentifier
 
 /**

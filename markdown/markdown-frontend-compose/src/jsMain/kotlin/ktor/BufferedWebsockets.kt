@@ -1,4 +1,4 @@
-package party.markdown.p2p.ktor
+package ktor
 
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
