@@ -89,7 +89,7 @@ class MemoryExchangeIncomingTest {
                   Event(
                       seqno,
                       site,
-                      DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
+                      DefaultBinaryFormat.encodeToByteArray(Boolean.serializer(), true),
                   )),
           ),
           awaitItem(),
@@ -116,7 +116,7 @@ class MemoryExchangeIncomingTest {
                   Event(
                       seqno,
                       site,
-                      DefaultSerializationFormat.encodeToByteArray(Boolean.serializer(), true),
+                      DefaultBinaryFormat.encodeToByteArray(Boolean.serializer(), true),
                   ),
               )),
           awaitItem(),

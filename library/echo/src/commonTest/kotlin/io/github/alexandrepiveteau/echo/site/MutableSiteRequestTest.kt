@@ -21,7 +21,7 @@ import kotlinx.serialization.builtins.serializer
 class MutableSiteRequestTest {
 
   private fun encode(value: Int): ByteArray {
-    return DefaultSerializationFormat.encodeToByteArray(Int.serializer(), value)
+    return DefaultBinaryFormat.encodeToByteArray(Int.serializer(), value)
   }
 
   @Test

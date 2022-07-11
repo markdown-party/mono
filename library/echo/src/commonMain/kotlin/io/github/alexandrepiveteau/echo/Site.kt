@@ -153,8 +153,8 @@ inline fun <M, reified T> site(
                     OneWayMutableProjection(
                         projection = projection,
                         eventSerializer = serializer(),
-                        format = DefaultSerializationFormat),
-                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
+                        format = DefaultBinaryFormat),
+                events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         strategy = strategy,
     ) { it }
@@ -187,9 +187,9 @@ inline fun <M, reified T, reified C> site(
                         projection = projection,
                         changeSerializer = serializer(),
                         eventSerializer = serializer(),
-                        format = DefaultSerializationFormat,
+                        format = DefaultBinaryFormat,
                     ),
-                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
+                events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         strategy = strategy,
     ) { it }
@@ -239,7 +239,7 @@ inline fun <M, reified T> mutableSite(
         history = history,
         strategy = strategy,
         eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
+        format = DefaultBinaryFormat,
     ) { it }
 
 /**
@@ -325,7 +325,7 @@ inline fun <M, reified T, R> mutableSite(
         identifier = identifier,
         history = history,
         eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
+        format = DefaultBinaryFormat,
         strategy = strategy,
         transform = transform,
     )
@@ -363,12 +363,12 @@ inline fun <M, reified T, R> mutableSite(
                     OneWayMutableProjection(
                         projection = projection,
                         eventSerializer = serializer(),
-                        format = DefaultSerializationFormat,
+                        format = DefaultBinaryFormat,
                     ),
-                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
+                events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
+        format = DefaultBinaryFormat,
         strategy = strategy,
         transform = transform,
     )
@@ -408,12 +408,12 @@ inline fun <M, reified T, reified C, R> mutableSite(
                         projection = projection,
                         changeSerializer = serializer(),
                         eventSerializer = serializer(),
-                        format = DefaultSerializationFormat,
+                        format = DefaultBinaryFormat,
                     ),
-                events = events.mapToBinary(serializer(), DefaultSerializationFormat),
+                events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         eventSerializer = serializer(),
-        format = DefaultSerializationFormat,
+        format = DefaultBinaryFormat,
         strategy = strategy,
         transform = transform,
     )

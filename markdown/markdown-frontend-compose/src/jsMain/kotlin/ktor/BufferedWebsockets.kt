@@ -62,7 +62,7 @@ private fun buffered(
 }
 
 private class ActualBufferedWebSocketSession(
-    private val session: DefaultWebSocketSession,
+    session: DefaultWebSocketSession,
     buffer: Channel<Frame>,
 ) : BufferedWebSocketSession, CoroutineScope by session {
   override val incoming = session.incoming

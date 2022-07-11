@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.*
 
 // BUFFERING
 
-// An implementation of a Buffered Echo.
+// An implementation of a Buffered exchange.
 private class BufferedExchange<I, O>(
     private val capacity: Int,
     private val backing: Exchange<I, O>,

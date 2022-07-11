@@ -1,6 +1,6 @@
 package party.markdown.backend
 
-import io.github.alexandrepiveteau.echo.DefaultSerializationFormat
+import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -29,7 +29,7 @@ fun Application.signaling(groups: GroupMap) {
         groups.get(requireId()).session(this) { myId ->
           for (frame in incoming) {
             val bytes = (frame as Frame.Binary).readBytes()
-            val msg = DefaultSerializationFormat.decodeFromByteArray<ClientToServer>(bytes)
+            val msg = DefaultBinaryFormat.decodeFromByteArray<ClientToServer>(bytes)
             forward(msg.to, msg.toServerToClient(myId))
           }
         }

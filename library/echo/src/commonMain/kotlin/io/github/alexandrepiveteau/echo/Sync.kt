@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 /**
- * Syncs the provided bi-directional flows until they are done communicating. The [sync] operator
+ * Syncs the provided bidirectional flows until they are done communicating. The [sync] operator
  * creates bidirectional communication between the two [Flow] generator functions.
  *
  * The communication stops when both generated [Flow] are completed.
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 suspend fun <I, O> sync(
     first: (Flow<I>) -> Flow<O>,
     second: (Flow<O>) -> Flow<I>,
-): Unit = coroutineScope {
+) = coroutineScope {
   val firstToSecond = Channel<O>()
   val secondToFirst = Channel<I>()
   launch {
@@ -49,10 +49,31 @@ suspend fun <I, O> sync(
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-suspend fun <I, O> sync(
-    vararg exchanges: Exchange<I, O>,
+suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
+  return sync(exchanges.asSequence().zipWithNext())
+}
+
+/**
+ * Syncs the provided [Exchange] until they are all done communicating. The [syncAll] operator
+ * creates some pairs of [Exchange], forming a fully connected graph.
+ *
+ * Because a fully connected graph is created, some [Exchange] may transitively sync messages, event
+ * if their direct connections are stopped. The degenerate case of this topology is a single
+ * exchange, which will not sync at all.
+ *
+ * @param I the type of the incoming messages.
+ * @param O the type of the outgoing messages.
+ */
+suspend fun <I, O> syncAll(vararg exchanges: Exchange<I, O>) {
+  val s = exchanges.asSequence()
+  val pairs = s.flatMapIndexed { i, a -> s.filterIndexed { j, _ -> i != j }.map { b -> a to b } }
+  return sync(pairs)
+}
+
+private suspend fun <I, O> sync(
+    exchanges: Sequence<Pair<Exchange<I, O>, Exchange<I, O>>>,
 ): Unit = coroutineScope {
-  exchanges.asSequence().zipWithNext().forEach { (left, right) ->
+  exchanges.forEach { (left, right) ->
     launch { sync(left::send, right::receive) }
     launch { sync(left::receive, right::send) }
   }

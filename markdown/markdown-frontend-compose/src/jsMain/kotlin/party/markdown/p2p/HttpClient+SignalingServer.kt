@@ -1,6 +1,6 @@
 package party.markdown.p2p
 
-import io.github.alexandrepiveteau.echo.DefaultSerializationFormat
+import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
@@ -85,6 +85,7 @@ private suspend fun HttpClient.socketSignalingServer(
     factory: SocketFactory,
     block: suspend SignalingServer.() -> Unit,
 ) = factory {
+  // TODO : This should be the caller's responsibility.
   while (true) {
     block(WsSessionSignalingServer(exchange, this))
     delay(RetryDelaySignalingServer)
@@ -100,7 +101,7 @@ private suspend fun HttpClient.socketSignalingServer(
  */
 private fun WsSession.send(to: PeerIdentifier, message: ClientToClientMessage) {
   val forward = ClientToServer.Forward(to = to, message = message)
-  val frame = Binary(true, DefaultSerializationFormat.encodeToByteArray<ClientToServer>(forward))
+  val frame = Binary(true, DefaultBinaryFormat.encodeToByteArray<ClientToServer>(forward))
   outgoing.trySend(frame)
 }
 
@@ -113,7 +114,7 @@ private fun WsSession.send(to: PeerIdentifier, message: ClientToClientMessage) {
 private suspend inline fun WsSession.forEachServerToClient(block: (ServerToClient) -> Unit) {
   for (frame in incoming) {
     val bytes = (frame as Binary).readBytes()
-    val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)
+    val msg = DefaultBinaryFormat.decodeFromByteArray<ServerToClient>(bytes)
     block(msg)
   }
 }
@@ -127,15 +128,13 @@ private class WsSessionSignalingServer(
     launch {
       forEachServerToClient { msg ->
         when (msg) {
-          is ServerToClient.GotMessage -> {
-            val from = msg.from
-            when (val message = msg.message) {
-              is Answer -> handleAnswer(from, message.channel, message.answer)
-              is Offer -> handleOffer(from, message.channel, message.offer)
-              is IceCaller -> handleIceCaller(from, message.channel, message.ice)
-              is IceCallee -> handleIceCallee(from, message.channel, message.ice)
-            }
-          }
+          is ServerToClient.GotMessage ->
+              when (val message = msg.message) {
+                is Answer -> handleAnswer(msg.from, message.channel, message.answer)
+                is Offer -> handleOffer(msg.from, message.channel, message.offer)
+                is IceCaller -> handleIceCaller(msg.from, message.channel, message.ice)
+                is IceCallee -> handleIceCallee(msg.from, message.channel, message.ice)
+              }
           is ServerToClient.PeerJoined -> addPeer(msg.peer)
           is ServerToClient.PeerLeft -> removePeer(msg.peer)
         }

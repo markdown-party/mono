@@ -1,6 +1,6 @@
 package io.github.alexandrepiveteau.echo.demo.set
 
-import io.github.alexandrepiveteau.echo.DefaultSerializationFormat
+import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
@@ -85,7 +85,7 @@ class GSetTest {
   fun reproducer_b84() {
     val a = Random.nextSiteIdentifier()
     val b = Random.nextSiteIdentifier()
-    val format = DefaultSerializationFormat
+    val format = DefaultBinaryFormat
 
     val history =
         mutableHistoryOf(

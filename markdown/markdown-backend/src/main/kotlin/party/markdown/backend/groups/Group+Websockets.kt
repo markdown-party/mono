@@ -1,6 +1,6 @@
 package party.markdown.backend.groups
 
-import io.github.alexandrepiveteau.echo.DefaultSerializationFormat
+import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.ktor.websocket.*
 import io.ktor.websocket.Frame.*
 import kotlinx.serialization.encodeToByteArray
@@ -20,7 +20,7 @@ suspend fun Group.session(
 ) =
     session(
         Outbox.wrap(session.outgoing).map {
-          Binary(true, DefaultSerializationFormat.encodeToByteArray(it))
+          Binary(true, DefaultBinaryFormat.encodeToByteArray(it))
         },
         block,
     )

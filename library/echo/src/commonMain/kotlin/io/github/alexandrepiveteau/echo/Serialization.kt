@@ -12,4 +12,4 @@ import kotlinx.serialization.protobuf.ProtoBuf
  * The [BinaryFormat] that's used by default for serialization of events and changes when events are
  * inserted in the event and change logs.
  */
-val DefaultSerializationFormat: BinaryFormat = ProtoBuf
+val DefaultBinaryFormat: BinaryFormat = ProtoBuf
