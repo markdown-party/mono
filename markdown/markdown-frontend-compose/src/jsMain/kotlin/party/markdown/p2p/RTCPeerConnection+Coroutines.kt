@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
 import webrtc.*
 
 /** The type of the JS events to query when fetching ICE information. */
@@ -44,10 +45,14 @@ private const val DataChannelEventType = "datachannel"
  */
 suspend fun RTCPeerConnection.awaitDataChannel(): RTCDataChannel {
   return suspendCancellableCoroutine { cont ->
-    val listener: (Event) -> Unit = {
-      val event = it.unsafeCast<RTCDataChannelEvent>()
-      cont.resume(event.channel)
-    }
+    val listener =
+        object : EventListener {
+          override fun handleEvent(event: Event) {
+            removeEventListener(DataChannelEventType, this)
+            val rtcEvent = event.unsafeCast<RTCDataChannelEvent>()
+            cont.resume(rtcEvent.channel)
+          }
+        }
     addEventListener(DataChannelEventType, listener)
     cont.invokeOnCancellation { removeEventListener(DataChannelEventType, listener) }
   }

@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.*
 import io.ktor.websocket.*
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentSetOf
@@ -23,6 +24,9 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
+import party.markdown.p2p.ktor.BufferedWebSocketSession as WsSession
+import party.markdown.p2p.ktor.bufferedWs
+import party.markdown.p2p.ktor.bufferedWss
 import party.markdown.p2p.wrappers.*
 import party.markdown.signaling.PeerIdentifier
 import party.markdown.signaling.SignalingMessage.ClientToServer
@@ -31,44 +35,43 @@ import webrtc.RTCIceServer
 import webrtc.RTCPeerConnection
 
 /**
- * Invokes the given [block] with a [SignalingServer] available at the provided [urlString].
+ * Invokes the given [block] with a [SignalingServer] available at the provided [request].
  *
  * @param exchange the [SendExchange] used to answer requests from the other side.
- * @param urlString the url which will be queried.
+ * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
 suspend fun HttpClient.wsSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
-    urlString: String,
+    request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,
 ): Unit =
     socketSignalingServer(
         exchange = exchange,
-        factory = { ws(urlString) { it() } },
+        factory = { bufferedWs(request) { it() } },
         block = block,
     )
 
 /**
- * Invokes the given [block] with a [SignalingServer] available at the provided [urlString].
+ * Invokes the given [block] with a [SignalingServer] available at the provided [request].
  *
  * @param exchange the [SendExchange] used to answer requests from the other side.
- * @param urlString the url which will be queried.
+ * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
 suspend fun HttpClient.wssSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
-    urlString: String,
+    request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,
 ): Unit =
     socketSignalingServer(
         exchange = exchange,
-        factory = { wss(urlString) { it() } },
+        factory = { bufferedWss(request) { it() } },
         block = block,
     )
 
 /** A type alias representing a factory to create a socket. */
-private typealias SocketFactory =
-    suspend HttpClient.(suspend DefaultWebSocketSession.() -> Unit) -> Unit
+private typealias SocketFactory = suspend HttpClient.(suspend WsSession.() -> Unit) -> Unit
 
 /**
  * Invokes the given [block] with a [SignalingServer] which was created through the provided
@@ -82,12 +85,12 @@ private suspend fun HttpClient.socketSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     factory: SocketFactory,
     block: suspend SignalingServer.() -> Unit,
-) = factory { block(DefaultWebSocketSessionSignalingServer(exchange, this)) }
+) = factory { block(WsSessionSignalingServer(exchange, this)) }
 
-private class DefaultWebSocketSessionSignalingServer(
+private class WsSessionSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
-    session: DefaultWebSocketSession,
-) : DefaultWebSocketSession by session, SignalingServer, Comm {
+    session: WsSession,
+) : WsSession by session, SignalingServer, Comm {
 
   private val state = State(this, exchange)
 
@@ -114,23 +117,13 @@ private class DefaultWebSocketSessionSignalingServer(
 
   override val peers = state.peers
 
-  // TODO : This is how we do not block.
-  private val queue = Channel<Frame>(UNLIMITED)
-
-  init {
-    launch {
-      for (frame in queue) send(frame)
-      close()
-    }
-  }
-
   override fun enqueue(to: PeerIdentifier, message: Message) {
     val encoded = DefaultStringFormat.encodeToString(message)
     // KLUDGE : We need to explicitly mark this as ClientToServer or Kotlinx serialization may not
     //          work properly.
     val forward: ClientToServer = ClientToServer.Forward(to = to, message = encoded)
     val frame = Frame.Binary(true, DefaultSerializationFormat.encodeToByteArray(forward))
-    queue.trySend(frame)
+    outgoing.trySend(frame)
   }
 
   override suspend fun connect(peer: PeerIdentifier): PeerToPeerConnection {
