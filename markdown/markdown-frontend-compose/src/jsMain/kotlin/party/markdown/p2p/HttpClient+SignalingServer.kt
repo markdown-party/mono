@@ -8,9 +8,6 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.websocket.*
 import io.ktor.websocket.Frame.*
-import kotlinx.collections.immutable.minus
-import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.plus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
@@ -85,7 +82,12 @@ private suspend fun HttpClient.socketSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     factory: SocketFactory,
     block: suspend SignalingServer.() -> Unit,
-) = factory { block(WsSessionSignalingServer(exchange, this)) }
+) = factory {
+  while (true) {
+    block(WsSessionSignalingServer(exchange, this))
+    delay(RetryDelaySignalingServer)
+  }
+}
 
 /**
  * Sends a message to the peer with the provided [PeerIdentifier] through the [WsSession].
@@ -102,11 +104,9 @@ private fun WsSession.send(to: PeerIdentifier, message: Message) {
 }
 
 private class WsSessionSignalingServer(
-    exchange: SendExchange<Incoming, Outgoing>,
+    private val exchange: SendExchange<Incoming, Outgoing>,
     session: WsSession,
 ) : WsSession by session, SignalingServer {
-
-  private val state = State(this, exchange)
 
   init {
     launch {
@@ -116,41 +116,26 @@ private class WsSessionSignalingServer(
           is ServerToClient.GotMessage -> {
             val from = msg.from
             when (val message = DefaultStringFormat.decodeFromString<Message>(msg.message)) {
-              is Message.Answer -> state.handleAnswer(from, message.channel, message.answer)
-              is Message.Offer -> state.handleOffer(from, message.channel, message.offer)
-              is Message.IceCaller -> state.handleIceCaller(from, message.channel, message.ice)
-              is Message.IceCallee -> state.handleIceCallee(from, message.channel, message.ice)
+              is Message.Answer -> handleAnswer(from, message.channel, message.answer)
+              is Message.Offer -> handleOffer(from, message.channel, message.offer)
+              is Message.IceCaller -> handleIceCaller(from, message.channel, message.ice)
+              is Message.IceCallee -> handleIceCallee(from, message.channel, message.ice)
             }
           }
-          is ServerToClient.PeerJoined -> state.addPeer(msg.peer)
-          is ServerToClient.PeerLeft -> state.removePeer(msg.peer)
+          is ServerToClient.PeerJoined -> addPeer(msg.peer)
+          is ServerToClient.PeerLeft -> removePeer(msg.peer)
         }
       }
     }
   }
 
-  override val peers = state.peers
-
   override suspend fun connect(peer: PeerIdentifier): PeerToPeerConnection {
-    val caller = state.create(peer)
+    val caller = create(peer)
     return object : PeerToPeerConnection {
       override val incoming: ReceiveChannel<String> = caller.incoming
       override val outgoing: SendChannel<String> = caller.outgoing
     }
   }
-}
-
-private val GoogleIceServers =
-    arrayOf<RTCIceServer>(
-        jso { urls = "stun:stun.l.google.com:19302" },
-    )
-
-data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)
-
-class State(
-    private val comm: WsSession,
-    private val exchange: SendExchange<Incoming, Outgoing>,
-) : WsSession by comm {
 
   private var _id = 0
   private suspend fun nextChannelId(): ChannelId = mutex.withLock { ChannelId(_id++) }
@@ -169,22 +154,13 @@ class State(
   ) : CoroutineScope by CoroutineScope(Job())
 
   private val mutex = Mutex()
-  private var members = persistentSetOf<PeerIdentifier>()
   private val callers = mutableMapOf<PeerChannelId, Caller>()
   private val callees = mutableMapOf<PeerChannelId, Callee>()
 
-  private val membersFlow =
-      MutableSharedFlow<Set<PeerIdentifier>>(
-              replay = 1,
-              extraBufferCapacity = Int.MAX_VALUE,
-          )
-          .apply { tryEmit(emptySet()) }
-
-  val peers: SharedFlow<Set<PeerIdentifier>> = membersFlow.asSharedFlow()
+  override val peers = MutableStateFlow(emptySet<PeerIdentifier>())
 
   fun addPeer(peer: PeerIdentifier) {
-    members += peer
-    membersFlow.tryEmit(members)
+    peers.update { it + peer }
   }
 
   fun removePeer(peer: PeerIdentifier) {
@@ -202,10 +178,8 @@ class State(
       connection?.outgoing?.close()
       connection?.cancel()
     }
-
     // Remove the peer from the members.
-    members -= peer
-    membersFlow.tryEmit(members)
+    peers.update { it - peer }
   }
 
   suspend fun create(peer: PeerIdentifier): Caller {
@@ -216,7 +190,7 @@ class State(
       // Send all the Ice candidates.
       caller.forward(createDataChannel(null), caller.incoming, caller.outgoing)
       onicecandidate { event ->
-        event.candidate?.let { comm.send(peer, Message.IceCallee(channelId, it)) }
+        event.candidate?.let { send(peer, Message.IceCallee(channelId, it)) }
       }
       val offer = createOfferSuspend()
       setLocalDescriptionSuspend(offer)
@@ -249,7 +223,7 @@ class State(
         null
       }
       onicecandidate { event ->
-        event.candidate?.let { comm.send(from, Message.IceCaller(channel, it)) }
+        event.candidate?.let { send(from, Message.IceCaller(channel, it)) }
       }
       setRemoteDescriptionSuspend(offer)
       val answer = createAnswerSuspend()
@@ -285,3 +259,8 @@ class State(
     callee.connection.addIceCandidateSuspend(iceCandidate)
   }
 }
+
+/** The [Array] of [RTCIceServer] which can be used for computing the ICE candidates. */
+private val GoogleIceServers = arrayOf<RTCIceServer>(jso { urls = "stun:stun.l.google.com:19302" })
+
+data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)

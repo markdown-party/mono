@@ -4,7 +4,6 @@ import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -16,9 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import party.markdown.signaling.PeerIdentifier
-
-/** The delay before retrying to [sync]. */
-private val RetryDelay = 1000.milliseconds
 
 /**
  * Syncs the [SendExchange] to a single peer.
@@ -37,7 +33,7 @@ suspend fun SignalingServer.sync(
         .receive(connection.incoming.consumeAsFlow().map(DefaultStringFormat::decodeFromString))
         .onEach { connection.outgoing.send(DefaultStringFormat.encodeToString(it)) }
         .collect()
-    delay(RetryDelay)
+    delay(RetryDelayDataChannel)
   }
 }
 
