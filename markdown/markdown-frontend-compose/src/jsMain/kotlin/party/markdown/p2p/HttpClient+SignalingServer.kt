@@ -5,9 +5,9 @@ import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.websocket.*
+import io.ktor.websocket.Frame.*
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.plus
@@ -87,17 +87,31 @@ private suspend fun HttpClient.socketSignalingServer(
     block: suspend SignalingServer.() -> Unit,
 ) = factory { block(WsSessionSignalingServer(exchange, this)) }
 
+/**
+ * Sends a message to the peer with the provided [PeerIdentifier] through the [WsSession].
+ *
+ * @receiver the [WsSession] in which the messages are sent.
+ * @param to the identifier of the receiver peer.
+ * @param message the [Message] that is sent.
+ */
+private fun WsSession.send(to: PeerIdentifier, message: Message) {
+  val encoded = DefaultStringFormat.encodeToString(message)
+  val forward = ClientToServer.Forward(to = to, message = encoded)
+  val frame = Binary(true, DefaultSerializationFormat.encodeToByteArray<ClientToServer>(forward))
+  outgoing.trySend(frame)
+}
+
 private class WsSessionSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     session: WsSession,
-) : WsSession by session, SignalingServer, Comm {
+) : WsSession by session, SignalingServer {
 
   private val state = State(this, exchange)
 
   init {
     launch {
       for (frame in incoming) {
-        val bytes = (frame as Frame.Binary).readBytes()
+        val bytes = (frame as Binary).readBytes()
         when (val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)) {
           is ServerToClient.GotMessage -> {
             val from = msg.from
@@ -117,15 +131,6 @@ private class WsSessionSignalingServer(
 
   override val peers = state.peers
 
-  override fun enqueue(to: PeerIdentifier, message: Message) {
-    val encoded = DefaultStringFormat.encodeToString(message)
-    // KLUDGE : We need to explicitly mark this as ClientToServer or Kotlinx serialization may not
-    //          work properly.
-    val forward: ClientToServer = ClientToServer.Forward(to = to, message = encoded)
-    val frame = Frame.Binary(true, DefaultSerializationFormat.encodeToByteArray(forward))
-    outgoing.trySend(frame)
-  }
-
   override suspend fun connect(peer: PeerIdentifier): PeerToPeerConnection {
     val caller = state.create(peer)
     return object : PeerToPeerConnection {
@@ -140,18 +145,12 @@ private val GoogleIceServers =
         jso { urls = "stun:stun.l.google.com:19302" },
     )
 
-// TODO : Clean this up afterwards.
-
-interface Comm {
-  fun enqueue(to: PeerIdentifier, message: Message)
-}
-
 data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)
 
 class State(
-    private val comm: Comm,
+    private val comm: WsSession,
     private val exchange: SendExchange<Incoming, Outgoing>,
-) : Comm by comm {
+) : WsSession by comm {
 
   private var _id = 0
   private suspend fun nextChannelId(): ChannelId = mutex.withLock { ChannelId(_id++) }
@@ -217,11 +216,11 @@ class State(
       // Send all the Ice candidates.
       caller.forward(createDataChannel(null), caller.incoming, caller.outgoing)
       onicecandidate { event ->
-        event.candidate?.let { comm.enqueue(peer, Message.IceCallee(channelId, it)) }
+        event.candidate?.let { comm.send(peer, Message.IceCallee(channelId, it)) }
       }
       val offer = createOfferSuspend()
       setLocalDescriptionSuspend(offer)
-      enqueue(peer, Message.Offer(channelId, offer))
+      send(peer, Message.Offer(channelId, offer))
     }
     return caller
   }
@@ -250,12 +249,12 @@ class State(
         null
       }
       onicecandidate { event ->
-        event.candidate?.let { comm.enqueue(from, Message.IceCaller(channel, it)) }
+        event.candidate?.let { comm.send(from, Message.IceCaller(channel, it)) }
       }
       setRemoteDescriptionSuspend(offer)
       val answer = createAnswerSuspend()
       setLocalDescriptionSuspend(answer)
-      enqueue(from, Message.Answer(channel, answer))
+      send(from, Message.Answer(channel, answer))
     }
   }
 
