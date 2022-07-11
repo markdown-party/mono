@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
@@ -26,11 +27,14 @@ suspend fun SignalingServer.sync(
     peer: PeerIdentifier,
     exchange: ReceiveExchange<Incoming, Outgoing>,
 ) {
-  val connection = connect(peer)
-  exchange
-      .receive(connection.incoming.consumeAsFlow().map { DefaultStringFormat.decodeFromString(it) })
-      .onEach { connection.outgoing.send(DefaultStringFormat.encodeToString(it)) }
-      .collect()
+  while (true) {
+    val connection = connect(peer)
+    exchange
+        .receive(connection.incoming.consumeAsFlow().map(DefaultStringFormat::decodeFromString))
+        .onEach { connection.outgoing.send(DefaultStringFormat.encodeToString(it)) }
+        .collect()
+    delay(RetryDelayDataChannel)
+  }
 }
 
 /**

@@ -42,10 +42,13 @@ sealed class SignalingMessage {
     /**
      * Indicates that the server should relay this ICE candidate to the given peer.
      *
-     * @property message the encoded message to be transmitted.
+     * @property message the message to be transmitted.
      */
     @Serializable
-    data class Forward(override val to: PeerIdentifier, val message: String) : ClientToServer() {
+    data class Forward(
+        override val to: PeerIdentifier,
+        val message: ClientToClientMessage,
+    ) : ClientToServer() {
 
       override fun toServerToClient(
           from: PeerIdentifier,
@@ -61,10 +64,13 @@ sealed class SignalingMessage {
      * Indicates an ICE candidate to use when communicating with a given client.
      *
      * @property from the identifier of the peer who sent the message.
-     * @property message the encoded message received from the peer.
+     * @property message the message received from the peer.
      */
     @Serializable
-    data class GotMessage(val from: PeerIdentifier, val message: String) : ServerToClient()
+    data class GotMessage(
+        val from: PeerIdentifier,
+        val message: ClientToClientMessage,
+    ) : ServerToClient()
 
     /**
      * Indicates that a peer has joined the collaboration session. The client should attempt to

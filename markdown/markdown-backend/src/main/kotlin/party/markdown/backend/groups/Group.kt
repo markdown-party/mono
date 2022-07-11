@@ -23,8 +23,11 @@ class Group(private val scope: CoroutineScope) {
   /** The [MutableMap] of all the peer identifiers, and the [Outbox] for their messages. */
   private var peers = persistentMapOf<PeerIdentifier, Outbox<ServerToClient>>()
 
+  /** The next [PeerIdentifier] that should be given. */
+  private var _nextId = 0
+
   /** Returns the next [PeerIdentifier] that should be attributed. */
-  private fun nextPeerIdentifier() = PeerIdentifier(peers.keys.maxOfOrNull { it.id }?.plus(1) ?: 0)
+  private fun nextPeerIdentifier() = PeerIdentifier(_nextId++)
 
   /**
    * Joins the [Group], and gets a new peer identifier assigned.

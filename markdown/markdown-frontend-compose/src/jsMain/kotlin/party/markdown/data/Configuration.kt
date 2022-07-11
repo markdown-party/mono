@@ -61,8 +61,18 @@ data class Configuration(
 private val Client = HttpClient(Js) { install(WebSockets) }
 
 suspend fun Configuration.sync(exchange: Exchange<Incoming, Outgoing>) {
+  val config = this
   val server = if (secure) Client::wssSignalingServer else Client::wsSignalingServer
-  // TODO : Maybe wssSignalingServer or wsSignalingServer may pass the scheme etc. directly.
-  val scheme = if (secure) "wss" else "ws"
-  server(exchange, "$scheme://$host:$port/$signalingServerPath") { this.sync(exchange) }
+  server(
+      exchange,
+      {
+        port = config.port
+        url {
+          host = config.host
+          path(config.signalingServerPath)
+        }
+      },
+  ) {
+    this.sync(exchange)
+  }
 }

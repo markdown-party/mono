@@ -1,8 +1,8 @@
 package party.markdown.p2p.wrappers
 
 import kotlinx.coroutines.await
-import party.markdown.p2p.IceCandidate
-import party.markdown.p2p.SessionDescription
+import party.markdown.signaling.IceCandidate
+import party.markdown.signaling.SessionDescription
 import webrtc.RTCIceCandidateInit
 import webrtc.RTCPeerConnection
 import webrtc.RTCPeerConnectionIceEvent
@@ -19,17 +19,37 @@ fun RTCPeerConnection.onicecandidate(callback: (RTCPeerConnectionIceEvent) -> Un
         callback = { callback(it as RTCPeerConnectionIceEvent) },
     )
 
-suspend fun RTCPeerConnection.setLocalDescriptionSuspend(description: SessionDescription) =
+/**
+ * Sets the local [SessionDescription] for this [RTCPeerConnection], and awaits.
+ *
+ * @receiver the [RTCPeerConnection] to which the session description is set.
+ * @param description the [SessionDescription] which is set.
+ */
+suspend fun RTCPeerConnection.setLocalDescriptionSuspend(description: SessionDescription): Unit =
     setLocalDescription(JSON.parse(description.json)).await()
 
-suspend fun RTCPeerConnection.setRemoteDescriptionSuspend(description: SessionDescription) =
+/**
+ * Sets the remote [SessionDescription] for this [RTCPeerConnection], and awaits.
+ *
+ * @receiver the [RTCPeerConnection] to which the session description is set.
+ * @param description the [SessionDescription] which is set.
+ */
+suspend fun RTCPeerConnection.setRemoteDescriptionSuspend(description: SessionDescription): Unit =
     setRemoteDescription(JSON.parse(description.json)).await()
 
-suspend fun RTCPeerConnection.createOfferSuspend() =
+/** Returns the offer [SessionDescription] for this [RTCPeerConnection]. */
+suspend fun RTCPeerConnection.createOfferSuspend(): SessionDescription =
     SessionDescription(JSON.stringify(createOffer().await()))
 
-suspend fun RTCPeerConnection.createAnswerSuspend() =
+/** Returns the answer [SessionDescription] for this [RTCPeerConnection]. */
+suspend fun RTCPeerConnection.createAnswerSuspend(): SessionDescription =
     SessionDescription(JSON.stringify(createAnswer().await()))
 
-suspend fun RTCPeerConnection.addIceCandidateSuspend(candidate: IceCandidate) =
+/**
+ * Adds an [IceCandidate] for this [RTCPeerConnection], and awaits.
+ *
+ * @receiver the [RTCPeerConnection] to which the candidate is added.
+ * @param candidate the [IceCandidate] which is added to the [RTCPeerConnection].
+ */
+suspend fun RTCPeerConnection.addIceCandidateSuspend(candidate: IceCandidate): Unit =
     addIceCandidate(JSON.parse<RTCIceCandidateInit>(candidate.json)).await()

@@ -5,11 +5,9 @@ import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.*
 import io.ktor.websocket.*
-import kotlinx.collections.immutable.minus
-import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.plus
+import io.ktor.websocket.Frame.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
@@ -23,52 +21,56 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
+import ktor.BufferedWebSocketSession as WsSession
+import ktor.bufferedWs
+import ktor.bufferedWss
 import party.markdown.p2p.wrappers.*
-import party.markdown.signaling.PeerIdentifier
+import party.markdown.peerToPeer.PeerToPeerConnection
+import party.markdown.peerToPeer.webRTC.GoogleIceServers
+import party.markdown.signaling.*
+import party.markdown.signaling.ClientToClientMessage.*
 import party.markdown.signaling.SignalingMessage.ClientToServer
 import party.markdown.signaling.SignalingMessage.ServerToClient
-import webrtc.RTCIceServer
 import webrtc.RTCPeerConnection
 
 /**
- * Invokes the given [block] with a [SignalingServer] available at the provided [urlString].
+ * Invokes the given [block] with a [SignalingServer] available at the provided [request].
  *
  * @param exchange the [SendExchange] used to answer requests from the other side.
- * @param urlString the url which will be queried.
+ * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
 suspend fun HttpClient.wsSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
-    urlString: String,
+    request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,
 ): Unit =
     socketSignalingServer(
         exchange = exchange,
-        factory = { ws(urlString) { it() } },
+        factory = { bufferedWs(request) { it() } },
         block = block,
     )
 
 /**
- * Invokes the given [block] with a [SignalingServer] available at the provided [urlString].
+ * Invokes the given [block] with a [SignalingServer] available at the provided [request].
  *
  * @param exchange the [SendExchange] used to answer requests from the other side.
- * @param urlString the url which will be queried.
+ * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
 suspend fun HttpClient.wssSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
-    urlString: String,
+    request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,
 ): Unit =
     socketSignalingServer(
         exchange = exchange,
-        factory = { wss(urlString) { it() } },
+        factory = { bufferedWss(request) { it() } },
         block = block,
     )
 
 /** A type alias representing a factory to create a socket. */
-private typealias SocketFactory =
-    suspend HttpClient.(suspend DefaultWebSocketSession.() -> Unit) -> Unit
+private typealias SocketFactory = suspend HttpClient.(suspend WsSession.() -> Unit) -> Unit
 
 /**
  * Invokes the given [block] with a [SignalingServer] which was created through the provided
@@ -82,83 +84,72 @@ private suspend fun HttpClient.socketSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     factory: SocketFactory,
     block: suspend SignalingServer.() -> Unit,
-) = factory { block(DefaultWebSocketSessionSignalingServer(exchange, this)) }
+) = factory {
+  while (true) {
+    block(WsSessionSignalingServer(exchange, this))
+    delay(RetryDelaySignalingServer)
+  }
+}
 
-private class DefaultWebSocketSessionSignalingServer(
-    exchange: SendExchange<Incoming, Outgoing>,
-    session: DefaultWebSocketSession,
-) : DefaultWebSocketSession by session, SignalingServer, Comm {
+/**
+ * Sends a message to the peer with the provided [PeerIdentifier] through the [WsSession].
+ *
+ * @receiver the [WsSession] in which the messages are sent.
+ * @param to the identifier of the receiver peer.
+ * @param message the [ClientToClientMessage] that is sent.
+ */
+private fun WsSession.send(to: PeerIdentifier, message: ClientToClientMessage) {
+  val forward = ClientToServer.Forward(to = to, message = message)
+  val frame = Binary(true, DefaultSerializationFormat.encodeToByteArray<ClientToServer>(forward))
+  outgoing.trySend(frame)
+}
 
-  private val state = State(this, exchange)
+/**
+ * Runs the given [block] for each message that is received in this [WsSession].
+ *
+ * @receiver the [WsSession] on which the messages are read.
+ * @param block the block that gets invoked on each message.
+ */
+private suspend inline fun WsSession.forEachServerToClient(block: (ServerToClient) -> Unit) {
+  for (frame in incoming) {
+    val bytes = (frame as Binary).readBytes()
+    val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)
+    block(msg)
+  }
+}
+
+private class WsSessionSignalingServer(
+    private val exchange: SendExchange<Incoming, Outgoing>,
+    session: WsSession,
+) : WsSession by session, SignalingServer {
 
   init {
     launch {
-      for (frame in incoming) {
-        val bytes = (frame as Frame.Binary).readBytes()
-        when (val msg = DefaultSerializationFormat.decodeFromByteArray<ServerToClient>(bytes)) {
+      forEachServerToClient { msg ->
+        when (msg) {
           is ServerToClient.GotMessage -> {
             val from = msg.from
-            when (val message = DefaultStringFormat.decodeFromString<Message>(msg.message)) {
-              is Message.Answer -> state.handleAnswer(from, message.channel, message.answer)
-              is Message.Offer -> state.handleOffer(from, message.channel, message.offer)
-              is Message.IceCaller -> state.handleIceCaller(from, message.channel, message.ice)
-              is Message.IceCallee -> state.handleIceCallee(from, message.channel, message.ice)
+            when (val message = msg.message) {
+              is Answer -> handleAnswer(from, message.channel, message.answer)
+              is Offer -> handleOffer(from, message.channel, message.offer)
+              is IceCaller -> handleIceCaller(from, message.channel, message.ice)
+              is IceCallee -> handleIceCallee(from, message.channel, message.ice)
             }
           }
-          is ServerToClient.PeerJoined -> state.addPeer(msg.peer)
-          is ServerToClient.PeerLeft -> state.removePeer(msg.peer)
+          is ServerToClient.PeerJoined -> addPeer(msg.peer)
+          is ServerToClient.PeerLeft -> removePeer(msg.peer)
         }
       }
     }
   }
 
-  override val peers = state.peers
-
-  // TODO : This is how we do not block.
-  private val queue = Channel<Frame>(UNLIMITED)
-
-  init {
-    launch {
-      for (frame in queue) send(frame)
-      close()
-    }
-  }
-
-  override fun enqueue(to: PeerIdentifier, message: Message) {
-    val encoded = DefaultStringFormat.encodeToString(message)
-    // KLUDGE : We need to explicitly mark this as ClientToServer or Kotlinx serialization may not
-    //          work properly.
-    val forward: ClientToServer = ClientToServer.Forward(to = to, message = encoded)
-    val frame = Frame.Binary(true, DefaultSerializationFormat.encodeToByteArray(forward))
-    queue.trySend(frame)
-  }
-
   override suspend fun connect(peer: PeerIdentifier): PeerToPeerConnection {
-    val caller = state.create(peer)
+    val caller = create(peer)
     return object : PeerToPeerConnection {
       override val incoming: ReceiveChannel<String> = caller.incoming
       override val outgoing: SendChannel<String> = caller.outgoing
     }
   }
-}
-
-private val GoogleIceServers =
-    arrayOf<RTCIceServer>(
-        jso { urls = "stun:stun.l.google.com:19302" },
-    )
-
-// TODO : Clean this up afterwards.
-
-interface Comm {
-  fun enqueue(to: PeerIdentifier, message: Message)
-}
-
-data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)
-
-class State(
-    private val comm: Comm,
-    private val exchange: SendExchange<Incoming, Outgoing>,
-) : Comm by comm {
 
   private var _id = 0
   private suspend fun nextChannelId(): ChannelId = mutex.withLock { ChannelId(_id++) }
@@ -177,22 +168,13 @@ class State(
   ) : CoroutineScope by CoroutineScope(Job())
 
   private val mutex = Mutex()
-  private var members = persistentSetOf<PeerIdentifier>()
   private val callers = mutableMapOf<PeerChannelId, Caller>()
   private val callees = mutableMapOf<PeerChannelId, Callee>()
 
-  private val membersFlow =
-      MutableSharedFlow<Set<PeerIdentifier>>(
-              replay = 1,
-              extraBufferCapacity = Int.MAX_VALUE,
-          )
-          .apply { tryEmit(emptySet()) }
-
-  val peers: SharedFlow<Set<PeerIdentifier>> = membersFlow.asSharedFlow()
+  override val peers = MutableStateFlow(emptySet<PeerIdentifier>())
 
   fun addPeer(peer: PeerIdentifier) {
-    members += peer
-    membersFlow.tryEmit(members)
+    peers.update { it + peer }
   }
 
   fun removePeer(peer: PeerIdentifier) {
@@ -210,10 +192,8 @@ class State(
       connection?.outgoing?.close()
       connection?.cancel()
     }
-
     // Remove the peer from the members.
-    members -= peer
-    membersFlow.tryEmit(members)
+    peers.update { it - peer }
   }
 
   suspend fun create(peer: PeerIdentifier): Caller {
@@ -223,12 +203,10 @@ class State(
     with(caller.connection) {
       // Send all the Ice candidates.
       caller.forward(createDataChannel(null), caller.incoming, caller.outgoing)
-      onicecandidate { event ->
-        event.candidate?.let { comm.enqueue(peer, Message.IceCallee(channelId, it)) }
-      }
+      onicecandidate { event -> event.candidate?.let { send(peer, IceCallee(channelId, it)) } }
       val offer = createOfferSuspend()
       setLocalDescriptionSuspend(offer)
-      enqueue(peer, Message.Offer(channelId, offer))
+      send(peer, Offer(channelId, offer))
     }
     return caller
   }
@@ -256,13 +234,11 @@ class State(
         callee.forward(it.channel, callee.incoming, callee.outgoing)
         null
       }
-      onicecandidate { event ->
-        event.candidate?.let { comm.enqueue(from, Message.IceCaller(channel, it)) }
-      }
+      onicecandidate { event -> event.candidate?.let { send(from, IceCaller(channel, it)) } }
       setRemoteDescriptionSuspend(offer)
       val answer = createAnswerSuspend()
       setLocalDescriptionSuspend(answer)
-      enqueue(from, Message.Answer(channel, answer))
+      send(from, Answer(channel, answer))
     }
   }
 
@@ -293,3 +269,5 @@ class State(
     callee.connection.addIceCandidateSuspend(iceCandidate)
   }
 }
+
+data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)
