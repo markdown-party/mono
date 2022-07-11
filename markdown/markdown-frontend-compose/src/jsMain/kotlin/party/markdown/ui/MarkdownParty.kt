@@ -9,6 +9,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message
 import org.jetbrains.compose.web.dom.Div
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.data.Configuration
 import party.markdown.data.project.MutableSiteProjectApi
 import party.markdown.data.project.ProjectApi
 import party.markdown.data.text.MutableSiteTextApi
@@ -21,7 +22,7 @@ import party.markdown.ui.topBar.TopBar
 fun MarkdownParty(
     link: String,
     local: MutableSite<MarkdownPartyEvent, MarkdownParty>,
-    remote: Exchange<Message.Incoming, Message.Outgoing>
+    configuration: Configuration,
 ) {
   val projectApi = remember<ProjectApi>(local) { MutableSiteProjectApi(local) }
   val treeApi = remember<TreeApi>(local) { MutableSiteTreeApi(local) }
@@ -32,7 +33,7 @@ fun MarkdownParty(
     TopBar(
         publicLink = link,
         local = local,
-        remote = remote,
+        configuration = configuration,
         projectApi = projectApi,
         debugEnabled = debug,
         onDebugEnabled = setDebug,

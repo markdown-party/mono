@@ -1,32 +1,31 @@
 package party.markdown.data
 
 import io.github.alexandrepiveteau.echo.Exchange
-import io.github.alexandrepiveteau.echo.ktor.wsExchange
-import io.github.alexandrepiveteau.echo.ktor.wssExchange
-import io.github.alexandrepiveteau.echo.protocol.Message
-import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
+import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
+import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import party.markdown.p2p.sync
+import party.markdown.p2p.wsSignalingServer
+import party.markdown.p2p.wssSignalingServer
 
 /**
  * A data class representing the [Configuration] that should be used when communicating with a
- * remote server.
+ * signaling server.
  *
  * @param host the host name to connect to.
  * @param port the port number on which the API is hosted.
  * @param secure `true` is WSS should be used rather than WS.
- * @param senderEndpoint the endpoint for the sender side of the protocol.
- * @param receiverEndpoint the endpoint for the receiver side of the protocol.
+ * @param signalingServerPath the endpoint for the signaling server of the protocol.
  */
 data class Configuration(
     val host: String,
     val port: Int,
     val secure: Boolean,
-    val senderEndpoint: String,
-    val receiverEndpoint: String,
+    val signalingServerPath: String,
 ) {
   companion object {
 
@@ -40,8 +39,7 @@ data class Configuration(
             host = "api.markdown.party",
             port = 443,
             secure = true,
-            senderEndpoint = "v1/$session/snd",
-            receiverEndpoint = "v1/$session/rcv",
+            signalingServerPath = "groups/$session",
         )
 
     /**
@@ -54,8 +52,7 @@ data class Configuration(
             host = "localhost",
             port = 1234,
             secure = false,
-            senderEndpoint = "v1/$session/snd",
-            receiverEndpoint = "v1/$session/rcv",
+            signalingServerPath = "groups/$session",
         )
   }
 }
@@ -63,29 +60,9 @@ data class Configuration(
 /** The [HttpClient] which will be used to create the exchanges from configurations. */
 private val Client = HttpClient(Js) { install(WebSockets) }
 
-/**
- * Returns the [Exchange] that corresponds to the receiver [Configuration]. This [Exchange] can then
- * be used to sync with some sites or mutable sites locally to interpret the operations.
- */
-fun Configuration.toExchange(): Exchange<Message.Incoming, Message.Outgoing> {
-  val builder = if (secure) Client::wssExchange else Client::wsExchange
-  return builder(
-          // Receiver.
-          {
-            this.port = this@toExchange.port
-            url {
-              this.host = this@toExchange.host
-              path(this@toExchange.receiverEndpoint)
-            }
-          },
-          // Sender.
-          {
-            this.port = this@toExchange.port
-            url {
-              this.host = this@toExchange.host
-              path(this@toExchange.senderEndpoint)
-            }
-          },
-      )
-      .decodeFromFrame()
+suspend fun Configuration.sync(exchange: Exchange<Incoming, Outgoing>) {
+  val server = if (secure) Client::wssSignalingServer else Client::wsSignalingServer
+  // TODO : Maybe wssSignalingServer or wsSignalingServer may pass the scheme etc. directly.
+  val scheme = if (secure) "wss" else "ws"
+  server(exchange, "$scheme://$host:$port/$signalingServerPath") { this.sync(exchange) }
 }

@@ -12,6 +12,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
+import party.markdown.data.Configuration
 import party.markdown.data.project.ProjectApi
 import party.markdown.ui.editor.colorToTailwind
 import party.markdown.ui.editor.toCursor
@@ -21,7 +22,7 @@ import party.markdown.ui.editor.toCursor
  * browser.
  * @param local the local [MutableSite], aka the local source of truth on which the operations are
  * performed.
- * @param remote the remote [Exchange], with which we should sync.
+ * @param configuration the [Configuration], with which we should handle signaling.
  * @param projectApi the [ProjectApi] that can be used to manage the current project.
  * @param debugEnabled `true` if the debug options should be displayed.
  * @param onDebugEnabled a callback called whenever we should change the debug state.
@@ -30,7 +31,7 @@ import party.markdown.ui.editor.toCursor
 fun TopBar(
     publicLink: String,
     local: MutableSite<MarkdownPartyEvent, MarkdownParty>,
-    remote: Exchange<Message.Incoming, Message.Outgoing>,
+    configuration: Configuration,
     projectApi: ProjectApi,
     debugEnabled: Boolean,
     onDebugEnabled: (Boolean) -> Unit,
@@ -57,7 +58,7 @@ fun TopBar(
     ShareLinkButton(publicLink)
     SyncIndicator(
         local = local,
-        remote = remote,
+        configuration = configuration,
         debugMode = debugEnabled,
     )
     Player(

@@ -10,6 +10,10 @@ kotlin {
     implementation(project(":library:echo-ktor-server"))
     implementation(project(":library:echo-ktor-websockets"))
     implementation(project(":markdown:markdown"))
+    implementation(project(":markdown:markdown-signaling"))
+
+    // Kotlinx Immutable collections
+    implementation(libs.immutablecollections)
 
     // Ktor
     implementation(libs.ktor.client.cio)
@@ -18,6 +22,13 @@ kotlin {
 
     // SL4J
     implementation(libs.slf4j.simple)
+
+    testImplementation(kotlin("test-common"))
+    testImplementation(kotlin("test-annotations-common"))
+    testImplementation(kotlin("test-junit"))
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
   }
 
   sourceSets { all { languageSettings.optIn("kotlin.RequiresOptIn") } }
