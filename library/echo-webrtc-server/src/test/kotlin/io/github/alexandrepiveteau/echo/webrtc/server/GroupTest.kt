@@ -3,6 +3,7 @@ package io.github.alexandrepiveteau.echo.webrtc.server
 import io.github.alexandrepiveteau.echo.webrtc.server.groups.Group
 import io.github.alexandrepiveteau.echo.webrtc.server.groups.Outbox
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
+import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -22,7 +23,7 @@ class GroupTest {
   @Test
   fun `does not receive PeerJoined nor PeerLeft when alone in group`() = runTest {
     val job = Job()
-    val group = Group(CoroutineScope(job))
+    val group = Group(CoroutineScope(job), SessionIdentifier(""), KtorSimpleLogger("Test"))
     val participant = Participant()
 
     group.session(participant.outbox) { /* No-op. */}
@@ -33,7 +34,7 @@ class GroupTest {
   @Test
   fun `member receives PeerJoined and PeerLeft when another participant joins`() = runTest {
     val job = Job()
-    val group = Group(CoroutineScope(job))
+    val group = Group(CoroutineScope(job), SessionIdentifier(""), KtorSimpleLogger("Test"))
     val alice = Participant()
     val bob = Participant()
 
