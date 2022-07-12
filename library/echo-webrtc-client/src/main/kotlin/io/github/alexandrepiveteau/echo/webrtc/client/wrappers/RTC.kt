@@ -1,19 +1,19 @@
-package party.markdown.p2p.wrappers
+package io.github.alexandrepiveteau.echo.webrtc.client.wrappers
 
-import kotlinx.coroutines.await
 import io.github.alexandrepiveteau.echo.webrtc.signaling.IceCandidate
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SessionDescription
+import kotlinx.coroutines.await
 import webrtc.RTCIceCandidateInit
 import webrtc.RTCPeerConnection
 import webrtc.RTCPeerConnectionIceEvent
 
-val RTCPeerConnectionIceEvent.candidate: IceCandidate?
+internal val RTCPeerConnectionIceEvent.candidate: IceCandidate?
   get() {
     val candidate = asDynamic().candidate.unsafeCast<RTCIceCandidateInit?>()
     return candidate?.let { IceCandidate(JSON.stringify(it)) }
   }
 
-fun RTCPeerConnection.onicecandidate(callback: (RTCPeerConnectionIceEvent) -> Unit) =
+internal fun RTCPeerConnection.onicecandidate(callback: (RTCPeerConnectionIceEvent) -> Unit) =
     addEventListener(
         type = "icecandidate",
         callback = { callback(it as RTCPeerConnectionIceEvent) },
@@ -25,8 +25,9 @@ fun RTCPeerConnection.onicecandidate(callback: (RTCPeerConnectionIceEvent) -> Un
  * @receiver the [RTCPeerConnection] to which the session description is set.
  * @param description the [SessionDescription] which is set.
  */
-suspend fun RTCPeerConnection.setLocalDescriptionSuspend(description: SessionDescription): Unit =
-    setLocalDescription(JSON.parse(description.json)).await()
+internal suspend fun RTCPeerConnection.setLocalDescriptionSuspend(
+    description: SessionDescription
+): Unit = setLocalDescription(JSON.parse(description.json)).await()
 
 /**
  * Sets the remote [SessionDescription] for this [RTCPeerConnection], and awaits.
@@ -34,15 +35,16 @@ suspend fun RTCPeerConnection.setLocalDescriptionSuspend(description: SessionDes
  * @receiver the [RTCPeerConnection] to which the session description is set.
  * @param description the [SessionDescription] which is set.
  */
-suspend fun RTCPeerConnection.setRemoteDescriptionSuspend(description: SessionDescription): Unit =
-    setRemoteDescription(JSON.parse(description.json)).await()
+internal suspend fun RTCPeerConnection.setRemoteDescriptionSuspend(
+    description: SessionDescription
+): Unit = setRemoteDescription(JSON.parse(description.json)).await()
 
 /** Returns the offer [SessionDescription] for this [RTCPeerConnection]. */
-suspend fun RTCPeerConnection.createOfferSuspend(): SessionDescription =
+internal suspend fun RTCPeerConnection.createOfferSuspend(): SessionDescription =
     SessionDescription(JSON.stringify(createOffer().await()))
 
 /** Returns the answer [SessionDescription] for this [RTCPeerConnection]. */
-suspend fun RTCPeerConnection.createAnswerSuspend(): SessionDescription =
+internal suspend fun RTCPeerConnection.createAnswerSuspend(): SessionDescription =
     SessionDescription(JSON.stringify(createAnswer().await()))
 
 /**
@@ -51,5 +53,5 @@ suspend fun RTCPeerConnection.createAnswerSuspend(): SessionDescription =
  * @receiver the [RTCPeerConnection] to which the candidate is added.
  * @param candidate the [IceCandidate] which is added to the [RTCPeerConnection].
  */
-suspend fun RTCPeerConnection.addIceCandidateSuspend(candidate: IceCandidate): Unit =
+internal suspend fun RTCPeerConnection.addIceCandidateSuspend(candidate: IceCandidate): Unit =
     addIceCandidate(JSON.parse<RTCIceCandidateInit>(candidate.json)).await()

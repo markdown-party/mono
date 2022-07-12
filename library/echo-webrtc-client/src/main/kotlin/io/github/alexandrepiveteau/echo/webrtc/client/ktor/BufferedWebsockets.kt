@@ -1,4 +1,4 @@
-package ktor
+package io.github.alexandrepiveteau.echo.webrtc.client.ktor
 
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
  * offers some slightly different semantics for a websocket connection, where the outgoing buffer is
  * unlimited.
  */
-interface BufferedWebSocketSession : CoroutineScope {
+internal interface BufferedWebSocketSession : CoroutineScope {
 
   /** @see DefaultWebSocketSession.incoming */
   val incoming: ReceiveChannel<Frame>
@@ -32,7 +32,7 @@ interface BufferedWebSocketSession : CoroutineScope {
  *
  * @see HttpClient.ws
  */
-suspend fun HttpClient.bufferedWs(
+internal suspend fun HttpClient.bufferedWs(
     request: HttpRequestBuilder.() -> Unit,
     block: suspend BufferedWebSocketSession.() -> Unit
 ) = ws(request) { buffered(block)() }
@@ -43,7 +43,7 @@ suspend fun HttpClient.bufferedWs(
  * @param request the block to create the HTTP request.
  * @param block the block executed in the websocket session.
  */
-suspend fun HttpClient.bufferedWss(
+internal suspend fun HttpClient.bufferedWss(
     request: HttpRequestBuilder.() -> Unit,
     block: suspend BufferedWebSocketSession.() -> Unit,
 ) = wss(request) { buffered(block)() }

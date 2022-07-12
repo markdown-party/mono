@@ -1,4 +1,4 @@
-package party.markdown.p2p
+package io.github.alexandrepiveteau.echo.webrtc.client
 
 import kotlin.coroutines.resume
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +20,7 @@ private const val IceCandidateEventType = "icecandidate"
  * @receiver the [RTCPeerConnection] for which the events are retrieved.
  * @return the [Flow] of [RTCIceCandidateInit] which are being generated.
  */
-fun RTCPeerConnection.iceCandidatesAsFlow(): Flow<RTCIceCandidateInit> {
+internal fun RTCPeerConnection.iceCandidatesAsFlow(): Flow<RTCIceCandidateInit> {
   return callbackFlow {
         val listener: (Event) -> Unit = {
           val event = it.unsafeCast<RTCPeerConnectionIceEvent>()
@@ -43,7 +43,7 @@ private const val DataChannelEventType = "datachannel"
  * @receiver the [RTCPeerConnection] for which the data channel is created.
  * @return the [RTCDataChannel] which is used.
  */
-suspend fun RTCPeerConnection.awaitDataChannel(): RTCDataChannel {
+internal suspend fun RTCPeerConnection.awaitDataChannel(): RTCDataChannel {
   return suspendCancellableCoroutine { cont ->
     val listener =
         object : EventListener {

@@ -1,9 +1,15 @@
-package party.markdown.p2p
+package io.github.alexandrepiveteau.echo.webrtc.client
 
 import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.webrtc.client.ktor.BufferedWebSocketSession as WsSession
+import io.github.alexandrepiveteau.echo.webrtc.client.ktor.bufferedWs
+import io.github.alexandrepiveteau.echo.webrtc.client.ktor.bufferedWss
+import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.PeerToPeerConnection
+import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.webRTC.GoogleIceServers
+import io.github.alexandrepiveteau.echo.webrtc.client.wrappers.*
 import io.github.alexandrepiveteau.echo.webrtc.signaling.*
 import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage.*
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ClientToServer
@@ -25,12 +31,6 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
-import ktor.BufferedWebSocketSession as WsSession
-import ktor.bufferedWs
-import ktor.bufferedWss
-import party.markdown.p2p.wrappers.*
-import party.markdown.peerToPeer.PeerToPeerConnection
-import party.markdown.peerToPeer.webRTC.GoogleIceServers
 import webrtc.RTCPeerConnection
 
 /**
@@ -269,4 +269,4 @@ private class WsSessionSignalingServer(
   }
 }
 
-data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)
+internal data class PeerChannelId(val peer: PeerIdentifier, val channel: ChannelId)

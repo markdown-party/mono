@@ -42,7 +42,7 @@ kotlin {
 
         implementation(project(":library:echo-ktor-client"))
         implementation(project(":library:echo-ktor-websockets"))
-        implementation(project(":library:echo-webrtc-signaling"))
+        implementation(project(":library:echo-webrtc-client"))
         implementation(project(":markdown:markdown"))
 
         implementation(libs.serialization.json)

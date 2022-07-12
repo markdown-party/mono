@@ -1,4 +1,4 @@
-package party.markdown.peerToPeer.webRTC
+package io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.webRTC
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*
@@ -15,7 +15,7 @@ import webrtc.RTCDataChannel
  * @param scope the [CoroutineScope] in which the items are sent.
  * @return the [SendChannel] which can be used to emit the elements.
  */
-fun RTCDataChannel.asSendChannelIn(scope: CoroutineScope): SendChannel<String> {
+internal fun RTCDataChannel.asSendChannelIn(scope: CoroutineScope): SendChannel<String> {
   val channel = Channel<String>(Channel.UNLIMITED)
   val onopen =
       object : EventListener {
@@ -46,7 +46,7 @@ fun RTCDataChannel.asSendChannelIn(scope: CoroutineScope): SendChannel<String> {
  * @receiver the [RTCDataChannel] for which a [ReceiveChannel] is created.
  * @return the [ReceiveChannel] which can be used to receive the elements.
  */
-fun RTCDataChannel.asReceiveChannel(): ReceiveChannel<String> {
+internal fun RTCDataChannel.asReceiveChannel(): ReceiveChannel<String> {
   val channel = Channel<String>(Channel.UNLIMITED)
   val onmessage: (Event) -> Unit = { channel.trySend(it.asDynamic().data.unsafeCast<String>()) }
   val onclose =

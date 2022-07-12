@@ -1,4 +1,4 @@
-package party.markdown.p2p
+package io.github.alexandrepiveteau.echo.webrtc.client
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 import webrtc.RTCDataChannel
 
-fun CoroutineScope.forward(
+internal fun CoroutineScope.forward(
     channel: RTCDataChannel,
     incoming: SendChannel<String>,
     outgoing: ReceiveChannel<String>,

@@ -1,9 +1,10 @@
-package party.markdown.p2p
+package io.github.alexandrepiveteau.echo.webrtc.client
 
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 
 /**
  * Syncs the [SendExchange] to a single peer.
@@ -23,7 +23,7 @@ import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
  * @param peer the [PeerIdentifier] to which we're interested in syncing.
  * @param exchange the [ReceiveExchange] to which we're interested in syncing.
  */
-suspend fun SignalingServer.sync(
+private suspend fun SignalingServer.sync(
     peer: PeerIdentifier,
     exchange: ReceiveExchange<Incoming, Outgoing>,
 ) {

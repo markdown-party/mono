@@ -3,14 +3,14 @@ package party.markdown.data
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.webrtc.client.sync
+import io.github.alexandrepiveteau.echo.webrtc.client.wsSignalingServer
+import io.github.alexandrepiveteau.echo.webrtc.client.wssSignalingServer
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import party.markdown.p2p.sync
-import party.markdown.p2p.wsSignalingServer
-import party.markdown.p2p.wssSignalingServer
 
 /**
  * A data class representing the [Configuration] that should be used when communicating with a

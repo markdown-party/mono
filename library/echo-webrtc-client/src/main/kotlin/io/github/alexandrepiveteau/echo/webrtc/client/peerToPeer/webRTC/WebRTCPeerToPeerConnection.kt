@@ -1,11 +1,11 @@
-package party.markdown.peerToPeer.webRTC
+package io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.webRTC
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.js.jso
-import party.markdown.peerToPeer.PeerToPeerConnection
+import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.PeerToPeerConnection
 import io.github.alexandrepiveteau.echo.webrtc.signaling.IceCandidate
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SessionDescription
 import webrtc.RTCDataChannel
@@ -19,7 +19,7 @@ import webrtc.RTCPeerConnection
  *
  * @param scope the [CoroutineScope] in which this [PeerToPeerConnection] is running.
  */
-class WebRTCPeerToPeerConnection
+internal class WebRTCPeerToPeerConnection
 private constructor(
     private val connection: RTCPeerConnection,
     override val incoming: ReceiveChannel<String>,
@@ -87,4 +87,4 @@ private constructor(
 }
 
 /** The [Array] of [RTCIceServer] which can be used for computing the ICE candidates. */
-val GoogleIceServers = arrayOf<RTCIceServer>(jso { urls = "stun:stun.l.google.com:19302" })
+internal val GoogleIceServers = arrayOf<RTCIceServer>(jso { urls = "stun:stun.l.google.com:19302" })
