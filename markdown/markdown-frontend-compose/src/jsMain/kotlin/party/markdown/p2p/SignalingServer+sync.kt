@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import party.markdown.signaling.PeerIdentifier
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 
 /**
  * Syncs the [SendExchange] to a single peer.

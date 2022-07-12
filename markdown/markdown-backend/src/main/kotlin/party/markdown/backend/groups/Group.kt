@@ -1,13 +1,13 @@
 package party.markdown.backend.groups
 
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient.PeerJoined
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import party.markdown.coroutines.inOrder
-import party.markdown.signaling.PeerIdentifier
-import party.markdown.signaling.SignalingMessage.ServerToClient
-import party.markdown.signaling.SignalingMessage.ServerToClient.PeerJoined
 
 /**
  * A group represents a session of collaboration. Each participant will be granted a unique

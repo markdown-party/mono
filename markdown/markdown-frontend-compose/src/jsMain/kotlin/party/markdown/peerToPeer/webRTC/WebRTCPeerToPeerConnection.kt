@@ -6,8 +6,8 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.js.jso
 import party.markdown.peerToPeer.PeerToPeerConnection
-import party.markdown.signaling.IceCandidate
-import party.markdown.signaling.SessionDescription
+import io.github.alexandrepiveteau.echo.webrtc.signaling.IceCandidate
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SessionDescription
 import webrtc.RTCDataChannel
 import webrtc.RTCIceCandidateInit
 import webrtc.RTCIceServer

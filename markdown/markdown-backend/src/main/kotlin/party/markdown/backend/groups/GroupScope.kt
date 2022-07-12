@@ -1,7 +1,7 @@
 package party.markdown.backend.groups
 
-import party.markdown.signaling.PeerIdentifier
-import party.markdown.signaling.SignalingMessage.ServerToClient
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 
 /** An interface representing the operations which are available when in a session in a [Group]. */
 fun interface GroupScope {

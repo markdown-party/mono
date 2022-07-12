@@ -1,6 +1,7 @@
 package party.markdown.backend
 
 import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ClientToServer
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -8,7 +9,6 @@ import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromByteArray
 import party.markdown.backend.groups.GroupMap
 import party.markdown.backend.groups.session
-import party.markdown.signaling.SignalingMessage.ClientToServer
 
 /** The value of the id argument. */
 private const val IdArgument = "id"

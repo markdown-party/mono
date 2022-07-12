@@ -12,13 +12,17 @@ rootProject.name = 'kotlin-echo'
 // echo replication libraries
 include ':library:echo-core'
 include ':library:echo'
+
+// Websockets support
 include ':library:echo-ktor-client'
 include ':library:echo-ktor-server'
 include ':library:echo-ktor-websockets'
 
+// WebRTC support
+include ':library:echo-webrtc-signaling'
+
 // markdown-party
 include ':markdown:markdown'
-include ':markdown:markdown-signaling'
 include ':markdown:markdown-backend'
 include ':markdown:markdown-frontend-compose'
 

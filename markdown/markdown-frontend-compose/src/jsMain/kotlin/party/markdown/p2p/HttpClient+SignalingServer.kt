@@ -4,6 +4,10 @@ import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.webrtc.signaling.*
+import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage.*
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ClientToServer
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.websocket.*
@@ -27,10 +31,6 @@ import ktor.bufferedWss
 import party.markdown.p2p.wrappers.*
 import party.markdown.peerToPeer.PeerToPeerConnection
 import party.markdown.peerToPeer.webRTC.GoogleIceServers
-import party.markdown.signaling.*
-import party.markdown.signaling.ClientToClientMessage.*
-import party.markdown.signaling.SignalingMessage.ClientToServer
-import party.markdown.signaling.SignalingMessage.ServerToClient
 import webrtc.RTCPeerConnection
 
 /**

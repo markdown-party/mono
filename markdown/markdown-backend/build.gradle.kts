@@ -9,8 +9,8 @@ kotlin {
     implementation(project(":library:echo"))
     implementation(project(":library:echo-ktor-server"))
     implementation(project(":library:echo-ktor-websockets"))
+    implementation(project(":library:echo-webrtc-signaling"))
     implementation(project(":markdown:markdown"))
-    implementation(project(":markdown:markdown-signaling"))
 
     // Kotlinx Immutable collections
     implementation(libs.immutablecollections)

@@ -3,7 +3,7 @@ package party.markdown.p2p
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import kotlinx.coroutines.flow.*
 import party.markdown.peerToPeer.PeerToPeerConnection
-import party.markdown.signaling.PeerIdentifier
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 
 /**
  * An interface representing a signaling server, which provides information about the currently

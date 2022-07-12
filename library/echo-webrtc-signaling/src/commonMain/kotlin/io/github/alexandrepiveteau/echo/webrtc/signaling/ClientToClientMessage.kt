@@ -1,19 +1,6 @@
-package party.markdown.signaling
+package io.github.alexandrepiveteau.echo.webrtc.signaling
 
-import kotlin.jvm.JvmInline
 import kotlinx.serialization.Serializable
-
-/** A session description, encoded in [json]. */
-@Serializable @JvmInline value class SessionDescription(val json: String)
-
-/** An ICE candidate, encoded in [json]. */
-@Serializable @JvmInline value class IceCandidate(val json: String)
-
-/**
- * A channel identifier, which lets clients multiplex over a single connection and which has a
- * unique [id].
- */
-@Serializable @JvmInline value class ChannelId(val id: Int)
 
 /**
  * A sealed class representing the different kinds of messages which may be exchanged between

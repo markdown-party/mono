@@ -1,10 +1,10 @@
 package party.markdown.backend.groups
 
 import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.ktor.websocket.*
 import io.ktor.websocket.Frame.*
 import kotlinx.serialization.encodeToByteArray
-import party.markdown.signaling.PeerIdentifier
 
 /**
  * Starts a session within this [Group], ensuring that the user properly joins and then leaves the
