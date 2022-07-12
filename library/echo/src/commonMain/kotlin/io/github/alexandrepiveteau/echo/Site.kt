@@ -20,12 +20,12 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.protocol.MutableSiteImpl
 import io.github.alexandrepiveteau.echo.protocol.SiteImpl
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
 
 /**
  * An interface describing a [Site] in the distributed system. When collected, it will emit the
@@ -106,7 +106,8 @@ inline fun <M, reified T> site(
     orderedSite(
         history = history,
         strategy = strategy,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [Site] with a backing history.
@@ -157,7 +158,8 @@ inline fun <M, reified T> site(
                 events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         strategy = strategy,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [Site] for the provided [SiteIdentifier], with a backing log. Additionally, this
@@ -192,7 +194,8 @@ inline fun <M, reified T, reified C> site(
                 events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
         strategy = strategy,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing history. The
@@ -240,7 +243,8 @@ inline fun <M, reified T> mutableSite(
         strategy = strategy,
         eventSerializer = serializer(),
         format = DefaultBinaryFormat,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing log. Additionally,
@@ -269,7 +273,8 @@ inline fun <M, reified T> mutableSite(
         projection = projection,
         events = events,
         strategy = strategy,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing log. Additionally,
@@ -299,7 +304,8 @@ inline fun <M, reified T, reified C> mutableSite(
         projection = projection,
         events = events,
         strategy = strategy,
-    ) { it }
+        transform = { it },
+    )
 
 /**
  * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing mutable history.
@@ -354,7 +360,7 @@ inline fun <M, reified T, R> mutableSite(
     strategy: SyncStrategy<Inc, Out> = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
-    orderedMutableSite(
+    mutableSite(
         identifier = identifier,
         history =
             mutableHistoryOf(
@@ -367,8 +373,6 @@ inline fun <M, reified T, R> mutableSite(
                     ),
                 events = events.mapToBinary(serializer(), DefaultBinaryFormat),
             ),
-        eventSerializer = serializer(),
-        format = DefaultBinaryFormat,
         strategy = strategy,
         transform = transform,
     )
