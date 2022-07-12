@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.webrtc.client
 
+import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
@@ -13,8 +14,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromHexString
+import kotlinx.serialization.encodeToHexString
 
 /**
  * Syncs the [SendExchange] to a single peer.
@@ -30,8 +31,8 @@ private suspend fun SignalingServer.sync(
   while (true) {
     val connection = connect(peer)
     exchange
-        .receive(connection.incoming.consumeAsFlow().map(DefaultStringFormat::decodeFromString))
-        .onEach { connection.outgoing.send(DefaultStringFormat.encodeToString(it)) }
+        .receive(connection.incoming.consumeAsFlow().map(DefaultBinaryFormat::decodeFromHexString))
+        .onEach { connection.outgoing.send(DefaultBinaryFormat.encodeToHexString(it)) }
         .collect()
     delay(RetryDelayDataChannel)
   }

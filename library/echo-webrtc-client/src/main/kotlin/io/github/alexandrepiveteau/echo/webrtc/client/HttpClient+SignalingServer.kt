@@ -27,10 +27,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.js.jso
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.*
 import webrtc.RTCPeerConnection
 
 /**
@@ -220,8 +217,8 @@ private class WsSessionSignalingServer(
     with(callee) {
       launch {
         exchange
-            .send(incoming.consumeAsFlow().map { DefaultStringFormat.decodeFromString(it) })
-            .onEach { outgoing.send(DefaultStringFormat.encodeToString(it)) }
+            .send(incoming.consumeAsFlow().map { DefaultBinaryFormat.decodeFromHexString(it) })
+            .onEach { outgoing.send(DefaultBinaryFormat.encodeToHexString(it)) }
             .onCompletion { outgoing.close() }
             .collect()
       }
