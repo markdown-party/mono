@@ -28,6 +28,7 @@ private suspend fun SignalingServer.sync(
     peer: PeerIdentifier,
     exchange: ReceiveExchange<Incoming, Outgoing>,
 ) {
+  // TODO : Should this be the caller's responsibility ?
   while (true) {
     val connection = connect(peer)
     exchange

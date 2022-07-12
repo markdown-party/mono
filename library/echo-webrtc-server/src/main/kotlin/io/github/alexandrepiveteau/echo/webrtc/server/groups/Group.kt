@@ -1,9 +1,11 @@
 package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
+import io.github.alexandrepiveteau.echo.webrtc.server.SessionIdentifier
 import io.github.alexandrepiveteau.echo.webrtc.server.coroutines.actor
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient.PeerJoined
+import io.ktor.util.logging.*
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -14,8 +16,19 @@ import kotlinx.coroutines.withContext
  * identifier, and will be notified of new members.
  *
  * @param scope the [CoroutineScope] in which the [Group] is running.
+ * @param session the [SessionIdentifier] in which the [Group] is running.
+ * @param logger the [Logger] which is used to monitor the [Group].
  */
-internal class Group(private val scope: CoroutineScope) {
+internal class Group(
+    private val scope: CoroutineScope,
+    private val session: SessionIdentifier,
+    private val logger: Logger,
+) {
+
+  /** Logs the given [message], prefixing it with the [session] identifier. */
+  private fun log(message: String) {
+    logger.debug("($session) $message")
+  }
 
   /** The `Actor` used to schedule all the computations. */
   private val actor = scope.actor()
@@ -42,7 +55,9 @@ internal class Group(private val scope: CoroutineScope) {
       peers = current.put(peer, outbox)
       withResult(peer) {
         for ((id, site) in current) {
+          log("[->$id] : $peer joined.")
           site.sendCatching(PeerJoined(peer)) // Tell other sites we've joined.
+          log("[->$peer] : $id joined.")
           outbox.sendCatching(PeerJoined(id)) // Learn all the connected sites.
         }
       }
@@ -59,7 +74,8 @@ internal class Group(private val scope: CoroutineScope) {
       val withoutPeer = peers.remove(peer)
       peers = withoutPeer
       withNoResult {
-        for ((_, outbox) in withoutPeer) {
+        for ((to, outbox) in withoutPeer) {
+          log("[->$to] : $peer left.")
           outbox.sendCatching(ServerToClient.PeerLeft(peer))
         }
       }
@@ -75,7 +91,12 @@ internal class Group(private val scope: CoroutineScope) {
   private suspend fun forward(peer: PeerIdentifier, message: ServerToClient) {
     actor.schedule {
       val outbox = peers[peer]
-      withNoResult { outbox?.sendCatching(message) }
+      withNoResult {
+        if (outbox != null) {
+          log("[->$peer] : $message")
+          outbox.sendCatching(message)
+        }
+      }
     }
   }
 

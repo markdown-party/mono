@@ -22,7 +22,7 @@ fun Route.signaling(
     scope: CoroutineScope,
     session: (ApplicationCall) -> SessionIdentifier,
 ) {
-  val groups = GroupMap(scope)
+  val groups = GroupMap(scope, application.log)
   webSocket {
     groups.get(session(call)).session(this) { myId ->
       for (frame in incoming) {

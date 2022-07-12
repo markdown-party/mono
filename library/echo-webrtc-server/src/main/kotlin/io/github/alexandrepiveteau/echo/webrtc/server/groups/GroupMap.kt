@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
 import io.github.alexandrepiveteau.echo.webrtc.server.SessionIdentifier
+import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -11,8 +12,12 @@ import kotlinx.coroutines.sync.withLock
  * for all the clients which request access using the same session identifier.
  *
  * @param scope the [CoroutineScope] in which the [GroupMap] is running.
+ * @param logger the [Logger] which is used to monitor the [GroupMap].
  */
-internal class GroupMap(private val scope: CoroutineScope) {
+internal class GroupMap(
+    private val scope: CoroutineScope,
+    private val logger: Logger,
+) {
 
   /** The [Mutex] that protects the [groups]. */
   private val mutex = Mutex()
@@ -28,5 +33,5 @@ internal class GroupMap(private val scope: CoroutineScope) {
    */
   suspend fun get(
       session: SessionIdentifier,
-  ): Group = mutex.withLock { groups.getOrPut(session) { Group(scope) } }
+  ): Group = mutex.withLock { groups.getOrPut(session) { Group(scope, session, logger) } }
 }
