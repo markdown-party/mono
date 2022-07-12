@@ -16,27 +16,18 @@ Up until now, all the interactions we had with a _site_ occurred on a single mac
 
 Additionally, while _sites_ do, indeed, offer replication, they're not the lowest level abstraction that does so. Let's look at the inheritance hierarchy of `MutableSite` :
 
-```text
-The Site and MutableSite inheritance hierarchy:
-
- +-----------------+  +--------------+    	               
- | ReceiveExchange |  | SendExchange |                    
- +-----------------+  +--------------+                    
-         ^                   ^                            
-         |                   |                            
-         +---------+---------+                            
-                   |                         
-             +----------+                                
-             | Exchange |                                
-             +----------+                                
-                   |                                          
-               +------+                                  
-               | Site |                                  
-               +------+                                  
-                   |                                     
-            +-------------+                               
-            | MutableSite |                               
-            +-------------+       
+```mermaid
+classDiagram
+  direction BT
+  class ReceiveExchange
+  class SendExchange
+  class Exchange
+  class Site
+  class MutableSite
+  Exchange    --|> ReceiveExchange
+  Exchange    --|> SendExchange
+  Site        --|> Exchange
+  MutableSite --|> Site
 ```
 
 In fact, the `ReceiveExchange` and `SendExchange` interfaces are the lowest-level components that can sync content. The replication protocol is asymmetric : a `ReceiveExchange` will receive requests from other _sites_, and respond with the events it has. A `SendExchange` starts by sending some requests, and will then receive the events from a `ReceiveExchange`.
