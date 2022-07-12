@@ -1,6 +1,6 @@
 package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
-import io.github.alexandrepiveteau.echo.webrtc.server.coroutines.inOrder
+import io.github.alexandrepiveteau.echo.webrtc.server.coroutines.actor
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient.PeerJoined
@@ -17,8 +17,8 @@ import kotlinx.coroutines.withContext
  */
 internal class Group(private val scope: CoroutineScope) {
 
-  /** The `InOrder` used to schedule all the computations. */
-  private val inOrder = scope.inOrder()
+  /** The `Actor` used to schedule all the computations. */
+  private val actor = scope.actor()
 
   /** The [MutableMap] of all the peer identifiers, and the [Outbox] for their messages. */
   private var peers = persistentMapOf<PeerIdentifier, Outbox<ServerToClient>>()
@@ -36,7 +36,7 @@ internal class Group(private val scope: CoroutineScope) {
    * @return the [PeerIdentifier] assigned to this participant.
    */
   private suspend fun join(outbox: Outbox<ServerToClient>): PeerIdentifier {
-    return inOrder.schedule {
+    return actor.schedule {
       val current = peers
       val peer = nextPeerIdentifier()
       peers = current.put(peer, outbox)
@@ -55,7 +55,7 @@ internal class Group(private val scope: CoroutineScope) {
    * @param peer the identifier of the peer who is leaving the group.
    */
   private suspend fun leave(peer: PeerIdentifier) {
-    inOrder.schedule {
+    actor.schedule {
       val withoutPeer = peers.remove(peer)
       peers = withoutPeer
       withNoResult {
@@ -73,7 +73,7 @@ internal class Group(private val scope: CoroutineScope) {
    * @param message the sent message.
    */
   private suspend fun forward(peer: PeerIdentifier, message: ServerToClient) {
-    inOrder.schedule {
+    actor.schedule {
       val outbox = peers[peer]
       withNoResult { outbox?.sendCatching(message) }
     }
