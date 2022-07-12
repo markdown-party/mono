@@ -1,0 +1,5 @@
+public final class io/github/alexandrepiveteau/echo/serialization/CodingKt {
+	public static final fun decodeFromFrame (Lio/github/alexandrepiveteau/echo/Exchange;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun encodeToFrame (Lio/github/alexandrepiveteau/echo/Exchange;)Lio/github/alexandrepiveteau/echo/Exchange;
+}
+

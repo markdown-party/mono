@@ -1,0 +1,5 @@
+public final class io/github/alexandrepiveteau/echo/ktor/server/WebsocketKt {
+	public static final fun receiver (Lio/ktor/server/routing/Route;Lkotlin/jvm/functions/Function2;)V
+	public static final fun sender (Lio/ktor/server/routing/Route;Lkotlin/jvm/functions/Function2;)V
+}
+

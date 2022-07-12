@@ -1,4 +1,7 @@
-plugins { kotlin(Plugins.KotlinMultiplatform) }
+plugins {
+  kotlin(Plugins.KotlinMultiplatform)
+  id(Plugins.KotlinBinaryCompatibility)
+}
 
 kotlin {
   jvm()

@@ -1,4 +1,7 @@
-plugins { kotlin(Plugins.KotlinJvm) }
+plugins {
+  kotlin(Plugins.KotlinJvm)
+  id(Plugins.KotlinBinaryCompatibility)
+}
 
 kotlin {
   target { compilations.all { kotlinOptions.allWarningsAsErrors = true } }

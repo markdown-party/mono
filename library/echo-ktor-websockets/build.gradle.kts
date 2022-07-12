@@ -1,6 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   kotlin(Plugins.KotlinSerialization)
+  id(Plugins.KotlinBinaryCompatibility)
 }
 
 kotlin {
