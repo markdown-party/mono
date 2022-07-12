@@ -27,7 +27,7 @@ internal class Group(
 
   /** Logs the given [message], prefixing it with the [session] identifier. */
   private fun log(message: String) {
-    logger.debug("($session) $message")
+    logger.info("($session) $message")
   }
 
   /** The `Actor` used to schedule all the computations. */
