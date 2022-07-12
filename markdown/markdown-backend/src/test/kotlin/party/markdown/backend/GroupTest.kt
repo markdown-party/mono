@@ -1,5 +1,6 @@
 package party.markdown.backend
 
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -10,7 +11,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.test.runTest
 import party.markdown.backend.groups.Group
 import party.markdown.backend.groups.Outbox
-import party.markdown.signaling.SignalingMessage.ServerToClient
 
 class GroupTest {
 

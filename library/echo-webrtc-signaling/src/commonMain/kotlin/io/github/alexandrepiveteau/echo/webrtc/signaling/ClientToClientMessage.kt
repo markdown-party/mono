@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 /**
  * A sealed class representing the different kinds of messages which may be exchanged between
  * clients. These messages are sent using a [SignalingMessage.ClientToServer.Forward] message.
+ *
+ * TODO : Better document this.
  */
 @Serializable
 sealed class ClientToClientMessage {
