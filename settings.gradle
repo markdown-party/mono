@@ -19,6 +19,7 @@ include ':library:echo-ktor-server'
 include ':library:echo-ktor-websockets'
 
 // WebRTC support
+include ':library:echo-webrtc-server'
 include ':library:echo-webrtc-signaling'
 
 // markdown-party

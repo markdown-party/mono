@@ -1,5 +1,7 @@
-package party.markdown.backend
+package io.github.alexandrepiveteau.echo.webrtc.server
 
+import io.github.alexandrepiveteau.echo.webrtc.server.groups.Group
+import io.github.alexandrepiveteau.echo.webrtc.server.groups.Outbox
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,12 +11,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.test.runTest
-import party.markdown.backend.groups.Group
-import party.markdown.backend.groups.Outbox
 
 class GroupTest {
 
-  data class Participant(
+  internal data class Participant(
       val channel: Channel<ServerToClient> = Channel(Channel.UNLIMITED),
       val outbox: Outbox<ServerToClient> = Outbox.wrap(channel),
   )

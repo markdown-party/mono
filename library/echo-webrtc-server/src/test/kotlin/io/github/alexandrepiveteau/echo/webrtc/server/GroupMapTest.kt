@@ -1,12 +1,12 @@
-package party.markdown.backend
+package io.github.alexandrepiveteau.echo.webrtc.server
 
+import io.github.alexandrepiveteau.echo.webrtc.server.groups.GroupMap
 import kotlin.test.Test
 import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
-import party.markdown.backend.groups.GroupMap
 
 class GroupMapTest {
 

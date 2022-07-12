@@ -1,4 +1,4 @@
-package party.markdown.coroutines
+package io.github.alexandrepiveteau.echo.webrtc.server.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -7,6 +7,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+// TODO : Rename this to Actor.
 
 /**
  * A utility interface which schedules atomic operations to be executed sequentially. This
@@ -67,13 +69,13 @@ internal data class InOrderResult<T>(
  *
  * @see CoroutineScope
  */
-interface InOrderResultScope : CoroutineScope {
+internal interface InOrderResultScope : CoroutineScope {
 
   /** A [Mutex] that guarantees exclusive access. */
   val mutex: Mutex
 }
 
-typealias ScheduledBlock = suspend InOrderResultScope.() -> Unit
+internal typealias ScheduledBlock = suspend InOrderResultScope.() -> Unit
 
 /**
  * Returns a new [InOrder], which uses the receiver [CoroutineScope] to schedule the execution of

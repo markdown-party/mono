@@ -1,5 +1,6 @@
-package party.markdown.backend.groups
+package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
+import io.github.alexandrepiveteau.echo.webrtc.server.coroutines.inOrder
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient.PeerJoined
@@ -7,7 +8,6 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import party.markdown.coroutines.inOrder
 
 /**
  * A group represents a session of collaboration. Each participant will be granted a unique
@@ -15,7 +15,7 @@ import party.markdown.coroutines.inOrder
  *
  * @param scope the [CoroutineScope] in which the [Group] is running.
  */
-class Group(private val scope: CoroutineScope) {
+internal class Group(private val scope: CoroutineScope) {
 
   /** The `InOrder` used to schedule all the computations. */
   private val inOrder = scope.inOrder()

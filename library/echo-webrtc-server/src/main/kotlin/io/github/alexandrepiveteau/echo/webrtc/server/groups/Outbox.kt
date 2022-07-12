@@ -1,4 +1,4 @@
-package party.markdown.backend.groups
+package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.SendChannel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.channels.SendChannel
  *
  * @param T the type of the messages sent.
  */
-fun interface Outbox<in T> {
+internal fun interface Outbox<in T> {
 
   /**
    * Send a message through this [Outbox].
@@ -27,7 +27,7 @@ fun interface Outbox<in T> {
      * @param channel the underlying [SendChannel].
      * @return the resulting [Outbox].
      */
-    fun <T> wrap(channel: SendChannel<T>) =
+    internal fun <T> wrap(channel: SendChannel<T>) =
         Outbox<T> { element ->
           try {
             channel.send(element)

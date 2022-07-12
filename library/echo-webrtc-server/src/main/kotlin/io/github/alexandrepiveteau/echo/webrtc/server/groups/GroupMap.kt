@@ -1,9 +1,9 @@
-package party.markdown.backend.groups
+package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
+import io.github.alexandrepiveteau.echo.webrtc.server.SessionIdentifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import party.markdown.backend.SessionIdentifier
 
 /**
  * A map of all the collaboration sessions which are currently underway. Each [Group] can be
@@ -12,7 +12,7 @@ import party.markdown.backend.SessionIdentifier
  *
  * @param scope the [CoroutineScope] in which the [GroupMap] is running.
  */
-class GroupMap(private val scope: CoroutineScope) {
+internal class GroupMap(private val scope: CoroutineScope) {
 
   /** The [Mutex] that protects the [groups]. */
   private val mutex = Mutex()

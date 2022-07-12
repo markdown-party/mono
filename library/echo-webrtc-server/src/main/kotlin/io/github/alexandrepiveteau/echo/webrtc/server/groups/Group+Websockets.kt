@@ -1,4 +1,4 @@
-package party.markdown.backend.groups
+package io.github.alexandrepiveteau.echo.webrtc.server.groups
 
 import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
@@ -14,7 +14,7 @@ import kotlinx.serialization.encodeToByteArray
  * @param session the [WebSocketSession] used for communication.
  * @param block the [GroupScope] in which the participant may forward some messages.
  */
-suspend fun Group.session(
+internal suspend fun Group.session(
     session: WebSocketSession,
     block: suspend GroupScope.(PeerIdentifier) -> Unit,
 ) =

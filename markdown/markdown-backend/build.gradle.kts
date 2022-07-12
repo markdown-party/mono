@@ -9,6 +9,7 @@ kotlin {
     implementation(project(":library:echo"))
     implementation(project(":library:echo-ktor-server"))
     implementation(project(":library:echo-ktor-websockets"))
+    implementation(project(":library:echo-webrtc-server"))
     implementation(project(":library:echo-webrtc-signaling"))
     implementation(project(":markdown:markdown"))
 
