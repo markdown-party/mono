@@ -5,7 +5,7 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.js.jso
-import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.PeerToPeerConnection
+import io.github.alexandrepiveteau.echo.webrtc.client.PeerToPeerConnection
 import io.github.alexandrepiveteau.echo.webrtc.signaling.IceCandidate
 import io.github.alexandrepiveteau.echo.webrtc.signaling.SessionDescription
 import webrtc.RTCDataChannel

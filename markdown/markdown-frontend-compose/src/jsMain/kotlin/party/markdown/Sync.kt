@@ -61,6 +61,7 @@ fun rememberSyncState(
         configuration.sync(local)
       } catch (problem: Throwable) {
         // Ignored.
+        println("Stopped with $problem")
       } finally {
         state.stop()
       }

@@ -5,15 +5,13 @@ import io.github.alexandrepiveteau.echo.ReceiveExchange
 import io.github.alexandrepiveteau.echo.SendExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.webrtc.client.coroutines.runCatchingCancellable
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromHexString
 import kotlinx.serialization.encodeToHexString
 
@@ -28,14 +26,12 @@ private suspend fun SignalingServer.sync(
     peer: PeerIdentifier,
     exchange: ReceiveExchange<Incoming, Outgoing>,
 ) {
-  // TODO : Should this be the caller's responsibility ?
-  while (true) {
+  runCatchingCancellable {
     val connection = connect(peer)
     exchange
         .receive(connection.incoming.consumeAsFlow().map(DefaultBinaryFormat::decodeFromHexString))
         .onEach { connection.outgoing.send(DefaultBinaryFormat.encodeToHexString(it)) }
         .collect()
-    delay(RetryDelayDataChannel)
   }
 }
 
@@ -50,6 +46,7 @@ private suspend fun SignalingServer.sync(
 suspend fun SignalingServer.sync(
     exchange: ReceiveExchange<Incoming, Outgoing>,
 ): Nothing = coroutineScope {
+  val scope = this
   val jobs = mutableMapOf<PeerIdentifier, Job>()
 
   // Preserve state for remaining sites across collect invocations, such that existing jobs are
@@ -67,7 +64,15 @@ suspend fun SignalingServer.sync(
 
     // Add all the new peers.
     for (peer in added) {
-      jobs[peer] = launch { sync(peer, exchange) }
+      jobs[peer] = launch {
+        sync(peer, exchange)
+
+        // If one of the jobs reaches this, a non-cancellation exception was thrown in the `sync`
+        // call and the whole `SignalingServer` should stop. This may happen if the connectivity
+        // with one of the peers was lost, and the best way to recover is to re-setup all the
+        // clients.
+        scope.cancel()
+      }
     }
   }
 }

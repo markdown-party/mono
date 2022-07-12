@@ -2,7 +2,6 @@ package io.github.alexandrepiveteau.echo.webrtc.client
 
 import io.github.alexandrepiveteau.echo.ReceiveExchange
 import kotlinx.coroutines.flow.*
-import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.PeerToPeerConnection
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 
 /**

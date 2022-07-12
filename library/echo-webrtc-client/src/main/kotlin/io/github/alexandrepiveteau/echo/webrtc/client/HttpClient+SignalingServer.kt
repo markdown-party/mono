@@ -7,7 +7,6 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.webrtc.client.ktor.BufferedWebSocketSession as WsSession
 import io.github.alexandrepiveteau.echo.webrtc.client.ktor.bufferedWs
 import io.github.alexandrepiveteau.echo.webrtc.client.ktor.bufferedWss
-import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.PeerToPeerConnection
 import io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer.webRTC.GoogleIceServers
 import io.github.alexandrepiveteau.echo.webrtc.client.wrappers.*
 import io.github.alexandrepiveteau.echo.webrtc.signaling.*
@@ -81,13 +80,7 @@ private suspend fun HttpClient.socketSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     factory: SocketFactory,
     block: suspend SignalingServer.() -> Unit,
-) = factory {
-  // TODO : This should be the caller's responsibility.
-  while (true) {
-    block(WsSessionSignalingServer(exchange, this))
-    delay(RetryDelaySignalingServer)
-  }
-}
+) = factory { block(WsSessionSignalingServer(exchange, this)) }
 
 /**
  * Sends a message to the peer with the provided [PeerIdentifier] through the [WsSession].

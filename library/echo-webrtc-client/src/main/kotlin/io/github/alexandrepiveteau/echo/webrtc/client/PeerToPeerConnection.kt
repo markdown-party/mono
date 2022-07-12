@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.webrtc.client.peerToPeer
+package io.github.alexandrepiveteau.echo.webrtc.client
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
