@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.webrtc.client.coroutines
+package io.github.alexandrepiveteau.echo.webrtc.client.internal
 
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success

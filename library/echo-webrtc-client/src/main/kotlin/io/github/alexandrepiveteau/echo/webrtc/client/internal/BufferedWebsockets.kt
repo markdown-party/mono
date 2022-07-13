@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.webrtc.client.ktor
+package io.github.alexandrepiveteau.echo.webrtc.client.internal
 
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
@@ -58,6 +58,9 @@ private fun buffered(
     }
     outgoing.close()
   }
+  // Make sure an error is thrown when a closeReason is made available, to terminate the `sync`
+  // call with an exception.
+  launch { error(closeReason.await()?.message ?: "Connection terminated.") }
   block(ActualBufferedWebSocketSession(this, buffer))
 }
 

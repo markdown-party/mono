@@ -1,6 +1,11 @@
 public abstract interface class io/github/alexandrepiveteau/echo/Exchange : io/github/alexandrepiveteau/echo/ReceiveExchange, io/github/alexandrepiveteau/echo/SendExchange {
 }
 
+public final class io/github/alexandrepiveteau/echo/ExchangeKt {
+	public static final fun asReceiveExchange (Lio/github/alexandrepiveteau/echo/ReceiveExchange;)Lio/github/alexandrepiveteau/echo/ReceiveExchange;
+	public static final fun asSendExchange (Lio/github/alexandrepiveteau/echo/SendExchange;)Lio/github/alexandrepiveteau/echo/SendExchange;
+}
+
 public final class io/github/alexandrepiveteau/echo/Exchanges {
 	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Exchange;I)Lio/github/alexandrepiveteau/echo/Exchange;
 	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Exchange;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;

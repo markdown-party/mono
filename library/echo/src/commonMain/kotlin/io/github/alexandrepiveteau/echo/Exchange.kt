@@ -14,6 +14,9 @@ fun interface SendExchange<in I, out O> {
   fun send(incoming: Flow<I>): Flow<O>
 }
 
+/** Returns the [SendExchange]. */
+fun <I, O> SendExchange<I, O>.asSendExchange(): SendExchange<I, O> = SendExchange(this::send)
+
 /**
  * An interface defining an asymmetrical replication site, biased towards receiving data.
  *
@@ -25,6 +28,10 @@ fun interface ReceiveExchange<out I, in O> {
   /** Sends some [I] as a response to an [incoming] [Flow] of [O]. */
   fun receive(incoming: Flow<O>): Flow<I>
 }
+
+/** Returns the [ReceiveExchange]. */
+fun <I, O> ReceiveExchange<I, O>.asReceiveExchange(): ReceiveExchange<I, O> =
+    ReceiveExchange(this::receive)
 
 /**
  * An interface defining an [Exchange], which is able to generate some flows that are used for
