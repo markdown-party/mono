@@ -6,12 +6,28 @@ import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.decodeFromHexString as decodeHex
 import kotlinx.serialization.encodeToHexString as encodeHex
 
+/**
+ * Encodes the given [SendExchange] to a [SendExchange] of [String].
+ *
+ * @param A the type of the incoming messages.
+ * @param B the type of the outgoing messages.
+ * @param format the [BinaryFormat] to use when encoding the messages.
+ * @return the encoded [SendExchange].
+ */
 internal inline fun <reified A, reified B> SendExchange<A, B>.encode(
     format: BinaryFormat = DefaultBinaryFormat,
 ): SendExchange<String, String> = SendExchange { incoming ->
   this@encode.send(incoming.map(format::decodeHex)).map(format::encodeHex)
 }
 
+/**
+ * Encodes the given [ReceiveExchange] to a [ReceiveExchange] of [String].
+ *
+ * @param A the type of the incoming messages.
+ * @param B the type of the outgoing messages.
+ * @param format the [BinaryFormat] to use when encoding the messages.
+ * @return the encoded [ReceiveExchange].
+ */
 internal inline fun <reified A, reified B> ReceiveExchange<A, B>.encode(
     format: BinaryFormat = DefaultBinaryFormat,
 ): ReceiveExchange<String, String> = ReceiveExchange { incoming ->

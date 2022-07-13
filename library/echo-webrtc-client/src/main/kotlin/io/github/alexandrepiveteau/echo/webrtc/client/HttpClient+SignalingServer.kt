@@ -7,6 +7,8 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.webrtc.client.internal.BufferedWebSocketSession as WsSession
 import io.github.alexandrepiveteau.echo.webrtc.client.internal.bufferedWs
 import io.github.alexandrepiveteau.echo.webrtc.client.internal.bufferedWss
+import io.github.alexandrepiveteau.echo.webrtc.client.peers.Callee
+import io.github.alexandrepiveteau.echo.webrtc.client.peers.Caller
 import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage
 import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage.*
 import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier

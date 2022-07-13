@@ -21,7 +21,13 @@ interface PeerToPeerConnection {
   suspend fun sendCatching(message: String): ChannelResult<Unit>
 }
 
-fun PeerToPeerConnection.receiveAsFlow(): Flow<String> = flow {
+/**
+ * Receives all the messages from this [PeerToPeerConnection], and emits them in a [Flow].
+ *
+ * @receiver the [PeerToPeerConnection] from which the messages are received.
+ * @return the [Flow] of messages.
+ */
+internal fun PeerToPeerConnection.receiveAsFlow(): Flow<String> = flow {
   var finished = false
   while (!finished) {
     receiveCatching()
@@ -31,16 +37,22 @@ fun PeerToPeerConnection.receiveAsFlow(): Flow<String> = flow {
   }
 }
 
-suspend fun Flow<String>.collectTo(
+/**
+ * Collects all the [String] in this [Flow], and sends them to the [connection].
+ *
+ * @receiver the [Flow] of messages that is collected.
+ * @param connection the [PeerToPeerConnection] to which the messages are sent.
+ */
+internal suspend fun Flow<String>.collectTo(
     connection: PeerToPeerConnection,
 ) = collect { value -> connection.sendCatching(value).getOrThrow() }
 
-// TODO : Document this.
+/** Syncs this [ReceiveExchange] with the provided [PeerToPeerConnection]. */
 internal suspend fun ReceiveExchange<String, String>.sync(
     connection: PeerToPeerConnection,
 ) = receive(connection.receiveAsFlow()).collectTo(connection)
 
-// TODO : Document this.
+/** Syncs this [SendExchange] with the provided [PeerToPeerConnection]. */
 internal suspend fun SendExchange<String, String>.sync(
     connection: PeerToPeerConnection,
 ) = send(connection.receiveAsFlow()).collectTo(connection)
