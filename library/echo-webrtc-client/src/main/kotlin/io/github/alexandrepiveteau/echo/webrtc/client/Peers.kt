@@ -11,7 +11,7 @@ import io.github.alexandrepiveteau.echo.webrtc.client.internal.encode
 import io.github.alexandrepiveteau.echo.webrtc.client.internal.eventFlow
 import io.github.alexandrepiveteau.echo.webrtc.client.peers.GoogleIceServers
 import io.github.alexandrepiveteau.echo.webrtc.signaling.*
-import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage.Offer
+import io.github.alexandrepiveteau.echo.webrtc.signaling.ClientToClientMessage.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.channels.ChannelResult.Companion.closed
@@ -73,7 +73,7 @@ internal class Caller(
         val offer = connection.createOffer().await()
         connection.setLocalDescription(offer).await()
         val description = SessionDescription(JSON.stringify(offer))
-        message(Offer(ChannelId(0), description))
+        message(Offer(description))
       }
 
   private val jobIce =
@@ -83,7 +83,7 @@ internal class Caller(
             .filterIsInstance<RTCPeerConnectionIceEvent>()
             .mapNotNull { it.asDynamic().candidate.unsafeCast<RTCIceCandidateInit?>() }
             .map(JSON::stringify)
-            .onEach { message(ClientToClientMessage.IceCallee(ChannelId(0), IceCandidate(it))) }
+            .onEach { message(IceCallee(IceCandidate(it))) }
             .collect()
       }
 
@@ -117,7 +117,7 @@ internal class Callee(
         val answer = connection.createAnswer().await()
         connection.setLocalDescription(answer).await()
         val description = SessionDescription(JSON.stringify(answer))
-        message(ClientToClientMessage.Answer(ChannelId(0), description))
+        message(Answer(description))
       }
 
   private val jobIce =
@@ -127,7 +127,7 @@ internal class Callee(
             .filterIsInstance<RTCPeerConnectionIceEvent>()
             .mapNotNull { it.asDynamic().candidate.unsafeCast<RTCIceCandidateInit?>() }
             .map(JSON::stringify)
-            .onEach { message(ClientToClientMessage.IceCaller(ChannelId(0), IceCandidate(it))) }
+            .onEach { message(IceCaller(IceCandidate(it))) }
             .collect()
       }
 
