@@ -13,7 +13,6 @@ private const val Version = 2
 internal suspend fun openDatabase(): Database =
     openDatabase(Name, Version) { database, oldVersion, _ ->
       if (oldVersion != Version) {
-        database.deleteObjectStore(EventsStore)
         database.createObjectStore(EventsStore, EventIdPath)
       }
     }
