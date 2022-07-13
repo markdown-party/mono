@@ -1,120 +1,63 @@
 package party.markdown.ui.topBar
 
 import androidx.compose.runtime.*
-import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.web.dom.*
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.data.Configuration
 import party.markdown.rememberSyncState
 
-private val TickDuration = 500.milliseconds
-private val SyncIndicatorDuration = 500.milliseconds
 private val RetryDuration = 5.seconds
-
-/**
- * Proxies the [Exchange] to observe the [Instant] of the latest message to was sent or received
- * through the [Exchange]. The [Instant] can then be observed through a [StateFlow], that will be
- * updated with a new [Instant] on each message.
- *
- * Additionally, the returned [StateFlow] is guaranteed to return monotonically increasing [Instant]
- * values.
- *
- * @return A [Pair] of the proxied [Exchange] and the last message [Instant].
- */
-private fun <I, O> Exchange<I, O>.proxy(): Pair<Exchange<I, O>, StateFlow<Instant>> {
-  val lastMessage = MutableStateFlow(Clock.System.now())
-  val mutex = Mutex()
-  val update = suspend {
-    val current = Clock.System.now()
-    mutex.withLock {
-      val value = lastMessage.value
-      if (current > value) lastMessage.value = current
-    }
-  }
-  return object : Exchange<I, O> {
-    override fun receive(
-        incoming: Flow<O>,
-    ) = this@proxy.receive(incoming.onEach { update() }).onEach { update() }
-    override fun send(
-        incoming: Flow<I>,
-    ) = this@proxy.send(incoming.onEach { update() }).onEach { update() }
-  } to lastMessage
-}
-
-/**
- * Returns a [Flow] that regularly ticks with the provided [duration] interval. However, the
- * returned [Flow] does not try to keep in sync with the system clock, but rather only waits for the
- * given interval [duration] after each emission.
- *
- * @param duration how long the [Flow] waits between emissions.
- *
- * @return A cold [Flow] with the current [Instant].
- */
-private fun every(duration: Duration): Flow<Instant> = flow {
-  while (true) {
-    emit(Clock.System.now())
-    delay(duration)
-  }
-}
 
 /**
  * An enumeration representing the different sync icons that might get displayed as an indicator of
  * the current sync status.
  */
-enum class SyncIcon(
+data class SyncIcon(
     val url: String,
     val label: String,
 ) {
 
-  /** We're currently connected to the backend, but there's no activity. */
-  Online(
-      "/icons/sync-status-online.svg",
-      "Online",
-  ),
+  companion object {
 
-  // We could add finer granularity with the addition of TrafficUp and TrafficDown icons.
+    /** We're currently connected to the backend, but there's no activity. */
+    val Online =
+        SyncIcon(
+            url = "/icons/sync-status-online.svg",
+            label = "Online",
+        )
 
-  /** Some messages are being sent and received. */
-  TrafficBoth(
-      "/icons/sync-status-traffic-both.svg",
-      "Syncing",
-  ),
+    /** There are [count] participants currently connected. */
+    fun participants(count: Int) =
+        SyncIcon(
+            url = "/icons/sync-status-people.svg",
+            label = "${count + 1}\u00a0Online",
+        )
 
-  /** There is no active connection to the backend. */
-  Offline(
-      "/icons/sync-status-offline.svg",
-      "Offline",
-  ),
+    /** There is no active connection to the backend. */
+    val Offline =
+        SyncIcon(
+            "/icons/sync-status-offline.svg",
+            "Offline",
+        )
+  }
 }
 
 /**
- * Combines the current [syncing] state, and two [Flow] returning the current timestamp and the
- * timestamp of the last message that was exchanged.
+ * Returns the [SyncIcon] corresponding to the current
+ *
+ * @param syncing true if the client is currently syncing.
+ * @param participants the number of participants in the editing session.
  *
  * @return the [SyncIcon] corresponding to the current state.
  */
-@Composable
-private fun collectSyncIcon(
-    syncing: Boolean,
-    now: Flow<Instant>,
-    latest: StateFlow<Instant>,
-): SyncIcon {
-  val nowValue by now.collectAsState(Clock.System.now())
-  val latestValue by latest.collectAsState()
-  if (!syncing) return SyncIcon.Offline
-  if (nowValue - SyncIndicatorDuration < latestValue) return SyncIcon.TrafficBoth
-  return SyncIcon.Online
+private fun syncIcon(syncing: Boolean, participants: Int): SyncIcon {
+  return if (!syncing) SyncIcon.Offline
+  else if (participants > 0) SyncIcon.participants(participants) else SyncIcon.Online
 }
 
 /**
@@ -173,11 +116,8 @@ fun SyncIndicator(
     configuration: Configuration,
     debugMode: Boolean,
 ) {
-  // TODO : Support sync indicators.
-  val latest = remember { MutableStateFlow(Clock.System.now()) }
   val state = rememberSyncState(local, configuration)
-  val now = remember { every(TickDuration) }
-  val icon = collectSyncIcon(state.syncing, now, latest)
+  val icon = syncIcon(state.syncing, state.participantsCount)
 
   // Ensure we run sync whenever possible.
   RetrySync(
@@ -206,7 +146,10 @@ fun SyncIndicator(
               "w-24",
               "text-right",
           )
-        }) { Text(icon.label) }
+        },
+    ) {
+      Text(icon.label)
+    }
     Img(src = icon.url, alt = "Sync status")
     if (debugMode) {
       DebugButton(text = "Start now", onClick = { state.start() })

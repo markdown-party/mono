@@ -7,6 +7,7 @@ import io.github.alexandrepiveteau.echo.asReceiveExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.webrtc.client.internal.encode
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +32,12 @@ interface SignalingServer {
  *
  * @receiver the [SignalingServer] which provides information about the sites.
  * @param exchange the [ReceiveExchange] to which we're interested in syncing.
+ * @param onParticipantsChanged a callback which will be called when the participant count changes.
  */
-suspend fun SignalingServer.sync(exchange: Exchange<Incoming, Outgoing>): Nothing = coroutineScope {
+suspend fun SignalingServer.sync(
+    exchange: Exchange<Incoming, Outgoing>,
+    onParticipantsChanged: (Set<PeerIdentifier>) -> Unit = {},
+): Nothing = coroutineScope {
   val connected = mutableMapOf<Peer, Job>()
 
   // Preserve state for remaining sites across collect invocations, such that existing jobs are
@@ -52,5 +57,8 @@ suspend fun SignalingServer.sync(exchange: Exchange<Incoming, Outgoing>): Nothin
     for (peer in added) {
       connected[peer] = launch { exchange.encode().asReceiveExchange().sync(peer) }
     }
+
+    // Notify the callback.
+    onParticipantsChanged(peers.mapTo(mutableSetOf()) { it.identifier })
   }
 }

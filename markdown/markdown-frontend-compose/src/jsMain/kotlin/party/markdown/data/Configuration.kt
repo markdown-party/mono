@@ -6,6 +6,7 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.webrtc.client.sync
 import io.github.alexandrepiveteau.echo.webrtc.client.wsSignalingServer
 import io.github.alexandrepiveteau.echo.webrtc.client.wssSignalingServer
+import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.websocket.*
@@ -60,7 +61,10 @@ data class Configuration(
 /** The [HttpClient] which will be used to create the exchanges from configurations. */
 private val Client = HttpClient(Js) { install(WebSockets) }
 
-suspend fun Configuration.sync(exchange: Exchange<Incoming, Outgoing>) {
+suspend fun Configuration.sync(
+    exchange: Exchange<Incoming, Outgoing>,
+    onParticipantsChanged: (Set<PeerIdentifier>) -> Unit = {},
+) {
   val config = this
   val server = if (secure) Client::wssSignalingServer else Client::wsSignalingServer
   server(
@@ -73,6 +77,6 @@ suspend fun Configuration.sync(exchange: Exchange<Incoming, Outgoing>) {
         }
       },
   ) {
-    this.sync(exchange)
+    this.sync(exchange, onParticipantsChanged)
   }
 }
