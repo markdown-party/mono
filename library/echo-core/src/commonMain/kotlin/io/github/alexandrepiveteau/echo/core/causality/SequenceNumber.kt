@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 value class SequenceNumber
 internal constructor(
     @PublishedApi internal val index: UInt,
-) {
+) : Comparable<SequenceNumber> {
 
   /** Increments this value. */
   operator fun inc(): SequenceNumber {
@@ -29,7 +29,7 @@ internal constructor(
   }
 
   /** Compares this [SequenceNumber] with an other [SequenceNumber]. */
-  operator fun compareTo(other: SequenceNumber): Int {
+  override operator fun compareTo(other: SequenceNumber): Int {
     return index.compareTo(other.index)
   }
 

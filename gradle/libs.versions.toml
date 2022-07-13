@@ -6,6 +6,7 @@ compose = "1.2.0-alpha01-dev686"
 coroutines = "1.6.0"
 datetime = "0.3.1"
 immutablecollections = "0.3.4"
+juul-indexeddb = "0.2.3"
 ktor = "2.0.2"
 serialization = "1.3.2"
 slf4j = "1.7.21"
@@ -19,6 +20,9 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 immutablecollections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "immutablecollections" }
+
+juul-indexeddb-core = { module = "com.juul.indexeddb:core", version.ref = "juul-indexeddb" }
+juul-indexeddb-external = { module = "com.juul.indexeddb:external", version.ref = "juul-indexeddb" }
 
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 

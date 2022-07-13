@@ -23,6 +23,9 @@ include ':library:echo-webrtc-client'
 include ':library:echo-webrtc-server'
 include ':library:echo-webrtc-signaling'
 
+// Persistence
+include ':library:echo-indexeddb'
+
 // markdown-party
 include ':markdown:markdown'
 include ':markdown:markdown-backend'

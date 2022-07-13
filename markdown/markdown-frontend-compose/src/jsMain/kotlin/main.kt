@@ -6,10 +6,7 @@ import kotlin.random.Random
 import kotlinext.js.require
 import kotlinx.browser.window
 import org.jetbrains.compose.web.renderComposable
-import party.markdown.MarkdownParty
-import party.markdown.MarkdownPartyEvent
-import party.markdown.MarkdownPartyHistory
-import party.markdown.MutableMarkdownParty
+import party.markdown.*
 import party.markdown.data.Configuration
 import party.markdown.ui.MarkdownParty
 
@@ -52,6 +49,12 @@ fun main() {
   val publicLink = window.document.URL
 
   renderComposable("root") {
+
+    // Persistence.
+    LoadEventsEffect(session, local)
+    SaveEventsEffect(session, local)
+
+    // Application.
     CompositionLocalProvider(LocalSiteIdentifier provides site) {
       MarkdownParty(
           link = publicLink,

@@ -40,6 +40,7 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-js"))
 
+        implementation(project(":library:echo-indexeddb"))
         implementation(project(":library:echo-ktor-client"))
         implementation(project(":library:echo-ktor-websockets"))
         implementation(project(":library:echo-webrtc-client"))

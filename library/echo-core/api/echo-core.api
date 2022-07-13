@@ -277,10 +277,12 @@ public final class io/github/alexandrepiveteau/echo/core/causality/EventIdentifi
 	public static final fun toULong--MgKYFQ (J)J
 }
 
-public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumber {
+public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumber : java/lang/Comparable {
 	public static final field Companion Lio/github/alexandrepiveteau/echo/core/causality/SequenceNumber$Companion;
 	public static final synthetic fun box-impl (I)Lio/github/alexandrepiveteau/echo/core/causality/SequenceNumber;
-	public static final fun compareTo-PmzKtwM (II)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo-PmzKtwM (I)I
+	public static fun compareTo-PmzKtwM (II)I
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (ILjava/lang/Object;)Z
 	public static final fun equals-impl0 (II)Z
