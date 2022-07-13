@@ -1,5 +1,3 @@
-@file:OptIn(InternalCoroutinesApi::class)
-
 package io.github.alexandrepiveteau.echo.webrtc.client.peers
 
 import io.github.alexandrepiveteau.echo.webrtc.signaling.IceCandidate
@@ -7,9 +5,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ChannelResult.Companion.closed
-import kotlinx.coroutines.channels.ChannelResult.Companion.failure
-import kotlinx.coroutines.channels.ChannelResult.Companion.success
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.js.jso
 import webrtc.RTCIceCandidateInit
@@ -32,15 +28,16 @@ internal abstract class RTCPeerConnectionPeer : ICEPeer {
 
   override suspend fun receiveCatching() = incoming.receiveCatching()
 
+  @OptIn(InternalCoroutinesApi::class)
   override suspend fun sendCatching(message: String) =
       try {
-        success(outgoing.send(message))
+        ChannelResult.success(outgoing.send(message))
       } catch (cancellation: CancellationException) {
         throw cancellation
       } catch (closed: ClosedSendChannelException) {
-        closed(closed.cause)
+        ChannelResult.closed(closed.cause)
       } catch (throwable: Throwable) {
-        failure()
+        ChannelResult.failure()
       }
 
   override suspend fun ice(
