@@ -11,4 +11,8 @@ import kotlinx.serialization.Serializable
  *
  * @property id the unique identifier for this peer, within a given group.
  */
-@Serializable @JvmInline value class PeerIdentifier(val id: Int)
+@Serializable
+@JvmInline
+value class PeerIdentifier(val id: Int) {
+  override fun toString() = id.toString()
+}
