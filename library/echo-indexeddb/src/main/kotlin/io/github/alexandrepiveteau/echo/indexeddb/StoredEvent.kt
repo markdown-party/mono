@@ -10,6 +10,12 @@ import kotlinx.js.jso
 /** The [KeyPath] for the keys of [StoredEvent]. */
 internal val EventIdPath = KeyPath("session", "site", "seqno")
 
+/** The [KeyPath] for a single session. */
+internal val SessionPath = KeyPath("session")
+
+/** The index for the session key. */
+internal const val SessionIndex = "session"
+
 /** The path for the events object store. */
 internal const val EventsStore = "events"
 
