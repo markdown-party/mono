@@ -18,13 +18,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun LoadEventsEffect(session: String, exchange: Exchange<Incoming, Outgoing>) {
-  LaunchedEffect(session, exchange) {
-    try {
-      load(session, exchange)
-    } catch (_: Throwable) {
-      /*Ignored*/
-    }
-  }
+  LaunchedEffect(session, exchange) { runCatching { load(session, exchange) } }
 }
 
 /** The delay between each save. */
@@ -41,7 +35,7 @@ fun SaveEventsEffect(session: String, exchange: Exchange<Incoming, Outgoing>) {
   LaunchedEffect(session, exchange) {
     while (true) {
       delay(SaveDelay)
-      save(session, exchange)
+      runCatching { save(session, exchange) }
     }
   }
 }
