@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.indexeddb
 
+import com.juul.indexeddb.Key
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.log.Event
@@ -54,10 +55,9 @@ suspend fun load(session: String, exchange: Exchange<Incoming, Outgoing>) {
         val log = mutableEventLogOf()
         val events =
             objectStore(EventsStore)
-                .getAll()
-                .map { it.unsafeCast<StoredEvent>() }
-                .filter { it.session == session }
-                .map { it.toEvent() }
+                .index(SessionIndex)
+                .getAll(Key(session))
+                .map { it.unsafeCast<StoredEvent>().toEvent() }
                 .sortedBy { it.seqno }
         events.forEach { event ->
           log.insert(
