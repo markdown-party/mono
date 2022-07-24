@@ -7,7 +7,7 @@ import io.github.alexandrepiveteau.echo.core.causality.*
 import kotlinx.datetime.Clock
 
 /** Returns an [EventIdentifier] that acknowledges the given [SequenceNumber]. */
-private fun EventIdentifier.withSequenceNumber(seqno: SequenceNumber): EventIdentifier =
+private fun EventIdentifier.withSequenceNumberAck(seqno: SequenceNumber): EventIdentifier =
     EventIdentifier(maxOf(this.seqno, seqno), this.site)
 
 /** A [MutableAcknowledgeMap] manages a list set of acknowledgements. */
@@ -32,7 +32,7 @@ private constructor(
     require(seqno.isSpecified)
 
     val i = backing.binarySearchBySite(site)
-    if (i >= 0) backing[i] = backing[i].withSequenceNumber(seqno)
+    if (i >= 0) backing[i] = backing[i].withSequenceNumberAck(seqno)
     else backing.push(EventIdentifier(seqno, site), offset = -(i + 1))
   }
 
@@ -41,7 +41,6 @@ private constructor(
    * sorted.
    */
   fun acknowledge(ids: EventIdentifierArray) {
-    // TODO : Provide a faster path if the array is sorted.
     for (i in 0 until ids.size) {
       acknowledge(ids[i].seqno, ids[i].site)
     }
@@ -90,7 +89,7 @@ private constructor(
   /** Returns the next expected [SequenceNumber] for the given [SiteIdentifier]. */
   fun expected(site: SiteIdentifier): SequenceNumber {
     val physical = clock.now().toSequenceNumber()
-    val logical = get(site).inc() // Because SequenceNumber.Unspecified + 1U == SequenceNumber.Min
+    val logical = get(site).inc().takeOrElse { SequenceNumber.Min }
     return maxOf(physical, logical)
   }
 

@@ -307,6 +307,7 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SequenceNumbe
 	public static final fun isUnspecified-PmzKtwM (I)Z
 	public static final fun maxOf-VlF6aSQ (III)I
 	public static final fun maxOf-k25hgY8 (II)I
+	public static final fun takeOrElse-kC0Vv3Q (ILkotlin/jvm/functions/Function0;)I
 	public static final fun toSequenceNumber (Lkotlinx/datetime/Instant;)I
 	public static final fun toSequenceNumber-WZ4Q5Ns (I)I
 	public static final fun toUInt-PmzKtwM (I)I

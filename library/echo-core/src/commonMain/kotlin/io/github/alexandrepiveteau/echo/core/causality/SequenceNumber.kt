@@ -20,15 +20,17 @@ internal constructor(
 
   /** Increments this value. */
   operator fun inc(): SequenceNumber {
+    if (!isSpecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index.inc())
   }
 
   /** Adds a certain [count] to this value. */
   operator fun plus(count: UInt): SequenceNumber {
+    if (!isSpecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index + count)
   }
 
-  /** Compares this [SequenceNumber] with an other [SequenceNumber]. */
+  /** Compares this [SequenceNumber] with another [SequenceNumber]. */
   override operator fun compareTo(other: SequenceNumber): Int {
     return index.compareTo(other.index)
   }
@@ -66,6 +68,14 @@ inline val SequenceNumber.isSpecified: Boolean
 /** `true` when this is [SequenceNumber.Unspecified]. */
 inline val SequenceNumber.isUnspecified: Boolean
   get() = index == SequenceNumber.Unspecified.index
+
+/**
+ * If this [SequenceNumber] [isSpecified] then [this] is returned, otherwise [block] is executed and
+ * its result is returned.
+ */
+inline fun SequenceNumber.takeOrElse(
+    block: () -> SequenceNumber,
+): SequenceNumber = if (isSpecified) this else block()
 
 /** Creates a [SequenceNumber] from a [UInt]. */
 fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)

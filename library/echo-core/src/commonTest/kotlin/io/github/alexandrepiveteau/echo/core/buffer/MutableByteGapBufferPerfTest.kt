@@ -7,8 +7,8 @@ import kotlin.time.measureTime
 class MutableByteGapBufferPerfTest {
 
   /**
-   * A workflow that mutableListOf should optimized for, and where both data structures are designed
-   * to feature amortized constant-time insertions.
+   * A workflow that mutableListOf should be optimized for, and where both data structures are
+   * designed to feature amortized constant-time insertions.
    */
   @Performance
   @Test
@@ -43,8 +43,8 @@ class MutableByteGapBufferPerfTest {
   }
 
   /**
-   * A workflow that mutableListOf should optimized for, and where both data structures are designed
-   * to feature amortized constant-time insertions.
+   * A workflow that mutableListOf should be optimized for, and where both data structures are
+   * designed to feature amortized constant-time insertions.
    */
   @Performance
   @Test
