@@ -96,9 +96,7 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
                   advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
             }
             is I.Events ->
-                withMutableEventLogLock {
-                  msg.events.forEach { insert(it.seqno, it.site, it.data) }
-                }
+                withEventLogLock { msg.events.forEach { insert(it.seqno, it.site, it.data) } }
             is I.Ready -> error("Unexpected duplicate Ready.")
             null -> isDoneReceiving = true
           }

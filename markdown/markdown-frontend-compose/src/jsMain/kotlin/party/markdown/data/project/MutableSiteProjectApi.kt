@@ -2,7 +2,8 @@ package party.markdown.data.project
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.map
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.tree.TreeEvent
@@ -15,7 +16,7 @@ class MutableSiteProjectApi(
     private val site: MutableSite<MarkdownPartyEvent, MarkdownParty>,
 ) : ProjectApi {
 
-  override val currentName: StateFlow<String> = site.map { it.tree.name ?: DefaultName }
+  override val currentName: Flow<String> = site.value.map { it.tree.name ?: DefaultName }
 
   override suspend fun name(
       value: String,

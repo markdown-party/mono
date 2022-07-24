@@ -77,7 +77,7 @@ class GSetTest {
       yield(GSetEvent.Add(3))
     }
 
-    val result = echo.first { it.size == 3 }
+    val result = echo.value.first { it.size == 3 }
     assertEquals(setOf(1, 2, 3), result)
   }
 
@@ -135,8 +135,8 @@ class GSetTest {
 
       sync(alice, bob)
       val expected = setOf(123, 456, 789)
-      assertEquals(expected, alice.value)
-      assertEquals(expected, bob.value)
+      assertEquals(expected, alice.value.first())
+      assertEquals(expected, bob.value.first())
     }
 
     test(Once, Continuous)
@@ -179,8 +179,8 @@ class GSetTest {
       yield(GSetEvent.Add(4))
     }
 
-    val aliceBeforeSync = aliceEcho.first { it.size == 2 }
-    val bobBeforeSync = bobEcho.first { it.size == 3 }
+    val aliceBeforeSync = aliceEcho.value.first { it.size == 2 }
+    val bobBeforeSync = bobEcho.value.first { it.size == 3 }
 
     // Before sync, both sites have not merged their operations yet.
     assertEquals(setOf(1, 2), aliceBeforeSync)
@@ -191,7 +191,7 @@ class GSetTest {
 
     // All the events are properly synced.
     val expected = setOf(1, 2, 3, 4)
-    assertEquals(expected, aliceEcho.value)
-    assertEquals(expected, bobEcho.value)
+    assertEquals(expected, aliceEcho.value.first())
+    assertEquals(expected, bobEcho.value.first())
   }
 }

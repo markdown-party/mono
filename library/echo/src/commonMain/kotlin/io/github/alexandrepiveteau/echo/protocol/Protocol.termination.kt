@@ -13,5 +13,5 @@ internal fun terminate(): Nothing = throw TerminationException()
 internal inline fun runCatchingTermination(body: () -> Unit) {
   try {
     body()
-  } catch (term: TerminationException) {}
+  } catch (_: TerminationException) {}
 }

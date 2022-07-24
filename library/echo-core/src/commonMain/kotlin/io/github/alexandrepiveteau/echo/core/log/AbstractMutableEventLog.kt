@@ -2,6 +2,7 @@ package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.EventLog.OnLogUpdateListener
 import io.github.alexandrepiveteau.echo.core.requireRange
 import kotlinx.datetime.Clock
 
@@ -14,6 +15,9 @@ import kotlinx.datetime.Clock
 abstract class AbstractMutableEventLog(
     clock: Clock = Clock.System,
 ) : MutableEventLog {
+
+  /** The [OnLogUpdateListener] which should be notified when the log is updated. */
+  private val listeners = mutableSetOf<OnLogUpdateListener>()
 
   // Store what we've already seen.
   private val acknowledgedMap = MutableAcknowledgeMap(clock)
@@ -93,6 +97,7 @@ abstract class AbstractMutableEventLog(
             from = from,
             until = until,
         )
+    notifyLogListeners()
   }
 
   /**
@@ -103,6 +108,7 @@ abstract class AbstractMutableEventLog(
     val id = eventStore.currentId
     eventStore.removeCurrent()
     eventStoreBySite[id.site]?.removeById(id)
+    notifyLogListeners()
   }
 
   /**
@@ -191,18 +197,23 @@ abstract class AbstractMutableEventLog(
         from = from,
         until = until,
     )
+    notifyLogListeners()
     return EventIdentifier(seqno, site)
   }
 
   override fun acknowledge(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Unit = acknowledgedMap.acknowledge(seqno, site)
+  ) {
+    acknowledgedMap.acknowledge(seqno, site)
+    notifyLogListeners()
+  }
 
   override fun acknowledge(
       from: EventLog,
   ): MutableEventLog {
     acknowledgedMap.acknowledge(from.acknowledged())
+    notifyLogListeners()
     return this
   }
 
@@ -254,5 +265,18 @@ abstract class AbstractMutableEventLog(
   override fun clear() {
     eventStore.clear()
     eventStoreBySite.clear()
+    notifyLogListeners()
+  }
+
+  /** Notifies all the [OnLogUpdateListener]s that a change occurred. */
+  private fun notifyLogListeners() = listeners.toSet().forEach(OnLogUpdateListener::onLogUpdated)
+
+  override fun registerLogUpdateListener(listener: OnLogUpdateListener) {
+    listeners += listener
+    listener.onLogUpdated()
+  }
+
+  override fun unregisterLogUpdateListener(listener: OnLogUpdateListener) {
+    listeners -= listener
   }
 }

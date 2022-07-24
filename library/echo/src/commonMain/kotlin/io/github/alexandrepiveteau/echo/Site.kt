@@ -22,7 +22,7 @@ import io.github.alexandrepiveteau.echo.protocol.SiteImpl
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
@@ -33,7 +33,11 @@ import kotlinx.serialization.serializer
  *
  * @param M the type of the underlying aggregated model for this [Site].
  */
-interface Site<out M> : StateFlow<M>, Exchange<Inc, Out>
+interface Site<out M> : Exchange<Inc, Out> {
+
+  /** Returns the current value. */
+  val value: Flow<M>
+}
 
 /**
  * A mutable version of [Site], which allows the insertion of the events [T] through its [event]

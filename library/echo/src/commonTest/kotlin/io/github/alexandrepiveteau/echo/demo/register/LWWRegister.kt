@@ -12,7 +12,9 @@ import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 
@@ -57,7 +59,7 @@ private class LWWRegister(site: SiteIdentifier) {
       )
 
   /** The latest available value from the [LWWRegister]. */
-  val value: StateFlow<Int?> = exchange.map { (id, value) -> value.takeIf { id.isSpecified } }
+  val value: Flow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
 
   suspend fun set(value: Int) {
     // By default, events are added with a highest seqno than whatever they've received until now.
@@ -78,15 +80,15 @@ class LWWRegisterTest {
     aliceRegister.set(123)
     bobRegister.set(456)
 
-    assertEquals(123, aliceRegister.value.value)
-    assertEquals(456, bobRegister.value.value)
+    assertEquals(123, aliceRegister.value.first())
+    assertEquals(456, bobRegister.value.first())
 
     // Sync once.
     sync(aliceRegister.exchange, bobRegister.exchange)
 
     // Ensure convergence over a non-null value.
-    val aliceValue = aliceRegister.value.value
-    val bobValue = bobRegister.value.value
+    val aliceValue = aliceRegister.value.first()
+    val bobValue = bobRegister.value.first()
     assertEquals(aliceValue, bobValue)
 
     // Let the "other" site issue an event.
@@ -102,7 +104,7 @@ class LWWRegisterTest {
     sync(aliceRegister.exchange, bobRegister.exchange)
 
     // Ensure convergence over a non-null value.
-    assertEquals(789, aliceRegister.value.value)
-    assertEquals(789, bobRegister.value.value)
+    assertEquals(789, aliceRegister.value.first())
+    assertEquals(789, bobRegister.value.first())
   }
 }

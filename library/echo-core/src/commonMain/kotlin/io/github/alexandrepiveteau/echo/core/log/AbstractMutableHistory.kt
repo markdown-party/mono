@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.log.History.OnValueUpdateListener
 import kotlinx.datetime.Clock
 
 /**
@@ -13,6 +14,9 @@ abstract class AbstractMutableHistory<T>(
     private val projection: MutableProjection<T>,
     clock: Clock = Clock.System,
 ) : AbstractMutableEventLog(clock), MutableHistory<T> {
+
+  /** The [OnValueUpdateListener]s which should be notified when the value is updated. */
+  private val listeners = mutableSetOf<OnValueUpdateListener<T>>()
 
   // The ChangeScope that will be provided to the projection whenever some changes mush be appended
   // to the history of changes.
@@ -73,10 +77,27 @@ abstract class AbstractMutableHistory<T>(
   }
 
   override fun clear() {
-    super.clear()
     changeStore.clear()
+    super.clear()
   }
 
   final override var current: T = initial
-    private set
+    private set(value) {
+      field = value
+      notifyValueListeners(value)
+    }
+
+  /** Notifies all the [OnValueUpdateListener]s that a new value is available. */
+  private fun notifyValueListeners(value: T) {
+    listeners.toSet().forEach { it.onValueUpdated(value) }
+  }
+
+  override fun registerValueUpdateListener(listener: OnValueUpdateListener<T>) {
+    listeners += listener
+    listener.onValueUpdated(current)
+  }
+
+  override fun unregisterValueUpdateListener(listener: OnValueUpdateListener<T>) {
+    listeners -= listener
+  }
 }

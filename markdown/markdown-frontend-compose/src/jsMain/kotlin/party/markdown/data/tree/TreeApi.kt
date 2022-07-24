@@ -1,5 +1,6 @@
 package party.markdown.data.tree
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.tree.TreeNode
 import party.markdown.tree.TreeNodeIdentifier
@@ -14,7 +15,7 @@ interface TreeApi {
    * A [StateFlow] which gives access to the latest root [TreeNode], representing the collection of
    * documents and folders which the user may edit.
    */
-  val current: StateFlow<TreeNode>
+  val current: Flow<TreeNode>
 
   /**
    * Creates a new file, with the provided [name] and the given [parent].

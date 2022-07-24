@@ -361,7 +361,9 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableE
 	protected fun partialInsert-PdOoclA (J[BII)V
 	public static synthetic fun partialInsert-PdOoclA$default (Lio/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog;J[BIIILjava/lang/Object;)V
 	protected fun partialRemove-qH2TBG0 (II)Z
+	public fun registerLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
 	public fun remove-qH2TBG0 (II)Z
+	public fun unregisterLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
 }
 
 public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableHistory : io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog, io/github/alexandrepiveteau/echo/core/log/MutableHistory {
@@ -371,6 +373,8 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableH
 	public final fun getCurrent ()Ljava/lang/Object;
 	public fun moveLeft ()V
 	public fun moveRight ()V
+	public fun registerValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
+	public fun unregisterValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
@@ -453,12 +457,28 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventL
 	public abstract fun getSize ()I
 	public abstract fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 	public abstract fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public abstract fun registerLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+	public abstract fun unregisterLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener {
+	public abstract fun onLogUpdated ()V
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/EventLog_ExtensionsKt {
 	public static final fun copyOf (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static final fun isEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Z
 	public static final fun isNotEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Z
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/core/log/History : io/github/alexandrepiveteau/echo/core/log/EventLog {
+	public abstract fun getCurrent ()Ljava/lang/Object;
+	public abstract fun registerValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
+	public abstract fun unregisterValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener {
+	public abstract fun onValueUpdated (Ljava/lang/Object;)V
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableEventLog : io/github/alexandrepiveteau/echo/core/log/EventLog {
@@ -476,8 +496,7 @@ public final class io/github/alexandrepiveteau/echo/core/log/MutableEventLog$Def
 	public static synthetic fun insert-BnEfkuQ$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;II[BIIILjava/lang/Object;)V
 }
 
-public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableHistory : io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
-	public abstract fun getCurrent ()Ljava/lang/Object;
+public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableHistory : io/github/alexandrepiveteau/echo/core/log/History, io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableProjection {

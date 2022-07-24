@@ -2,7 +2,8 @@ package party.markdown.data.tree
 
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.map
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.tree.TreeEvent
@@ -14,7 +15,7 @@ class MutableSiteTreeApi(
     private val site: MutableSite<MarkdownPartyEvent, MarkdownParty>,
 ) : TreeApi {
 
-  override val current: StateFlow<TreeNode> = site.map { it.tree }
+  override val current: Flow<TreeNode> = site.value.map { it.tree }
 
   override suspend fun createFile(name: String, parent: TreeNode): Unit =
       site.event {

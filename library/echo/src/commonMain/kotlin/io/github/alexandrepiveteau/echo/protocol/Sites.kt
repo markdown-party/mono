@@ -12,7 +12,6 @@ import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.*
@@ -32,17 +31,6 @@ internal open class ExchangeImpl(
   /** The [Mutex] that protects access to the [log] variable. */
   internal val mutex = Mutex()
 
-  /** A [MutableSharedFlow] that is used to mark that a mutation has occurred in the log. */
-  private val mutations = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = DROP_OLDEST)
-
-  /**
-   * A function that will be called whenever some mutations were performed, and some computed values
-   * or the event log should be updated.
-   */
-  open fun mutation() {
-    mutations.tryEmit(Unit)
-  }
-
   /**
    * Runs an exchange in an [ExchangeBlock]. The implementation of the exchange may be a finite
    * state machine, or a simple suspending function that performs linear and consecutive steps.
@@ -57,8 +45,8 @@ internal open class ExchangeImpl(
       block: ExchangeBlock<I, O>,
   ): Flow<O> = channelFlow {
     val inc = incoming.produceIn(this)
-    val channel = mutations.produceIn(this)
-    val scope = ExchangeScopeImpl(mutex, log, channel, inc, this, ::mutation)
+    val channel = log.asMutationsFlow().produceIn(this)
+    val scope = ExchangeScopeImpl(mutex, log, channel, inc, this)
 
     // Give the other threads a chance to run and generate some (termination ?) messages, and then
     // launch our exchange.
@@ -88,12 +76,8 @@ internal open class SiteImpl<M, R>(
     strategy: SyncStrategy<Inc, Out>,
     private val transform: (R) -> M,
     internal val current: MutableStateFlow<M> = MutableStateFlow(transform(history.current)),
-) : ExchangeImpl(history, strategy), Site<M>, StateFlow<M> by current {
-
-  override fun mutation() {
-    current.value = transform(history.current)
-    super.mutation()
-  }
+) : ExchangeImpl(history, strategy), Site<M> {
+  override val value = history.asCurrentFlow().map(transform)
 }
 
 internal open class MutableSiteImpl<T, M, R>(
@@ -102,7 +86,7 @@ internal open class MutableSiteImpl<T, M, R>(
     private val history: MutableHistory<R>,
     private val format: BinaryFormat,
     strategy: SyncStrategy<Inc, Out>,
-    transform: (R) -> M,
+    private val transform: (R) -> M,
 ) :
     SiteImpl<M, R>(
         history = history,
@@ -120,7 +104,7 @@ internal open class MutableSiteImpl<T, M, R>(
 
   override suspend fun <R> event(
       block: suspend EventScope<T>.(M) -> R,
-  ) = mutex.withLock { block(this, value).apply { mutation() } }
+  ) = mutex.withLock { block(this, transform(history.current)) }
 }
 
 /**
@@ -132,7 +116,6 @@ internal open class MutableSiteImpl<T, M, R>(
  * @param sentinel a [ReceiveChannel] emitting new values whenever the log is updated.
  * @param incoming a [ReceiveChannel] with incoming messages.
  * @param outgoing a [SendChannel] with outgoing messages.
- * @param mutation a lambda that should be called with mutual exclusion when the log is mutated.
  *
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
@@ -144,12 +127,10 @@ private class ExchangeScopeImpl<I, O>(
     private val sentinel: ReceiveChannel<*>,
     incoming: ReceiveChannel<I>,
     outgoing: SendChannel<O>,
-    private val mutation: () -> Unit,
 ) : ExchangeScope<I, O>, ReceiveChannel<I> by incoming, SendChannel<O> by outgoing {
 
   override suspend fun lock() = mutex.lock()
   override fun unlock() = mutex.unlock()
-  override fun mutate() = mutation()
 
   override val onEventLogUpdate =
       object : SelectClause0 {
