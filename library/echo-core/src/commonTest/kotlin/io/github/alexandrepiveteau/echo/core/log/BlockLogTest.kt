@@ -1,7 +1,10 @@
 package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.assertThrows
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class BlockLogTest {
@@ -19,5 +22,16 @@ class BlockLogTest {
     val a = log.iterator()
     log.iterator()
     assertThrows<ConcurrentModificationException> { a.hasNext() }
+  }
+
+  @Test
+  fun adding_removing_isEmpty() {
+    val log = BlockLog()
+    val iterator = log.iterator()
+    iterator.add(SequenceNumber.Min, SiteIdentifier.Min, byteArrayOf(1, 2))
+    iterator.movePrevious()
+    iterator.remove()
+    assertEquals(0, log.size)
+    assertTrue(iterator.isEmpty())
   }
 }
