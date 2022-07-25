@@ -172,8 +172,6 @@ internal class BlockLog {
 
     override fun next(): Event {
       check(hasNext())
-      lastCursorNextIndex = cursorNextIndex
-      lastCursorNextBlock = cursorNextBlock
       moveNext()
       return Event(
           seqno = previousSeqno,
@@ -184,8 +182,6 @@ internal class BlockLog {
     override fun previous(): Event {
       check(hasPrevious())
       movePrevious()
-      lastCursorNextIndex = cursorNextIndex
-      lastCursorNextBlock = cursorNextBlock
       return Event(
           seqno = nextSeqno,
           site = nextSite,
@@ -194,6 +190,8 @@ internal class BlockLog {
     }
     override fun moveNext() {
       check(hasNext())
+      lastCursorNextIndex = cursorNextIndex
+      lastCursorNextBlock = cursorNextBlock
       cursorNextBlock += blockSizes[nextIndex()]
       cursorNextIndex += 1
     }
@@ -201,6 +199,8 @@ internal class BlockLog {
       check(hasPrevious())
       cursorNextBlock -= blockSizes[previousIndex()]
       cursorNextIndex -= 1
+      lastCursorNextIndex = cursorNextIndex
+      lastCursorNextBlock = cursorNextBlock
     }
     override fun hasNext(): Boolean {
       checkToken()
