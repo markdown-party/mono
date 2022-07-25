@@ -23,7 +23,7 @@ abstract class AbstractMutableEventLog(
   private val acknowledgedMap = MutableAcknowledgeMap(clock)
 
   // Storing the events and the changes.
-  internal val eventStore = BlockLog()
+  private val eventStore = BlockLog()
   private val eventStoreBySite = mutableMapOf<SiteIdentifier, BlockLog>()
 
   override val size: Int
@@ -51,8 +51,8 @@ abstract class AbstractMutableEventLog(
       until: Int,
   ) {
     val id = EventIdentifier(seqno, site)
-    while (hasPrevious() && EventIdentifier(previousSeqno, previousSite) > id) movePrevious()
-    while (hasNext() && EventIdentifier(nextSeqno, nextSite) < id) moveNext()
+    while (hasPrevious() && previousEventIdentifier > id) movePrevious()
+    while (hasNext() && nextEventIdentifier < id) moveNext()
     add(seqno, site, event, from, until)
   }
 
@@ -113,15 +113,16 @@ abstract class AbstractMutableEventLog(
 
   override fun acknowledged(): EventIdentifierArray = acknowledgedMap.toEventIdentifierArray()
 
-  override fun iterator(): EventIterator = eventStore.iteratorAtEnd()
+  override fun iterator(): EventIterator = eventStore.iterator()
 
-  override fun iterator(site: SiteIdentifier): EventIterator {
-    return site(site).iteratorAtEnd()
-  }
+  override fun iteratorAtEnd(): EventIterator = eventStore.iteratorAtEnd()
+
+  override fun iterator(site: SiteIdentifier): EventIterator = site(site).iterator()
+
+  override fun iteratorAtEnd(site: SiteIdentifier): EventIterator = site(site).iteratorAtEnd()
 
   override fun merge(from: EventLog): MutableEventLog {
     val iterator = from.iterator()
-    while (iterator.hasPrevious()) iterator.movePrevious()
     while (iterator.hasNext()) {
       iterator.moveNext()
       insert(
@@ -145,7 +146,7 @@ abstract class AbstractMutableEventLog(
     for (iterator in iterators) {
       loop@ while (iterator.hasPrevious()) {
         iterator.movePrevious()
-        if (EventIdentifier(iterator.nextSeqno, iterator.nextSite) == id) {
+        if (iterator.nextEventIdentifier == id) {
           iterator.remove()
           removed = true
           break@loop

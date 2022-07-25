@@ -49,20 +49,34 @@ interface EventLog {
   fun acknowledged(): EventIdentifierArray
 
   /**
-   * Returns an [EventIterator]. The retrieved [EventIterator] will start at the end of the
-   * [MutableEventLog], and should not be used anymore if the underlying [MutableEventLog] is
-   * modified.
+   * Returns an [EventIterator]. The retrieved [EventIterator] will start at the beginning of the
+   * [EventLog], and should not be used anymore if the underlying [EventLog] is modified.
    */
   operator fun iterator(): EventIterator
 
   /**
-   * Returns an [EventIterator] specific to a single site. The retrieved [EventIdentifier] will
-   * start at the end of the [MutableEventLog], and should not be used anymore if the underlying
-   * [EventLog] is modified.
+   * Returns an [EventIterator]. The retrieved [EventIterator] will start at the end of the
+   * [EventLog], and should not be used anymore if the underlying [EventLog] is modified.
+   */
+  fun iteratorAtEnd(): EventIterator
+
+  /**
+   * Returns an [EventIterator] specific to a single site. The retrieved [EventIterator] will start
+   * at the beginning of the [EventLog], and should not be used anymore if the underlying [EventLog]
+   * is modified.
    *
    * @param site the [SiteIdentifier] for which the [EventIterator] is retrieved.
    */
   fun iterator(site: SiteIdentifier): EventIterator
+
+  /**
+   * Returns an [EventIterator] specific to a single site. The retrieved [EventIterator] will start
+   * at the end of the [EventLog], and should not be used anymore if the underlying [EventLog] is
+   * modified.
+   *
+   * @param site the [SiteIdentifier] for which the [EventIterator] is retrieved.
+   */
+  fun iteratorAtEnd(site: SiteIdentifier): EventIterator
 
   /** A listener which may be used to observe some changed performed on an [EventLog]. */
   fun interface OnLogUpdateListener {

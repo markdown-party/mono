@@ -32,6 +32,9 @@ interface EventIterator : ListIterator<Event> {
   val previousSeqno: SequenceNumber
   /** The [SiteIdentifier] of the previous event. */
   val previousSite: SiteIdentifier
+  /** The [EventIdentifier] of the previous event. */
+  val previousEventIdentifier: EventIdentifier
+    get() = EventIdentifier(previousSeqno, previousSite)
   /** The body of the previous event, between [previousFrom] and [previousUntil]. */
   val previousEvent: MutableByteGapBuffer
   /** The start of the previous event body. */
@@ -43,6 +46,9 @@ interface EventIterator : ListIterator<Event> {
   val nextSeqno: SequenceNumber
   /** The [SiteIdentifier] of the next event. */
   val nextSite: SiteIdentifier
+  /** The [EventIdentifier] of the next event. */
+  val nextEventIdentifier: EventIdentifier
+    get() = EventIdentifier(nextSeqno, nextSite)
   /** The body of the next event, between [nextFrom] and [nextUntil]. */
   val nextEvent: MutableByteGapBuffer
   /** The start of the next event body. */

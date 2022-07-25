@@ -76,8 +76,8 @@ class MutableEventLogRemoveTest {
       assertFalse(iterator.hasPrevious())
     }
 
-    checkIterator(log.iterator())
-    checkIterator(log.iterator(SiteIdentifier.Min))
+    checkIterator(log.iteratorAtEnd())
+    checkIterator(log.iteratorAtEnd(SiteIdentifier.Min))
   }
 
   @Test
@@ -106,8 +106,8 @@ class MutableEventLogRemoveTest {
       assertFalse(iterator.hasPrevious())
     }
 
-    checkIterator(log.iterator())
-    checkIterator(log.iterator(SiteIdentifier.Min))
+    checkIterator(log.iteratorAtEnd())
+    checkIterator(log.iteratorAtEnd(SiteIdentifier.Min))
   }
 
   @Test
@@ -136,7 +136,7 @@ class MutableEventLogRemoveTest {
       assertFalse(iterator.hasPrevious())
     }
 
-    checkIterator(log.iterator())
-    checkIterator(log.iterator(SiteIdentifier.Min))
+    checkIterator(log.iteratorAtEnd())
+    checkIterator(log.iteratorAtEnd(SiteIdentifier.Min))
   }
 }

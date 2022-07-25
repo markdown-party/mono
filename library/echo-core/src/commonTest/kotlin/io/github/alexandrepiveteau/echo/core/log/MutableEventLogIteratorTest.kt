@@ -33,7 +33,7 @@ class MutableEventLogIteratorTest {
     val site = SiteIdentifier.Min
     val data = byteArrayOf(1, 2, 3)
     val log = mutableEventLogOf(ZeroClock).apply { append(site, data) }
-    val iterator = log.iterator()
+    val iterator = log.iteratorAtEnd()
     assertTrue(iterator.hasPrevious())
     assertFalse(iterator.hasNext())
     assertFails { iterator.moveNext() }
@@ -58,7 +58,7 @@ class MutableEventLogIteratorTest {
     val (seq1, _) = log.append(site1, data1)
     val (seq2, _) = log.append(site2, data2)
 
-    val iterator = log.iterator()
+    val iterator = log.iteratorAtEnd()
 
     val event2 = iterator.previous()
     assertTrue(iterator.hasPrevious())
