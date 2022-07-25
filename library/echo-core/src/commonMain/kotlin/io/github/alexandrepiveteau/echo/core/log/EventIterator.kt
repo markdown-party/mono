@@ -75,6 +75,11 @@ fun EventIterator.moveToEnd() {
   while (hasNext()) moveNext()
 }
 
+/** Moves the [EventIterator] to the previous, until [predicate] is valid. */
+inline fun EventIterator.movePreviousUntil(predicate: () -> Boolean) {
+  while (hasPrevious() && !predicate()) movePrevious()
+}
+
 /**
  * Moves the [EventIterator] such that the next insertion position is available at
  * [MutableEventIterator.add].
@@ -82,10 +87,8 @@ fun EventIterator.moveToEnd() {
  * @param seqno the [SequenceNumber] for insertions.
  * @param site the [SiteIdentifier] for insertions.
  */
-fun EventIterator.moveBefore(seqno: SequenceNumber, site: SiteIdentifier) {
-  moveToEnd()
-  val id = EventIdentifier(seqno, site)
-  while (hasPrevious() && EventIdentifier(previousSeqno, previousSite) > id) movePrevious()
+fun EventIterator.moveBefore(seqno: SequenceNumber, site: SiteIdentifier) = movePreviousUntil {
+  previousEventIdentifier > EventIdentifier(seqno, site)
 }
 
 /**

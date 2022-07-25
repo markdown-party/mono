@@ -224,7 +224,7 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
   withEventLogLock {
     for (i in 0 until requests.size) {
       val (seqno, site) = requests[i]
-      val iterator = iterator(site).apply { moveBefore(seqno, site) }
+      val iterator = iteratorAtEnd(site).apply { moveBefore(seqno, site) }
       iterator.take(
           index = i,
           requests = requests,
