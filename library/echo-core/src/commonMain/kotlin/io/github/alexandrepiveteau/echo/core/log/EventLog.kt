@@ -85,3 +85,9 @@ interface EventLog {
    */
   fun unregisterLogUpdateListener(listener: OnLogUpdateListener)
 }
+
+/** Transforms this [EventLog] to a [List] of [Event]. */
+fun EventLog.toList(): List<Event> = buildList {
+  val iterator = this@toList.iterator().apply { moveToStart() }
+  while (iterator.hasNext()) add(iterator.next())
+}
