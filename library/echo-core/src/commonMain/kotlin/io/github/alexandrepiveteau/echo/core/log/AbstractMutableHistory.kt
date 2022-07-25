@@ -1,5 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.History.OnValueUpdateListener
 import kotlinx.datetime.Clock
 
@@ -8,8 +11,6 @@ import kotlinx.datetime.Clock
  * to incrementally update the model.
  *
  * @param clock the [Clock] used to integrate new events.
- *
- * TODO : Re-implement this.
  */
 abstract class AbstractMutableHistory<T>(
     initial: T,
@@ -20,63 +21,60 @@ abstract class AbstractMutableHistory<T>(
   /** The [OnValueUpdateListener]s which should be notified when the value is updated. */
   private val listeners = mutableSetOf<OnValueUpdateListener<T>>()
 
-  // The ChangeScope that will be provided to the projection whenever some changes mush be appended
-  // to the history of changes.
-  private val scope = ChangeScope { _, _, _ ->
-    // changeStore.pushAtGap(
-    //     id = eventStore.lastId,
-    //     array = array,
-    //     from = from,
-    //     until = until,
-    // )
+  private inline fun MutableEventIterator.withScope(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      block: ChangeScope.() -> Unit
+  ) = block(ChangeScope { array, from, until -> add(seqno, site, array, from, until) })
+
+  override fun MutableEventIterator.addToLog(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      event: ByteArray,
+      from: Int,
+      until: Int,
+  ) {
+    val id = EventIdentifier(seqno, site)
+    val changeIterator = changeStore.iteratorAtEnd()
+    while (hasPrevious() && previousEventIdentifier > id) {
+      movePrevious()
+      while (changeIterator.hasPrevious() &&
+          changeIterator.previousEventIdentifier == nextEventIdentifier) {
+        changeIterator.movePrevious()
+        current =
+            projection.backward(
+                model = current,
+                identifier = nextEventIdentifier,
+                data = nextEvent,
+                from = nextFrom,
+                until = nextUntil,
+                changeData = changeIterator.nextEvent,
+                changeFrom = changeIterator.nextFrom,
+                changeUntil = changeIterator.nextUntil,
+            )
+        changeIterator.remove()
+      }
+    }
+    add(seqno, site, event, from, until)
+    movePrevious()
+    while (hasNext()) {
+      moveNext()
+      changeIterator.withScope(seqno, site) {
+        with(projection) {
+          current =
+              forward(
+                  model = current,
+                  identifier = previousEventIdentifier,
+                  data = previousEvent,
+                  from = previousFrom,
+                  until = previousUntil,
+              )
+        }
+      }
+    }
   }
 
   private val changeStore = BlockLog()
-
-  /*override fun moveLeft() {
-    // Remove all the associated changes.
-    reverseChange@ while (changeStore.hasPrevious) {
-
-      // val changeId = changesIds[changesIds.gap.startIndex - 1]
-      if (changeStore.lastId != eventStore.lastId) break@reverseChange
-
-      // Update the current projection.
-      current =
-          projection.backward(
-              model = current,
-              identifier = eventStore.lastId,
-              data = eventStore.backing,
-              from = eventStore.lastFrom,
-              until = eventStore.lastUntil,
-              changeData = changeStore.backing,
-              changeFrom = changeStore.lastFrom,
-              changeUntil = changeStore.lastUntil,
-          )
-
-      // Only remove the change once it has been used to update the projection.
-      changeStore.removeLeft()
-    }
-
-    // Move the event log.
-    super.moveLeft()
-  }
-
-  override fun moveRight() {
-    // Move the event log.
-    super.moveRight()
-
-    // Update the current value.
-    current =
-        with(projection) {
-          scope.forward(
-              model = current,
-              identifier = eventStore.lastId,
-              data = eventStore.backing,
-              from = eventStore.lastFrom,
-              until = eventStore.lastUntil,
-          )
-        }
-  }*/
 
   override fun clear() {
     changeStore.clear()

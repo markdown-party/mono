@@ -23,7 +23,7 @@ abstract class AbstractMutableEventLog(
   private val acknowledgedMap = MutableAcknowledgeMap(clock)
 
   // Storing the events and the changes.
-  private val eventStore = BlockLog()
+  internal val eventStore = BlockLog()
   private val eventStoreBySite = mutableMapOf<SiteIdentifier, BlockLog>()
 
   override val size: Int
@@ -56,6 +56,19 @@ abstract class AbstractMutableEventLog(
     add(seqno, site, event, from, until)
   }
 
+  /**
+   * Adds an event to the log, starting from the end of the [EventLog].
+   *
+   * @receiver the [MutableEventIterator], starting from the end.
+   */
+  protected open fun MutableEventIterator.addToLog(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      event: ByteArray,
+      from: Int,
+      until: Int,
+  ) = addOrdered(seqno, site, event, from, until)
+
   override fun insert(
       seqno: SequenceNumber,
       site: SiteIdentifier,
@@ -75,7 +88,7 @@ abstract class AbstractMutableEventLog(
     acknowledge(seqno, site)
 
     // Adding the event in the iterators.
-    eventStore.iteratorAtEnd().addOrdered(seqno, site, event, from, until)
+    eventStore.iteratorAtEnd().addToLog(seqno, site, event, from, until)
     site(site).iteratorAtEnd().addOrdered(seqno, site, event, from, until)
     notifyLogListeners()
   }
@@ -122,13 +135,14 @@ abstract class AbstractMutableEventLog(
   override fun iteratorAtEnd(site: SiteIdentifier): EventIterator = site(site).iteratorAtEnd()
 
   override fun merge(from: EventLog): MutableEventLog {
-    val iterator = from.iterator()
-    while (iterator.hasNext()) {
-      iterator.moveNext()
+    // TODO : Perform the insertion in a single pass, without calling `insert`.
+    val inserted = from.iterator()
+    while (inserted.hasNext()) {
+      inserted.moveNext()
       insert(
-          seqno = iterator.previousSeqno,
-          site = iterator.previousSite,
-          event = iterator.previousEvent.copyOfRange(iterator.previousFrom, iterator.previousUntil),
+          seqno = inserted.previousSeqno,
+          site = inserted.previousSite,
+          event = inserted.previousEvent.copyOfRange(inserted.previousFrom, inserted.previousUntil),
       )
     }
     return this
