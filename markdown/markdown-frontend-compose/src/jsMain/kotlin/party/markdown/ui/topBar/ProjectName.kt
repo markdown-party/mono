@@ -14,7 +14,7 @@ import party.markdown.data.project.ProjectApi
 fun ProjectName(
     api: ProjectApi,
 ) {
-  val name by api.currentName.collectAsState()
+  val name by api.currentName.collectAsState(initial = "")
   val scope = rememberCoroutineScope()
   var editedName by remember { mutableStateOf<String?>(null) }
   val editing = editedName != null

@@ -61,7 +61,7 @@ suspend fun main(args: Array<String>) = coroutineScope {
   runServer(site, config)
 
   // Run the GUI.
-  val figures = site.map { it.figures }
+  val figures = site.value.map { it.figures }
 
   awaitApplication {
     Window(

@@ -1,5 +1,6 @@
 package party.markdown.data.project
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface ProjectApi {
 
   /** Returns a [StateFlow] with the latest value for the project name. */
-  val currentName: StateFlow<String>
+  val currentName: Flow<String>
 
   /**
    * Sets the name of the project. On concurrent modifications, the [value] may be ignored and

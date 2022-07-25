@@ -5,7 +5,8 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.eventIdentifierArrayOf
 import io.github.alexandrepiveteau.echo.map
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.cursors.CursorEvent
@@ -21,8 +22,8 @@ class MutableSiteTextApi(
 
   override fun current(
       id: EventIdentifier,
-  ): StateFlow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>> =
-      site.map {
+  ): Flow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>> =
+      site.value.map {
         val (char, event) = it.documents[id] ?: DefaultDocument
         val cursors = it.cursors[id]
         Triple(char, event, cursors)

@@ -52,4 +52,25 @@ interface EventLog {
    * @param site the [SiteIdentifier] for which the [EventIterator] is retrieved.
    */
   fun iterator(site: SiteIdentifier): EventIterator
+
+  /** A listener which may be used to observe some changed performed on an [EventLog]. */
+  fun interface OnLogUpdateListener {
+
+    /** A callback which will be called whenever some updates are performed on an [EventLog]. */
+    fun onLogUpdated()
+  }
+
+  /**
+   * Registers the provided [OnLogUpdateListener] to this [EventLog].
+   *
+   * @param listener the [OnLogUpdateListener] which is registered.
+   */
+  fun registerLogUpdateListener(listener: OnLogUpdateListener)
+
+  /**
+   * Unregisters the provided [OnLogUpdateListener] from this [EventLog].
+   *
+   * @param listener the [OnLogUpdateListener] which is unregistered.
+   */
+  fun unregisterLogUpdateListener(listener: OnLogUpdateListener)
 }

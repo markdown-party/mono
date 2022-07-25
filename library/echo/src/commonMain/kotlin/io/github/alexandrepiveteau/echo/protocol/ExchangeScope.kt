@@ -1,6 +1,5 @@
 package io.github.alexandrepiveteau.echo.protocol
 
-import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
@@ -28,9 +27,6 @@ interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
   /** Unlocks access to the [MutableEventLog]. */
   fun unlock()
 
-  /** Atomically marks that the [MutableEventLog] has been mutated. */
-  fun mutate()
-
   /**
    * A [SelectClause0] that is made available when the event log is updated with some new content.
    * This is typically used to ensure that the state is notified with the latest log state.
@@ -39,33 +35,16 @@ interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
 }
 
 /**
- * Executes the given [block] on the [EventLog] with global exclusion. Because the [EventLog] may be
- * accessed concurrently, you should not reference the [EventLog] outside of this block.
+ * Executes the given [block] on the [MutableEventLog] with global exclusion. Because the
+ * [MutableEventLog] may be accessed concurrently, you should not reference the [MutableEventLog]
+ * outside of this block.
  *
  * @param R the return type of the update [block].
  */
-suspend inline fun <R> ExchangeScope<*, *>.withEventLogLock(block: EventLog.() -> R): R {
+suspend inline fun <R> ExchangeScope<*, *>.withEventLogLock(block: MutableEventLog.() -> R): R {
   lock()
   try {
     return block(log)
-  } finally {
-    unlock()
-  }
-}
-
-/**
- * Executes the given [block] on the [MutableEventLog] with global exclusion. When in the body of
- * this method, you may write to the [MutableEventLog]. Because the [MutableEventLog] may be
- * accessed concurrently, you should not reference the [MutableEventLog] outside of this block.
- *
- * @param R the return type of the update [block].
- */
-suspend inline fun <R> ExchangeScope<*, *>.withMutableEventLogLock(
-    block: MutableEventLog.() -> R,
-): R {
-  lock()
-  try {
-    return block(log).apply { mutate() }
   } finally {
     unlock()
   }

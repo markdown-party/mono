@@ -1,12 +1,14 @@
 package party.markdown.ui
 
 import androidx.compose.runtime.*
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier.Companion.Unspecified
 import io.github.alexandrepiveteau.echo.core.causality.toEventIdentifier
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Div
 import party.markdown.data.text.TextApi
 import party.markdown.data.tree.TreeApi
 import party.markdown.tree.TreeNode
+import party.markdown.tree.TreeNode.Folder
 import party.markdown.ui.editor.Editor
 import party.markdown.ui.navigator.Navigator
 
@@ -43,10 +45,9 @@ fun Panes(
     treeApi: TreeApi,
     textApi: TextApi,
 ) {
-  val tree by treeApi.current.collectAsState()
+  val tree by treeApi.current.collectAsState(Folder(Unspecified, emptySet(), null))
   val scope = rememberCoroutineScope()
   val (selected, setSelected) = remember { mutableStateOf<TreeNode?>(null) }
-  val nodes by treeApi.current.collectAsState()
 
   Div(
       attrs = { classes("h-full", "flex", "flex-row") },
@@ -64,7 +65,7 @@ fun Panes(
         })
     DividerHorizontal()
     Editor(
-        treeNode = selected?.takeIf { it in nodes },
+        treeNode = selected?.takeIf { it in tree },
         api = textApi,
     )
   }

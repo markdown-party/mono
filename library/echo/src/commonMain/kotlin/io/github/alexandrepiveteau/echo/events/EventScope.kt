@@ -23,31 +23,19 @@ fun interface EventScope<in T> {
    *
    * @return the [EventIdentifier] that's issued for this new event.
    */
-  fun yield(
-      event: T,
-  ): EventIdentifier
+  fun yield(event: T): EventIdentifier
 
   /**
    * Appends an [Iterator] of events to the operations of this site.
    *
    * @param events the events that will be added to the log.
    */
-  fun yieldAll(
-      events: Iterator<T>,
-  ) {
-    for (event in events) {
-      yield(event)
-    }
-  }
+  fun yieldAll(events: Iterator<T>) = events.forEach(::yield)
 
   /**
    * Appends an [Iterable] of events to the operations of this site.
    *
    * @param events the events that will be added to the log.
    */
-  fun yieldAll(
-      events: Iterable<T>,
-  ) {
-    yieldAll(events.iterator())
-  }
+  fun yieldAll(events: Iterable<T>) = yieldAll(events.iterator())
 }

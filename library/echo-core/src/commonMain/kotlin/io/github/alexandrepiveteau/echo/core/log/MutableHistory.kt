@@ -8,10 +8,4 @@ package io.github.alexandrepiveteau.echo.core.log
  *
  * @see MutableEventLog a variation of [MutableEventLog] with no incremental state
  */
-interface MutableHistory<out T> : MutableEventLog {
-
-  /**
-   * The [current] value of the aggregated [MutableHistory].
-   */
-  val current: T
-}
+interface MutableHistory<out T> : History<T>, MutableEventLog

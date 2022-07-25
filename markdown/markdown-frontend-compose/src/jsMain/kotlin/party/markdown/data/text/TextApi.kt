@@ -2,6 +2,7 @@ package party.markdown.data.text
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import party.markdown.cursors.CursorEvent
 import party.markdown.cursors.Cursors
@@ -17,7 +18,7 @@ interface TextApi {
    */
   fun current(
       id: TreeNodeIdentifier,
-  ): StateFlow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>>
+  ): Flow<Triple<CharArray, EventIdentifierArray, Set<Cursors.Cursor>>>
 
   /**
    * Emits some [RGAEvent] for the replicated growable array associated with a certain

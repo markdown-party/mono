@@ -5,6 +5,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.sync
 import io.github.alexandrepiveteau.echo.sync.SyncStrategy
+import kotlinx.coroutines.flow.first
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -46,6 +47,6 @@ class MarkdownPartyEventTest {
     }
     sync(alice, bob)
     assertEquals(5, aliceHistory.size)
-    assertContentEquals(charArrayOf('a', 'b', 'c'), bob.value.documents[file]?.first)
+    assertContentEquals(charArrayOf('a', 'b', 'c'), bob.value.first().documents[file]?.first)
   }
 }
