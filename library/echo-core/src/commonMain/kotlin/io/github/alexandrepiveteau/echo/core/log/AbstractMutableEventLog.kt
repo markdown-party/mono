@@ -30,134 +30,30 @@ abstract class AbstractMutableEventLog(
     get() = eventStore.size
 
   /**
-   * Returns true if the insertion of an event with [seqno] and [site] would require moving back in
-   * the log. If the event could be inserted at the current index, `true` will be returned.
+   * Retrieves the [BlockLog] for the given [SiteIdentifier].
+   *
+   * @param site the [SiteIdentifier] for which the [BlockLog] is retrieved.
+   * @return the [BlockLog] for the given site.
    */
-  private fun shouldInsertBefore(
+  private fun site(site: SiteIdentifier) = eventStoreBySite.getOrPut(site) { BlockLog() }
+
+  /**
+   * Moves the [MutableEventIterator] to the right index for insertion of the given event, assuming
+   * all the events are linearly ordered.
+   *
+   * @see MutableEventIterator.add
+   */
+  private fun MutableEventIterator.addOrdered(
       seqno: SequenceNumber,
       site: SiteIdentifier,
-  ): Boolean {
-    return eventStore.hasPrevious && EventIdentifier(seqno, site) <= eventStore.lastId
-  }
-
-  /**
-   * Returns true if the insertion of an event with [seqno] and [site] would require moving forward
-   * the log. This looks at the current log value (if available). If the event could be inserted
-   * after, `true` will be returned.
-   */
-  private fun shouldInsertAfter(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Boolean {
-    return eventStore.hasCurrent && EventIdentifier(seqno, site) > eventStore.currentId
-  }
-
-  /**
-   * Moves the event cursor back, dismissing all the changes associated with the current event if
-   * needed.
-   */
-  open fun moveLeft() {
-    check(eventStore.hasPrevious) { "Can't move backward if at start." }
-
-    // Move the event to the right of the cursor. The event cursor is shifted only after it has been
-    // reversed with all the changes, to ensure that the content is read (and not the gap, which may
-    // have unreliable data).
-    eventStore.moveLeft()
-  }
-
-  /**
-   * Moves the projection forward, meaning that the event at the current cursor index will be used
-   * to generate some changes and move the aggregated value forward.
-   */
-  open fun moveRight() {
-    eventStore.moveRight()
-  }
-
-  /**
-   * Pushes the given event at the current gap position, without moving it. This also populates the
-   * site-specific [BlockLog] with the given event.
-   */
-  private fun pushAtGapWithoutMove(
-      id: EventIdentifier,
-      array: ByteArray,
-      from: Int = 0,
-      until: Int = array.size,
+      event: ByteArray,
+      from: Int,
+      until: Int,
   ) {
-    eventStore.pushAtGapWithoutMove(
-        id = id,
-        array = array,
-        from = from,
-        until = until,
-    )
-    eventStoreBySite
-        .getOrPut(id.site) { BlockLog() }
-        .pushAtId(
-            id = id,
-            array = array,
-            from = from,
-            until = until,
-        )
-    notifyLogListeners()
-  }
-
-  /**
-   * Removes the event at the given gap position, without moving it. Because of the removal, the
-   * next event will then be place directly at the current cursor position.
-   */
-  private fun removeAtGapWithoutMove() {
-    val id = eventStore.currentId
-    eventStore.removeCurrent()
-    eventStoreBySite[id.site]?.removeById(id)
-    notifyLogListeners()
-  }
-
-  /**
-   * Partially inserts the given event, but does not move the gap afterwards. This method does not
-   * make the assumption that the event may be inserted at the current index. Rather, it will
-   * iterate to the right / left until it may insert the event, and push it without moving the gap.
-   */
-  protected open fun partialInsert(
-      id: EventIdentifier,
-      array: ByteArray,
-      from: Int = 0,
-      until: Int = array.size
-  ) {
-    // Fast return.
-    if (contains(id.seqno, id.site)) return
-
-    // Insert the event.
-    acknowledge(id.seqno, id.site)
-    while (shouldInsertBefore(id.seqno, id.site)) moveLeft()
-    while (shouldInsertAfter(id.seqno, id.site)) moveRight()
-    pushAtGapWithoutMove(id, array, from, until)
-  }
-
-  /**
-   * Partially removes the given event, but does not move the gap afterwards. This method does not
-   * make the assumption that it is correctly positioned on the event. Rather, it will move left and
-   * right until it finds the event to remove, and only then remove it without moving the gap.
-   */
-  protected open fun partialRemove(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Boolean {
-    // Fast return.
-    if (!contains(seqno, site)) return false
-
-    // Move the right index.
-    while (shouldInsertBefore(seqno, site)) moveLeft()
-    while (shouldInsertAfter(seqno, site)) moveRight()
-
-    // Make sure we only remove an op if it's actually there with the right index.
-    if (!eventStore.hasCurrent) return false
-    if (eventStore.currentId != EventIdentifier(seqno, site)) return false
-
-    removeAtGapWithoutMove()
-    return true
-  }
-
-  private fun resetCursor() {
-    while (eventStore.hasCurrent) moveRight()
+    val id = EventIdentifier(seqno, site)
+    while (hasPrevious() && EventIdentifier(previousSeqno, previousSite) > id) movePrevious()
+    while (hasNext() && EventIdentifier(nextSeqno, nextSite) < id) moveNext()
+    add(seqno, site, event, from, until)
   }
 
   override fun insert(
@@ -165,29 +61,33 @@ abstract class AbstractMutableEventLog(
       site: SiteIdentifier,
       event: ByteArray,
       from: Int,
-      until: Int
+      until: Int,
   ) {
 
     // Input sanitization.
     require(seqno.isSpecified)
     requireRange(from, until, event)
 
-    // State checks
-    check(!eventStore.hasCurrent) { "cursor should be at end" }
+    // Don't add existing events.
+    if (EventIdentifier(seqno, site) in this) return
 
-    partialInsert(EventIdentifier(seqno, site), event, from, until).apply { resetCursor() }
+    // Acknowledge the new event.
+    acknowledge(seqno, site)
+
+    // Adding the event in the iterators.
+    eventStore.iteratorAtEnd().addOrdered(seqno, site, event, from, until)
+    site(site).iteratorAtEnd().addOrdered(seqno, site, event, from, until)
+    notifyLogListeners()
   }
 
-  override fun contains(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Boolean = acknowledgedMap.contains(seqno, site)
+  override fun contains(seqno: SequenceNumber, site: SiteIdentifier): Boolean =
+      acknowledgedMap.contains(seqno, site)
 
   override fun append(
       site: SiteIdentifier,
       event: ByteArray,
       from: Int,
-      until: Int
+      until: Int,
   ): EventIdentifier {
     val seqno = acknowledgedMap.expected()
     insert(
@@ -197,21 +97,15 @@ abstract class AbstractMutableEventLog(
         from = from,
         until = until,
     )
-    notifyLogListeners()
     return EventIdentifier(seqno, site)
   }
 
-  override fun acknowledge(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ) {
+  override fun acknowledge(seqno: SequenceNumber, site: SiteIdentifier) {
     acknowledgedMap.acknowledge(seqno, site)
     notifyLogListeners()
   }
 
-  override fun acknowledge(
-      from: EventLog,
-  ): MutableEventLog {
+  override fun acknowledge(from: EventLog): MutableEventLog {
     acknowledgedMap.acknowledge(from.acknowledged())
     notifyLogListeners()
     return this
@@ -219,47 +113,47 @@ abstract class AbstractMutableEventLog(
 
   override fun acknowledged(): EventIdentifierArray = acknowledgedMap.toEventIdentifierArray()
 
-  override fun iterator(): EventIterator = eventStore.Iterator()
+  override fun iterator(): EventIterator = eventStore.iteratorAtEnd()
 
-  override fun iterator(
-      site: SiteIdentifier,
-  ): EventIterator {
-    return eventStoreBySite[site]?.Iterator() ?: EmptyEventIterator
+  override fun iterator(site: SiteIdentifier): EventIterator {
+    return site(site).iteratorAtEnd()
   }
 
-  override fun merge(
-      from: EventLog,
-  ): MutableEventLog {
-
-    // Fast success.
-    if (from.size == 0) return this
-
+  override fun merge(from: EventLog): MutableEventLog {
     val iterator = from.iterator()
     while (iterator.hasPrevious()) iterator.movePrevious()
-
-    var keepGoing = true
-    while (keepGoing) {
-      partialInsert(
-          id = EventIdentifier(iterator.seqno, iterator.site),
-          array = iterator.event.copyOfRange(iterator.from, iterator.until),
+    while (iterator.hasNext()) {
+      iterator.moveNext()
+      insert(
+          seqno = iterator.previousSeqno,
+          site = iterator.previousSite,
+          event = iterator.previousEvent.copyOfRange(iterator.previousFrom, iterator.previousUntil),
       )
-      keepGoing = iterator.hasNext()
-      if (keepGoing) iterator.moveNext()
     }
-
-    resetCursor()
     return this
   }
 
-  override fun remove(
-      seqno: SequenceNumber,
-      site: SiteIdentifier,
-  ): Boolean {
+  override fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean {
 
     // Input sanitization.
     require(seqno.isSpecified)
 
-    return partialRemove(seqno, site).apply { resetCursor() }
+    val id = EventIdentifier(seqno, site)
+    var removed = false
+
+    val iterators = setOf(eventStore.iteratorAtEnd(), site(site).iteratorAtEnd())
+    for (iterator in iterators) {
+      loop@ while (iterator.hasPrevious()) {
+        iterator.movePrevious()
+        if (EventIdentifier(iterator.nextSeqno, iterator.nextSite) == id) {
+          iterator.remove()
+          removed = true
+          break@loop
+        }
+      }
+    }
+
+    return removed
   }
 
   override fun clear() {

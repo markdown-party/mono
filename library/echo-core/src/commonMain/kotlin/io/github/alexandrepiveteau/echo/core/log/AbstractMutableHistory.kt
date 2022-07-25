@@ -8,6 +8,8 @@ import kotlinx.datetime.Clock
  * to incrementally update the model.
  *
  * @param clock the [Clock] used to integrate new events.
+ *
+ * TODO : Re-implement this.
  */
 abstract class AbstractMutableHistory<T>(
     initial: T,
@@ -20,18 +22,18 @@ abstract class AbstractMutableHistory<T>(
 
   // The ChangeScope that will be provided to the projection whenever some changes mush be appended
   // to the history of changes.
-  private val scope = ChangeScope { array, from, until ->
-    changeStore.pushAtGap(
-        id = eventStore.lastId,
-        array = array,
-        from = from,
-        until = until,
-    )
+  private val scope = ChangeScope { _, _, _ ->
+    // changeStore.pushAtGap(
+    //     id = eventStore.lastId,
+    //     array = array,
+    //     from = from,
+    //     until = until,
+    // )
   }
 
   private val changeStore = BlockLog()
 
-  override fun moveLeft() {
+  /*override fun moveLeft() {
     // Remove all the associated changes.
     reverseChange@ while (changeStore.hasPrevious) {
 
@@ -74,7 +76,7 @@ abstract class AbstractMutableHistory<T>(
               until = eventStore.lastUntil,
           )
         }
-  }
+  }*/
 
   override fun clear() {
     changeStore.clear()

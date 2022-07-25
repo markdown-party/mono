@@ -4,6 +4,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.core.log.EventIterator
+import io.github.alexandrepiveteau.echo.core.log.moveBefore
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
@@ -175,46 +176,6 @@ private object EventComparator : Comparator<Event> {
 }
 
 /**
- * Moves the given [EventIterator] until the event identifier formed by the provided
- * [SequenceNumber] and [SiteIdentifier] is present on the current index, or should be present if it
- * was to be included in the log.
- *
- * If the iterator is empty, it will not move.
- */
-private fun EventIterator.moveAt(
-    seqno: SequenceNumber,
-    site: SiteIdentifier,
-) {
-
-  // Start from the right hand-side.
-  while (hasNext()) moveNext()
-  if (hasPrevious()) movePrevious()
-
-  // We have an empty iterator.
-  if (!has()) return
-
-  // Iterate to the left, until we either can't move anymore, or are on an event identifier that is
-  // smaller than the given value.
-  while (true) {
-
-    // Check the current item.
-    when {
-      EventIdentifier(this.seqno, this.site) == EventIdentifier(seqno, site) -> return
-      EventIdentifier(this.seqno, this.site) < EventIdentifier(seqno, site) -> {
-        if (hasNext()) moveNext()
-        return
-      }
-      else -> {
-        // If we reached the start of the iterator, stop here. Otherwise, we can move to the
-        // previous item to check for equality.
-        if (!hasPrevious()) return
-        movePrevious()
-      }
-    }
-  }
-}
-
-/**
  * Takes as many events as available in the [credits] (for the given [index]) and adds them to the
  * [queue]. If an event is taken, the [requests] array is updated.
  */
@@ -226,38 +187,27 @@ private fun EventIterator.take(
     advertised: MutableEventIdentifierGapBuffer,
     stopAfterAdvertised: Boolean,
 ) {
-
-  if (!has()) return // Empty iterator.
-  if (EventIdentifier(seqno, site) < requests[index]) return // No interesting event.
-
   while (true) {
+
+    // We have reached the end of the available events.
+    if (!hasNext()) return
 
     // We have a valid event. Check if we have the credits for it, and if so, add it to the queue.
     if (credits[index].toUInt() == 0U) return
 
     // Do not enqueue events if we have already reached the advertised threshold.
     if (stopAfterAdvertised) {
-      val adIndex = advertised.binarySearchBySite(site)
+      val adIndex = advertised.binarySearchBySite(nextSite)
       if (adIndex < 0) return
-      if (seqno > advertised[adIndex].seqno) return
+      if (nextSeqno > advertised[adIndex].seqno) return
     }
 
     // Update the credits and requests.
     credits[index] = (credits[index].toUInt() - 1U).toInt()
-    requests[index] = EventIdentifier(seqno + 1U, site)
+    requests[index] = EventIdentifier(nextSeqno + 1U, nextSite)
 
     // Add the event to the queue.
-    queue.add(
-        Event(
-            seqno = seqno,
-            site = site,
-            data = event.copyOfRange(from, until),
-        ),
-    )
-
-    // Move to the next event, if possible.
-    if (!hasNext()) return
-    moveNext()
+    queue.add(next())
   }
 }
 
@@ -274,7 +224,7 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
   withEventLogLock {
     for (i in 0 until requests.size) {
       val (seqno, site) = requests[i]
-      val iterator = iterator(site).apply { moveAt(seqno, site) }
+      val iterator = iterator(site).apply { moveBefore(seqno, site) }
       iterator.take(
           index = i,
           requests = requests,

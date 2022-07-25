@@ -63,16 +63,16 @@ class MutableEventLogRemoveTest {
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(6, 7, 8, 9),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 2u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 2u, iterator.nextSeqno)
       assertTrue(iterator.hasPrevious())
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(1, 2),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 0u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 0u, iterator.nextSeqno)
       assertFalse(iterator.hasPrevious())
     }
 
@@ -93,16 +93,16 @@ class MutableEventLogRemoveTest {
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(6, 7, 8, 9),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 2u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 2u, iterator.nextSeqno)
       assertTrue(iterator.hasPrevious())
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(3, 4, 5),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 1u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 1u, iterator.nextSeqno)
       assertFalse(iterator.hasPrevious())
     }
 
@@ -123,16 +123,16 @@ class MutableEventLogRemoveTest {
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(3, 4, 5),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 1u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 1u, iterator.nextSeqno)
       assertTrue(iterator.hasPrevious())
       iterator.movePrevious()
       assertContentEquals(
           byteArrayOf(1, 2),
-          iterator.event.copyOfRange(iterator.from, iterator.until),
+          iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil),
       )
-      assertEquals(SequenceNumber.Min + 0u, iterator.seqno)
+      assertEquals(SequenceNumber.Min + 0u, iterator.nextSeqno)
       assertFalse(iterator.hasPrevious())
     }
 

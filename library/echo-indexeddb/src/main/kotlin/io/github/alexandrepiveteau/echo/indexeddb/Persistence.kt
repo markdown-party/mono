@@ -2,7 +2,6 @@ package io.github.alexandrepiveteau.echo.indexeddb
 
 import com.juul.indexeddb.Key
 import io.github.alexandrepiveteau.echo.Exchange
-import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.core.log.EventIterator
 import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
@@ -15,15 +14,6 @@ import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 /** Transforms the events from the provided [EventIterator] into a [List] of [Event]. */
 private fun EventIterator.toList(): List<Event> = buildList {
   while (hasPrevious()) movePrevious()
-  if (has()) {
-    add(
-        Event(
-            seqno = seqno,
-            site = site,
-            data = event.copyOfRange(from, until),
-        ),
-    )
-  }
   while (hasNext()) add(next())
 }
 

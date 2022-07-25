@@ -1,7 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
-import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import kotlinx.serialization.SerialName
@@ -13,21 +13,6 @@ import kotlinx.serialization.Serializable
  * objects on each iteration.
  */
 interface EventIterator : ListIterator<Event> {
-
-  override fun next(): Event {
-    check(hasNext()) { "No next element." }
-    moveNext()
-    return Event(seqno, site, event.copyOfRange(from, until))
-  }
-
-  override fun previous(): Event {
-    check(hasPrevious()) { "No previous element." }
-    movePrevious()
-    return Event(seqno, site, event.copyOfRange(from, until))
-  }
-
-  /** Returns true if the iterator has an item at the current index. */
-  fun has(): Boolean
 
   /**
    * Moves the [EventIterator] to the next event, without allocations.
@@ -43,20 +28,58 @@ interface EventIterator : ListIterator<Event> {
    */
   fun movePrevious()
 
-  /** The [SequenceNumber] of the current event. */
-  val seqno: SequenceNumber
+  /** The [SequenceNumber] of the previous event. */
+  val previousSeqno: SequenceNumber
+  /** The [SiteIdentifier] of the previous event. */
+  val previousSite: SiteIdentifier
+  /** The body of the previous event, between [previousFrom] and [previousUntil]. */
+  val previousEvent: MutableByteGapBuffer
+  /** The start of the previous event body. */
+  val previousFrom: Int
+  /** The end (non-inclusive) of previous event body. */
+  val previousUntil: Int
 
-  /** The [SiteIdentifier] of the current event. */
-  val site: SiteIdentifier
+  /** The [SequenceNumber] of the next event. */
+  val nextSeqno: SequenceNumber
+  /** The [SiteIdentifier] of the next event. */
+  val nextSite: SiteIdentifier
+  /** The body of the next event, between [nextFrom] and [nextUntil]. */
+  val nextEvent: MutableByteGapBuffer
+  /** The start of the next event body. */
+  val nextFrom: Int
+  /** The end (non-inclusive) of next event body. */
+  val nextUntil: Int
+}
 
-  /** The body of the events. You should only read the contents in the [from] to [until] range. */
-  val event: MutableByteGapBuffer
+/** Returns true iff the [EventIterator] is empty. */
+fun EventIterator.isEmpty(): Boolean {
+  return !hasPrevious() && !hasNext()
+}
 
-  /** The start of the event body. */
-  val from: Int
+/** Returns true iff the [EventIterator] is not empty. */
+fun EventIterator.isNotEmpty(): Boolean = !isEmpty()
 
-  /** The end (non-inclusive) of the event body. */
-  val until: Int
+/** Moves the [EventIterator] to its start, without allocations. */
+fun EventIterator.moveToStart() {
+  while (hasPrevious()) movePrevious()
+}
+
+/** Moves the [EventIterator] to its end, without allocations. */
+fun EventIterator.moveToEnd() {
+  while (hasNext()) moveNext()
+}
+
+/**
+ * Moves the [EventIterator] such that the next insertion position is available at
+ * [MutableEventIterator.add].
+ *
+ * @param seqno the [SequenceNumber] for insertions.
+ * @param site the [SiteIdentifier] for insertions.
+ */
+fun EventIterator.moveBefore(seqno: SequenceNumber, site: SiteIdentifier) {
+  moveToEnd()
+  val id = EventIdentifier(seqno, site)
+  while (hasPrevious() && EventIdentifier(previousSeqno, previousSite) > id) movePrevious()
 }
 
 /**

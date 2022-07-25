@@ -29,6 +29,17 @@ interface EventLog {
   fun contains(seqno: SequenceNumber, site: SiteIdentifier): Boolean
 
   /**
+   * Returns true if the event with the event with the given [EventIdentifier] is included in the
+   * [EventLog], or if any event with the same [SiteIdentifier] and a higher [SequenceNumber] has
+   * already been integrated.
+   *
+   * @param id the [EventIdentifier] to check for.
+   *
+   * @return `true` iff the event was already integrated.
+   */
+  operator fun contains(id: EventIdentifier) = contains(id.seqno, id.site)
+
+  /**
    * Returns an [EventIdentifierArray] with all the acknowledgements that have been issued by this
    * [MutableEventLog]. This [EventIdentifierArray] only contains one [EventIdentifier] per
    * [SiteIdentifier].
