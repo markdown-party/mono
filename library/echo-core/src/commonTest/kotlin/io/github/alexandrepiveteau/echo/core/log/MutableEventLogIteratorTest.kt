@@ -62,7 +62,7 @@ class MutableEventLogIteratorTest {
 
     val event2 = iterator.previous()
     assertTrue(iterator.hasPrevious())
-    assertFalse(iterator.hasNext())
+    assertTrue(iterator.hasNext())
     assertEquals(site2, event2.site)
     assertEquals(seq2, event2.seqno)
     assertContentEquals(data2, event2.data)
@@ -74,6 +74,7 @@ class MutableEventLogIteratorTest {
     assertEquals(seq1, event1.seqno)
     assertContentEquals(data1, event1.data)
 
+    iterator.next()
     val event2bis = iterator.next()
     assertEquals(event2, event2bis)
     assertFalse(iterator.hasNext())
