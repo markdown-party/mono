@@ -20,13 +20,13 @@ internal constructor(
 
   /** Increments this value. */
   operator fun inc(): SequenceNumber {
-    if (!isSpecified) return Unspecified // No-op on Unspecified values.
+    if (isUnspecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index.inc())
   }
 
   /** Adds a certain [count] to this value. */
   operator fun plus(count: UInt): SequenceNumber {
-    if (!isSpecified) return Unspecified // No-op on Unspecified values.
+    if (isUnspecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index + count)
   }
 
