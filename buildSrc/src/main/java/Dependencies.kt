@@ -2,9 +2,9 @@ object Versions {
   const val KotlinAllOpen = "1.6.21"
   const val KotlinBenchmark = "0.4.3"
   const val KotlinBinaryCompatibility = "0.10.0"
-  const val Ktor = "2.0.2"
 
   const val Compose = "1.2.0-alpha01-dev686"
+  const val Ktor = "2.0.2"
 }
 
 object Plugins {
