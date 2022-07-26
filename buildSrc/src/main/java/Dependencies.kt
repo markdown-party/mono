@@ -3,6 +3,8 @@ object Versions {
   const val Ktor = "2.0.2"
 
   const val Compose = "1.2.0-alpha01-dev686"
+
+  const val Jmh = "0.6.6"
 }
 
 object Plugins {
@@ -14,4 +16,6 @@ object Plugins {
   const val KotlinSerialization = "plugin.serialization"
 
   const val Compose = "org.jetbrains.compose"
+
+  const val Jmh = "me.champeau.jmh"
 }
