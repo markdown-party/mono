@@ -341,40 +341,6 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifie
 	public static final fun toUInt-C_LfJGE (I)I
 }
 
-public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog : io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
-	public fun <init> ()V
-	public fun <init> (Lkotlinx/datetime/Clock;)V
-	public synthetic fun <init> (Lkotlinx/datetime/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public fun acknowledge-qH2TBG0 (II)V
-	public fun acknowledged ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
-	protected fun addToLog-i3_qHKE (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;II[BII)V
-	public fun append-Q0QDvhs (I[BII)J
-	public fun clear ()V
-	public fun contains--MgKYFQ (J)Z
-	public fun contains-qH2TBG0 (II)Z
-	public fun getSize ()I
-	public fun insert-BnEfkuQ (II[BII)V
-	public fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
-	public fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
-	public fun iteratorAtEnd ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
-	public fun iteratorAtEnd-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
-	public fun merge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public fun registerLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
-	public fun remove-qH2TBG0 (II)Z
-	public fun unregisterLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
-}
-
-public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableHistory : io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog, io/github/alexandrepiveteau/echo/core/log/MutableHistory {
-	public fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;)V
-	public synthetic fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	protected fun addToLog-i3_qHKE (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;II[BII)V
-	public fun clear ()V
-	public final fun getCurrent ()Ljava/lang/Object;
-	public fun registerValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
-	public fun unregisterValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
-}
-
 public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
 	public static final fun mutableEventLogOf (Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static final fun mutableEventLogOf ([Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;

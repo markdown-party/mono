@@ -12,7 +12,7 @@ import kotlinx.datetime.Clock
  *
  * @param clock the [Clock] used to integrate new events.
  */
-abstract class AbstractMutableEventLog(
+internal abstract class AbstractMutableEventLog(
     clock: Clock = Clock.System,
 ) : MutableEventLog {
 
@@ -23,7 +23,7 @@ abstract class AbstractMutableEventLog(
   private val acknowledgedMap = MutableAcknowledgeMap(clock)
 
   // Storing the events and the changes.
-  internal val eventStore = BlockLog()
+  private val eventStore = BlockLog()
   private val eventStoreBySite = mutableMapOf<SiteIdentifier, BlockLog>()
 
   override val size: Int

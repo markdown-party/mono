@@ -12,7 +12,7 @@ import kotlinx.datetime.Clock
  *
  * @param clock the [Clock] used to integrate new events.
  */
-abstract class AbstractMutableHistory<T>(
+internal abstract class AbstractMutableHistory<T>(
     initial: T,
     private val projection: MutableProjection<T>,
     clock: Clock = Clock.System,
