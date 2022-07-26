@@ -33,15 +33,8 @@ class MutableCursors {
   /** `true` if the operation referenced in ids could be compacted. */
   private val shouldCompact = mutableGapBufferOf<Boolean>() // TODO : Specialize MutableGapBuffer
 
-  /**
-   * Returns the previous [EventIdentifier] for an [EventIdentifier] that would have resulted in a
-   * [put], but only if the operation allows for the compaction of operations.
-   */
-  internal fun previous(id: EventIdentifier): EventIdentifier {
-    val index = ids.binarySearchBySite(id.site)
-    if (index >= 0 && ids[index].seqno < id.seqno && shouldCompact[index]) return ids[index]
-    return EventIdentifier.Unspecified
-  }
+  /** The gap buffer of the candidate operations for compaction. */
+  internal val compactionCandidates = mutableEventIdentifierGapBufferOf()
 
   /**
    * Puts the cursor at a given [anchor] for a given [node], if its [id] is more recent than the
@@ -73,7 +66,14 @@ class MutableCursors {
       // We have already received some cursor events for this site. We'll compare the sequence
       // numbers of the events, and if we have a more recent event, we'll update the anchor, node
       // and localTimestamp fields.
-      if (ids[index].seqno >= id.seqno) return
+      if (ids[index].seqno >= id.seqno) {
+        if (compact) compactionCandidates.push(id) // We may compact the new operation.
+        return
+      }
+
+      // We may compact the previous element.
+      if (shouldCompact[index]) compactionCandidates.push(ids[index])
+
       ids[index] = id
       nodes[index] = node
       anchors[index] = anchor
