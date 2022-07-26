@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core.log
+package io.github.alexandrepiveteau.echo.core.log.buffer
 
 import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuffer
 import io.github.alexandrepiveteau.echo.core.buffer.binarySearchBySite
