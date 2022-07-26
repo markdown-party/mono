@@ -1,6 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   kotlin(Plugins.KotlinSerialization)
+  id(Plugins.KotlinAllOpen)
   id(Plugins.KotlinBenchmark)
   id(Plugins.KotlinBinaryCompatibility)
 }
@@ -48,3 +49,5 @@ kotlin {
 }
 
 benchmark { targets { register("jvmBenchmarks") } }
+
+allOpen { annotation("org.openjdk.jmh.annotations.State") }

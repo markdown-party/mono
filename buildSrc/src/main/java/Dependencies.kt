@@ -1,4 +1,5 @@
 object Versions {
+  const val KotlinAllOpen = "1.6.21"
   const val KotlinBenchmark = "0.4.3"
   const val KotlinBinaryCompatibility = "0.10.0"
   const val Ktor = "2.0.2"
@@ -7,6 +8,7 @@ object Versions {
 }
 
 object Plugins {
+  const val KotlinAllOpen = "org.jetbrains.kotlin.plugin.allopen"
   const val KotlinMultiplatform = "multiplatform"
   const val KotlinJvm = "jvm"
   const val KotlinJs = "js"

@@ -22,6 +22,7 @@ allprojects {
 }
 
 plugins {
+  id(Plugins.KotlinAllOpen) version Versions.KotlinAllOpen apply false
   id(Plugins.KotlinBenchmark) version Versions.KotlinBenchmark apply false
   id(Plugins.KotlinBinaryCompatibility) version Versions.KotlinBinaryCompatibility apply false
   id(Plugins.Compose) version Versions.Compose apply false
