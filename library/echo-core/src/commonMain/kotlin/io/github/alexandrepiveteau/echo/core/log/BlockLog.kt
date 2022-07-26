@@ -110,7 +110,7 @@ internal class BlockLog {
     override fun remove() {
       checkToken()
       check(lastCursorNextBlock != NoIndex)
-      check(lastCursorNextBlock != NoIndex)
+      check(lastCursorNextIndex != NoIndex)
       blocks.remove(lastCursorNextBlock, blockSizes[lastCursorNextIndex])
       blockSizes.remove(lastCursorNextIndex, 1)
       blockIds.remove(lastCursorNextIndex, 1)

@@ -59,7 +59,7 @@ abstract class AbstractMutableHistory<T>(
     movePrevious()
     while (hasNext()) {
       moveNext()
-      changeIterator.withScope(seqno, site) {
+      changeIterator.withScope(previousSeqno, previousSite) {
         with(projection) {
           current =
               forward(

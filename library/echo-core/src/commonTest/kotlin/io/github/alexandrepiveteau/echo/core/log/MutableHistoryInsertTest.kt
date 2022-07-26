@@ -4,9 +4,11 @@ import io.github.alexandrepiveteau.echo.core.buffer.MutableByteGapBuffer
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 class MutableHistoryInsertTest {
 
@@ -82,5 +84,24 @@ class MutableHistoryInsertTest {
     history.merge(from = history2)
 
     assertContentEquals(listOf(1, 1, 1, 3, 3, 3, 2, 2), history.current)
+  }
+
+  @Test
+  fun complex_reordering() {
+    val history = mutableHistoryOf(emptyList(), Projection)
+    val alice = SiteIdentifier.Min
+    val bob = SiteIdentifier.Max
+    val zero = SequenceNumber.Min
+    val one = SequenceNumber.Min + 1U
+    val two = SequenceNumber.Min + 2U
+
+    history.insert(zero, alice, byteArrayOf(1))
+    history.insert(one, alice, byteArrayOf(2))
+    history.insert(two, alice, byteArrayOf(3))
+    history.insert(zero, bob, byteArrayOf(4))
+    history.insert(one, bob, byteArrayOf(5))
+
+    assertEquals(5, history.size)
+    assertEquals(listOf<Byte>(1, 4, 2, 5, 3), history.current)
   }
 }
