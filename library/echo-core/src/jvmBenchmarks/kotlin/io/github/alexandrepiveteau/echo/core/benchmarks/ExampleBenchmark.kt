@@ -1,4 +1,4 @@
-package benchmarks
+package io.github.alexandrepiveteau.echo.core.benchmarks
 
 import kotlinx.benchmark.Benchmark
 
