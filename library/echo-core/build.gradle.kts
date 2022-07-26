@@ -4,6 +4,7 @@ plugins {
   id(Plugins.KotlinAllOpen)
   id(Plugins.KotlinBenchmark)
   id(Plugins.KotlinBinaryCompatibility)
+  id(Plugins.Dokka)
 }
 
 kotlin {
