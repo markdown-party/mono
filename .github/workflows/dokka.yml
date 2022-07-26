@@ -1,0 +1,28 @@
+name: publish documentation
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎁 Checkout repo
+        uses: actions/checkout@v2
+      - name: ☕️ Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: 📖 Generate documentation
+        run: ./gradlew dokkaHtmlMultiModule
+      - name: Update Wiki
+        run: |
+          cd build/dokka/htmlMultiModule
+          git init .
+          git config user.name "${{github.actor}}"
+          git config user.email "${{github.actor}}@users.noreply.github.com"
+          git add .
+          git commit -m "Deployed the documentation 🚀"
+          git remote add origin https://${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
+          git push -u origin dokka --force
