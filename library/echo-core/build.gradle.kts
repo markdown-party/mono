@@ -1,6 +1,8 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   kotlin(Plugins.KotlinSerialization)
+  id(Plugins.KotlinAllOpen)
+  id(Plugins.KotlinBenchmark)
   id(Plugins.KotlinBinaryCompatibility)
 }
 
@@ -31,6 +33,10 @@ kotlin {
     }
     val jvmMain by getting
     val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
+    val jvmBenchmarks by creating {
+      dependsOn(commonMain)
+      dependencies { implementation(libs.benchmark) }
+    }
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
@@ -39,4 +45,9 @@ kotlin {
       languageSettings.optIn("kotlin.time.ExperimentalTime")
     }
   }
+  targets { jvm { compilations.create("benchmarks") } }
 }
+
+benchmark { targets { register("jvmBenchmarks") } }
+
+allOpen { annotation("org.openjdk.jmh.annotations.State") }

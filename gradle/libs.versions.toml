@@ -1,6 +1,7 @@
 [versions]
 
 kotlin = "1.6.21"
+benchmark = "0.4.3"
 binarycompatibility = "0.8.0"
 compose = "1.2.0-alpha01-dev686"
 coroutines = "1.6.0"
@@ -12,6 +13,8 @@ serialization = "1.3.2"
 slf4j = "1.7.21"
 
 [libraries]
+
+benchmark = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "benchmark" }
 
 coroutines-core-common = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-core-js = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js", version.ref = "coroutines" }
