@@ -15,14 +15,16 @@ class MutableEventLogIteratorTest {
     val iterator = log.iterator()
     assertFalse(iterator.hasPrevious())
     assertFalse(iterator.hasNext())
-    assertFails { iterator.seqno }
+    assertFails { iterator.nextSeqno }
     assertFails { iterator.moveNext() }
+    assertFails { iterator.previousSeqno }
     assertFails { iterator.movePrevious() }
     val siteIterator = log.iterator(SiteIdentifier.Min)
     assertFalse(siteIterator.hasPrevious())
     assertFalse(siteIterator.hasNext())
-    assertFails { siteIterator.seqno }
+    assertFails { siteIterator.nextSeqno }
     assertFails { siteIterator.moveNext() }
+    assertFails { siteIterator.previousSeqno }
     assertFails { siteIterator.movePrevious() }
   }
 
@@ -31,18 +33,18 @@ class MutableEventLogIteratorTest {
     val site = SiteIdentifier.Min
     val data = byteArrayOf(1, 2, 3)
     val log = mutableEventLogOf(ZeroClock).apply { append(site, data) }
-    val iterator = log.iterator()
+    val iterator = log.iteratorAtEnd()
     assertTrue(iterator.hasPrevious())
     assertFalse(iterator.hasNext())
     assertFails { iterator.moveNext() }
     iterator.movePrevious()
     assertFalse(iterator.hasPrevious())
-    assertFalse(iterator.hasNext())
-    assertEquals(site, iterator.site)
-    assertEquals(SequenceNumber.Min, iterator.seqno)
-    assertEquals(0, iterator.from)
-    assertEquals(3, iterator.until)
-    assertContentEquals(data, iterator.event.copyOfRange(iterator.from, iterator.until))
+    assertTrue(iterator.hasNext())
+    assertEquals(site, iterator.nextSite)
+    assertEquals(SequenceNumber.Min, iterator.nextSeqno)
+    assertEquals(0, iterator.nextFrom)
+    assertEquals(3, iterator.nextUntil)
+    assertContentEquals(data, iterator.nextEvent.copyOfRange(iterator.nextFrom, iterator.nextUntil))
   }
 
   @Test
@@ -56,11 +58,11 @@ class MutableEventLogIteratorTest {
     val (seq1, _) = log.append(site1, data1)
     val (seq2, _) = log.append(site2, data2)
 
-    val iterator = log.iterator()
+    val iterator = log.iteratorAtEnd()
 
     val event2 = iterator.previous()
     assertTrue(iterator.hasPrevious())
-    assertFalse(iterator.hasNext())
+    assertTrue(iterator.hasNext())
     assertEquals(site2, event2.site)
     assertEquals(seq2, event2.seqno)
     assertContentEquals(data2, event2.data)
@@ -72,6 +74,7 @@ class MutableEventLogIteratorTest {
     assertEquals(seq1, event1.seqno)
     assertContentEquals(data1, event1.data)
 
+    iterator.next()
     val event2bis = iterator.next()
     assertEquals(event2, event2bis)
     assertFalse(iterator.hasNext())

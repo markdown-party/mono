@@ -348,19 +348,18 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableE
 	public fun acknowledge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public fun acknowledge-qH2TBG0 (II)V
 	public fun acknowledged ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	protected fun addToLog-i3_qHKE (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;II[BII)V
 	public fun append-Q0QDvhs (I[BII)J
 	public fun clear ()V
+	public fun contains--MgKYFQ (J)Z
 	public fun contains-qH2TBG0 (II)Z
 	public fun getSize ()I
 	public fun insert-BnEfkuQ (II[BII)V
 	public fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 	public fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public fun iteratorAtEnd ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public fun iteratorAtEnd-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 	public fun merge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
-	public fun moveLeft ()V
-	public fun moveRight ()V
-	protected fun partialInsert-PdOoclA (J[BII)V
-	public static synthetic fun partialInsert-PdOoclA$default (Lio/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog;J[BIIILjava/lang/Object;)V
-	protected fun partialRemove-qH2TBG0 (II)Z
 	public fun registerLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
 	public fun remove-qH2TBG0 (II)Z
 	public fun unregisterLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
@@ -369,10 +368,9 @@ public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableE
 public abstract class io/github/alexandrepiveteau/echo/core/log/AbstractMutableHistory : io/github/alexandrepiveteau/echo/core/log/AbstractMutableEventLog, io/github/alexandrepiveteau/echo/core/log/MutableHistory {
 	public fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;)V
 	public synthetic fun <init> (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	protected fun addToLog-i3_qHKE (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;II[BII)V
 	public fun clear ()V
 	public final fun getCurrent ()Ljava/lang/Object;
-	public fun moveLeft ()V
-	public fun moveRight ()V
 	public fun registerValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
 	public fun unregisterValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
 }
@@ -434,35 +432,72 @@ public final class io/github/alexandrepiveteau/echo/core/log/Event$Companion {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventIterator : java/util/ListIterator, kotlin/jvm/internal/markers/KMappedMarker {
-	public abstract fun getEvent ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
-	public abstract fun getFrom ()I
-	public abstract fun getSeqno-iWHgJgY ()I
-	public abstract fun getSite-ix6DSBw ()I
-	public abstract fun getUntil ()I
-	public abstract fun has ()Z
+	public abstract fun getNextEvent ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
+	public abstract fun getNextEventIdentifier-Fj5ptdU ()J
+	public abstract fun getNextFrom ()I
+	public abstract fun getNextSeqno-iWHgJgY ()I
+	public abstract fun getNextSite-ix6DSBw ()I
+	public abstract fun getNextUntil ()I
+	public abstract fun getPreviousEvent ()Lio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;
+	public abstract fun getPreviousEventIdentifier-Fj5ptdU ()J
+	public abstract fun getPreviousFrom ()I
+	public abstract fun getPreviousSeqno-iWHgJgY ()I
+	public abstract fun getPreviousSite-ix6DSBw ()I
+	public abstract fun getPreviousUntil ()I
 	public abstract fun moveNext ()V
 	public abstract fun movePrevious ()V
-	public abstract fun next ()Lio/github/alexandrepiveteau/echo/core/log/Event;
-	public abstract fun previous ()Lio/github/alexandrepiveteau/echo/core/log/Event;
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/EventIterator$DefaultImpls {
-	public static fun next (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)Lio/github/alexandrepiveteau/echo/core/log/Event;
-	public static fun previous (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)Lio/github/alexandrepiveteau/echo/core/log/Event;
+	public static fun getNextEventIdentifier-Fj5ptdU (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)J
+	public static fun getPreviousEventIdentifier-Fj5ptdU (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)J
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/EventIteratorKt {
+	public static final fun isEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)Z
+	public static final fun isNotEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)Z
+	public static final fun movePreviousWhile (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;Lkotlin/jvm/functions/Function1;)V
+	public static final fun moveToEnd (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)V
+	public static final fun moveToStart (Lio/github/alexandrepiveteau/echo/core/log/EventIterator;)V
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventLog {
 	public abstract fun acknowledged ()Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	public abstract fun contains--MgKYFQ (J)Z
 	public abstract fun contains-qH2TBG0 (II)Z
 	public abstract fun getSize ()I
 	public abstract fun iterator ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 	public abstract fun iterator-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public abstract fun iteratorAtEnd ()Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
+	public abstract fun iteratorAtEnd-C_LfJGE (I)Lio/github/alexandrepiveteau/echo/core/log/EventIterator;
 	public abstract fun registerLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
 	public abstract fun unregisterLogUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
 }
 
+public final class io/github/alexandrepiveteau/echo/core/log/EventLog$DefaultImpls {
+	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/EventLog;J)Z
+}
+
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener {
-	public abstract fun onLogUpdated ()V
+	public abstract fun onAcknowledgement ()V
+	public abstract fun onCleared ()V
+	public abstract fun onInsert-BnEfkuQ (II[BII)V
+	public abstract fun onRegistered ()V
+	public abstract fun onRemoved-qH2TBG0 (II)V
+	public abstract fun onUnregistered ()V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener$DefaultImpls {
+	public static fun onAcknowledgement (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+	public static fun onCleared (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+	public static fun onInsert-BnEfkuQ (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;II[BII)V
+	public static fun onRegistered (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+	public static fun onRemoved-qH2TBG0 (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;II)V
+	public static fun onUnregistered (Lio/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdateListener;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/EventLogKt {
+	public static final fun toList (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Ljava/util/List;
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/EventLog_ExtensionsKt {
@@ -477,8 +512,22 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Histor
 	public abstract fun unregisterValueUpdateListener (Lio/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener;)V
 }
 
+public final class io/github/alexandrepiveteau/echo/core/log/History$DefaultImpls {
+	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/History;J)Z
+}
+
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/History$OnValueUpdateListener {
 	public abstract fun onValueUpdated (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableEventIterator : io/github/alexandrepiveteau/echo/core/log/EventIterator, java/util/ListIterator, kotlin/jvm/internal/markers/KMutableListIterator {
+	public abstract fun add-BnEfkuQ (II[BII)V
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/MutableEventIterator$DefaultImpls {
+	public static synthetic fun add-BnEfkuQ$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;II[BIIILjava/lang/Object;)V
+	public static fun getNextEventIdentifier-Fj5ptdU (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;)J
+	public static fun getPreviousEventIdentifier-Fj5ptdU (Lio/github/alexandrepiveteau/echo/core/log/MutableEventIterator;)J
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableEventLog : io/github/alexandrepiveteau/echo/core/log/EventLog {
@@ -493,10 +542,15 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 
 public final class io/github/alexandrepiveteau/echo/core/log/MutableEventLog$DefaultImpls {
 	public static synthetic fun append-Q0QDvhs$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;I[BIIILjava/lang/Object;)J
+	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;J)Z
 	public static synthetic fun insert-BnEfkuQ$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;II[BIIILjava/lang/Object;)V
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableHistory : io/github/alexandrepiveteau/echo/core/log/History, io/github/alexandrepiveteau/echo/core/log/MutableEventLog {
+}
+
+public final class io/github/alexandrepiveteau/echo/core/log/MutableHistory$DefaultImpls {
+	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;J)Z
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableProjection {

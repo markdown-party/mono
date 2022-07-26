@@ -45,7 +45,7 @@ internal constructor(
   operator fun component1(): SequenceNumber = SequenceNumber(unpackUInt1(packed))
   operator fun component2(): SiteIdentifier = SiteIdentifier(unpackUInt2(packed))
 
-  override fun toString(): String = "EventIdentifier(seqno = ${seqno.index}, site = ${site.unique})"
+  override fun toString(): String = "EventIdentifier(seqno = ${seqno}, site = ${site.unique})"
 
   companion object {
 
