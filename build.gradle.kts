@@ -26,6 +26,7 @@ plugins {
   id(Plugins.KotlinBenchmark) version Versions.KotlinBenchmark apply false
   id(Plugins.KotlinBinaryCompatibility) version Versions.KotlinBinaryCompatibility apply false
   id(Plugins.Compose) version Versions.Compose apply false
+  id(Plugins.Dokka) version Versions.Dokka
 }
 
 // Move the `yarn.lock` file for Kotlin/JS to the `./gradle` directory.

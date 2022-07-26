@@ -1,6 +1,7 @@
 plugins {
   kotlin(Plugins.KotlinJs)
   id(Plugins.KotlinBinaryCompatibility)
+  id(Plugins.Dokka)
 }
 
 kotlin {
