@@ -1,11 +1,13 @@
 plugins {
   kotlin(Plugins.KotlinMultiplatform)
   kotlin(Plugins.KotlinSerialization)
+  id(Plugins.KotlinBenchmark)
   id(Plugins.KotlinBinaryCompatibility)
 }
 
 kotlin {
   jvm {
+    compilations.create("benchmarks")
     compilations.all { kotlinOptions.jvmTarget = "1.8" }
     testRuns["test"].executionTask.configure { useJUnit() }
     withJava()
@@ -31,6 +33,7 @@ kotlin {
     }
     val jvmMain by getting
     val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
+    val jvmBenchmarks by existing { dependencies { implementation(libs.benchmark) } }
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
     all {
@@ -40,3 +43,5 @@ kotlin {
     }
   }
 }
+
+benchmark { targets { register("jvmBenchmarks") } }
