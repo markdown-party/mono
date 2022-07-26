@@ -5,6 +5,8 @@ https://opensource.org/licenses/MIT)
 [![.github/workflows/backend.yml](https://github.com/markdown-party/mono/actions/workflows/backend.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/backend.yml)
 [![.github/workflows/tests.yml](https://github.com/markdown-party/mono/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/markdown-party/mono/actions/workflows/tests.yml)
 
+[![.github/workflows/dokka.yml](https://github.com/markdown-party/mono/actions/workflows/dokka.yml/badge.svg?branch=main)](https://markdown-party.github.io/mono/)
+
 # Welcome to :rainbow: [markdown.party](https://markdown.party/) :rainbow:
 
 `markdown-party/mono` is a distributed collaborative Markdown editor, based on a replicated log of
@@ -17,8 +19,12 @@ CRDTs to replicate its state.
 
 ## Library and project walk-through
 
-> Many snippets from the walk-through can be found in the `sample-walkthrough` module. Make sure to
+The library documentation can be found on [GitHub Pages](https://markdown-party.github.io/mono/).
+
+> Many snippets from the walk-through can be found in the `samples/walkthrough` module. Make sure to
 > check them out and run them on your machine, to get a feel of how the library works !
+
+### Project walk-through
 
 1. [Introduction and basics](library/echo/README.md)
 2. [The low-level event log API](library/echo-core/README.md)
@@ -27,7 +33,7 @@ CRDTs to replicate its state.
 
 ## Local setup
 
-This project uses Kotlin 1.5.21 and is built with [Gradle](https://gradle.org). To run the unit
+This project uses Kotlin 1.6.21 and is built with [Gradle](https://gradle.org). To run the unit
 tests locally, please proceed as follows :
 
 ```bash
@@ -38,10 +44,10 @@ tests locally, please proceed as follows :
 > ./gradlew check
 
 # Run the markdown editor frontend and backend. You'll have to edit the configuration in the
-# file "markdown-frontend/src/main/kotlin/main.kt" to point to your localhost rather than the
-# production server.
-> ./gradlew markdown-backend:run
-> ./gradlew markdown-frontend:browserRun
+# file "markdown/markdown-frontend-compose/src/jsMain/kotlin/main.kt" to point to your localhost
+# rather than the production server.
+> ./gradlew markdown:markdown-backend:run
+> ./gradlew markdown:markdown-frontend-compose:jsBrowserRun
 ```
 
 ## Cheat sheet
