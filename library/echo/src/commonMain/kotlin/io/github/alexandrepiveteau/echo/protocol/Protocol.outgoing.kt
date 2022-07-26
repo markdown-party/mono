@@ -4,7 +4,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.log.Event
 import io.github.alexandrepiveteau.echo.core.log.EventIterator
-import io.github.alexandrepiveteau.echo.core.log.moveBefore
+import io.github.alexandrepiveteau.echo.core.log.movePreviousWhile
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
@@ -224,7 +224,8 @@ private suspend fun ExchangeScope<*, *>.enqueueEvents(
   withEventLogLock {
     for (i in 0 until requests.size) {
       val (seqno, site) = requests[i]
-      val iterator = iteratorAtEnd(site).apply { moveBefore(seqno, site) }
+      val iterator = iteratorAtEnd(site)
+      iterator.movePreviousWhile { previousEventIdentifier >= EventIdentifier(seqno, site) }
       iterator.take(
           index = i,
           requests = requests,
