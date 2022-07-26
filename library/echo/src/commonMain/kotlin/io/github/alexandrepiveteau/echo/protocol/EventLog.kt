@@ -1,5 +1,7 @@
 package io.github.alexandrepiveteau.echo.protocol
 
+import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.EventLog.OnLogUpdateListener
 import io.github.alexandrepiveteau.echo.core.log.History
@@ -26,8 +28,23 @@ internal fun EventLog.asMutationsFlow() = asBufferedMutationsFlow().buffer(CONFL
  */
 internal fun <T> History<T>.asCurrentFlow() = asBufferedCurrentFlow().buffer(CONFLATED)
 
+private class OnLogUpdateListenerAdapter(private val block: () -> Unit) : OnLogUpdateListener {
+  override fun onRegistered() = block()
+  override fun onAcknowledgement() = block()
+  override fun onInsert(
+      seqno: SequenceNumber,
+      site: SiteIdentifier,
+      data: ByteArray,
+      from: Int,
+      until: Int,
+  ) = block()
+  override fun onRemoved(seqno: SequenceNumber, site: SiteIdentifier) = block()
+  override fun onCleared() = block()
+  override fun onUnregistered() = block()
+}
+
 private fun EventLog.asBufferedMutationsFlow(): Flow<Unit> = callbackFlow {
-  val listener = OnLogUpdateListener { trySend(Unit) }
+  val listener = OnLogUpdateListenerAdapter { trySend(Unit) }
   registerLogUpdateListener(listener)
   awaitClose { unregisterLogUpdateListener(listener) }
 }

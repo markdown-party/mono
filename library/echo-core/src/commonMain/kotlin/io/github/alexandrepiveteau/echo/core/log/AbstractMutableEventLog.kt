@@ -90,7 +90,7 @@ abstract class AbstractMutableEventLog(
     // Adding the event in the iterators.
     eventStore.iteratorAtEnd().addToLog(seqno, site, event, from, until)
     site(site).iteratorAtEnd().addOrdered(seqno, site, event, from, until)
-    notifyLogListeners()
+    notifyLogListeners { onInsert(seqno, site, event, from, until) }
   }
 
   override fun contains(seqno: SequenceNumber, site: SiteIdentifier): Boolean =
@@ -115,12 +115,12 @@ abstract class AbstractMutableEventLog(
 
   override fun acknowledge(seqno: SequenceNumber, site: SiteIdentifier) {
     acknowledgedMap.acknowledge(seqno, site)
-    notifyLogListeners()
+    notifyLogListeners { onAcknowledgement() }
   }
 
   override fun acknowledge(from: EventLog): MutableEventLog {
     acknowledgedMap.acknowledge(from.acknowledged())
-    notifyLogListeners()
+    notifyLogListeners { onAcknowledgement() }
     return this
   }
 
@@ -168,24 +168,33 @@ abstract class AbstractMutableEventLog(
       }
     }
 
+    if (removed) notifyLogListeners { onRemoved(seqno, site) }
+
     return removed
   }
 
   override fun clear() {
     eventStore.clear()
     eventStoreBySite.clear()
-    notifyLogListeners()
+    notifyLogListeners { onCleared() }
   }
 
-  /** Notifies all the [OnLogUpdateListener]s that a change occurred. */
-  private fun notifyLogListeners() = listeners.toSet().forEach(OnLogUpdateListener::onLogUpdated)
+  /**
+   * Notifies all the [OnLogUpdateListener]s that a change occurred.
+   *
+   * @param block the [block] to execute.
+   */
+  private fun notifyLogListeners(
+      block: OnLogUpdateListener.() -> Unit,
+  ) = listeners.toSet().forEach(block)
 
   override fun registerLogUpdateListener(listener: OnLogUpdateListener) {
     listeners += listener
-    listener.onLogUpdated()
+    listener.onRegistered()
   }
 
   override fun unregisterLogUpdateListener(listener: OnLogUpdateListener) {
     listeners -= listener
+    listener.onUnregistered()
   }
 }

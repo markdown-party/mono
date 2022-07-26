@@ -35,6 +35,8 @@ internal constructor(
     return index.compareTo(other.index)
   }
 
+  override fun toString() = if (isUnspecified) "Unspecified" else index.toString()
+
   companion object {
 
     /**

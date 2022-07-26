@@ -79,10 +79,47 @@ interface EventLog {
   fun iteratorAtEnd(site: SiteIdentifier): EventIterator
 
   /** A listener which may be used to observe some changed performed on an [EventLog]. */
-  fun interface OnLogUpdateListener {
+  interface OnLogUpdateListener {
 
-    /** A callback which will be called whenever some updates are performed on an [EventLog]. */
-    fun onLogUpdated()
+    /** Called when the callback is registered. */
+    fun onRegistered() = Unit
+
+    /** Called after the acknowledgements of the [EventLog] are updated. */
+    fun onAcknowledgement() = Unit
+
+    /**
+     * Called after a new event has been inserted.
+     *
+     * @param seqno the [SequenceNumber] of the new event.
+     * @param site the [SiteIdentifier] of the new event.
+     * @param data the [ByteArray] which contains the event.
+     * @param from the start indices of the event.
+     * @param until the end indices of the event.
+     */
+    fun onInsert(
+        seqno: SequenceNumber,
+        site: SiteIdentifier,
+        data: ByteArray,
+        from: Int,
+        until: Int,
+    ) = Unit
+
+    /**
+     * Called after an event is removed.
+     *
+     * @param seqno the [SequenceNumber] of the removed event.
+     * @param site the [SiteIdentifier] of the removed event.
+     */
+    fun onRemoved(
+        seqno: SequenceNumber,
+        site: SiteIdentifier,
+    ) = Unit
+
+    /** Called when the log is cleared. */
+    fun onCleared() = Unit
+
+    /** Called when the callback is unregistered. */
+    fun onUnregistered() = Unit
   }
 
   /**
