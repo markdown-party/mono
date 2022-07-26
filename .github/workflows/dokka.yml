@@ -16,7 +16,7 @@ jobs:
           java-version: 1.11
       - name: 📖 Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
-      - name: Update Wiki
+      - name: ☁️ Update docs
         run: |
           cd build/dokka/htmlMultiModule
           git init .
