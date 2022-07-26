@@ -1,17 +1,19 @@
 package io.github.alexandrepiveteau.echo.core.log
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.log.buffer.AbstractGapBufferMutableEventLog
+import io.github.alexandrepiveteau.echo.core.log.buffer.AbstractGapBufferMutableHistory
 import kotlinx.datetime.Clock
 
-/** The actual implementation of [AbstractMutableHistory] used in the builders. */
+/** The actual implementation of [AbstractGapBufferMutableHistory] used in the builders. */
 private class ActualMutableHistory<T>(
     initial: T,
     projection: MutableProjection<T>,
     clock: Clock,
-) : AbstractMutableHistory<T>(initial, projection, clock)
+) : AbstractGapBufferMutableHistory<T>(initial, projection, clock)
 
-/** The actual implementation of [AbstractMutableEventLog] used in the builders. */
-private class ActualMutableEventLog(clock: Clock) : AbstractMutableEventLog(clock)
+/** The actual implementation of [AbstractGapBufferMutableEventLog] used in the builders. */
+private class ActualMutableEventLog(clock: Clock) : AbstractGapBufferMutableEventLog(clock)
 
 /**
  * Creates a new [MutableHistory], with an aggregate with an [initial] value and a [projection] for

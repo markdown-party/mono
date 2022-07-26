@@ -1,9 +1,11 @@
-package io.github.alexandrepiveteau.echo.core.log
+package io.github.alexandrepiveteau.echo.core.log.buffer
 
 import io.github.alexandrepiveteau.echo.core.buffer.*
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.Event
+import io.github.alexandrepiveteau.echo.core.log.MutableEventIterator
 import io.github.alexandrepiveteau.echo.core.requireRange
 
 /** A special sentinel value which indicates that an index is not set. */

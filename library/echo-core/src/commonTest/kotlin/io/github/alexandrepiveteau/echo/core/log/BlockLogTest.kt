@@ -3,6 +3,7 @@ package io.github.alexandrepiveteau.echo.core.log
 import io.github.alexandrepiveteau.echo.core.assertThrows
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.buffer.BlockLog
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

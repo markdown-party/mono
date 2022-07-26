@@ -1,9 +1,13 @@
-package io.github.alexandrepiveteau.echo.core.log
+package io.github.alexandrepiveteau.echo.core.log.buffer
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.log.ChangeScope
 import io.github.alexandrepiveteau.echo.core.log.History.OnValueUpdateListener
+import io.github.alexandrepiveteau.echo.core.log.MutableEventIterator
+import io.github.alexandrepiveteau.echo.core.log.MutableHistory
+import io.github.alexandrepiveteau.echo.core.log.MutableProjection
 import kotlinx.datetime.Clock
 
 /**
@@ -12,11 +16,11 @@ import kotlinx.datetime.Clock
  *
  * @param clock the [Clock] used to integrate new events.
  */
-internal abstract class AbstractMutableHistory<T>(
+internal abstract class AbstractGapBufferMutableHistory<T>(
     initial: T,
     private val projection: MutableProjection<T>,
     clock: Clock = Clock.System,
-) : AbstractMutableEventLog(clock), MutableHistory<T> {
+) : AbstractGapBufferMutableEventLog(clock), MutableHistory<T> {
 
   /** The [OnValueUpdateListener]s which should be notified when the value is updated. */
   private val listeners = mutableSetOf<OnValueUpdateListener<T>>()

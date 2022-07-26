@@ -1,4 +1,4 @@
-package io.github.alexandrepiveteau.echo.core.log
+package io.github.alexandrepiveteau.echo.core.log.buffer
 
 import io.github.alexandrepiveteau.echo.core.buffer.MutableEventIdentifierGapBuffer
 import io.github.alexandrepiveteau.echo.core.buffer.binarySearchBySite
@@ -81,16 +81,16 @@ private constructor(
   fun expected(): SequenceNumber {
     var max = clock.now().toSequenceNumber()
     for (i in 0 until backing.size) {
-      max = maxOf(max, backing[i].seqno.inc())
+      max = io.github.alexandrepiveteau.echo.core.causality.maxOf(max, backing[i].seqno.inc())
     }
-    return maxOf(max, SequenceNumber.Min)
+    return io.github.alexandrepiveteau.echo.core.causality.maxOf(max, SequenceNumber.Min)
   }
 
   /** Returns the next expected [SequenceNumber] for the given [SiteIdentifier]. */
   fun expected(site: SiteIdentifier): SequenceNumber {
     val physical = clock.now().toSequenceNumber()
     val logical = get(site).inc().takeOrElse { SequenceNumber.Min }
-    return maxOf(physical, logical)
+    return io.github.alexandrepiveteau.echo.core.causality.maxOf(physical, logical)
   }
 
   /**

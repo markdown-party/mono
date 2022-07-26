@@ -1,7 +1,8 @@
-package io.github.alexandrepiveteau.echo.core.log
+package io.github.alexandrepiveteau.echo.core.log.buffer
 
 import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.*
+import io.github.alexandrepiveteau.echo.core.log.*
 import io.github.alexandrepiveteau.echo.core.log.EventLog.OnLogUpdateListener
 import io.github.alexandrepiveteau.echo.core.requireRange
 import kotlinx.datetime.Clock
@@ -12,7 +13,7 @@ import kotlinx.datetime.Clock
  *
  * @param clock the [Clock] used to integrate new events.
  */
-internal abstract class AbstractMutableEventLog(
+internal abstract class AbstractGapBufferMutableEventLog(
     clock: Clock = Clock.System,
 ) : MutableEventLog {
 

@@ -137,6 +137,32 @@ interface EventLog {
   fun unregisterLogUpdateListener(listener: OnLogUpdateListener)
 }
 
+/**
+ * Returns true iff there are no events in the [EventLog].
+ *
+ * @see EventLog.size
+ */
+fun EventLog.isEmpty(): Boolean {
+  return size == 0
+}
+
+/**
+ * Returns true iff there are some events in the [EventLog].
+ *
+ * @see EventLog.size
+ */
+fun EventLog.isNotEmpty(): Boolean {
+  return size != 0
+}
+
+/** Returns a copy of the current [EventLog]. */
+fun EventLog.copyOf(): EventLog = toMutableEventLog()
+
+/** Returns a [MutableEventLog] copy of this [EventLog]. */
+fun EventLog.toMutableEventLog(): MutableEventLog {
+  return mutableEventLogOf().merge(this)
+}
+
 /** Transforms this [EventLog] to a [List] of [Event]. */
 fun EventLog.toList(): List<Event> = buildList {
   val iterator = this@toList.iterator().apply { moveToStart() }

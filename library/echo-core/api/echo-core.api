@@ -463,13 +463,11 @@ public final class io/github/alexandrepiveteau/echo/core/log/EventLog$OnLogUpdat
 }
 
 public final class io/github/alexandrepiveteau/echo/core/log/EventLogKt {
-	public static final fun toList (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Ljava/util/List;
-}
-
-public final class io/github/alexandrepiveteau/echo/core/log/EventLog_ExtensionsKt {
-	public static final fun copyOf (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun copyOf (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/EventLog;
 	public static final fun isEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Z
 	public static final fun isNotEmpty (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Z
+	public static final fun toList (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Ljava/util/List;
+	public static final fun toMutableEventLog (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/History : io/github/alexandrepiveteau/echo/core/log/EventLog {
