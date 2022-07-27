@@ -44,10 +44,17 @@ tests locally, please proceed as follows :
 > ./gradlew check
 
 # Run the markdown editor frontend and backend. You'll have to edit the configuration in the
-# file "markdown/markdown-frontend-compose/src/jsMain/kotlin/main.kt" to point to your localhost
+# file "markdown/markdown-frontend-compose/src/jsMain/resources/config.js" to point to your localhost
 # rather than the production server.
 > ./gradlew markdown:markdown-backend:run
 > ./gradlew markdown:markdown-frontend-compose:jsBrowserRun
+
+# Alternatively, if you have Docker Compose installed, you can run both the backend and the frontend
+# locally as follows :
+#
+# > ./run-local.sh
+#
+# The frontend will be available on http://localhost:8080, and the backend on http://localhost:8081.
 ```
 
 ## Cheat sheet
