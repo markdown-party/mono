@@ -36,7 +36,7 @@ fun main() {
 
   // Create the local and configuration.
   val site = Random.nextSiteIdentifier()
-  val config = Configuration.remote(session)
+  val config = Configuration.fromWindow(session)
 
   val local =
       mutableSite<MarkdownParty, MarkdownPartyEvent, MutableMarkdownParty>(
