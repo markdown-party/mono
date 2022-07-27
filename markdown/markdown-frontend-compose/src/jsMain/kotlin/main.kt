@@ -25,6 +25,7 @@ fun main() {
 
   // Load CSS
   require("./app.css")
+  require("./config.js")
 
   // Creates a new session identifier, if needed.
   val splits = window.location.pathname.split("/")
@@ -36,7 +37,7 @@ fun main() {
 
   // Create the local and configuration.
   val site = Random.nextSiteIdentifier()
-  val config = Configuration.remote(session)
+  val config = Configuration.fromWindow(session)
 
   val local =
       mutableSite<MarkdownParty, MarkdownPartyEvent, MutableMarkdownParty>(

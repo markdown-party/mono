@@ -12,6 +12,7 @@ import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.browser.window
 
 /**
  * A data class representing the [Configuration] that should be used when communicating with a
@@ -31,30 +32,24 @@ data class Configuration(
   companion object {
 
     /**
-     * A remote configuration that's used in production.
+     * A configuration that's dynamically loaded from a `config.js` file located at the root of the
+     * file structure.
      *
      * @param session the unique session identifier for this edition.
      */
-    fun remote(session: String): Configuration =
-        Configuration(
-            host = "api.markdown.party",
-            port = 443,
-            secure = true,
-            signalingServerPath = "groups/$session",
-        )
-
-    /**
-     * A local configuration that's used for local deployments.
-     *
-     * @param session the unique session identifier for this edition.
-     */
-    fun local(session: String): Configuration =
-        Configuration(
-            host = "localhost",
-            port = 1234,
-            secure = false,
-            signalingServerPath = "groups/$session",
-        )
+    fun fromWindow(session: String): Configuration {
+      val env = window.asDynamic().__env
+      val host = env.CONF_HOST.unsafeCast<String>()
+      val port = env.CONF_PORT.unsafeCast<String>()
+      val path = env.CONF_PATH.unsafeCast<String>()
+      val secure = env.CONF_SECURE.unsafeCast<String>()
+      return Configuration(
+          host = host,
+          port = port.toInt(),
+          signalingServerPath = "$path$session",
+          secure = secure.toBooleanStrict(),
+      )
+    }
   }
 }
 
