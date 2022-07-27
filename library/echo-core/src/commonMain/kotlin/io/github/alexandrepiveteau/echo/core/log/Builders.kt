@@ -25,7 +25,7 @@ private class ActualMutableEventLog(clock: Clock) : AbstractGapBufferMutableEven
  *
  * @param T the type of the aggregate.
  */
-fun <T> mutableHistoryOf(
+public fun <T> mutableHistoryOf(
     initial: T,
     projection: MutableProjection<T>,
     clock: Clock = Clock.System,
@@ -42,7 +42,7 @@ fun <T> mutableHistoryOf(
  *
  * @param T the type of the aggregate.
  */
-fun <T> mutableHistoryOf(
+public fun <T> mutableHistoryOf(
     initial: T,
     projection: MutableProjection<T>,
     vararg events: Pair<EventIdentifier, ByteArray>,
@@ -59,7 +59,7 @@ fun <T> mutableHistoryOf(
  *
  * @param clock the [Clock] used to generate new events.
  */
-fun mutableEventLogOf(
+public fun mutableEventLogOf(
     clock: Clock = Clock.System,
 ): MutableEventLog = mutableEventLogOf(*emptyArray(), clock = clock)
 
@@ -69,7 +69,7 @@ fun mutableEventLogOf(
  * @param events some events to pre-populate the history.
  * @param clock the [Clock] used to generate new events.
  */
-fun mutableEventLogOf(
+public fun mutableEventLogOf(
     vararg events: Pair<EventIdentifier, ByteArray>,
     clock: Clock = Clock.System,
 ): MutableEventLog =

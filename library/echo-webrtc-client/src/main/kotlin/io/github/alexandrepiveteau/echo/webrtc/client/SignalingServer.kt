@@ -19,10 +19,10 @@ import kotlinx.coroutines.launch
  * connected peers, as well as ways to create a [ReceiveExchange] with any of the remote peers from
  * the signaling server.
  */
-interface SignalingServer {
+public interface SignalingServer {
 
   /** A [Flow] which indicates currently available [Peer]s. */
-  val peers: SharedFlow<Set<Peer>>
+  public val peers: SharedFlow<Set<Peer>>
 }
 
 /**
@@ -34,7 +34,7 @@ interface SignalingServer {
  * @param exchange the [ReceiveExchange] to which we're interested in syncing.
  * @param onParticipantsChanged a callback which will be called when the participant count changes.
  */
-suspend fun SignalingServer.sync(
+public suspend fun SignalingServer.sync(
     exchange: Exchange<Incoming, Outgoing>,
     onParticipantsChanged: (Set<PeerIdentifier>) -> Unit = {},
 ): Nothing = coroutineScope {

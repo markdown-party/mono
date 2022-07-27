@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable(with = SiteIdentifierSerializer::class)
 @JvmInline
-value class SiteIdentifier
+public value class SiteIdentifier
 internal constructor(
     @PublishedApi internal val unique: UInt,
 ) : Comparable<SiteIdentifier> {
@@ -21,28 +21,28 @@ internal constructor(
     return unique.compareTo(other.unique)
   }
 
-  companion object {
+  public companion object {
 
     /** The minimum [SiteIdentifier] that could possibly exist. */
-    val Min: SiteIdentifier = SiteIdentifier(UInt.MIN_VALUE)
+    public val Min: SiteIdentifier = SiteIdentifier(UInt.MIN_VALUE)
 
     /** The maximum [SiteIdentifier] that could possibly exist. */
-    val Max: SiteIdentifier = SiteIdentifier(UInt.MAX_VALUE)
+    public val Max: SiteIdentifier = SiteIdentifier(UInt.MAX_VALUE)
   }
 }
 
 /** Creates a [SiteIdentifier] from the current [Int]. */
-fun UInt.toSiteIdentifier(): SiteIdentifier {
+public fun UInt.toSiteIdentifier(): SiteIdentifier {
   return SiteIdentifier(this)
 }
 
 /** Creates an [UInt] from the current [SiteIdentifier]. */
-fun SiteIdentifier.toUInt(): UInt {
+public fun SiteIdentifier.toUInt(): UInt {
   return this.unique
 }
 
 /** Gets the next random [SiteIdentifier] from the random number generator. */
-fun Random.nextSiteIdentifier(): SiteIdentifier {
+public fun Random.nextSiteIdentifier(): SiteIdentifier {
   // In range [0, UInt.MAX_VALUE]
   return SiteIdentifier(nextUInt())
 }

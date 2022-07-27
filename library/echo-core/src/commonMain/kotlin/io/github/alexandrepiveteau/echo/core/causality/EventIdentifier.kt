@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  * @param site the [SiteIdentifier] that's used.
  * @return the built [EventIdentifier].
  */
-fun EventIdentifier(
+public fun EventIdentifier(
     seqno: SequenceNumber,
     site: SiteIdentifier,
 ): EventIdentifier = EventIdentifier(packUInts(seqno.index, site.unique))
@@ -27,30 +27,30 @@ fun EventIdentifier(
  */
 @Serializable(with = EventIdentifierSerializer::class)
 @JvmInline
-value class EventIdentifier
+public value class EventIdentifier
 internal constructor(
     internal val packed: ULong,
 ) : Comparable<EventIdentifier> {
 
   // Because we're using packed values and giving precedence to the sequence number, we can simply
   // compare event identifiers as longs to find a total order.
-  override operator fun compareTo(other: EventIdentifier) = packed.compareTo(other.packed)
+  override operator fun compareTo(other: EventIdentifier): Int = packed.compareTo(other.packed)
 
-  val seqno: SequenceNumber
+  public val seqno: SequenceNumber
     get() = SequenceNumber(unpackUInt1(packed))
 
-  val site: SiteIdentifier
+  public val site: SiteIdentifier
     get() = SiteIdentifier(unpackUInt2(packed))
 
-  operator fun component1(): SequenceNumber = SequenceNumber(unpackUInt1(packed))
-  operator fun component2(): SiteIdentifier = SiteIdentifier(unpackUInt2(packed))
+  public operator fun component1(): SequenceNumber = SequenceNumber(unpackUInt1(packed))
+  public operator fun component2(): SiteIdentifier = SiteIdentifier(unpackUInt2(packed))
 
   override fun toString(): String = "EventIdentifier(seqno = ${seqno}, site = ${site.unique})"
 
-  companion object {
+  public companion object {
 
     /** A special sentinel value that indicates that no [EventIdentifier] is set. */
-    val Unspecified: EventIdentifier =
+    public val Unspecified: EventIdentifier =
         EventIdentifier(
             SequenceNumber.Unspecified,
             SiteIdentifier.Min,
@@ -59,21 +59,21 @@ internal constructor(
 }
 
 /** `false` when this has [SiteIdentifier.Unspecified] or [SequenceNumber.Unspecified]. */
-inline val EventIdentifier.isSpecified: Boolean
+public inline val EventIdentifier.isSpecified: Boolean
   get() {
     // Avoid auto-boxing.
     return seqno.isSpecified
   }
 
 /** `false` when this has [SiteIdentifier.Unspecified] or [SequenceNumber.Unspecified]. */
-inline val EventIdentifier.isUnspecified: Boolean
+public inline val EventIdentifier.isUnspecified: Boolean
   get() {
     // Avoid auto-boxing.
     return seqno.isUnspecified
   }
 
 /** Creates an [EventIdentifier] from a [ULong]. */
-fun ULong.toEventIdentifier(): EventIdentifier = EventIdentifier(this)
+public fun ULong.toEventIdentifier(): EventIdentifier = EventIdentifier(this)
 
 /** Creates an [ULong] from an [EventIdentifier]. */
-fun EventIdentifier.toULong(): ULong = packed
+public fun EventIdentifier.toULong(): ULong = packed

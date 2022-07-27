@@ -5,7 +5,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
 import io.github.alexandrepiveteau.echo.core.causality.toTypedArray
 
 /** Creates an empty [MutableEventIdentifierGapBuffer]. */
-fun mutableEventIdentifierGapBufferOf(): MutableEventIdentifierGapBuffer =
+public fun mutableEventIdentifierGapBufferOf(): MutableEventIdentifierGapBuffer =
     MutableEventIdentifierGapBufferImpl()
 
 /**
@@ -13,7 +13,7 @@ fun mutableEventIdentifierGapBufferOf(): MutableEventIdentifierGapBuffer =
  *
  * @throws IllegalArgumentException if the size is negative.
  */
-fun MutableEventIdentifierGapBuffer(size: Int): MutableEventIdentifierGapBuffer {
+public fun MutableEventIdentifierGapBuffer(size: Int): MutableEventIdentifierGapBuffer {
   return MutableEventIdentifierGapBuffer(size) { EventIdentifier.Unspecified }
 }
 
@@ -22,7 +22,7 @@ fun MutableEventIdentifierGapBuffer(size: Int): MutableEventIdentifierGapBuffer 
  *
  * @throws IllegalArgumentException if the size is negative.
  */
-fun MutableEventIdentifierGapBuffer(
+public fun MutableEventIdentifierGapBuffer(
     size: Int,
     init: (Int) -> EventIdentifier
 ): MutableEventIdentifierGapBuffer {
@@ -33,7 +33,7 @@ fun MutableEventIdentifierGapBuffer(
 /**
  * Copies the contents of this [MutableEventIdentifierGapBuffer] into a new [EventIdentifierArray].
  */
-fun MutableEventIdentifierGapBuffer.toEventIdentifierArray(): EventIdentifierArray {
+public fun MutableEventIdentifierGapBuffer.toEventIdentifierArray(): EventIdentifierArray {
   return copyInto(EventIdentifierArray(size))
 }
 
@@ -41,20 +41,23 @@ fun MutableEventIdentifierGapBuffer.toEventIdentifierArray(): EventIdentifierArr
  * Copies the contents of this [MutableEventIdentifierGapBuffer] into a new [Array] of
  * [EventIdentifier].
  */
-fun MutableEventIdentifierGapBuffer.toTypedArray(): Array<EventIdentifier> {
+public fun MutableEventIdentifierGapBuffer.toTypedArray(): Array<EventIdentifier> {
   return toEventIdentifierArray().toTypedArray()
 }
 
 /**
  * Copies the contents of this [EventIdentifierArray] into a new [MutableEventIdentifierGapBuffer].
  */
-fun EventIdentifierArray.toMutableGapBuffer(): MutableEventIdentifierGapBuffer {
+public fun EventIdentifierArray.toMutableGapBuffer(): MutableEventIdentifierGapBuffer {
   return MutableEventIdentifierGapBuffer(size, this::get)
 }
 
 /** Copies the given range from the [MutableEventIdentifierGapBuffer]. */
-fun MutableEventIdentifierGapBuffer.copyOfRange(from: Int, until: Int): EventIdentifierArray {
-    val size = until - from
-    require(size >= 0) { "Can't copy a negative range." }
-    return copyInto(EventIdentifierArray(size), startOffset = from, endOffset = until)
+public fun MutableEventIdentifierGapBuffer.copyOfRange(
+    from: Int,
+    until: Int,
+): EventIdentifierArray {
+  val size = until - from
+  require(size >= 0) { "Can't copy a negative range." }
+  return copyInto(EventIdentifierArray(size), startOffset = from, endOffset = until)
 }

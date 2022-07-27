@@ -38,7 +38,7 @@ private class BufferedExchange<I, O>(
  *
  * @see [buffer] the buffer operator on the underlying [Flow].
  */
-fun <I, O> Exchange<I, O>.buffer(
+public fun <I, O> Exchange<I, O>.buffer(
     capacity: Int = Channel.BUFFERED,
 ): Exchange<I, O> = BufferedExchange(capacity, this)
 
@@ -65,7 +65,7 @@ private class FlowOnExchange<I, O>(
  *
  * @param context the [CoroutineContext] to use for the flow.
  */
-fun <I, O> Exchange<I, O>.flowOn(
+public fun <I, O> Exchange<I, O>.flowOn(
     context: CoroutineContext,
 ): Exchange<I, O> = FlowOnExchange(context, this)
 
@@ -75,7 +75,7 @@ fun <I, O> Exchange<I, O>.flowOn(
  *
  * @param context the [CoroutineContext] to use for the flow.
  */
-fun <T, M> MutableSite<T, M>.flowOn(
+public fun <T, M> MutableSite<T, M>.flowOn(
     context: CoroutineContext,
 ): MutableSite<T, M> =
     object : MutableSite<T, M>, Exchange<Inc, Out> by FlowOnExchange(context, this) {
@@ -104,7 +104,7 @@ fun <T, M> MutableSite<T, M>.flowOn(
  * @param M1 the type of the original model.
  * @param M2 the type of the transformed model.
  */
-fun <T, M1, M2> MutableSite<T, M1>.map(
+public fun <T, M1, M2> MutableSite<T, M1>.map(
     f: (M1) -> M2,
 ): MutableSite<T, M2> = MappingMutableSite(f, this)
 

@@ -3,7 +3,7 @@
 package io.github.alexandrepiveteau.echo.core.causality
 
 /** Creates an empty [EventIdentifierArray]. */
-fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongArrayOf())
+public fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongArrayOf())
 
 /**
  * An array of event identifiers. When targeting the JVM, instances of this class are represented as
@@ -11,7 +11,7 @@ fun eventIdentifierArrayOf(): EventIdentifierArray = EventIdentifierArray(ulongA
  */
 // TODO : Wait for a fix of KT-35749, KT-39696
 /* @kotlin.jvm.JvmInline value */
-class EventIdentifierArray
+public class EventIdentifierArray
 internal constructor(
     internal val backing: ULongArray,
 ) {
@@ -20,10 +20,10 @@ internal constructor(
    * Creates a new array of the specified [size], with all elements initialized to
    * [EventIdentifier.Unspecified].
    */
-  constructor(size: Int) : this(ULongArray(size))
+  public constructor(size: Int) : this(ULongArray(size))
 
   /** Returns the number of elements in the array. */
-  val size: Int
+  public val size: Int
     get() = backing.size
 
   override fun equals(other: Any?): Boolean {
@@ -36,7 +36,7 @@ internal constructor(
     return backing.hashCode()
   }
 
-  operator fun contains(identifier: EventIdentifier): Boolean {
+  public operator fun contains(identifier: EventIdentifier): Boolean {
     for (i in 0 until size) {
       if (get(i) == identifier) return true
     }
@@ -50,7 +50,7 @@ internal constructor(
    * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in
    * Kotlin/JS where the behavior is unspecified.
    */
-  operator fun get(index: Int): EventIdentifier = EventIdentifier(backing[index])
+  public operator fun get(index: Int): EventIdentifier = EventIdentifier(backing[index])
 
   /**
    * Sets the element at the given [index] to the given [value]. This method can be called using the
@@ -59,17 +59,22 @@ internal constructor(
    * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in
    * Kotlin/JS where the behavior is unspecified.
    */
-  operator fun set(index: Int, value: EventIdentifier): Unit = backing.set(index, value.packed)
+  public operator fun set(
+      index: Int,
+      value: EventIdentifier,
+  ): Unit = backing.set(index, value.packed)
 
   /** Creates an iterator over the elements of the array. */
-  operator fun iterator(): EventIdentifierIterator =
+  public operator fun iterator(): EventIdentifierIterator =
       ActualEventIdentifier(backing.asLongArray().iterator())
 
   override fun toString(): String {
     return backing.joinToString(
         prefix = "[",
         postfix = "]",
-    ) { EventIdentifier(it).toString() }
+    ) {
+      EventIdentifier(it).toString()
+    }
   }
 
   private class ActualEventIdentifier(
@@ -100,7 +105,7 @@ internal constructor(
  *
  * @return the [destination] array.
  */
-fun EventIdentifierArray.copyInto(
+public fun EventIdentifierArray.copyInto(
     destination: EventIdentifierArray,
     destinationOffset: Int = 0,
     startIndex: Int = 0,
@@ -115,17 +120,17 @@ fun EventIdentifierArray.copyInto(
         ),
     )
 
-/** Returns a typed object array containing all of the elements of this primitive array. */
-fun EventIdentifierArray.toTypedArray(): Array<EventIdentifier> {
+/** Returns a typed object array containing all the elements of this primitive array. */
+public fun EventIdentifierArray.toTypedArray(): Array<EventIdentifier> {
   return Array(size, this::get)
 }
 
 /** Returns a primitive array from a generic [Array] of [EventIdentifier]. */
-fun Array<EventIdentifier>.toEventIdentifierArray(): EventIdentifierArray {
+public fun Array<EventIdentifier>.toEventIdentifierArray(): EventIdentifierArray {
   val array = EventIdentifierArray(size)
-  for (i in 0 until size) array[i] = get(i)
+  for (i in indices) array[i] = get(i)
   return array
 }
 
 /** Sorts the array in-place. */
-fun EventIdentifierArray.sort(): Unit = backing.sort() // ULong quicksort.
+public fun EventIdentifierArray.sort(): Unit = backing.sort() // ULong quicksort.

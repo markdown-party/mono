@@ -5,6 +5,7 @@ plugins {
 }
 
 kotlin {
+  explicitApi()
   dependencies {
     implementation(project(":library:echo"))
     implementation(project(":library:echo-webrtc-signaling"))

@@ -6,7 +6,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 /**
  * A mutable variation of [EventIterator], which may be used to mutate an underlying log of events.
  */
-interface MutableEventIterator : EventIterator, MutableListIterator<Event> {
+public interface MutableEventIterator : EventIterator, MutableListIterator<Event> {
 
   /**
    * Adds an event at the current implicit cursor position, and moves the cursor after the inserted
@@ -20,7 +20,7 @@ interface MutableEventIterator : EventIterator, MutableListIterator<Event> {
    * @param from the start index of the data.
    * @param until the end index of the data.
    */
-  fun add(
+  public fun add(
       seqno: SequenceNumber,
       site: SiteIdentifier,
       event: ByteArray,

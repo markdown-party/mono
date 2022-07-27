@@ -11,7 +11,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  * If multiple changes are issued in the [ChangeScope], the [backward] method will be called once
  * for each of these changes. The provided event will remain the same in both cases.
  */
-interface MutableProjection<T> {
+public interface MutableProjection<T> {
 
   /**
    * Moves the [MutableProjection] forward, and returns the new instance of [T] that should be used.
@@ -25,7 +25,7 @@ interface MutableProjection<T> {
    * @param from where the [data] should be read from.
    * @param until where the [data] should be read to.
    */
-  fun ChangeScope.forward(
+  public fun ChangeScope.forward(
       model: T,
       // Event.
       identifier: EventIdentifier,
@@ -49,7 +49,7 @@ interface MutableProjection<T> {
    * @param changeFrom where the [changeData] should be read from.
    * @param changeUntil where the [changeData] should be read to.
    */
-  fun backward(
+  public fun backward(
       model: T,
       // Event.
       identifier: EventIdentifier,

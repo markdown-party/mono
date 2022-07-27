@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 
-fun Route.sender(
+public fun Route.sender(
     block: suspend DefaultWebSocketServerSession.() -> SendExchange<Frame, Frame>,
 ) {
   webSocket {
@@ -22,7 +22,7 @@ fun Route.sender(
   }
 }
 
-fun Route.receiver(
+public fun Route.receiver(
     block: suspend DefaultWebSocketServerSession.() -> ReceiveExchange<Frame, Frame>,
 ) {
   webSocket {

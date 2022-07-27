@@ -8,18 +8,18 @@ package io.github.alexandrepiveteau.echo.core.log
  * nevertheless, depending on the granularity of the change operations, calling [push] for multiple
  * changes may be appropriate.
  */
-fun interface ChangeScope {
+public fun interface ChangeScope {
 
   /** Pushes a section of a [ByteArray] as a change, with boundaries between [from] and [until]. */
-  fun push(array: ByteArray, from: Int, until: Int)
+  public fun push(array: ByteArray, from: Int, until: Int)
 
   /** Pushes a single [Byte] as a change. */
-  fun push(byte: Byte) {
+  public fun push(byte: Byte) {
     push(byteArrayOf(byte))
   }
 
   /** Pushes the whole [ByteArray] as a change. */
-  fun push(array: ByteArray) {
+  public fun push(array: ByteArray) {
     push(array, from = 0, until = array.size)
   }
 }

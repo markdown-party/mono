@@ -6,7 +6,8 @@ plugins {
 }
 
 kotlin {
-  jvm() { withJava() }
+  explicitApi()
+  jvm { withJava() }
   js(IR) { browser() }
 
   sourceSets {

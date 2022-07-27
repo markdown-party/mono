@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 /** An ICE candidate, encoded in [json]. */
 @Serializable
 @JvmInline
-value class IceCandidate(val json: String) {
-  override fun toString() = json
+public value class IceCandidate(public val json: String) {
+  override fun toString(): String = json
 }

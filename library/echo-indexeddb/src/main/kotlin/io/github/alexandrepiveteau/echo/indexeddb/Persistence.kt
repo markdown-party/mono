@@ -16,7 +16,7 @@ import io.github.alexandrepiveteau.echo.sync.SyncStrategy
  * @param session the session identifier.
  * @param exchange the [Exchange] of which the events are saved.
  */
-suspend fun save(session: String, exchange: Exchange<Incoming, Outgoing>) {
+public suspend fun save(session: String, exchange: Exchange<Incoming, Outgoing>) {
   val database = openDatabase()
   val log = mutableEventLogOf().also { sync(exchange, exchange(it, SyncStrategy.Once)) }
   val events = log.toList()
@@ -31,7 +31,7 @@ suspend fun save(session: String, exchange: Exchange<Incoming, Outgoing>) {
  * @param session the session identifier.
  * @param exchange the [Exchange] of which the events are saved.
  */
-suspend fun load(session: String, exchange: Exchange<Incoming, Outgoing>) {
+public suspend fun load(session: String, exchange: Exchange<Incoming, Outgoing>) {
   val database = openDatabase()
   val events =
       database.transaction(EventsStore) {

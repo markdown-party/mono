@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.*
  * An interface representing a connection with a remote peer. A [PeerToPeerConnection] can send and
  * receive messages, and is connected to another peer.
  */
-interface PeerToPeerConnection {
+public interface PeerToPeerConnection {
 
   /** Attempts to receive a message from the peer. */
-  suspend fun receiveCatching(): ChannelResult<String>
+  public suspend fun receiveCatching(): ChannelResult<String>
 
   /** Attempts to send a message to the peer. */
-  suspend fun sendCatching(message: String): ChannelResult<Unit>
+  public suspend fun sendCatching(message: String): ChannelResult<Unit>
 }
 
 /**

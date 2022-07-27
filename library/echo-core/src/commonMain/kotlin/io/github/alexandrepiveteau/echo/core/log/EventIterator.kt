@@ -10,70 +10,70 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
  * for iteration are available, as well as an implementation of [ListIterator] which returns [Event]
  * objects on each iteration.
  */
-interface EventIterator : ListIterator<Event> {
+public interface EventIterator : ListIterator<Event> {
 
   /**
    * Moves the [EventIterator] to the next event, without allocations.
    *
    * You should check that [hasNext] returns true before calling this method.
    */
-  fun moveNext()
+  public fun moveNext()
 
   /**
    * Moves the [EventIterator] to the previous event, without allocations.
    *
    * You should check that [hasPrevious] returns true before calling this method.
    */
-  fun movePrevious()
+  public fun movePrevious()
 
   /** The [SequenceNumber] of the previous event. */
-  val previousSeqno: SequenceNumber
+  public val previousSeqno: SequenceNumber
   /** The [SiteIdentifier] of the previous event. */
-  val previousSite: SiteIdentifier
+  public val previousSite: SiteIdentifier
   /** The [EventIdentifier] of the previous event. */
-  val previousEventIdentifier: EventIdentifier
+  public val previousEventIdentifier: EventIdentifier
     get() = EventIdentifier(previousSeqno, previousSite)
   /** The body of the previous event, between [previousFrom] and [previousUntil]. */
-  val previousEvent: MutableByteGapBuffer
+  public val previousEvent: MutableByteGapBuffer
   /** The start of the previous event body. */
-  val previousFrom: Int
+  public val previousFrom: Int
   /** The end (non-inclusive) of previous event body. */
-  val previousUntil: Int
+  public val previousUntil: Int
 
   /** The [SequenceNumber] of the next event. */
-  val nextSeqno: SequenceNumber
+  public val nextSeqno: SequenceNumber
   /** The [SiteIdentifier] of the next event. */
-  val nextSite: SiteIdentifier
+  public val nextSite: SiteIdentifier
   /** The [EventIdentifier] of the next event. */
-  val nextEventIdentifier: EventIdentifier
+  public val nextEventIdentifier: EventIdentifier
     get() = EventIdentifier(nextSeqno, nextSite)
   /** The body of the next event, between [nextFrom] and [nextUntil]. */
-  val nextEvent: MutableByteGapBuffer
+  public val nextEvent: MutableByteGapBuffer
   /** The start of the next event body. */
-  val nextFrom: Int
+  public val nextFrom: Int
   /** The end (non-inclusive) of next event body. */
-  val nextUntil: Int
+  public val nextUntil: Int
 }
 
 /** Returns true iff the [EventIterator] is empty. */
-fun EventIterator.isEmpty(): Boolean {
+public fun EventIterator.isEmpty(): Boolean {
   return !hasPrevious() && !hasNext()
 }
 
 /** Returns true iff the [EventIterator] is not empty. */
-fun EventIterator.isNotEmpty(): Boolean = !isEmpty()
+public fun EventIterator.isNotEmpty(): Boolean = !isEmpty()
 
 /** Moves the [EventIterator] to its start, without allocations. */
-fun EventIterator.moveToStart() {
+public fun EventIterator.moveToStart() {
   while (hasPrevious()) movePrevious()
 }
 
 /** Moves the [EventIterator] to its end, without allocations. */
-fun EventIterator.moveToEnd() {
+public fun EventIterator.moveToEnd() {
   while (hasNext()) moveNext()
 }
 
 /** Moves the [EventIterator] to the previous, while the [predicate] is valid. */
-inline fun EventIterator.movePreviousWhile(predicate: EventIterator.() -> Boolean) {
+public inline fun EventIterator.movePreviousWhile(predicate: EventIterator.() -> Boolean) {
   while (hasPrevious() && predicate()) movePrevious()
 }

@@ -43,7 +43,7 @@ private class ChangeScopeAdapter<in T>(
  * @param M the type of the model.
  * @param T the type of the events.
  */
-class OneWayMutableProjection<M, T>(
+public class OneWayMutableProjection<M, T>(
     private val projection: OneWayProjection<M, T>,
     private val eventSerializer: KSerializer<T>,
     private val format: BinaryFormat,
@@ -55,7 +55,7 @@ class OneWayMutableProjection<M, T>(
       data: MutableByteGapBuffer,
       from: Int,
       until: Int
-  ) =
+  ): M =
       projection.forward(
           model = model,
           identifier = identifier,
@@ -71,7 +71,7 @@ class OneWayMutableProjection<M, T>(
       changeData: MutableByteGapBuffer,
       changeFrom: Int,
       changeUntil: Int
-  ) = model
+  ): M = model
 }
 
 /**
@@ -88,7 +88,7 @@ class OneWayMutableProjection<M, T>(
  * @param T the type of the events.
  * @param C the type of the changes.
  */
-class TwoWayMutableProjection<M, T, C>(
+public class TwoWayMutableProjection<M, T, C>(
     private val projection: TwoWayProjection<M, T, C>,
     private val changeSerializer: KSerializer<C>,
     private val eventSerializer: KSerializer<T>,
@@ -124,7 +124,7 @@ class TwoWayMutableProjection<M, T, C>(
       data: MutableByteGapBuffer,
       from: Int,
       until: Int,
-  ) =
+  ): M =
       with(projection) {
         scope(this@forward)
             .forward(
@@ -143,7 +143,7 @@ class TwoWayMutableProjection<M, T, C>(
       changeData: MutableByteGapBuffer,
       changeFrom: Int,
       changeUntil: Int,
-  ) =
+  ): M =
       projection.backward(
           model = model,
           id = identifier,

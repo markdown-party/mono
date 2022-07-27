@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("evt")
-data class Event(
+public data class Event(
     val seqno: SequenceNumber,
     val site: SiteIdentifier,
     val data: ByteArray,
