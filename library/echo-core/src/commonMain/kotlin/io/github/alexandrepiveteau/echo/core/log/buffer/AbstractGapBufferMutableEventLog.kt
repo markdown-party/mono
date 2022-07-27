@@ -136,7 +136,15 @@ internal abstract class AbstractGapBufferMutableEventLog(
   override fun iteratorAtEnd(site: SiteIdentifier): EventIterator = site(site).iteratorAtEnd()
 
   override fun merge(from: EventLog): MutableEventLog {
-    // TODO : Perform the insertion in a single pass, without calling `insert`.
+    // TODO : Perform the insertion in a single pass, without calling `insert` :
+    //
+    // Outline :
+    // 1. Use both acknowledged() to figure out the common bound, by taking the minimum for both
+    //    sites, but only where the sites differ (not sure about this one ?).
+    // 2. Find out the smallest sequence number in the resulting array. Move the current log to this
+    //    position.
+    // 3. Perform some step-by-step iteration over both logs, inserting missing events from the new
+    //    log. Once all the events have been inserted, notify the listeners.
     val inserted = from.iterator()
     while (inserted.hasNext()) {
       inserted.moveNext()
