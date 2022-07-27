@@ -6,8 +6,8 @@ package io.github.alexandrepiveteau.echo.projections
  *
  * @param T the type of the changes issued.
  */
-interface ChangeScope<in T> {
+public interface ChangeScope<in T> {
 
   /** Pushes a new [value] to the log of changes. */
-  fun push(value: T)
+  public fun push(value: T)
 }

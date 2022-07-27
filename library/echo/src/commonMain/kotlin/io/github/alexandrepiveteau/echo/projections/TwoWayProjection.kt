@@ -15,7 +15,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  * @param T the type of the events.
  * @param C the type of the changes.
  */
-interface TwoWayProjection<M, in T, C> {
+public interface TwoWayProjection<M, in T, C> {
 
   /**
    * Applies the event to the given [model], and returns a new immutable model. Additionally,
@@ -31,7 +31,7 @@ interface TwoWayProjection<M, in T, C> {
    *
    * @return the updated model.
    */
-  fun ChangeScope<C>.forward(
+  public fun ChangeScope<C>.forward(
       model: M,
       id: EventIdentifier,
       event: T,
@@ -47,7 +47,7 @@ interface TwoWayProjection<M, in T, C> {
    *
    * @return the updated model.
    */
-  fun backward(
+  public fun backward(
       model: M,
       id: EventIdentifier,
       event: T,

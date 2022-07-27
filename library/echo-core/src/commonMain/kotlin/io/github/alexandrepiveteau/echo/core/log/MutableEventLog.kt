@@ -11,7 +11,7 @@ import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
  *
  * @see MutableHistory a variation of [MutableEventLog] which keeps a state
  */
-interface MutableEventLog : EventLog {
+public interface MutableEventLog : EventLog {
 
   /**
    * Inserts the provided event in the [MutableEventLog] at the appropriate index. If the event is
@@ -27,7 +27,7 @@ interface MutableEventLog : EventLog {
    * @param from where the event body should be read.
    * @param until where the event body should be read.
    */
-  fun insert(
+  public fun insert(
       seqno: SequenceNumber,
       site: SiteIdentifier,
       event: ByteArray,
@@ -45,7 +45,7 @@ interface MutableEventLog : EventLog {
    * @param from where the event body should be read.
    * @param until where the event body should be read.
    */
-  fun append(
+  public fun append(
       site: SiteIdentifier,
       event: ByteArray,
       from: Int = 0,
@@ -59,7 +59,7 @@ interface MutableEventLog : EventLog {
    * @param seqno the [SequenceNumber] for the acknowledged event.
    * @param site the [SiteIdentifier] for the acknowledged event.
    */
-  fun acknowledge(seqno: SequenceNumber, site: SiteIdentifier)
+  public fun acknowledge(seqno: SequenceNumber, site: SiteIdentifier)
 
   /**
    * Acknowledges the latest [SequenceNumber] for each [SiteIdentifier] that the other
@@ -69,7 +69,7 @@ interface MutableEventLog : EventLog {
    * @param from the [MutableEventLog] from which acknowledgements are merged.
    * @return this [MutableEventLog] instance (with the new acknowledgements).
    */
-  fun acknowledge(from: EventLog): MutableEventLog
+  public fun acknowledge(from: EventLog): MutableEventLog
 
   /**
    * Merges this [MutableEventLog] [from] another log. The merge operation has the following
@@ -81,7 +81,7 @@ interface MutableEventLog : EventLog {
    * @param from the [EventLog] from which the operations are merged.
    * @return this [MutableEventLog] instance (with the new operations inserted).
    */
-  fun merge(from: EventLog): MutableEventLog
+  public fun merge(from: EventLog): MutableEventLog
 
   /**
    * Removes the event with the given [seqno] and [site], assuming it's present in the
@@ -93,7 +93,7 @@ interface MutableEventLog : EventLog {
    *
    * @return a [Boolean] with value `true` iff the event was removed.
    */
-  fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean
+  public fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean
 
   /**
    * Clears the data of the [MutableEventLog]. This will not necessarily reset the [acknowledged]
@@ -106,5 +106,5 @@ interface MutableEventLog : EventLog {
    * seen and dispatched to a central [MutableEventLog] or [MutableHistory], but do not need to keep
    * track of the actual body of the events that were already sent.
    */
-  fun clear()
+  public fun clear()
 }

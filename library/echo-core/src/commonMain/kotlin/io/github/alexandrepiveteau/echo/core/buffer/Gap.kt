@@ -1,13 +1,13 @@
 package io.github.alexandrepiveteau.echo.core.buffer
 
 /** An interface representing the [Gap] from a gap buffer. */
-interface Gap {
+public interface Gap {
 
   /** The start index of the gap (inclusive). */
-  val startIndex: Int
+  public val startIndex: Int
 
   /** The end index of the gap (exclusive). */
-  val endIndex: Int
+  public val endIndex: Int
 
   /**
    * Shifts the start and end indices of the gap by the provided amount, keeping it in the
@@ -15,11 +15,11 @@ interface Gap {
    *
    * This operation may move the gap.
    */
-  fun shift(amount: Int)
+  public fun shift(amount: Int)
 
-  companion object {
+  public companion object {
 
     /** The default size at which gap buffers will be created. */
-    const val DefaultSize = 32
+    public const val DefaultSize: Int = 32
   }
 }

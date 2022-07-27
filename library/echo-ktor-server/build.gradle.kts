@@ -5,6 +5,7 @@ plugins {
 }
 
 kotlin {
+  explicitApi()
   target { compilations.all { kotlinOptions.allWarningsAsErrors = true } }
 
   dependencies {

@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.webrtc.signaling
 
+import io.github.alexandrepiveteau.echo.webrtc.signaling.SignalingMessage.ServerToClient.GotMessage
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,14 +11,14 @@ import kotlinx.serialization.Serializable
  * communicates new connections, and clients which dropped their connection.
  */
 @Serializable
-sealed class SignalingMessage {
+public sealed class SignalingMessage {
 
   /** A marker interface for messages sent from the browser to the server. */
   @Serializable
-  sealed class ClientToServer : SignalingMessage() {
+  public sealed class ClientToServer : SignalingMessage() {
 
     /** The [PeerIdentifier] of the peer to which the message should be forwarded. */
-    abstract val to: PeerIdentifier
+    public abstract val to: PeerIdentifier
 
     /**
      * Transforms this [ClientToServer] message to a [ServerToClient] message, using the provided
@@ -26,7 +27,7 @@ sealed class SignalingMessage {
      * @param from the originator [PeerIdentifier].
      * @return the resulting [ServerToClient].
      */
-    abstract fun toServerToClient(from: PeerIdentifier): ServerToClient
+    public abstract fun toServerToClient(from: PeerIdentifier): ServerToClient
 
     /**
      * Indicates that the server should relay this ICE candidate to the given peer.
@@ -34,20 +35,20 @@ sealed class SignalingMessage {
      * @property message the message to be transmitted.
      */
     @Serializable
-    data class Forward(
+    public data class Forward(
         override val to: PeerIdentifier,
         val message: ClientToClientMessage,
     ) : ClientToServer() {
 
       override fun toServerToClient(
           from: PeerIdentifier,
-      ) = ServerToClient.GotMessage(from = from, message = message)
+      ): GotMessage = GotMessage(from = from, message = message)
     }
   }
 
   /** A marker interface for messages sent from the server to the browser. */
   @Serializable
-  sealed class ServerToClient : SignalingMessage() {
+  public sealed class ServerToClient : SignalingMessage() {
 
     /**
      * Indicates an ICE candidate to use when communicating with a given client.
@@ -56,7 +57,7 @@ sealed class SignalingMessage {
      * @property message the message received from the peer.
      */
     @Serializable
-    data class GotMessage(
+    public data class GotMessage(
         val from: PeerIdentifier,
         val message: ClientToClientMessage,
     ) : ServerToClient()
@@ -67,7 +68,7 @@ sealed class SignalingMessage {
      *
      * @property peer the unique identifier of the peer.
      */
-    @Serializable data class PeerJoined(val peer: PeerIdentifier) : ServerToClient()
+    @Serializable public data class PeerJoined(val peer: PeerIdentifier) : ServerToClient()
 
     /**
      * Indicates that a peer has left the collaboration session. The client should stop
@@ -75,6 +76,6 @@ sealed class SignalingMessage {
      *
      * @property peer the unique identifier of the peer.
      */
-    @Serializable data class PeerLeft(val peer: PeerIdentifier) : ServerToClient()
+    @Serializable public data class PeerLeft(val peer: PeerIdentifier) : ServerToClient()
   }
 }

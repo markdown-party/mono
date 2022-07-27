@@ -2,7 +2,6 @@ package io.github.alexandrepiveteau.echo.core.buffer
 
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
-import io.github.alexandrepiveteau.echo.core.causality.isSpecified
 import io.github.alexandrepiveteau.echo.core.requireIn
 
 // LINEAR SEARCH
@@ -18,7 +17,7 @@ import io.github.alexandrepiveteau.echo.core.requireIn
  *
  * @see MutableEventIdentifierGapBuffer.binarySearch a binary search equivalent
  */
-fun MutableEventIdentifierGapBuffer.linearSearch(
+public fun MutableEventIdentifierGapBuffer.linearSearch(
     value: EventIdentifier,
 ): Int {
   var index = 0
@@ -44,7 +43,7 @@ fun MutableEventIdentifierGapBuffer.linearSearch(
  * @return the index of the element, if it is contained in the array within the specified range;
  * otherwise the inverted insertion point `(-insertion point - 1)`.
  */
-fun MutableEventIdentifierGapBuffer.binarySearch(
+public fun MutableEventIdentifierGapBuffer.binarySearch(
     element: EventIdentifier,
     fromIndex: Int = 0,
     toIndex: Int = size,
@@ -80,7 +79,7 @@ fun MutableEventIdentifierGapBuffer.binarySearch(
  * @return the index of the element with the given site identifier, if it is contained in the array
  * within the specified range; otherwise the inverted insertion point `(-insertion point - 1)`.
  */
-fun MutableEventIdentifierGapBuffer.binarySearchBySite(
+public fun MutableEventIdentifierGapBuffer.binarySearchBySite(
     element: SiteIdentifier,
     fromIndex: Int = 0,
     toIndex: Int = size,

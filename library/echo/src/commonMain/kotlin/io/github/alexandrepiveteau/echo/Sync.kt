@@ -19,10 +19,10 @@ import kotlinx.coroutines.launch
  * @param I the type of the incoming data.
  * @param O the type of the outgoing data.
  */
-suspend fun <I, O> sync(
+public suspend fun <I, O> sync(
     first: (Flow<I>) -> Flow<O>,
     second: (Flow<O>) -> Flow<I>,
-) = coroutineScope {
+): Unit = coroutineScope {
   val firstToSecond = Channel<O>()
   val secondToFirst = Channel<I>()
   launch {
@@ -49,7 +49,7 @@ suspend fun <I, O> sync(
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
+public suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
   return sync(exchanges.asSequence().zipWithNext())
 }
 
@@ -64,7 +64,7 @@ suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-suspend fun <I, O> syncAll(vararg exchanges: Exchange<I, O>) {
+public suspend fun <I, O> syncAll(vararg exchanges: Exchange<I, O>) {
   val s = exchanges.asSequence()
   val pairs = s.flatMapIndexed { i, a -> s.filterIndexed { j, _ -> i != j }.map { b -> a to b } }
   return sync(pairs)

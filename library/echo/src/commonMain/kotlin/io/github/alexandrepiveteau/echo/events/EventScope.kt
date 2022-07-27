@@ -8,7 +8,7 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  *
  * @param T the type of the application-specific event data.
  */
-fun interface EventScope<in T> {
+public fun interface EventScope<in T> {
 
   /**
    * Append a new event to the issued operations by this site. A happens-before relationship is
@@ -23,19 +23,19 @@ fun interface EventScope<in T> {
    *
    * @return the [EventIdentifier] that's issued for this new event.
    */
-  fun yield(event: T): EventIdentifier
+  public fun yield(event: T): EventIdentifier
 
   /**
    * Appends an [Iterator] of events to the operations of this site.
    *
    * @param events the events that will be added to the log.
    */
-  fun yieldAll(events: Iterator<T>) = events.forEach(::yield)
+  public fun yieldAll(events: Iterator<T>): Unit = events.forEach(::yield)
 
   /**
    * Appends an [Iterable] of events to the operations of this site.
    *
    * @param events the events that will be added to the log.
    */
-  fun yieldAll(events: Iterable<T>) = yieldAll(events.iterator())
+  public fun yieldAll(events: Iterable<T>): Unit = yieldAll(events.iterator())
 }

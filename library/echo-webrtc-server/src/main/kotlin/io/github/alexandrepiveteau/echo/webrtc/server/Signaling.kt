@@ -18,7 +18,7 @@ import kotlinx.serialization.decodeFromByteArray
  * @param scope the [CoroutineScope] in which the sessions should be kept.
  * @param session a function which maps the [ApplicationCall] to its associated [SessionIdentifier].
  */
-fun Route.signaling(
+public fun Route.signaling(
     scope: CoroutineScope,
     session: (ApplicationCall) -> SessionIdentifier,
 ) {

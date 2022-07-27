@@ -5,6 +5,8 @@ plugins {
 }
 
 kotlin {
+  explicitApi()
+
   js(IR) { browser() }
 
   dependencies {

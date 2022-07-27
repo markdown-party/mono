@@ -5,6 +5,6 @@ package io.github.alexandrepiveteau.echo.webrtc.server
  * in a peer-to-peer fashion.
  */
 @JvmInline
-value class SessionIdentifier(private val id: String) {
+public value class SessionIdentifier(private val id: String) {
   override fun toString(): String = id
 }

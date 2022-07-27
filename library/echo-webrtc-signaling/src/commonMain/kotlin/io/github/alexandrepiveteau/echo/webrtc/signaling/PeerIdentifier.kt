@@ -13,6 +13,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @JvmInline
-value class PeerIdentifier(val id: Int) {
-  override fun toString() = id.toString()
+public value class PeerIdentifier(public val id: Int) {
+  override fun toString(): String = id.toString()
 }

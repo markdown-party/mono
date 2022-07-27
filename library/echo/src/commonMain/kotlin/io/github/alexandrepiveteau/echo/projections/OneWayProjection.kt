@@ -14,10 +14,10 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
  * @param M the type of the model.
  * @param T the type of the events.
  */
-fun interface OneWayProjection<M, in T> {
+public fun interface OneWayProjection<M, in T> {
 
   /** Applies the [event] to the given [model], and returns a new immutable model. */
-  fun forward(
+  public fun forward(
       model: M,
       identifier: EventIdentifier,
       event: T,

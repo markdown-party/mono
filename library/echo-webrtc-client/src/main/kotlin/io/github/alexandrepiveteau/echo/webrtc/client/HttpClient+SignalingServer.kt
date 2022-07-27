@@ -35,7 +35,7 @@ import kotlinx.serialization.encodeToByteArray
  * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
-suspend fun HttpClient.wsSignalingServer(
+public suspend fun HttpClient.wsSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,
@@ -53,7 +53,7 @@ suspend fun HttpClient.wsSignalingServer(
  * @param request the HTTP request builder.
  * @param block the block executed once the connection is established.
  */
-suspend fun HttpClient.wssSignalingServer(
+public suspend fun HttpClient.wssSignalingServer(
     exchange: SendExchange<Incoming, Outgoing>,
     request: HttpRequestBuilder.() -> Unit,
     block: suspend SignalingServer.() -> Unit,

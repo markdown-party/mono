@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.Flow
  * @param I the type of the domain-specific incoming events for this [SendExchange].
  * @param O the type of the domain-specific outgoing events for this [SendExchange].
  */
-fun interface SendExchange<in I, out O> {
+public fun interface SendExchange<in I, out O> {
 
   /** Sends some [O] as a response to an [incoming] [Flow] of [I]. */
-  fun send(incoming: Flow<I>): Flow<O>
+  public fun send(incoming: Flow<I>): Flow<O>
 }
 
 /** Returns the [SendExchange]. */
-fun <I, O> SendExchange<I, O>.asSendExchange(): SendExchange<I, O> = SendExchange(this::send)
+public fun <I, O> SendExchange<I, O>.asSendExchange(): SendExchange<I, O> = SendExchange(this::send)
 
 /**
  * An interface defining an asymmetrical replication site, biased towards receiving data.
@@ -23,14 +23,14 @@ fun <I, O> SendExchange<I, O>.asSendExchange(): SendExchange<I, O> = SendExchang
  * @param I the type of the domain-specific incoming events for this [ReceiveExchange].
  * @param O the type of the domain-specific outgoing events for this [ReceiveExchange].
  */
-fun interface ReceiveExchange<out I, in O> {
+public fun interface ReceiveExchange<out I, in O> {
 
   /** Sends some [I] as a response to an [incoming] [Flow] of [O]. */
-  fun receive(incoming: Flow<O>): Flow<I>
+  public fun receive(incoming: Flow<O>): Flow<I>
 }
 
 /** Returns the [ReceiveExchange]. */
-fun <I, O> ReceiveExchange<I, O>.asReceiveExchange(): ReceiveExchange<I, O> =
+public fun <I, O> ReceiveExchange<I, O>.asReceiveExchange(): ReceiveExchange<I, O> =
     ReceiveExchange(this::receive)
 
 /**
@@ -40,4 +40,4 @@ fun <I, O> ReceiveExchange<I, O>.asReceiveExchange(): ReceiveExchange<I, O> =
  * @param I the type of the domain-specific incoming events for this [Exchange].
  * @param O the type of the domain-specific outgoing events for this [Exchange].
  */
-interface Exchange<I, O> : SendExchange<I, O>, ReceiveExchange<I, O>
+public interface Exchange<I, O> : SendExchange<I, O>, ReceiveExchange<I, O>

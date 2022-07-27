@@ -49,7 +49,7 @@ private fun CoroutineScope.sender(
   }
 }
 
-fun HttpClient.wssSendExchange(
+public fun HttpClient.wssSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ): SendExchange<Frame, Frame> = SendExchange { inc ->
   channelFlow {
@@ -65,7 +65,7 @@ fun HttpClient.wssSendExchange(
   }
 }
 
-fun HttpClient.wsSendExchange(
+public fun HttpClient.wsSendExchange(
     sender: HttpRequestBuilder.() -> Unit,
 ): SendExchange<Frame, Frame> = SendExchange { inc ->
   channelFlow {
@@ -105,7 +105,7 @@ private fun CoroutineScope.receiver(
   }
 }
 
-fun HttpClient.wssReceiveExchange(
+public fun HttpClient.wssReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
   channelFlow {
@@ -121,7 +121,7 @@ fun HttpClient.wssReceiveExchange(
   }
 }
 
-fun HttpClient.wsReceiveExchange(
+public fun HttpClient.wsReceiveExchange(
     receiver: HttpRequestBuilder.() -> Unit,
 ): ReceiveExchange<Frame, Frame> = ReceiveExchange { inc ->
   channelFlow {
@@ -144,7 +144,7 @@ private class DelegatingExchange<I, O>(
     private val r: ReceiveExchange<I, O>,
 ) : Exchange<I, O>, SendExchange<I, O> by s, ReceiveExchange<I, O> by r
 
-fun HttpClient.wssExchange(
+public fun HttpClient.wssExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
 ): Exchange<Frame, Frame> =
@@ -153,7 +153,7 @@ fun HttpClient.wssExchange(
         r = wssReceiveExchange(receiver),
     )
 
-fun HttpClient.wsExchange(
+public fun HttpClient.wsExchange(
     receiver: HttpRequestBuilder.() -> Unit,
     sender: HttpRequestBuilder.() -> Unit,
 ): Exchange<Frame, Frame> =

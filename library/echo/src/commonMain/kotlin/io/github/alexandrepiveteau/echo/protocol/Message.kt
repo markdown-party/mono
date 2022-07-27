@@ -55,10 +55,10 @@ import kotlinx.serialization.Serializable
  * events, but may not issue any additional request. You should send a _Done_ message right away,
  * before emptying the in-flight queue.
  */
-sealed class Message {
+public sealed class Message {
 
   @Serializable
-  sealed class Incoming : Message() {
+  public sealed class Incoming : Message() {
 
     /**
      * This message is sent to let the other site know that we have some events at our disposable
@@ -77,7 +77,7 @@ sealed class Message {
      */
     @Serializable
     @SerialName("adv")
-    data class Advertisement(
+    public data class Advertisement(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
     ) : Incoming()
@@ -91,7 +91,7 @@ sealed class Message {
      * When you're interested in one-off syncs, this is usually a good place to start ignoring new
      * [Advertisement] messages.
      */
-    @Serializable @SerialName("rdy") object Ready : Incoming()
+    @Serializable @SerialName("rdy") public object Ready : Incoming()
 
     /**
      * Sends multiple events, alongside their body, to the [Outgoing] side. When sending an event,
@@ -105,15 +105,15 @@ sealed class Message {
      */
     @Serializable
     @SerialName("e")
-    data class Events(
+    public data class Events(
         val events: List<Event> = emptyList(),
     ) : Incoming()
 
-    companion object
+    public companion object
   }
 
   @Serializable
-  sealed class Outgoing : Message() {
+  public sealed class Outgoing : Message() {
 
     /**
      * Indicates the next sequence number that is not known by the [Outgoing] side for a specific
@@ -127,7 +127,7 @@ sealed class Message {
      */
     @Serializable
     @SerialName("ack")
-    data class Acknowledge(
+    public data class Acknowledge(
         val site: SiteIdentifier,
         val nextSeqno: SequenceNumber,
     ) : Outgoing()
@@ -146,11 +146,11 @@ sealed class Message {
      */
     @Serializable
     @SerialName("req")
-    data class Request(
+    public data class Request(
         val site: SiteIdentifier,
         val count: UInt,
     ) : Outgoing()
 
-    companion object
+    public companion object
   }
 }

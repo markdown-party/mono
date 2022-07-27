@@ -13,19 +13,19 @@ import kotlinx.serialization.Serializable
  */
 @Serializable(with = SequenceNumberSerializer::class)
 @JvmInline
-value class SequenceNumber
+public value class SequenceNumber
 internal constructor(
     @PublishedApi internal val index: UInt,
 ) : Comparable<SequenceNumber> {
 
   /** Increments this value. */
-  operator fun inc(): SequenceNumber {
+  public operator fun inc(): SequenceNumber {
     if (isUnspecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index.inc())
   }
 
   /** Adds a certain [count] to this value. */
-  operator fun plus(count: UInt): SequenceNumber {
+  public operator fun plus(count: UInt): SequenceNumber {
     if (isUnspecified) return Unspecified // No-op on Unspecified values.
     return SequenceNumber(index + count)
   }
@@ -35,57 +35,57 @@ internal constructor(
     return index.compareTo(other.index)
   }
 
-  override fun toString() = if (isUnspecified) "Unspecified" else index.toString()
+  override fun toString(): String = if (isUnspecified) "Unspecified" else index.toString()
 
-  companion object {
+  public companion object {
 
     /**
      * A sentinel value used to initialize a non-null parameter. It also has the property of being
      * the smallest [SequenceNumber], so [maxOf] will always return the other choice.
      */
-    val Unspecified = SequenceNumber(UInt.MIN_VALUE)
+    public val Unspecified: SequenceNumber = SequenceNumber(UInt.MIN_VALUE)
 
     /**
      * The minimum possible value for a [SequenceNumber]. Events may not be assigned a value smaller
      * than that.
      */
-    val Min = SequenceNumber(UInt.MIN_VALUE + 1U)
+    public val Min: SequenceNumber = SequenceNumber(UInt.MIN_VALUE + 1U)
 
     /** The maximum possible value for a [SequenceNumber]. */
-    val Max = SequenceNumber(UInt.MAX_VALUE)
+    public val Max: SequenceNumber = SequenceNumber(UInt.MAX_VALUE)
   }
 }
 
 /** Returns the maximum [SequenceNumber] in a pair. */
-fun maxOf(a: SequenceNumber, b: SequenceNumber): SequenceNumber = if (a >= b) a else b
+public fun maxOf(a: SequenceNumber, b: SequenceNumber): SequenceNumber = if (a >= b) a else b
 
 /** Returns the maximum [SequenceNumber] in a triple. */
-fun maxOf(a: SequenceNumber, b: SequenceNumber, c: SequenceNumber): SequenceNumber =
+public fun maxOf(a: SequenceNumber, b: SequenceNumber, c: SequenceNumber): SequenceNumber =
     maxOf(a, maxOf(b, c))
 
 /** `false` when this is [SequenceNumber.Unspecified]. */
-inline val SequenceNumber.isSpecified: Boolean
+public inline val SequenceNumber.isSpecified: Boolean
   get() = index != SequenceNumber.Unspecified.index
 
 /** `true` when this is [SequenceNumber.Unspecified]. */
-inline val SequenceNumber.isUnspecified: Boolean
+public inline val SequenceNumber.isUnspecified: Boolean
   get() = index == SequenceNumber.Unspecified.index
 
 /**
  * If this [SequenceNumber] [isSpecified] then [this] is returned, otherwise [block] is executed and
  * its result is returned.
  */
-inline fun SequenceNumber.takeOrElse(
+public inline fun SequenceNumber.takeOrElse(
     block: () -> SequenceNumber,
 ): SequenceNumber = if (isSpecified) this else block()
 
 /** Creates a [SequenceNumber] from a [UInt]. */
-fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)
+public fun UInt.toSequenceNumber(): SequenceNumber = SequenceNumber(this)
 
 /** Creates a [UInt] from a [SequenceNumber]. */
-fun SequenceNumber.toUInt(): UInt = index
+public fun SequenceNumber.toUInt(): UInt = index
 
-fun Instant.toSequenceNumber(): SequenceNumber {
+public fun Instant.toSequenceNumber(): SequenceNumber {
   // TODO : Not naive sequence numbers.
   return SequenceNumber(this.epochSeconds.toUInt())
 }

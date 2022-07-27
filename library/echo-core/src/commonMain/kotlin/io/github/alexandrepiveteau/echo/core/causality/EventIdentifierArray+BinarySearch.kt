@@ -14,7 +14,7 @@ import io.github.alexandrepiveteau.echo.core.requireIn
  * @return the index of the element, if it is contained in the array within the specified range;
  * otherwise the inverted insertion point `(-insertion point - 1)`.
  */
-fun EventIdentifierArray.binarySearch(
+public fun EventIdentifierArray.binarySearch(
     element: EventIdentifier,
     fromIndex: Int = 0,
     toIndex: Int = size,
@@ -50,7 +50,7 @@ fun EventIdentifierArray.binarySearch(
  * @return the index of the element with the given site identifier, if it is contained in the array
  * within the specified range; otherwise the inverted insertion point `(-insertion point - 1)`.
  */
-fun EventIdentifierArray.binarySearchBySite(
+public fun EventIdentifierArray.binarySearchBySite(
     element: SiteIdentifier,
     fromIndex: Int = 0,
     toIndex: Int = size,

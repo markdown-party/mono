@@ -14,20 +14,20 @@ import io.github.alexandrepiveteau.echo.core.causality.EventIdentifierArray
  * In a gap buffer, positions are known as offsets. An offset is semantically identical to an index
  * in an array, except that it jumps over the gap.
  */
-interface MutableEventIdentifierGapBuffer {
+public interface MutableEventIdentifierGapBuffer {
 
   /** How many items there are in the gap buffer. */
-  val size: Int
+  public val size: Int
 
   /** Some meta-data about the [Gap]. This may be useful for specific optimizations. */
-  val gap: Gap
+  public val gap: Gap
 
   /**
    * Gets the [EventIdentifier] at the given [offset].
    *
    * @throws IllegalArgumentException if the [offset] is out of bounds.
    */
-  operator fun get(
+  public operator fun get(
       offset: Int,
   ): EventIdentifier
 
@@ -36,7 +36,7 @@ interface MutableEventIdentifierGapBuffer {
    *
    * @throws IllegalArgumentException if the [offset] is out of bounds.
    */
-  operator fun set(
+  public operator fun set(
       offset: Int,
       value: EventIdentifier,
   )
@@ -46,7 +46,7 @@ interface MutableEventIdentifierGapBuffer {
    *
    * This operation may move the gap.
    */
-  fun push(
+  public fun push(
       value: EventIdentifier,
       offset: Int = size,
   )
@@ -57,7 +57,7 @@ interface MutableEventIdentifierGapBuffer {
    *
    * This operation may move the gap.
    */
-  fun push(
+  public fun push(
       array: EventIdentifierArray,
       offset: Int = size,
       startIndex: Int = 0,
@@ -73,7 +73,7 @@ interface MutableEventIdentifierGapBuffer {
    *
    * This operation may move the gap.
    */
-  fun copyInto(
+  public fun copyInto(
       array: EventIdentifierArray,
       destinationOffset: Int = 0,
       startOffset: Int = 0,
@@ -85,7 +85,7 @@ interface MutableEventIdentifierGapBuffer {
    *
    * This operation may move the gap.
    */
-  fun remove(
+  public fun remove(
       offset: Int,
       size: Int = 1,
   )
@@ -94,5 +94,5 @@ interface MutableEventIdentifierGapBuffer {
    * Removes the whole gap buffer, clearing the current data. This operation takes a constant time
    * and does not require moving the gap.
    */
-  fun clear()
+  public fun clear()
 }

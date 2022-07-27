@@ -15,7 +15,7 @@ import io.github.alexandrepiveteau.echo.core.requireIn
  *
  * @see MutableIntGapBuffer.binarySearch a binary search equivalent
  */
-fun MutableIntGapBuffer.linearSearch(
+public fun MutableIntGapBuffer.linearSearch(
     value: Int,
 ): Int {
   var index = 0
@@ -41,7 +41,7 @@ fun MutableIntGapBuffer.linearSearch(
  * @return the index of the element, if it is contained in the array within the specified range;
  * otherwise the inverted insertion point `(-insertion point - 1)`.
  */
-fun MutableIntGapBuffer.binarySearch(
+public fun MutableIntGapBuffer.binarySearch(
     element: Int,
     fromIndex: Int = 0,
     toIndex: Int = size,

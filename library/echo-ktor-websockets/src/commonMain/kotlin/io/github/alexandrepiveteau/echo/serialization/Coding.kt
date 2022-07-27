@@ -19,7 +19,7 @@ import kotlinx.serialization.serializer
  *
  * @return the encoded [Exchange]
  */
-fun Exchange<Incoming, Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
+public fun Exchange<Incoming, Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
     object : Exchange<Frame, Frame> {
 
       override fun receive(
@@ -37,7 +37,7 @@ fun Exchange<Incoming, Outgoing>.encodeToFrame(): Exchange<Frame, Frame> =
  *
  * @return the decoded [Exchange]
  */
-fun Exchange<Frame, Frame>.decodeFromFrame(): Exchange<Incoming, Outgoing> =
+public fun Exchange<Frame, Frame>.decodeFromFrame(): Exchange<Incoming, Outgoing> =
     object : Exchange<Incoming, Outgoing> {
 
       override fun receive(
