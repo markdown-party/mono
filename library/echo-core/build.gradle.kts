@@ -36,7 +36,10 @@ kotlin {
     val jvmTest by getting { dependencies { implementation(kotlin("test-junit")) } }
     val jvmBenchmarks by creating {
       dependsOn(commonMain)
-      dependencies { implementation(libs.benchmark) }
+      dependencies {
+        implementation(libs.benchmark)
+        implementation(libs.coroutines.test)
+      }
     }
     val jsMain by getting
     val jsTest by getting { dependencies { implementation(kotlin("test-js")) } }
