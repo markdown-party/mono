@@ -17,8 +17,8 @@ jobs:
       - name: 🏗 Build frontend
         run: |
           ./gradlew markdown:markdown-frontend-compose:jsBrowserDistribution
-          cp ./deployment/firebase/.firebaserc .
-          cp ./deployment/firebase/firebase.json .
+          cp ./deployment/production/firebase/.firebaserc .
+          cp ./deployment/production/firebase/firebase.json .
       - name: 🚀 Deploy on Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:

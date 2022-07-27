@@ -16,12 +16,12 @@ jobs:
           java-version: 1.11
       - name: 🐳 Build the Docker image
         run: |
-          ./deployment/heroku/build-image.sh
+          ./deployment/production/heroku/build-image.sh
       - name: 🚀 Publish the image to Heroku
         env:
           HEROKU_TOKEN: ${{ secrets.HEROKU_TOKEN }}
         run: |
-          ./deployment/heroku/publish-image-heroku.sh
+          ./deployment/production/heroku/publish-image-heroku.sh
       - name: 🏁 Release the image on Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_TOKEN }}
