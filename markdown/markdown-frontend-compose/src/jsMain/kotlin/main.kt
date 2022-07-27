@@ -25,7 +25,6 @@ fun main() {
 
   // Load CSS
   require("./app.css")
-  require("./config.js")
 
   // Creates a new session identifier, if needed.
   val splits = window.location.pathname.split("/")
