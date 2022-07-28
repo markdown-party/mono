@@ -504,6 +504,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 	public abstract fun acknowledge-qH2TBG0 (II)V
 	public abstract fun append-Q0QDvhs (I[BII)J
 	public abstract fun clear ()V
+	public abstract fun insert (Lio/github/alexandrepiveteau/echo/core/log/Event;)V
 	public abstract fun insert-BnEfkuQ (II[BII)V
 	public abstract fun merge (Lio/github/alexandrepiveteau/echo/core/log/EventLog;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public abstract fun remove-qH2TBG0 (II)Z
@@ -512,6 +513,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 public final class io/github/alexandrepiveteau/echo/core/log/MutableEventLog$DefaultImpls {
 	public static synthetic fun append-Q0QDvhs$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;I[BIIILjava/lang/Object;)J
 	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;J)Z
+	public static fun insert (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/core/log/Event;)V
 	public static synthetic fun insert-BnEfkuQ$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;II[BIIILjava/lang/Object;)V
 }
 
@@ -520,6 +522,7 @@ public abstract interface class io/github/alexandrepiveteau/echo/core/log/Mutabl
 
 public final class io/github/alexandrepiveteau/echo/core/log/MutableHistory$DefaultImpls {
 	public static fun contains--MgKYFQ (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;J)Z
+	public static fun insert (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/core/log/Event;)V
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/MutableProjection {

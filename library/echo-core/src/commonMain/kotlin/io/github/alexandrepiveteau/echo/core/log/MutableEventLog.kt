@@ -36,6 +36,20 @@ public interface MutableEventLog : EventLog {
   )
 
   /**
+   * Inserts the provided [Event] in the [MutableEventLog] at the appropriate index. If the event is
+   * already present, or an event with the same [EventIdentifier] has already been inserted, the
+   * insertion will simply be ignored.
+   *
+   * This also means that if you have multiple events with the same [SiteIdentifier] at your
+   * disposal, you should make sure to [insert] them in the increasing [SequenceNumber] order.
+   *
+   * @param event the [Event] that is inserted.
+   */
+  public fun insert(
+      event: Event,
+  ): Unit = insert(seqno = event.seqno, site = event.site, event = event.data)
+
+  /**
    * Appends a new event in the [MutableEventLog] for the given [SiteIdentifier]. The
    * [MutableEventLog] should be owned by the given [SiteIdentifier], to ensure no duplicate
    * insertions can occur.
