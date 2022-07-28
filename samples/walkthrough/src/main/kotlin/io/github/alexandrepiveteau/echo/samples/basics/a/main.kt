@@ -1,11 +1,11 @@
 package io.github.alexandrepiveteau.echo.samples.basics.a
 
+import io.github.alexandrepiveteau.echo.SyncStrategy
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.random.Random
 
 val GCounter = OneWayProjection { model: Int, _: EventIdentifier, event: Int ->
