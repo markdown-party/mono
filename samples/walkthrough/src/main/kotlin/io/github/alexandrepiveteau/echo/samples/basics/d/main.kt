@@ -1,12 +1,12 @@
 package io.github.alexandrepiveteau.echo.samples.basics.d
 
+import io.github.alexandrepiveteau.echo.SyncStrategy.Once
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.ChangeScope
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.random.Random
 
 object TwoWaySet : TwoWayProjection<MutableSet<Int>, Int, Int> {

@@ -1,13 +1,13 @@
 package io.github.alexandrepiveteau.echo.site
 
+import io.github.alexandrepiveteau.echo.SyncStrategy.Continuous
+import io.github.alexandrepiveteau.echo.SyncStrategy.Once
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Continuous
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
-import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
 class MutableSiteSyncTest {
 

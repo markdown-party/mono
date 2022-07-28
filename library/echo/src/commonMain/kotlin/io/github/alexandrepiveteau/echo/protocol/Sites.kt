@@ -3,6 +3,7 @@ package io.github.alexandrepiveteau.echo.protocol
 import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
 import io.github.alexandrepiveteau.echo.Site
+import io.github.alexandrepiveteau.echo.SyncStrategy
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.log.EventLog
 import io.github.alexandrepiveteau.echo.core.log.MutableEventLog
@@ -10,7 +11,6 @@ import io.github.alexandrepiveteau.echo.core.log.MutableHistory
 import io.github.alexandrepiveteau.echo.events.EventScope
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
@@ -25,7 +25,7 @@ import kotlinx.serialization.KSerializer
 
 internal open class ExchangeImpl(
     private val log: MutableEventLog,
-    private val strategy: SyncStrategy<Inc, Out>,
+    private val strategy: SyncStrategy,
 ) : Exchange<Inc, Out> {
 
   /** The [Mutex] that protects access to the [log] variable. */
@@ -60,11 +60,11 @@ internal open class ExchangeImpl(
 
   override fun send(
       incoming: Flow<Inc>,
-  ): Flow<Out> = exchange(incoming) { with(strategy) { outgoing() } }
+  ): Flow<Out> = exchange(incoming) { with(strategy) { outgoing(this@exchange) } }
 
   override fun receive(
       incoming: Flow<Out>,
-  ): Flow<Inc> = exchange(incoming) { with(strategy) { incoming() } }
+  ): Flow<Inc> = exchange(incoming) { with(strategy) { incoming(this@exchange) } }
 }
 
 /**
@@ -73,7 +73,7 @@ internal open class ExchangeImpl(
  */
 internal open class SiteImpl<M, R>(
     private val history: MutableHistory<R>,
-    strategy: SyncStrategy<Inc, Out>,
+    strategy: SyncStrategy,
     private val transform: (R) -> M,
     internal val current: MutableStateFlow<M> = MutableStateFlow(transform(history.current)),
 ) : ExchangeImpl(history, strategy), Site<M> {
@@ -85,7 +85,7 @@ internal open class MutableSiteImpl<T, M, R>(
     private val serializer: KSerializer<T>,
     private val history: MutableHistory<R>,
     private val format: BinaryFormat,
-    strategy: SyncStrategy<Inc, Out>,
+    strategy: SyncStrategy,
     private val transform: (R) -> M,
 ) :
     SiteImpl<M, R>(

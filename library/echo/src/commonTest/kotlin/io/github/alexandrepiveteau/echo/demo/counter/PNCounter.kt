@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.demo.counter
 
+import io.github.alexandrepiveteau.echo.SyncStrategy.Once
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent.Decrement
@@ -8,12 +9,11 @@ import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.projections.ChangeScope
 import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @Serializable
 enum class PNCounterEvent {

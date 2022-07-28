@@ -1,14 +1,14 @@
 package party.markdown
 
 import io.github.alexandrepiveteau.echo.MutableSite
+import io.github.alexandrepiveteau.echo.SyncStrategy
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
-import kotlinx.coroutines.flow.first
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import party.markdown.cursors.CursorEvent
 import party.markdown.rga.RGAEvent

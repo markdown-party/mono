@@ -1,6 +1,9 @@
 package io.github.alexandrepiveteau.echo.demo.set
 
 import io.github.alexandrepiveteau.echo.DefaultBinaryFormat
+import io.github.alexandrepiveteau.echo.SyncStrategy
+import io.github.alexandrepiveteau.echo.SyncStrategy.Continuous
+import io.github.alexandrepiveteau.echo.SyncStrategy.Once
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
@@ -12,9 +15,6 @@ import io.github.alexandrepiveteau.echo.projections.TwoWayProjection
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Continuous
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -114,7 +114,7 @@ class GSetTest {
 
   @Test
   fun twoSites_singleOnceStrategy_converge() = runTest {
-    suspend fun test(a: SyncStrategy<Inc, Out>, b: SyncStrategy<Inc, Out>) {
+    suspend fun test(a: SyncStrategy, b: SyncStrategy) {
       val alice =
           mutableSite(
               identifier = Random.nextSiteIdentifier(),

@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo
 
+import io.github.alexandrepiveteau.echo.SyncStrategy.Once
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
@@ -7,7 +8,6 @@ import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.demo.counter.PNCounterEvent
 import io.github.alexandrepiveteau.echo.demo.counter.PNProjection
 import io.github.alexandrepiveteau.echo.projections.OneWayProjection
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy.Companion.Once
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.test.Ignore

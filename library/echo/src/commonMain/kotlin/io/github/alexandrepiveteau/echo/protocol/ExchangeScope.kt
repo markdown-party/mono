@@ -13,25 +13,25 @@ import kotlinx.coroutines.selects.SelectClause0
  * @param I the type of the incoming messages.
  * @param O the type of the outgoing messages.
  */
-public interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
+internal interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> {
 
   /**
    * The [MutableEventLog] instance, which can be used to receive and write some binary events from
    * other sites. It should only be accessed after between a [lock] and an [unlock] call.
    */
-  public val log: MutableEventLog
+  val log: MutableEventLog
 
   /** Locks access to the [MutableEventLog]. */
-  public suspend fun lock()
+  suspend fun lock()
 
   /** Unlocks access to the [MutableEventLog]. */
-  public fun unlock()
+  fun unlock()
 
   /**
    * A [SelectClause0] that is made available when the event log is updated with some new content.
    * This is typically used to ensure that the state is notified with the latest log state.
    */
-  public val onEventLogUpdate: SelectClause0
+  val onEventLogUpdate: SelectClause0
 }
 
 /**
@@ -41,7 +41,7 @@ public interface ExchangeScope<out I, in O> : ReceiveChannel<I>, SendChannel<O> 
  *
  * @param R the return type of the update [block].
  */
-public suspend inline fun <R> ExchangeScope<*, *>.withEventLogLock(
+internal suspend inline fun <R> ExchangeScope<*, *>.withEventLogLock(
     block: MutableEventLog.() -> R,
 ): R {
   lock()

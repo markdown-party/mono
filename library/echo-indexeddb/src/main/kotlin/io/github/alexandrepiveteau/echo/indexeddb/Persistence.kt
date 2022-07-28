@@ -2,13 +2,13 @@ package io.github.alexandrepiveteau.echo.indexeddb
 
 import com.juul.indexeddb.Key
 import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.SyncStrategy
 import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.core.log.toList
 import io.github.alexandrepiveteau.echo.exchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 
 /**
  * Saves the content from the provided [Exchange] to the given [session] in the browser.
