@@ -50,7 +50,7 @@ public suspend fun <I, O> sync(
  * @param O the type of the outgoing messages.
  */
 public suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
-  return sync(exchanges.asSequence().zipWithNext())
+  return sync(exchanges.asList(), Topology.linear())
 }
 
 /**
@@ -65,15 +65,40 @@ public suspend fun <I, O> sync(vararg exchanges: Exchange<I, O>) {
  * @param O the type of the outgoing messages.
  */
 public suspend fun <I, O> syncAll(vararg exchanges: Exchange<I, O>) {
-  val s = exchanges.asSequence()
-  val pairs = s.flatMapIndexed { i, a -> s.filterIndexed { j, _ -> i != j }.map { b -> a to b } }
-  return sync(pairs)
+  return sync(exchanges.asList(), Topology.complete())
+}
+
+/**
+ * A [Topology] defines a mapping between a [List] of sites and a [Sequence] of links between the
+ * sites. A [Topology] may introduce some redundancy in the connections between pairs of sites.
+ *
+ * @param T the type of the elements in the [Topology].
+ */
+private fun interface Topology<T> {
+
+  /** Maps the [List] of sites to a lazily computed sequence of [Pair]s of sites. */
+  fun transform(sites: List<T>): Sequence<Pair<T, T>>
+
+  companion object {
+
+    /** A [Topology] where sites are connected in a line. */
+    fun <T> linear() = Topology<T> { it.asSequence().zipWithNext() }
+
+    /** A [Topology] which connects each pair of sites once. */
+    fun <T> complete() =
+        Topology<T> {
+          it.asSequence().flatMapIndexed { i, from ->
+            it.asSequence().filterIndexed { j, _ -> i < j }.map { to -> from to to }
+          }
+        }
+  }
 }
 
 private suspend fun <I, O> sync(
-    exchanges: Sequence<Pair<Exchange<I, O>, Exchange<I, O>>>,
+    exchanges: List<Exchange<I, O>>,
+    topology: Topology<Exchange<I, O>>,
 ): Unit = coroutineScope {
-  exchanges.forEach { (left, right) ->
+  topology.transform(exchanges).forEach { (left, right) ->
     launch { sync(left::send, right::receive) }
     launch { sync(left::receive, right::send) }
   }
