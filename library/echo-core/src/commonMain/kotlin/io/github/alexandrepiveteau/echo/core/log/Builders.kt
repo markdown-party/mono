@@ -88,9 +88,4 @@ public fun mutableEventLogOf(
 public fun mutableEventLogOf(
     vararg events: Event,
     clock: Clock = Clock.System,
-): MutableEventLog =
-    ActualMutableEventLog(clock).apply {
-      for ((seqno, site, data) in events) {
-        insert(seqno, site, data)
-      }
-    }
+): MutableEventLog = ActualMutableEventLog(clock).apply { for (event in events) insert(event) }
