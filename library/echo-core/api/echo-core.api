@@ -343,8 +343,10 @@ public final class io/github/alexandrepiveteau/echo/core/causality/SiteIdentifie
 
 public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
 	public static final fun mutableEventLogOf (Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun mutableEventLogOf ([Lio/github/alexandrepiveteau/echo/core/log/Event;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static final fun mutableEventLogOf ([Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static synthetic fun mutableEventLogOf$default (Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableEventLogOf$default ([Lio/github/alexandrepiveteau/echo/core/log/Event;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static synthetic fun mutableEventLogOf$default ([Lkotlin/Pair;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
 	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
@@ -363,10 +365,12 @@ public final class io/github/alexandrepiveteau/echo/core/log/ChangeScope$Default
 	public static fun push (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;[B)V
 }
 
-public final class io/github/alexandrepiveteau/echo/core/log/Event {
+public final class io/github/alexandrepiveteau/echo/core/log/Event : java/lang/Comparable {
 	public static final field Companion Lio/github/alexandrepiveteau/echo/core/log/Event$Companion;
 	public synthetic fun <init> (II[BLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/SequenceNumber;Lio/github/alexandrepiveteau/echo/core/causality/SiteIdentifier;[BLkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compareTo (Lio/github/alexandrepiveteau/echo/core/log/Event;)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
 	public final fun component1-iWHgJgY ()I
 	public final fun component2-ix6DSBw ()I
 	public final fun component3 ()[B
@@ -374,6 +378,7 @@ public final class io/github/alexandrepiveteau/echo/core/log/Event {
 	public static synthetic fun copy-8X7VhMc$default (Lio/github/alexandrepiveteau/echo/core/log/Event;II[BILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/Event;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getData ()[B
+	public final fun getIdentifier-Fj5ptdU ()J
 	public final fun getSeqno-iWHgJgY ()I
 	public final fun getSite-ix6DSBw ()I
 	public fun hashCode ()I

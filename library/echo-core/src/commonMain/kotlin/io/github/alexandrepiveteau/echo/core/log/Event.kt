@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log
 
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import kotlinx.serialization.SerialName
@@ -21,7 +22,15 @@ public data class Event(
     val seqno: SequenceNumber,
     val site: SiteIdentifier,
     val data: ByteArray,
-) {
+) : Comparable<Event> {
+
+  /** The [EventIdentifier] for this [Event]. */
+  public val identifier: EventIdentifier
+    get() = EventIdentifier(seqno, site)
+
+  public override operator fun compareTo(other: Event): Int {
+    return identifier.compareTo(other.identifier)
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

@@ -5,6 +5,7 @@ import io.github.alexandrepiveteau.echo.core.buffer.mutableEventIdentifierGapBuf
 import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.SequenceNumber
 import io.github.alexandrepiveteau.echo.core.causality.binarySearchBySite
+import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as I
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as O
 import kotlinx.coroutines.selects.select
@@ -95,8 +96,10 @@ internal suspend fun ExchangeScope<I, O>.awaitEvents(
               if (!stopAfterAdvertised)
                   advertisements.push(EventIdentifier(msg.nextSeqno, msg.site))
             }
-            is I.Events ->
-                withEventLogLock { msg.events.forEach { insert(it.seqno, it.site, it.data) } }
+            is I.Events -> {
+              val log = mutableEventLogOf(*msg.events.toTypedArray())
+              withEventLogLock { merge(log) }
+            }
             is I.Ready -> error("Unexpected duplicate Ready.")
             null -> isDoneReceiving = true
           }

@@ -61,7 +61,7 @@ public fun <T> mutableHistoryOf(
  */
 public fun mutableEventLogOf(
     clock: Clock = Clock.System,
-): MutableEventLog = mutableEventLogOf(*emptyArray(), clock = clock)
+): MutableEventLog = ActualMutableEventLog(clock)
 
 /**
  * Creates a new [MutableEventLog], with no aggregate.
@@ -76,5 +76,21 @@ public fun mutableEventLogOf(
     ActualMutableEventLog(clock).apply {
       for ((id, body) in events) {
         insert(id.seqno, id.site, body)
+      }
+    }
+
+/**
+ * Creates a new [MutableEventLog], with no aggregate.
+ *
+ * @param events some events to pre-populate the history.
+ * @param clock the [Clock] used to generate new events.
+ */
+public fun mutableEventLogOf(
+    vararg events: Event,
+    clock: Clock = Clock.System,
+): MutableEventLog =
+    ActualMutableEventLog(clock).apply {
+      for ((seqno, site, data) in events) {
+        insert(seqno, site, data)
       }
     }
