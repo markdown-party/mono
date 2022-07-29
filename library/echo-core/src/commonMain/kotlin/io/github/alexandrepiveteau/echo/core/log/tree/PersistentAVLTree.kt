@@ -40,8 +40,7 @@ private constructor(
     val size: Int = 1 + (left?.size ?: 0) + (right?.size ?: 0)
 
     /** The balance factor of an [PersistentAVLNode]. Must be in the range [-2, 2]. */
-    private val balance: Int
-      get() = (right?.height ?: 0) - (left?.height ?: 0)
+    private val balance: Int = (right?.height ?: 0) - (left?.height ?: 0)
 
     /**
      * Balances the [PersistentAVLNode] with a balance factor in the range [-2, 2], by applying some
