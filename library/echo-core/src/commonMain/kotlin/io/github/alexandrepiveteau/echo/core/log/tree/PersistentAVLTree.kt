@@ -4,29 +4,32 @@ import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
 import kotlin.math.max
 
 /**
- * A persistent AVL Tree data structure.
+ * A persistent AVL Tree data structure, which associates keys with values.
  *
- * @param T the type of the elements in the [PersistentAVLTree].
+ * @param K the type of the keys, which must be unique and form a total order.
+ * @param V the type of the elements associated to the keys.
  * @property root the root [AVLNode]. Might be null if the tree is empty.
  */
-internal class PersistentAVLTree<T : Comparable<T>>
+internal class PersistentAVLTree<K : Comparable<K>, V>
 private constructor(
-    private val root: AVLNode<T>?,
+    private val root: AVLNode<K, V>?,
 ) {
 
   /**
    * A node within an [PersistentAVLTree], which may contain some values of type [T].
    *
-   * @param T the type of the value within the [AVLNode].
+   * @param K the type of the keys of [AVLNode]s.
+   * @param V the type of the value within the [AVLNode].
    *
    * @param value the value of the node.
    * @param left the left child of this node, if it exists.
    * @param right the right child of this node, if it exists.
    */
-  private data class AVLNode<out T>(
-      val value: T,
-      val left: AVLNode<T>?,
-      val right: AVLNode<T>?,
+  private data class AVLNode<out K, out V>(
+      val key: K,
+      val value: V,
+      val left: AVLNode<K, V>?,
+      val right: AVLNode<K, V>?,
   ) {
 
     /** The height of the tree. At least 1. */
@@ -40,7 +43,7 @@ private constructor(
      * Balances the [AVLNode] with a balance factor in the range [-2, 2], by applying some
      * rotations, and returns a new balanced node with a [balance] in the range [-1, 1].
      */
-    fun balance(): AVLNode<T> =
+    fun balance(): AVLNode<K, V> =
         when (this.balance) {
           -2 ->
               when (checkNotNull(left).balance) {
@@ -69,7 +72,7 @@ private constructor(
      *
      * @return the new root of the subtree.
      */
-    private fun rotateLeft(): AVLNode<T> {
+    private fun rotateLeft(): AVLNode<K, V> {
       val pivot = checkNotNull(right) { "Can't rotate left when no right child." }
       val newLeft = this.copy(right = pivot.left)
       return pivot.copy(left = newLeft)
@@ -89,7 +92,7 @@ private constructor(
      *
      * @return the new root of the subtree.
      */
-    private fun rotateRight(): AVLNode<T> {
+    private fun rotateRight(): AVLNode<K, V> {
       val pivot = checkNotNull(left) { "Can't rotate right when no left child." }
       val newRight = this.copy(left = pivot.right)
       return pivot.copy(right = newRight)
@@ -109,7 +112,7 @@ private constructor(
      *    b   c       a   b
      * ```
      */
-    private fun rotateLeftRight(): AVLNode<T> {
+    private fun rotateLeftRight(): AVLNode<K, V> {
       val left = checkNotNull(left) { "Can't rotate left-right when no left child." }
       val rotated = left.rotateLeft()
       return copy(left = rotated).rotateRight()
@@ -129,20 +132,20 @@ private constructor(
      *   b   c            c   d
      * ```
      */
-    private fun rotateRightLeft(): AVLNode<T> {
+    private fun rotateRightLeft(): AVLNode<K, V> {
       val right = checkNotNull(right) { "Can't rotate right-left when no right child." }
       val rotated = right.rotateRight()
       return copy(right = rotated).rotateLeft()
     }
 
     /** Returns the maximum node of this [AVLNode], whose [right] will be `null`. */
-    fun max(): AVLNode<T> {
+    fun max(): AVLNode<K, V> {
       var current = this
       while (true) current = current.right ?: return current
     }
 
     /** Returns the minimum value of this [AVLNode], whose [left] will be `null`. */
-    fun min(): AVLNode<T> {
+    fun min(): AVLNode<K, V> {
       var current = this
       while (true) current = current.left ?: return current
     }
@@ -220,7 +223,7 @@ private constructor(
     /** Transforms this [AVLNode] to a [Diagram]. */
     private fun toDiagram(): Diagram =
         CombinedDiagram(
-            value = TextDiagram(value.toString()),
+            value = TextDiagram("${key.toString()}:${value.toString()}"),
             left = left?.toDiagram() ?: TextDiagram(EmptyText),
             right = right?.toDiagram() ?: TextDiagram(EmptyText),
         )
@@ -232,18 +235,18 @@ private constructor(
   constructor() : this(null)
 
   /**
-   * Returns true iff the given [value] is contained within the [PersistentAVLTree], in O(log(n)).
+   * Returns true iff the given [key] is contained within the [PersistentAVLTree], in O(log(n)).
    *
-   * @param value the value whose presence is checked.
-   * @return true iff the value is present in the tree.
+   * @param key the key whose presence is checked.
+   * @return true iff the key is present in the tree.
    */
-  operator fun contains(value: T): Boolean {
+  operator fun contains(key: K): Boolean {
     var current = root
     while (current != null) {
       current =
           when {
-            value > current.value -> current.right
-            value < current.value -> current.left
+            key > current.key -> current.right
+            key < current.key -> current.left
             else -> return true
           }
     }
@@ -253,44 +256,54 @@ private constructor(
   /**
    * Inserts the given [value] in the [PersistentAVLTree], in O(log(n)).
    *
+   * @param key the key of the inserted item.
    * @param value the item which is inserted.
    */
-  operator fun plus(value: T): PersistentAVLTree<T> = PersistentAVLTree(add(root, value))
+  fun set(key: K, value: V): PersistentAVLTree<K, V> = PersistentAVLTree(put(root, key, value))
+
+  /**
+   * Inserts the given [Pair] in the [PersistentAVLTree], in O(log(n)).
+   *
+   * @param pair the [Pair] of key and value which is inserted.
+   */
+  operator fun plus(pair: Pair<K, V>): PersistentAVLTree<K, V> = set(pair.first, pair.second)
 
   /**
    * Inserts the given [value] in the provided [root], and returns the updated [AVLNode].
    *
    * @param root the [AVLNode] in which the value is inserted.
+   * @param key the inserted key.
    * @param value the inserted value.
    * @return the updated root [AVLNode].
    */
-  private fun add(root: AVLNode<T>?, value: T): AVLNode<T> =
+  private fun put(root: AVLNode<K, V>?, key: K, value: V): AVLNode<K, V> =
       when {
-        root == null -> AVLNode(value = value, left = null, right = null)
-        value < root.value -> root.copy(left = add(root.left, value)).balance()
-        value > root.value -> root.copy(right = add(root.right, value)).balance()
-        else -> root // Skip the insertion on duplicate entries.
+        root == null -> AVLNode(key = key, value = value, left = null, right = null)
+        key < root.key -> root.copy(left = put(root.left, key, value)).balance()
+        key > root.key -> root.copy(right = put(root.right, key, value)).balance()
+        else -> root.copy(value = value) // Update the value, and preserve balance.
       }
 
   /**
-   * Removes the given [value] in the [PersistentAVLTree], in O(log(n)).
+   * Removes the given [key] and its value in the [PersistentAVLTree], in O(log(n)).
    *
-   * @param value the item which is removed.
+   * @param key the key of the item which is removed.
    */
-  operator fun minus(value: T): PersistentAVLTree<T> = PersistentAVLTree(remove(root, value))
+  operator fun minus(key: K): PersistentAVLTree<K, V> = PersistentAVLTree(remove(root, key))
 
   /**
-   * Inserts the given [value] in the provided [root], and returns the updated [AVLNode].
+   * Removes the [value] associated to the given [key] in the provided [root], and returns the
+   * updated [AVLNode].
    *
    * @param root the [AVLNode] in which the value is removed.
-   * @param value the removed value.
+   * @param key the removed key.
    * @return the updated root [AVLNode], or null if empty.
    */
-  private fun remove(root: AVLNode<T>?, value: T): AVLNode<T>? =
+  private fun remove(root: AVLNode<K, V>?, key: K): AVLNode<K, V>? =
       when {
         root == null -> null
-        value < root.value -> root.copy(left = remove(root.left, value)).balance()
-        value > root.value -> root.copy(right = remove(root.right, value)).balance()
+        key < root.key -> root.copy(left = remove(root.left, key)).balance()
+        key > root.key -> root.copy(right = remove(root.right, key)).balance()
         else ->
             when {
               root.left == null && root.right == null -> null // no children
@@ -298,8 +311,8 @@ private constructor(
               root.right == null -> root.left // left is not null and balanced
               else -> {
                 val successor = root.right.min()
-                val newRight = remove(root.right, successor.value)
-                root.copy(value = successor.value, right = newRight).balance()
+                val newRight = remove(root.right, successor.key)
+                root.copy(key = successor.key, value = successor.value, right = newRight).balance()
               }
             }
       }
