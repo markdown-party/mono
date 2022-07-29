@@ -1,6 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.log.tree
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -10,6 +11,7 @@ class PersistentAVLTreeTest {
   fun emptyTree_containsReturnsFalse() {
     val tree = PersistentAVLTree<Int, Int>()
     assertFalse(0 in tree)
+    assertEquals(0, tree.size)
   }
 
   @Test
@@ -18,6 +20,7 @@ class PersistentAVLTreeTest {
     tree += 42 to Unit
     assertTrue(42 in tree)
     assertFalse(43 in tree)
+    assertEquals(1, tree.size)
   }
 
   @Test
@@ -26,7 +29,7 @@ class PersistentAVLTreeTest {
     tree += 42 to Unit
     tree += 42 to Unit
     assertTrue(42 in tree)
-    // TODO : Assertions on the tree size.
+    assertEquals(1, tree.size)
   }
 
   @Test
@@ -36,6 +39,7 @@ class PersistentAVLTreeTest {
     tree += 2 to Unit
     tree += 3 to Unit
     assertTrue(setOf(1, 2, 3).all { it in tree })
+    assertEquals(3, tree.size)
   }
 
   @Test
@@ -44,6 +48,7 @@ class PersistentAVLTreeTest {
     var tree = PersistentAVLTree<Int, Unit>()
     repeat(count) { tree += it to Unit }
     repeat(count) { assertTrue(it in tree) }
+    assertEquals(count, tree.size)
   }
 
   @Test
@@ -52,6 +57,7 @@ class PersistentAVLTreeTest {
     tree += 1 to Unit
     tree -= 1
     assertFalse(1 in tree)
+    assertEquals(0, tree.size)
   }
 
   @Test
@@ -62,5 +68,6 @@ class PersistentAVLTreeTest {
     repeat(count / 2) { tree -= 2 * it } // Remove all the even numbers.
     repeat(count / 2) { assertFalse(2 * it in tree) } // All event numbers are out.
     repeat(count / 2) { assertTrue(2 * it + 1 in tree) } // All odd numbers are in.
+    assertEquals(count / 2, tree.size)
   }
 }

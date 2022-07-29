@@ -35,6 +35,9 @@ private constructor(
     /** The height of the tree. At least 1. */
     val height: Int = max(left?.height ?: 0, right?.height ?: 0) + 1
 
+    /** The size of the tree. At least 1. */
+    val size: Int = 1 + (left?.size ?: 0) + (right?.size ?: 0)
+
     /** The balance factor of an [AVLNode]. Must be in the range [-2, 2]. */
     private val balance: Int
       get() = (right?.height ?: 0) - (left?.height ?: 0)
@@ -233,6 +236,10 @@ private constructor(
 
   /** Creates an empty [PersistentAVLTree]. */
   constructor() : this(null)
+
+  /** Returns the number of elements in the tree. */
+  val size: Int
+    get() = root?.size ?: 0
 
   /**
    * Returns true iff the given [key] is contained within the [PersistentAVLTree], in O(log(n)).
