@@ -5,7 +5,8 @@ import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
 /**
  * A persistent AVL Tree data structure.
  *
- * @param root the root [AVLNode]. Might be null if the tree is empty.
+ * @param T the type of the elements in the [PersistentAVLTree].
+ * @property root the root [AVLNode]. Might be null if the tree is empty.
  */
 internal class PersistentAVLTree<T : Comparable<T>>
 private constructor(
