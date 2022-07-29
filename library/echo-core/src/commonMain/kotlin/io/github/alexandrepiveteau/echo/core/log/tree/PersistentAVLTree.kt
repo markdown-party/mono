@@ -1,6 +1,8 @@
 package io.github.alexandrepiveteau.echo.core.log.tree
 
 import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
+import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode.Diagram.Companion.EmptyNode
+import kotlin.math.max
 
 /**
  * A persistent AVL Tree data structure.
@@ -145,6 +147,87 @@ private constructor(
       var current = this
       while (true) current = current.left ?: return current
     }
+
+    // String representation of the nodes / trees.
+
+    /** A [Diagram] represents a block which can render a subtree. */
+    private interface Diagram {
+
+      /** The index of the anchor line. */
+      val anchor: Int
+
+      /** The width of the rendered tree. */
+      val width: Int
+
+      /** The height of the rendered tree. */
+      val height: Int
+
+      /** Renders the [Diagram] to a [String]. */
+      fun render(): String
+
+      companion object {
+
+        /** The text which should be displayed for empty nodes. */
+        const val EmptyNode = "[EMPTY]"
+      }
+    }
+
+    private data class TextDiagram(val text: String) : Diagram {
+      private val lines = text.lines()
+      override val width = lines.maxOfOrNull { it.length } ?: 0
+      override val height = lines.size
+      override val anchor = height / 2
+      override fun render() = lines.joinToString(separator = "\n", transform = { it.padEnd(width) })
+    }
+
+    private data class CombinedDiagram(
+        val value: Diagram,
+        val left: Diagram,
+        val right: Diagram,
+    ) : Diagram {
+      override val width: Int = value.width + 3 + max(left.width, right.width)
+      override val height: Int = max(value.height, left.height + 1 + right.height)
+      override val anchor: Int = height / 2 - value.height / 2 + value.anchor
+      override fun render(): String {
+        val result = Array(height) { CharArray(width) { ' ' } }
+
+        /** Renders the given [text] at the [x] and [y] coordinates. */
+        fun renderAt(x: Int, y: Int, text: String) {
+          val lines = text.lines()
+          for (j in lines.indices) {
+            val line = lines[j]
+            for (i in line.indices) {
+              result[y + j][x + i] = line[i]
+            }
+          }
+        }
+
+        renderAt(0, height / 2 - value.height / 2, value.render())
+        renderAt(value.width + 3, 0, right.render())
+        renderAt(value.width + 3, height - left.height, left.render())
+
+        // Draw the lines.
+        for (j in right.anchor..height - left.height + left.anchor) result[j][value.width + 1] = '|'
+        result[anchor][value.width + 1] = '+'
+        result[right.anchor][value.width + 1] = '+'
+        result[height - left.height + left.anchor][value.width + 1] = '+'
+        result[anchor][value.width] = '-'
+        result[right.anchor][value.width + 2] = '-'
+        result[height - left.height + left.anchor][value.width + 2] = '-'
+
+        return result.joinToString("\n") { it.joinToString("") }
+      }
+    }
+
+    /** Transforms this [AVLNode] to a [Diagram]. */
+    private fun toDiagram(): Diagram =
+        CombinedDiagram(
+            value = TextDiagram(value.toString()),
+            left = left?.toDiagram() ?: TextDiagram(EmptyNode),
+            right = right?.toDiagram() ?: TextDiagram(EmptyNode),
+        )
+
+    override fun toString(): String = toDiagram().render()
   }
 
   /** Creates an empty [PersistentAVLTree]. */
