@@ -45,4 +45,25 @@ class PersistentAVLTreeTest {
     repeat(count) { tree += it }
     repeat(count) { assertTrue(it in tree) }
   }
+
+  @Test
+  fun insertionThenRemoval_isEmpty() {
+    var tree = PersistentAVLTree<Int>()
+    tree += 1
+    tree -= 1
+    assertFalse(1 in tree)
+  }
+
+  @Test
+  fun manyInsertionsManyRemovals_containsSomeElements() {
+    val count = 2048
+    var tree = PersistentAVLTree<Int>()
+    repeat(count) { tree += it }
+    repeat(count / 2) { tree -= 2 * it } // Remove all the even numbers.
+    repeat(count / 2) { assertFalse(2 * it in tree) } // All event numbers are out.
+    repeat(count / 2) { assertTrue(2 * it + 1 in tree) } // All odd numbers are in.
+    println(tree)
+  }
+
+  // TODO : Test all kinds of rotations. Have a traversal method in the tree.
 }
