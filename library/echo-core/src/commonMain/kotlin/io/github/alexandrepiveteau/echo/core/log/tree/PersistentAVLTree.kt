@@ -10,7 +10,7 @@ import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
  */
 internal class PersistentAVLTree<T : Comparable<T>>
 private constructor(
-    val root: AVLNode<T>?,
+    private val root: AVLNode<T>?,
 ) {
 
   /**
@@ -22,14 +22,14 @@ private constructor(
    * @param left the left child of this node, if it exists.
    * @param right the right child of this node, if it exists.
    */
-  internal data class AVLNode<out T>(
+  private data class AVLNode<out T>(
       val value: T,
       val left: AVLNode<T>?,
       val right: AVLNode<T>?,
   ) {
 
     /** The height of the tree. At least 1. */
-    val height = maxHeight(left, right) + 1
+    val height: Int = kotlin.math.max(left?.height ?: 0, right?.height ?: 0) + 1
 
     /** The balance factor of an [AVLNode]. Must be in the range [-2, 2]. */
     private val balance: Int
@@ -224,13 +224,4 @@ private constructor(
       }
 
   override fun toString(): String = root.toString()
-}
-
-/**
- * Returns the maximum height of a set of [AVLNode].
- *
- * @param nodes the set of [AVLNode] for which the maximum height is computed.
- */
-private fun maxHeight(vararg nodes: AVLNode<*>?): Int {
-  return nodes.maxOfOrNull { it?.height ?: 0 } ?: 0
 }
