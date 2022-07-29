@@ -1,5 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log.tree
 
+import io.github.alexandrepiveteau.echo.core.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -69,5 +70,67 @@ class PersistentAVLTreeTest {
     repeat(count / 2) { assertFalse(2 * it in tree) } // All event numbers are out.
     repeat(count / 2) { assertTrue(2 * it + 1 in tree) } // All odd numbers are in.
     assertEquals(count / 2, tree.size)
+  }
+
+  @Test
+  fun manyInsertions_iterator_hasAllElements() {
+    val count = 2048
+    var tree = PersistentAVLTree<Int, Unit>()
+    repeat(count) { tree += it to Unit }
+    val iterator = tree.iterator()
+    repeat(count) {
+      check(iterator.hasNext())
+      assertEquals(it, iterator.next().key)
+    }
+  }
+
+  @Test
+  fun manyInsertions_iteratorAtEnd_hasAllElements() {
+    val count = 2048
+    var tree = PersistentAVLTree<Int, Unit>()
+    repeat(count) { tree += it to Unit }
+    val iterator = tree.iteratorAtEnd()
+    repeat(count) {
+      check(iterator.hasPrevious())
+      assertEquals(count - it - 1, iterator.previous().key)
+    }
+  }
+
+  @Test
+  fun emptyTree_hasEmptyIterator() {
+    val tree = PersistentAVLTree<Nothing, Nothing>()
+    val iterator = tree.iterator()
+    assertFalse(iterator.hasPrevious())
+    assertFalse(iterator.hasNext())
+    assertThrows<IllegalStateException> { iterator.previous() }
+    assertThrows<IllegalStateException> { iterator.previousIndex() }
+    assertThrows<IllegalStateException> { iterator.next() }
+    assertThrows<IllegalStateException> { iterator.nextIndex() }
+  }
+
+  @Test
+  fun emptyTree_hasEmptyIteratorAtEnd() {
+    val tree = PersistentAVLTree<Nothing, Nothing>()
+    val iterator = tree.iteratorAtEnd()
+    assertFalse(iterator.hasPrevious())
+    assertFalse(iterator.hasNext())
+    assertThrows<IllegalStateException> { iterator.previous() }
+    assertThrows<IllegalStateException> { iterator.previousIndex() }
+    assertThrows<IllegalStateException> { iterator.next() }
+    assertThrows<IllegalStateException> { iterator.nextIndex() }
+  }
+
+  @Test
+  fun smallTree_iterator_worksInBothDirections() {
+    var tree = PersistentAVLTree<Int, Unit>()
+    repeat(10) { tree += it to Unit }
+    val iterator = tree.iterator()
+    assertFalse(iterator.hasPrevious())
+    assertTrue(iterator.hasNext())
+    assertEquals(0, iterator.next().key)
+    assertTrue(iterator.hasPrevious())
+    assertEquals(0, iterator.previous().key)
+    assertFalse(iterator.hasPrevious())
+    assertTrue(iterator.hasNext())
   }
 }
