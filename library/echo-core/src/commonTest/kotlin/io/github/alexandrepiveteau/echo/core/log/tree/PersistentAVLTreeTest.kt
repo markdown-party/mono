@@ -37,4 +37,12 @@ class PersistentAVLTreeTest {
     tree += 3
     assertTrue(setOf(1, 2, 3).all { it in tree })
   }
+
+  @Test
+  fun manyInsertions_containsAllElements() {
+    val count = 2048
+    var tree = PersistentAVLTree<Int>()
+    repeat(count) { tree += it }
+    repeat(count) { assertTrue(it in tree) }
+  }
 }
