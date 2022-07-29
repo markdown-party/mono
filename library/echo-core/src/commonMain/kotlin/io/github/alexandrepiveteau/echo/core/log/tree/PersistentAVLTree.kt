@@ -1,7 +1,6 @@
 package io.github.alexandrepiveteau.echo.core.log.tree
 
 import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
-import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode.Diagram.Companion.EmptyNode
 import kotlin.math.max
 
 /**
@@ -31,7 +30,7 @@ private constructor(
   ) {
 
     /** The height of the tree. At least 1. */
-    val height: Int = kotlin.math.max(left?.height ?: 0, right?.height ?: 0) + 1
+    val height: Int = max(left?.height ?: 0, right?.height ?: 0) + 1
 
     /** The balance factor of an [AVLNode]. Must be in the range [-2, 2]. */
     private val balance: Int
@@ -149,6 +148,11 @@ private constructor(
     }
 
     // String representation of the nodes / trees.
+    companion object {
+
+      /** The text which should be displayed for empty nodes. */
+      const val EmptyText = "[EMPTY]"
+    }
 
     /** A [Diagram] represents a block which can render a subtree. */
     private interface Diagram {
@@ -164,12 +168,6 @@ private constructor(
 
       /** Renders the [Diagram] to a [String]. */
       fun render(): String
-
-      companion object {
-
-        /** The text which should be displayed for empty nodes. */
-        const val EmptyNode = "[EMPTY]"
-      }
     }
 
     private data class TextDiagram(val text: String) : Diagram {
@@ -223,8 +221,8 @@ private constructor(
     private fun toDiagram(): Diagram =
         CombinedDiagram(
             value = TextDiagram(value.toString()),
-            left = left?.toDiagram() ?: TextDiagram(EmptyNode),
-            right = right?.toDiagram() ?: TextDiagram(EmptyNode),
+            left = left?.toDiagram() ?: TextDiagram(EmptyText),
+            right = right?.toDiagram() ?: TextDiagram(EmptyText),
         )
 
     override fun toString(): String = toDiagram().render()
@@ -306,5 +304,5 @@ private constructor(
             }
       }
 
-  override fun toString(): String = root.toString()
+  override fun toString(): String = root?.toString() ?: AVLNode.EmptyText
 }
