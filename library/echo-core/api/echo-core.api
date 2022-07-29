@@ -352,6 +352,12 @@ public final class io/github/alexandrepiveteau/echo/core/log/BuildersKt {
 	public static final fun mutableHistoryOf (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
 	public static synthetic fun mutableHistoryOf$default (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
 	public static synthetic fun mutableHistoryOf$default (Ljava/lang/Object;Lio/github/alexandrepiveteau/echo/core/log/MutableProjection;[Lkotlin/Pair;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+	public static final fun mutableTreeEventLogOf (Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun mutableTreeEventLogOf ([Lio/github/alexandrepiveteau/echo/core/log/Event;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static final fun mutableTreeEventLogOf ([Lkotlin/Pair;Lkotlinx/datetime/Clock;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableTreeEventLogOf$default (Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableTreeEventLogOf$default ([Lio/github/alexandrepiveteau/echo/core/log/Event;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
+	public static synthetic fun mutableTreeEventLogOf$default ([Lkotlin/Pair;Lkotlinx/datetime/Clock;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/core/log/ChangeScope {
