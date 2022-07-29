@@ -1,9 +1,7 @@
 package io.github.alexandrepiveteau.echo.core.log.buffer
 
-import io.github.alexandrepiveteau.echo.core.buffer.copyOfRange
 import io.github.alexandrepiveteau.echo.core.causality.*
 import io.github.alexandrepiveteau.echo.core.log.*
-import io.github.alexandrepiveteau.echo.core.log.EventLog.OnLogUpdateListener
 import io.github.alexandrepiveteau.echo.core.requireRange
 import kotlinx.datetime.Clock
 
@@ -15,13 +13,7 @@ import kotlinx.datetime.Clock
  */
 internal abstract class AbstractGapBufferMutableEventLog(
     clock: Clock = Clock.System,
-) : MutableEventLog {
-
-  /** The [OnLogUpdateListener] which should be notified when the log is updated. */
-  private val listeners = mutableSetOf<OnLogUpdateListener>()
-
-  // Store what we've already seen.
-  private val acknowledgedMap = MutableAcknowledgeMap(clock)
+) : AbstractMutableEventLog(clock) {
 
   // Storing the events and the changes.
   private val eventStore = BlockLog()
@@ -91,41 +83,8 @@ internal abstract class AbstractGapBufferMutableEventLog(
     // Adding the event in the iterators.
     eventStore.iteratorAtEnd().addToLog(seqno, site, event, from, until)
     site(site).iteratorAtEnd().addOrdered(seqno, site, event, from, until)
-    notifyLogListeners { onInsert(seqno, site, event, from, until) }
+    forEachLogUpdateListener { onInsert(seqno, site, event, from, until) }
   }
-
-  override fun contains(seqno: SequenceNumber, site: SiteIdentifier): Boolean =
-      acknowledgedMap.contains(seqno, site)
-
-  override fun append(
-      site: SiteIdentifier,
-      event: ByteArray,
-      from: Int,
-      until: Int,
-  ): EventIdentifier {
-    val seqno = acknowledgedMap.expected()
-    insert(
-        site = site,
-        seqno = seqno,
-        event = event,
-        from = from,
-        until = until,
-    )
-    return EventIdentifier(seqno, site)
-  }
-
-  override fun acknowledge(seqno: SequenceNumber, site: SiteIdentifier) {
-    acknowledgedMap.acknowledge(seqno, site)
-    notifyLogListeners { onAcknowledgement() }
-  }
-
-  override fun acknowledge(from: EventLog): MutableEventLog {
-    acknowledgedMap.acknowledge(from.acknowledged())
-    notifyLogListeners { onAcknowledgement() }
-    return this
-  }
-
-  override fun acknowledged(): EventIdentifierArray = acknowledgedMap.toEventIdentifierArray()
 
   override fun iterator(): EventIterator = eventStore.iterator()
 
@@ -134,28 +93,6 @@ internal abstract class AbstractGapBufferMutableEventLog(
   override fun iterator(site: SiteIdentifier): EventIterator = site(site).iterator()
 
   override fun iteratorAtEnd(site: SiteIdentifier): EventIterator = site(site).iteratorAtEnd()
-
-  override fun merge(from: EventLog): MutableEventLog {
-    // TODO : Perform the insertion in a single pass, without calling `insert` :
-    //
-    // Outline :
-    // 1. Use both acknowledged() to figure out the common bound, by taking the minimum for both
-    //    sites, but only where the sites differ (not sure about this one ?).
-    // 2. Find out the smallest sequence number in the resulting array. Move the current log to this
-    //    position.
-    // 3. Perform some step-by-step iteration over both logs, inserting missing events from the new
-    //    log. Once all the events have been inserted, notify the listeners.
-    val inserted = from.iterator()
-    while (inserted.hasNext()) {
-      inserted.moveNext()
-      insert(
-          seqno = inserted.previousSeqno,
-          site = inserted.previousSite,
-          event = inserted.previousEvent.copyOfRange(inserted.previousFrom, inserted.previousUntil),
-      )
-    }
-    return this
-  }
 
   override fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean {
 
@@ -177,7 +114,7 @@ internal abstract class AbstractGapBufferMutableEventLog(
       }
     }
 
-    if (removed) notifyLogListeners { onRemoved(seqno, site) }
+    if (removed) forEachLogUpdateListener { onRemoved(seqno, site) }
 
     return removed
   }
@@ -185,25 +122,6 @@ internal abstract class AbstractGapBufferMutableEventLog(
   override fun clear() {
     eventStore.clear()
     eventStoreBySite.clear()
-    notifyLogListeners { onCleared() }
-  }
-
-  /**
-   * Notifies all the [OnLogUpdateListener]s that a change occurred.
-   *
-   * @param block the [block] to execute.
-   */
-  private fun notifyLogListeners(
-      block: OnLogUpdateListener.() -> Unit,
-  ) = listeners.toSet().forEach(block)
-
-  override fun registerLogUpdateListener(listener: OnLogUpdateListener) {
-    listeners += listener
-    listener.onRegistered()
-  }
-
-  override fun unregisterLogUpdateListener(listener: OnLogUpdateListener) {
-    listeners -= listener
-    listener.onUnregistered()
+    forEachLogUpdateListener { onCleared() }
   }
 }
