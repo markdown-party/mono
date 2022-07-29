@@ -172,7 +172,7 @@ private constructor(
         val left = add(root.left, value)
         root
             .copy(
-                height = maxHeight(left, root.right),
+                height = maxHeight(left, root.right) + 1,
                 left = left,
             )
             .balance()
@@ -181,7 +181,7 @@ private constructor(
         val right = add(root.right, value)
         root
             .copy(
-                height = maxHeight(right, root.left),
+                height = maxHeight(right, root.left) + 1,
                 right = right,
             )
             .balance()
