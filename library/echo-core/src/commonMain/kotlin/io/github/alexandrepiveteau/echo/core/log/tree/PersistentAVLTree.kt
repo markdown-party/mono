@@ -16,25 +16,28 @@ private constructor(
   /**
    * A node within an [PersistentAVLTree], which may contain some values of type [T].
    *
+   * @param T the type of the value within the [AVLNode].
+   *
    * @param value the value of the node.
-   * @param height the height of the tree. At least 1.
    * @param left the left child of this node, if it exists.
    * @param right the right child of this node, if it exists.
    */
   internal data class AVLNode<T>(
       val value: T,
-      val height: Int,
       val left: AVLNode<T>?,
       val right: AVLNode<T>?,
   ) {
+
+    /** The height of the tree. At least 1. */
+    val height = maxHeight(left, right) + 1
 
     /** The balance factor of an [AVLNode]. Must be in the range [-2, 2]. */
     private val balance: Int
       get() = (right?.height ?: 0) - (left?.height ?: 0)
 
     /**
-     * Balances the [AVLNode], by applying some rotations, and returns a new balanced node with a
-     * [balance] in the range [-1, 1].
+     * Balances the [AVLNode] with a balance factor in the range [-2, 2], by applying some
+     * rotations, and returns a new balanced node with a [balance] in the range [-1, 1].
      */
     fun balance(): AVLNode<T> =
         when (this.balance) {
@@ -67,15 +70,8 @@ private constructor(
      */
     private fun rotateLeft(): AVLNode<T> {
       val pivot = checkNotNull(right) { "Can't rotate left when no right child." }
-      val newLeft =
-          this.copy(
-              height = maxHeight(this.left, pivot.left) + 1,
-              right = pivot.left,
-          )
-      return pivot.copy(
-          height = maxHeight(newLeft, pivot.right) + 1,
-          left = newLeft,
-      )
+      val newLeft = this.copy(right = pivot.left)
+      return pivot.copy(left = newLeft)
     }
 
     /**
@@ -94,15 +90,8 @@ private constructor(
      */
     private fun rotateRight(): AVLNode<T> {
       val pivot = checkNotNull(left) { "Can't rotate right when no left child." }
-      val newRight =
-          this.copy(
-              height = maxHeight(this.right, pivot.right) + 1,
-              left = pivot.right,
-          )
-      return pivot.copy(
-          height = maxHeight(newRight, pivot.left) + 1,
-          right = newRight,
-      )
+      val newRight = this.copy(left = pivot.right)
+      return pivot.copy(right = newRight)
     }
 
     /**
@@ -122,11 +111,7 @@ private constructor(
     private fun rotateLeftRight(): AVLNode<T> {
       val left = checkNotNull(left) { "Can't rotate left-right when no left child." }
       val rotated = left.rotateLeft()
-      return copy(
-              height = maxHeight(rotated, right) + 1,
-              left = rotated,
-          )
-          .rotateRight()
+      return copy(left = rotated).rotateRight()
     }
 
     /**
@@ -146,11 +131,19 @@ private constructor(
     private fun rotateRightLeft(): AVLNode<T> {
       val right = checkNotNull(right) { "Can't rotate right-left when no right child." }
       val rotated = right.rotateRight()
-      return copy(
-              height = maxHeight(left, rotated) + 1,
-              right = rotated,
-          )
-          .rotateLeft()
+      return copy(right = rotated).rotateLeft()
+    }
+
+    /** Returns the maximum node of this [AVLNode], whose [right] will be `null`. */
+    fun max(): AVLNode<T> {
+      var current = this
+      while (true) current = current.right ?: return current
+    }
+
+    /** Returns the minimum value of this [AVLNode], whose [left] will be `null`. */
+    fun min(): AVLNode<T> {
+      var current = this
+      while (true) current = current.left ?: return current
     }
   }
 
@@ -181,9 +174,7 @@ private constructor(
    *
    * @param value the item which is inserted.
    */
-  operator fun plus(value: T): PersistentAVLTree<T> {
-    return PersistentAVLTree(add(root, value))
-  }
+  operator fun plus(value: T): PersistentAVLTree<T> = PersistentAVLTree(add(root, value))
 
   /**
    * Inserts the given [value] in the provided [root], and returns the updated [AVLNode].
@@ -192,34 +183,47 @@ private constructor(
    * @param value the inserted value.
    * @return the updated root [AVLNode].
    */
-  private fun add(root: AVLNode<T>?, value: T): AVLNode<T> {
-    return when {
-      root == null -> AVLNode(value, 1, null, null)
-      value < root.value -> {
-        val left = add(root.left, value)
-        root
-            .copy(
-                height = maxHeight(left, root.right) + 1,
-                left = left,
-            )
-            .balance()
+  private fun add(root: AVLNode<T>?, value: T): AVLNode<T> =
+      when {
+        root == null -> AVLNode(value = value, left = null, right = null)
+        value < root.value -> root.copy(left = add(root.left, value)).balance()
+        value > root.value -> root.copy(right = add(root.right, value)).balance()
+        else -> root // Skip the insertion on duplicate entries.
       }
-      value > root.value -> {
-        val right = add(root.right, value)
-        root
-            .copy(
-                height = maxHeight(right, root.left) + 1,
-                right = right,
-            )
-            .balance()
+
+  /**
+   * Removes the given [value] in the [PersistentAVLTree], in O(log(n)).
+   *
+   * @param value the item which is removed.
+   */
+  operator fun minus(value: T): PersistentAVLTree<T> = PersistentAVLTree(remove(root, value))
+
+  /**
+   * Inserts the given [value] in the provided [root], and returns the updated [AVLNode].
+   *
+   * @param root the [AVLNode] in which the value is removed.
+   * @param value the removed value.
+   * @return the updated root [AVLNode], or null if empty.
+   */
+  private fun remove(root: AVLNode<T>?, value: T): AVLNode<T>? =
+      when {
+        root == null -> null
+        value < root.value -> root.copy(left = remove(root.left, value)).balance()
+        value > root.value -> root.copy(right = remove(root.right, value)).balance()
+        else ->
+            when {
+              root.left == null && root.right == null -> null // no children
+              root.left == null -> root.right // right is not null and balanced
+              root.right == null -> root.left // left is not null and balanced
+              else -> {
+                val successor = root.right.min()
+                val newRight = remove(root.right, successor.value)
+                root.copy(value = successor.value, right = newRight).balance()
+              }
+            }
       }
-      else -> root // Skip the insertion on duplicate entries.
-    }
-  }
 
-  // TODO : Removal of items.
-
-  override fun toString(): String = "PersistentAVLTree(${root.toString()})"
+  override fun toString(): String = root.toString()
 }
 
 /**
