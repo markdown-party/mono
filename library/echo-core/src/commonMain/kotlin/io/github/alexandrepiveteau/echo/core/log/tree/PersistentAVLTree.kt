@@ -64,7 +64,7 @@ private constructor(
      *
      * @return the new root of the subtree.
      */
-    fun rotateLeft(): AVLNode<T> {
+    private fun rotateLeft(): AVLNode<T> {
       val pivot = checkNotNull(right) { "Can't rotate left when no right child." }
       val newLeft =
           this.copy(
@@ -82,16 +82,16 @@ private constructor(
      * [rotateRight] is applied to `B` :
      *
      * ```
-     *     B            A
-     *    / \          / \
-     *   A   c  =>    a   B
-     *  / \              / \
-     * a   b            b   c
+     *       B          A
+     *      / \        / \
+     *     A   c  =>  a   B
+     *    / \            / \
+     *   a   b          b   c
      * ```
      *
      * @return the new root of the subtree.
      */
-    fun rotateRight(): AVLNode<T> {
+    private fun rotateRight(): AVLNode<T> {
       val pivot = checkNotNull(left) { "Can't rotate right when no left child." }
       val newRight =
           this.copy(
@@ -104,8 +104,21 @@ private constructor(
       )
     }
 
-    // TODO : Nice schema.
-    fun rotateLeftRight(): AVLNode<T> {
+    /**
+     * Rotates the [AVLNode] to the left, and then to the right. This corresponds to the following
+     * transformations if [rotateLeftRight] is applied to `A` :
+     *
+     * ```
+     *       A              A            C
+     *      / \            / \          / \
+     *     B   d          C   d        B   A
+     *    / \     =>     / \     =>   /|   |\
+     *   a  C           B   c        a b   c d
+     *     / \         / \
+     *    b   c       a   b
+     * ```
+     */
+    private fun rotateLeftRight(): AVLNode<T> {
       val left = checkNotNull(left) { "Can't rotate left-right when no left child." }
       val rotated = left.rotateLeft()
       return copy(
@@ -115,8 +128,21 @@ private constructor(
           .rotateRight()
     }
 
-    // TODO : Nice schema.
-    fun rotateRightLeft(): AVLNode<T> {
+    /**
+     * Rotates the [AVLNode] to the right, and then to the left. This corresponds to the following
+     * transformations if [rotateRightLeft] is applied to `A` :
+     *
+     * ```
+     *     A            A                C
+     *    / \          / \              / \
+     *   a   B        a   C            A   B
+     *      / \   =>     / \     =>   /|   |\
+     *     C   d        b   B        a b   c d
+     *    / \              / \
+     *   b   c            c   d
+     * ```
+     */
+    private fun rotateRightLeft(): AVLNode<T> {
       val right = checkNotNull(right) { "Can't rotate right-left when no right child." }
       val rotated = right.rotateRight()
       return copy(
