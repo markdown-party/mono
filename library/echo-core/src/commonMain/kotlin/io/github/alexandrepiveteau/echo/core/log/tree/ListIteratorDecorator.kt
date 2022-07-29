@@ -46,8 +46,8 @@ internal class ListIteratorDecorator(
 
   /** Runs the given [block] with the [previous] value. */
   private inline fun <R> withPrevious(block: Entry<EventIdentifier, ByteArray>.() -> R): R {
-    val result = block(iterator.next())
-    iterator.previous()
+    val result = block(iterator.previous())
+    iterator.next()
     return result
   }
   override val previousSeqno: SequenceNumber

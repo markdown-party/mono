@@ -67,8 +67,12 @@ internal abstract class AbstractAVLTreeMutableEventLog(
       ListIteratorDecorator(site(site).iteratorAtEnd())
 
   override fun remove(seqno: SequenceNumber, site: SiteIdentifier): Boolean {
-    val present = tree.contains(EventIdentifier(seqno, site))
-    if (present) tree = tree.minus(EventIdentifier(seqno, site))
+    val id = EventIdentifier(seqno, site)
+    val present = tree.contains(id) || site(site).contains(id)
+    if (present) {
+      tree = tree.minus(id)
+      treeBySite[site] = site(site).minus(id)
+    }
     if (present) forEachLogUpdateListener { onRemoved(seqno, site) }
     return present
   }
