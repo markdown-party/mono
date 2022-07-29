@@ -142,15 +142,21 @@ private constructor(
     }
 
     /** Returns the maximum node of this [AVLNode], whose [right] will be `null`. */
-    fun max(): AVLNode<K, V> {
-      var current = this
-      while (true) current = current.right ?: return current
+    fun traverseToMax(): Sequence<AVLNode<K, V>> = sequence {
+      var current = this@AVLNode
+      while (true) {
+        yield(current)
+        current = current.right ?: return@sequence
+      }
     }
 
     /** Returns the minimum value of this [AVLNode], whose [left] will be `null`. */
-    fun min(): AVLNode<K, V> {
-      var current = this
-      while (true) current = current.left ?: return current
+    fun traverseToMin(): Sequence<AVLNode<K, V>> = sequence {
+      var current = this@AVLNode
+      while (true) {
+        yield(current)
+        current = current.left ?: return@sequence
+      }
     }
 
     // String representation of the nodes / trees.
@@ -317,7 +323,7 @@ private constructor(
               root.left == null -> root.right // right is not null and balanced
               root.right == null -> root.left // left is not null and balanced
               else -> {
-                val successor = root.right.min()
+                val successor = root.right.traverseToMin().last()
                 val newRight = remove(root.right, successor.key)
                 root.copy(key = successor.key, value = successor.value, right = newRight).balance()
               }
