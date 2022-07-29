@@ -1,38 +1,54 @@
 package io.github.alexandrepiveteau.echo.core.log.tree
 
-import kotlin.math.max
+import io.github.alexandrepiveteau.echo.core.log.tree.PersistentAVLTree.AVLNode
 
-internal class AVLTree<T : Comparable<T>> {
+/**
+ * A persistent AVL Tree data structure.
+ *
+ * @param root the root [AVLNode]. Might be null if the tree is empty.
+ */
+internal class PersistentAVLTree<T : Comparable<T>>
+private constructor(
+    val root: AVLNode<T>?,
+) {
 
   /**
-   * A node within an [AVLTree], which may contain some values of type [T].
+   * A node within an [PersistentAVLTree], which may contain some values of type [T].
    *
    * @param value the value of the node.
-   * @param parent the parent of this [AVLNode], if it exists.
+   * @param height the height of the tree. At least 1.
    * @param left the left child of this node, if it exists.
-   * @param leftHeight the height of the left subtree.
    * @param right the right child of this node, if it exists.
-   * @param rightHeight the height of the right subtree.
    */
   internal data class AVLNode<T>(
       val value: T,
-      var parent: AVLNode<T>?,
-      var height: Int,
-      var left: AVLNode<T>?,
-      var right: AVLNode<T>?,
+      val height: Int,
+      val left: AVLNode<T>?,
+      val right: AVLNode<T>?,
   ) {
 
-    /** The balance of an [AVLNode]. */
-    val balance: Int
+    /** The balance factor of an [AVLNode]. Must be in the range [-2, 2]. */
+    private val balance: Int
       get() = (right?.height ?: 0) - (left?.height ?: 0)
 
     /**
-     * A helper function which recomputes the height of the current [AVLNode] using the [right] and
-     * [left] subtrees.
+     * Balances the [AVLNode], by applying some rotations, and returns a new balanced node with a
+     * [balance] in the range [-1, 1].
      */
-    private fun updateHeight() {
-      height = max(left?.height ?: 0, right?.height ?: 0) + 1
-    }
+    fun balance(): AVLNode<T> =
+        when (this.balance) {
+          -2 ->
+              when (checkNotNull(left).balance) {
+                1 -> rotateLeftRight()
+                else -> rotateRight()
+              }
+          2 ->
+              when (checkNotNull(right).balance) {
+                -1 -> rotateRightLeft()
+                else -> rotateLeft()
+              }
+          else -> this // The node is already balanced.
+        }
 
     /**
      * Rotates the [AVLNode] to the left. This corresponds to the following transformation if
@@ -50,13 +66,15 @@ internal class AVLTree<T : Comparable<T>> {
      */
     fun rotateLeft(): AVLNode<T> {
       val pivot = checkNotNull(right) { "Can't rotate left when no right child." }
-      pivot.parent = parent
-      parent = pivot
-      right = pivot.left
-      pivot.left = this
-      updateHeight()
-      pivot.updateHeight()
-      return pivot
+      val newLeft =
+          this.copy(
+              height = maxHeight(this.left, pivot.left) + 1,
+              right = pivot.left,
+          )
+      return pivot.copy(
+          height = maxHeight(newLeft, pivot.right) + 1,
+          left = newLeft,
+      )
     }
 
     /**
@@ -75,40 +93,45 @@ internal class AVLTree<T : Comparable<T>> {
      */
     fun rotateRight(): AVLNode<T> {
       val pivot = checkNotNull(left) { "Can't rotate right when no left child." }
-      pivot.parent = parent
-      parent = pivot
-      left = pivot.right
-      pivot.right = this
-      updateHeight()
-      pivot.updateHeight()
-      return pivot
+      val newRight =
+          this.copy(
+              height = maxHeight(this.right, pivot.right) + 1,
+              left = pivot.right,
+          )
+      return pivot.copy(
+          height = maxHeight(newRight, pivot.left) + 1,
+          right = newRight,
+      )
     }
 
-    /*
-    /** Returns the next [AVLNode], if it exists. */
-    fun next(): AVLNode<T>? = nextRight() ?: nextParent()
-
-    private fun nextRight(): AVLNode<T>? {
-      var current = right ?: return null
-      var left = current.left
-      while (left != null) {
-        current = left
-        left = current.left
-      }
-      return current
+    // TODO : Nice schema.
+    fun rotateLeftRight(): AVLNode<T> {
+      val left = checkNotNull(left) { "Can't rotate left-right when no left child." }
+      val rotated = left.rotateLeft()
+      return copy(
+              height = maxHeight(rotated, right) + 1,
+              left = rotated,
+          )
+          .rotateRight()
     }
 
-    private fun nextParent(): AVLNode<T>? {
-      TODO()
+    // TODO : Nice schema.
+    fun rotateRightLeft(): AVLNode<T> {
+      val right = checkNotNull(right) { "Can't rotate right-left when no right child." }
+      val rotated = right.rotateRight()
+      return copy(
+              height = maxHeight(left, rotated) + 1,
+              right = rotated,
+          )
+          .rotateLeft()
     }
-     */
   }
 
-  /** The root off the tree. Might be null if no elements have been inserted yet. */
-  private var root: AVLNode<T>? = null
+  /** Creates an empty [PersistentAVLTree]. */
+  constructor() : this(null)
 
   /**
-   * Returns true iff the given [value] is contained within the [AVLTree], in O(log(n)).
+   * Returns true iff the given [value] is contained within the [PersistentAVLTree], in O(log(n)).
    *
    * @param value the value whose presence is checked.
    * @return true iff the value is present in the tree.
@@ -118,8 +141,8 @@ internal class AVLTree<T : Comparable<T>> {
     while (current != null) {
       current =
           when {
-            value > current.value -> current.left
-            value < current.value -> current.right
+            value > current.value -> current.right
+            value < current.value -> current.left
             else -> return true
           }
     }
@@ -127,30 +150,56 @@ internal class AVLTree<T : Comparable<T>> {
   }
 
   /**
-   * Inserts the given [value] in the [AVLTree], in O(log(n)).
+   * Inserts the given [value] in the [PersistentAVLTree], in O(log(n)).
    *
    * @param value the item which is inserted.
    */
-  fun insert(value: T) {
-    root = add(root, value)
+  operator fun plus(value: T): PersistentAVLTree<T> {
+    return PersistentAVLTree(add(root, value))
   }
 
-  private fun add(node: AVLNode<T>?, value: T): AVLNode<T> {
-    // TODO : Handle setting the parent.
-    if (node == null) return AVLNode(value, null, 1, null, null)
-    when {
-      value < node.value -> {
-        val left = add(node.left, value)
-        left.parent = node
-        node.left = left
+  /**
+   * Inserts the given [value] in the provided [root], and returns the updated [AVLNode].
+   *
+   * @param root the [AVLNode] in which the value is inserted.
+   * @param value the inserted value.
+   * @return the updated root [AVLNode].
+   */
+  private fun add(root: AVLNode<T>?, value: T): AVLNode<T> {
+    return when {
+      root == null -> AVLNode(value, 1, null, null)
+      value < root.value -> {
+        val left = add(root.left, value)
+        root
+            .copy(
+                height = maxHeight(left, root.right),
+                left = left,
+            )
+            .balance()
       }
-      value > node.value -> {
-        val right = add(node.right, value)
-        right.parent = node
-        node.right = right
+      value > root.value -> {
+        val right = add(root.right, value)
+        root
+            .copy(
+                height = maxHeight(right, root.left),
+                right = right,
+            )
+            .balance()
       }
-      else -> return node // Skip the insertion on duplicate entries.
+      else -> root // Skip the insertion on duplicate entries.
     }
-    return node // TODO : Balance the nodes.
   }
+
+  // TODO : Removal of items.
+
+  override fun toString(): String = "PersistentAVLTree(${root.toString()})"
+}
+
+/**
+ * Returns the maximum height of a set of [AVLNode].
+ *
+ * @param nodes the set of [AVLNode] for which the maximum height is computed.
+ */
+private fun maxHeight(vararg nodes: AVLNode<*>?): Int {
+  return nodes.maxOfOrNull { it?.height ?: 0 } ?: 0
 }

@@ -4,37 +4,37 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class AVLTreeTest {
+class PersistentAVLTreeTest {
 
   @Test
   fun emptyTree_containsReturnsFalse() {
-    val tree = AVLTree<Int>()
+    val tree = PersistentAVLTree<Int>()
     assertFalse(0 in tree)
   }
 
   @Test
   fun singletonTree_containsReturnsTrueForElement() {
-    val tree = AVLTree<Int>()
-    tree.insert(42)
+    var tree = PersistentAVLTree<Int>()
+    tree += 42
     assertTrue(42 in tree)
     assertFalse(43 in tree)
   }
 
   @Test
   fun duplicateInsertions_containsReturnsElement() {
-    val tree = AVLTree<Int>()
-    tree.insert(42)
-    tree.insert(42)
+    var tree = PersistentAVLTree<Int>()
+    tree += 42
+    tree += 42
     assertTrue(42 in tree)
     // TODO : Assertions on the tree size.
   }
 
   @Test
   fun multipleInsertions_containsAllElements() {
-    val tree = AVLTree<Int>()
-    tree.insert(1)
-    tree.insert(2)
-    tree.insert(3)
+    var tree = PersistentAVLTree<Int>()
+    tree += 1
+    tree += 2
+    tree += 3
     assertTrue(setOf(1, 2, 3).all { it in tree })
   }
 }
