@@ -22,7 +22,7 @@ private constructor(
    * @param left the left child of this node, if it exists.
    * @param right the right child of this node, if it exists.
    */
-  internal data class AVLNode<T>(
+  internal data class AVLNode<out T>(
       val value: T,
       val left: AVLNode<T>?,
       val right: AVLNode<T>?,
