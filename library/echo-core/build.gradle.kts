@@ -54,6 +54,16 @@ kotlin {
   targets { jvm { compilations.create("benchmarks") } }
 }
 
-benchmark { targets { register("jvmBenchmarks") } }
+benchmark {
+  targets { register("jvmBenchmarks") }
+  configurations {
+    named("main") {
+      iterations = Benchmarks.IterationsCount
+      iterationTime = Benchmarks.IterationsTime
+      iterationTimeUnit = Benchmarks.IterationsTimeUnit
+      warmups = Benchmarks.WarmupsCount
+    }
+  }
+}
 
 allOpen { annotation("org.openjdk.jmh.annotations.State") }
