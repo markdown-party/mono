@@ -1,11 +1,11 @@
 package io.github.alexandrepiveteau.echo.lww
 
+import io.github.alexandrepiveteau.echo.SyncStrategy
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.nextSiteIdentifier
 import io.github.alexandrepiveteau.echo.lww.LWWRegister.Tagged
 import io.github.alexandrepiveteau.echo.mutableSite
 import io.github.alexandrepiveteau.echo.sync
-import io.github.alexandrepiveteau.echo.sync.SyncStrategy
 import kotlin.random.Random
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.Param
