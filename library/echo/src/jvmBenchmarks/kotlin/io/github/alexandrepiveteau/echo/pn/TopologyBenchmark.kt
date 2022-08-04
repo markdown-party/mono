@@ -24,9 +24,9 @@ import kotlinx.coroutines.runBlocking
 @State(Scope.Thread)
 class TopologyBenchmark {
 
-  @Param("2", "5", "10") var replicas = 0
-  @Param("1", "10", "100", "1000") var increments = 0
+  @Param("2", "4", "8") var replicas = 0
   @Param("GapBuffer", "Tree") var mode = GapBuffer
+  @Param("10", "50", "100", "500", "1000") var increments = 0
 
   enum class LogType {
     GapBuffer,
