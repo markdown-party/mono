@@ -2,7 +2,7 @@ name: benchmarks
 on: workflow_dispatch
 
 jobs:
-  test:
+  benchmark:
     runs-on: self-hosted
     steps:
       - name: 🎁 Checkout repo
@@ -11,5 +11,5 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - name: ✅ Test app
+      - name: ✅ Benchmark app
         run: ./gradlew jvmBenchmarksBenchmark
