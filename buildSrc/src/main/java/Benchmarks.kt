@@ -1,8 +1,8 @@
 import java.util.concurrent.TimeUnit
 
 object Benchmarks {
-  const val IterationsCount = 1
-  const val IterationsTime = 10L
+  const val IterationsCount = 20
+  const val IterationsTime = 5L
   val IterationsTimeUnit = TimeUnit.SECONDS.toString()
-  const val WarmupsCount = 1
+  const val WarmupsCount = 10
 }
