@@ -1,4 +1,4 @@
-name: tests
+name: benchmarks
 on: workflow_dispatch
 
 jobs:
