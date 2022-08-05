@@ -20,7 +20,7 @@ class PNCounterBenchmark {
   @Param("1", "10", "100", "10000") var increments = 0
 
   private fun site(identifier: SiteIdentifier) =
-      mutableSite(identifier = identifier, initial = 0, projection = PNCounter)
+      mutableSite(identifier = identifier, initial = 0, projection = TwoWayPNCounter)
 
   @Benchmark
   fun counter() = runBlocking {

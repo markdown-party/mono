@@ -1,33 +1,25 @@
-package io.github.alexandrepiveteau.echo.pn
+package io.github.alexandrepiveteau.echo
 
-import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.TopologyFlamegraph.LogType.GapBuffer
+import io.github.alexandrepiveteau.echo.TopologyFlamegraph.LogType.Tree
 import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
 import io.github.alexandrepiveteau.echo.core.causality.toUInt
 import io.github.alexandrepiveteau.echo.core.log.mutableEventLogOf
 import io.github.alexandrepiveteau.echo.core.log.mutableTreeEventLogOf
-import io.github.alexandrepiveteau.echo.exchange
-import io.github.alexandrepiveteau.echo.mutableSite
-import io.github.alexandrepiveteau.echo.pn.TopologyBenchmark.LogType.GapBuffer
-import io.github.alexandrepiveteau.echo.pn.TopologyBenchmark.LogType.Tree
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming as Inc
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing as Out
-import io.github.alexandrepiveteau.echo.sync
-import kotlinx.benchmark.Benchmark
-import kotlinx.benchmark.Param
-import kotlinx.benchmark.Scope
-import kotlinx.benchmark.State
+import kotlin.test.Test
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-@State(Scope.Thread)
-class TopologyBenchmark {
+class TopologyFlamegraph {
 
-  @Param("2", "4", "8") var replicas = 0
-  @Param("GapBuffer", "Tree") var mode = GapBuffer
-  @Param("10", "50", "100", "500", "1000") var increments = 0
+  var replicas = 4
+  var mode = Tree
+  var increments = 500
 
   enum class LogType {
     GapBuffer,
@@ -48,7 +40,7 @@ class TopologyBenchmark {
     return exchange(eventLog)
   }
 
-  @Benchmark
+  @Test
   fun star_twoWay() = runBlocking {
     val primary = primary(mode)
     repeat(replicas) {
@@ -64,7 +56,7 @@ class TopologyBenchmark {
     }
   }
 
-  @Benchmark
+  @Test
   fun star_oneWay() = runBlocking {
     val primary = primary(mode)
     repeat(replicas) {
