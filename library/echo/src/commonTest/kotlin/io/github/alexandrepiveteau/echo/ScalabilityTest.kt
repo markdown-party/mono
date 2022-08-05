@@ -87,7 +87,8 @@ class ScalabilityTest {
   @Test
   fun compareMutableHistoryToExchange() = runTest {
     val ops = 100_000
-    val primary = mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
+    val primary =
+      mutableSite(SiteIdentifier.Min, 0, PNProjection, strategy = Once)
     repeat(ops) { primary.event { yield(PNCounterEvent.Increment) } }
 
     val history = mutableSite(SiteIdentifier.Max, 0, PNProjection)
