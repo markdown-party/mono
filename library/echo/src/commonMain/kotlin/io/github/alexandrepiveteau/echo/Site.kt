@@ -86,21 +86,6 @@ public enum class SyncStrategy {
 /**
  * Creates a new [Exchange] with a backing event log.
  *
- * @param log the [MutableEventLog] backing the exchange.
- * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
- */
-public fun exchange(
-    log: MutableEventLog,
-    strategy: SyncStrategy = SyncStrategy.Continuous,
-): Exchange<Inc, Out> =
-    orderedExchange(
-        log = log,
-        strategy = strategy,
-    )
-
-/**
- * Creates a new [Exchange] with a backing event log.
- *
  * @param events some initial events to populate the event log.
  * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
  */
@@ -108,8 +93,23 @@ public fun exchange(
     vararg events: Pair<EventIdentifier, ByteArray>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Exchange<Inc, Out> =
-    orderedExchange(
+    exchange(
         log = mutableEventLogOf(*events),
+        strategy = strategy,
+    )
+
+/**
+ * Creates a new [Exchange] with a backing event log.
+ *
+ * @param log the [MutableEventLog] backing the exchange.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ */
+public fun exchange(
+    log: MutableEventLog,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+): Exchange<Inc, Out> =
+    ExchangeImpl(
+        log = log,
         strategy = strategy,
     )
 
@@ -126,7 +126,7 @@ public inline fun <M, reified T> site(
     history: MutableHistory<M>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
-    orderedSite(
+    site(
         history = history,
         strategy = strategy,
         transform = { it },
@@ -169,7 +169,7 @@ public inline fun <M, reified T> site(
     vararg events: Pair<EventIdentifier, T>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
-    orderedSite(
+    site(
         history =
             mutableHistoryOf(
                 initial = initial,
@@ -203,7 +203,7 @@ public inline fun <M, reified T, reified C> site(
     vararg events: Pair<EventIdentifier, T>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): Site<M> =
-    orderedSite(
+    site(
         history =
             mutableHistoryOf(
                 initial = initial,
@@ -218,6 +218,27 @@ public inline fun <M, reified T, reified C> site(
             ),
         strategy = strategy,
         transform = { it },
+    )
+
+/**
+ * Creates a new [Site] for the provided [SiteIdentifier], with a backing log.
+ *
+ * @param history the [MutableHistory] for this [Site].
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ * @param transform a function mapping the backing model from type [R] to type [M].
+ *
+ * @param M the type of the model for this [Site].
+ * @param R the type of the backing model for this [Site].
+ */
+public fun <M, R> site(
+    history: MutableHistory<R>,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+    transform: (R) -> M,
+): Site<M> =
+    SiteImpl(
+        history = history,
+        strategy = strategy,
+        transform = transform,
     )
 
 /**
@@ -260,7 +281,7 @@ public inline fun <M, reified T> mutableSite(
     history: MutableHistory<M>,
     strategy: SyncStrategy = SyncStrategy.Continuous,
 ): MutableSite<T, M> =
-    orderedMutableSite(
+    mutableSite(
         identifier = identifier,
         history = history,
         strategy = strategy,
@@ -350,7 +371,7 @@ public inline fun <M, reified T, R> mutableSite(
     strategy: SyncStrategy = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
-    orderedMutableSite(
+    mutableSite(
         identifier = identifier,
         history = history,
         eventSerializer = serializer(),
@@ -425,7 +446,7 @@ public inline fun <M, reified T, reified C, R> mutableSite(
     strategy: SyncStrategy = SyncStrategy.Continuous,
     noinline transform: (R) -> M,
 ): MutableSite<T, M> =
-    orderedMutableSite(
+    mutableSite(
         identifier = identifier,
         history =
             mutableHistoryOf(
@@ -445,6 +466,37 @@ public inline fun <M, reified T, reified C, R> mutableSite(
         transform = transform,
     )
 
+/**
+ * Creates a new [MutableSite] for the provided [SiteIdentifier], with a backing mutable history.
+ *
+ * @param identifier the globally unique identifier for this [Site].
+ * @param history the underlying [MutableHistory].
+ * @param eventSerializer the [KSerializer] for the events.
+ * @param format the binary format to use.
+ * @param strategy the [SyncStrategy] that's applied. Defaults to [SyncStrategy.Continuous].
+ * @param transform a function mapping the backing model from type [R] to type [M].
+ *
+ * @param M the type of the model for this [Site].
+ * @param T the type of the events managed by this [Site].
+ * @param R the type of the backing model for this [Site].
+ */
+public fun <M, T, R> mutableSite(
+    identifier: SiteIdentifier,
+    history: MutableHistory<R>,
+    eventSerializer: KSerializer<T>,
+    format: BinaryFormat = DefaultBinaryFormat,
+    strategy: SyncStrategy = SyncStrategy.Continuous,
+    transform: (R) -> M,
+): MutableSite<T, M> =
+    MutableSiteImpl(
+        identifier = identifier,
+        serializer = eventSerializer,
+        history = history,
+        format = format,
+        strategy = strategy,
+        transform = transform,
+    )
+
 // SITE BUILDERS
 
 @PublishedApi
@@ -455,16 +507,6 @@ internal object UnitProjection : OneWayProjection<Unit, Any?> {
       event: Any?,
   ) = model
 }
-
-@PublishedApi
-internal fun orderedExchange(
-    log: MutableEventLog,
-    strategy: SyncStrategy,
-): Exchange<Inc, Out> =
-    ExchangeImpl(
-        log = log,
-        strategy = strategy,
-    )
 
 /**
  * Transforms a vararg of [Pair] of [EventIdentifier] to [T] to a map an [Array] of [Pair] of
@@ -482,33 +524,3 @@ internal fun <T> Array<out Pair<EventIdentifier, T>>.mapToBinary(
         .map { (id, body) -> id to format.encodeToByteArray(serializer, body) }
         .toList()
         .toTypedArray()
-
-@PublishedApi
-internal fun <M, R> orderedSite(
-    history: MutableHistory<R>,
-    strategy: SyncStrategy,
-    transform: (R) -> M,
-): Site<M> =
-    SiteImpl(
-        history = history,
-        strategy = strategy,
-        transform = transform,
-    )
-
-@PublishedApi
-internal fun <M, T, R> orderedMutableSite(
-    identifier: SiteIdentifier,
-    history: MutableHistory<R>,
-    eventSerializer: KSerializer<T>,
-    format: BinaryFormat,
-    strategy: SyncStrategy,
-    transform: (R) -> M,
-): MutableSite<T, M> =
-    MutableSiteImpl(
-        identifier = identifier,
-        serializer = eventSerializer,
-        history = history,
-        format = format,
-        strategy = strategy,
-        transform = transform,
-    )

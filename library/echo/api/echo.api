@@ -18,9 +18,10 @@ public final class io/github/alexandrepiveteau/echo/Exchanges {
 	public static final fun getDefaultBinaryFormat ()Lkotlinx/serialization/BinaryFormat;
 	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
 	public static final fun mapToBinary ([Lkotlin/Pair;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)[Lkotlin/Pair;
-	public static final fun orderedExchange (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
-	public static final fun orderedMutableSite-UQNCs_s (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
-	public static final fun orderedSite (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun mutableSite-UQNCs_s (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-UQNCs_s$default (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun site (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
+	public static synthetic fun site$default (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Site;
 	public static final fun sync (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun sync ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun syncAll ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

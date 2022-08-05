@@ -72,4 +72,20 @@ class TopologyFlamegraph {
       }
     }
   }
+
+  @Test
+  fun star_optimizedCounter() = runBlocking {
+    val primary = primary(mode)
+    repeat(replicas) {
+      val id = (SiteIdentifier.Min.toUInt() + it.toUInt()).toSiteIdentifier()
+      val replica = fastCounter(identifier = id)
+      val syncJob = launch { sync(replica, primary) }
+
+      launch {
+        repeat(increments) { count -> replica.event { yield(count) } }
+        replica.value.first { sum -> sum == replicas * (increments - 1) }
+        syncJob.cancel()
+      }
+    }
+  }
 }
