@@ -76,6 +76,7 @@ internal abstract class AbstractGapBufferMutableHistory<T>(
         }
       }
     }
+    notifyValueListeners(current)
   }
 
   private val changeStore = BlockLog()
@@ -86,14 +87,11 @@ internal abstract class AbstractGapBufferMutableHistory<T>(
   }
 
   final override var current: T = initial
-    private set(value) {
-      field = value
-      notifyValueListeners(value)
-    }
+    private set
 
   /** Notifies all the [OnValueUpdateListener]s that a new value is available. */
   private fun notifyValueListeners(value: T) {
-    listeners.toSet().forEach { it.onValueUpdated(value) }
+    listeners.forEach { it.onValueUpdated(value) }
   }
 
   override fun registerValueUpdateListener(listener: OnValueUpdateListener<T>) {
