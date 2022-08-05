@@ -72,6 +72,7 @@ benchmark {
       iterationTime = Benchmarks.IterationsTime
       iterationTimeUnit = Benchmarks.IterationsTimeUnit
       warmups = Benchmarks.WarmupsCount
+      include("star")
     }
   }
 }
