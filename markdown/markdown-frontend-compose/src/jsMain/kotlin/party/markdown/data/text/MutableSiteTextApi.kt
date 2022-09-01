@@ -31,7 +31,7 @@ class MutableSiteTextApi(
 
   override suspend fun edit(
       id: EventIdentifier,
-      scope: suspend TextCursorEventScope.() -> Unit,
+      scope: TextCursorEventScope.() -> Unit,
   ) =
       site.event {
         val impl =

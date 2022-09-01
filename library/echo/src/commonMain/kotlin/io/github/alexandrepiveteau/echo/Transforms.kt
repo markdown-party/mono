@@ -86,9 +86,7 @@ public fun <T, M> MutableSite<T, M>.flowOn(
       override val value: Flow<M>
         get() = this@flowOn.value
 
-      override suspend fun <R> event(
-          block: suspend EventScope<T>.(M) -> R,
-      ) = this@flowOn.event(block)
+      override suspend fun <R> event(block: EventScope<T>.(M) -> R) = this@flowOn.event(block)
     }
 
 // MAP
@@ -127,6 +125,6 @@ private class MappingMutableSite<T, out M1, out M2>(
   override val value = backing.value.map(f)
 
   override suspend fun <R> event(
-      block: suspend EventScope<T>.(M2) -> R,
+      block: EventScope<T>.(M2) -> R,
   ) = backing.event { m -> block(this, f(m)) }
 }
