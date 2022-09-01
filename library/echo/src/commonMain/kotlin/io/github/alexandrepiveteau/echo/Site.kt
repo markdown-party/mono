@@ -60,7 +60,7 @@ public interface MutableSite<in T, out M> : Site<M> {
    *
    * @param R the return value of the [event] call.
    */
-  public suspend fun <R> event(block: suspend EventScope<T>.(M) -> R): R
+  public suspend fun <R> event(block: EventScope<T>.(M) -> R): R
 }
 
 /**

@@ -27,7 +27,7 @@ interface TextApi {
    * @param id the [TreeNodeIdentifier] that corresponds to a document.
    * @param scope the [TextCursorEventScope] where we may emit some events.
    */
-  suspend fun edit(id: TreeNodeIdentifier, scope: suspend TextCursorEventScope.() -> Unit)
+  suspend fun edit(id: TreeNodeIdentifier, scope: TextCursorEventScope.() -> Unit)
 }
 
 /** A scope which lets the consumer yield some [RGAEvent] or some [CursorEvent]. */
