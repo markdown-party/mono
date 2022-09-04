@@ -2,14 +2,9 @@ package party.markdown.ui.topBar
 
 import LocalSiteIdentifier
 import androidx.compose.runtime.Composable
-import io.github.alexandrepiveteau.echo.Exchange
 import io.github.alexandrepiveteau.echo.MutableSite
-import io.github.alexandrepiveteau.echo.protocol.Message
 import kotlinx.browser.window
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Img
-import org.jetbrains.compose.web.dom.Span
-import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.*
 import party.markdown.MarkdownParty
 import party.markdown.MarkdownPartyEvent
 import party.markdown.data.Configuration
@@ -47,6 +42,14 @@ fun TopBar(
           classes("h-12", "cursor-pointer", "hover:bg-gray-600", "rounded", "px-2", "py-1")
           onClick { onDebugEnabled(!debugEnabled) }
         })
+    A(
+      href = "https://github.com/markdown-party/mono",
+      attrs = {
+        classes("hover:bg-gray-600", "rounded", "p-3")
+      }
+    ) {
+      Img(src = "/icons/github.svg")
+    }
     ProjectName(api = projectApi)
     Div(attrs = { classes("flex-grow") })
     Button(
