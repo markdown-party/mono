@@ -28,7 +28,7 @@ public final class io/github/alexandrepiveteau/echo/Exchanges {
 }
 
 public abstract interface class io/github/alexandrepiveteau/echo/MutableSite : io/github/alexandrepiveteau/echo/Site {
-	public abstract fun event (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun event (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getIdentifier-ix6DSBw ()I
 }
 

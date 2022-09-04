@@ -103,7 +103,7 @@ internal open class MutableSiteImpl<T, M, R>(
       )
 
   override suspend fun <R> event(
-      block: suspend EventScope<T>.(M) -> R,
+      block: EventScope<T>.(M) -> R,
   ) = mutex.withLock { block(this, transform(history.current)) }
 }
 
