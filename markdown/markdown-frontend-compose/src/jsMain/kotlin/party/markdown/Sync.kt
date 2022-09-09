@@ -20,7 +20,7 @@ interface SyncState {
   val syncing: Boolean
 
   /** The number of participants in the session. */
-  val participantsCount: Int
+  @Deprecated("Not provided by the server.") val participantsCount: Int
 
   /** Requests the two [Exchange]s to start a sync process. */
   fun start()
@@ -34,7 +34,7 @@ private class SnapshotSyncState(initial: Boolean) : SyncState {
   override var syncing by mutableStateOf(initial)
     private set
 
-  override var participantsCount by mutableStateOf(0)
+  @Deprecated("Not provided by the server.") override val participantsCount = 0
 
   override fun start() {
     syncing = true
@@ -63,13 +63,11 @@ fun rememberSyncState(
   LaunchedEffect(local, configuration, state.syncing) {
     if (state.syncing) {
       try {
-        state.participantsCount = 0
-        configuration.sync(local) { state.participantsCount = it.size }
+        configuration.sync(local)
       } catch (problem: Throwable) {
         // Ignored.
         println("Stopped with $problem")
       } finally {
-        state.participantsCount = 0
         state.stop()
       }
     }

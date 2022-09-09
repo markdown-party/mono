@@ -1,12 +1,12 @@
 package party.markdown.data
 
 import io.github.alexandrepiveteau.echo.Exchange
+import io.github.alexandrepiveteau.echo.ktor.wsExchange
+import io.github.alexandrepiveteau.echo.ktor.wssExchange
 import io.github.alexandrepiveteau.echo.protocol.Message.Incoming
 import io.github.alexandrepiveteau.echo.protocol.Message.Outgoing
+import io.github.alexandrepiveteau.echo.serialization.decodeFromFrame
 import io.github.alexandrepiveteau.echo.webrtc.client.sync
-import io.github.alexandrepiveteau.echo.webrtc.client.wsSignalingServer
-import io.github.alexandrepiveteau.echo.webrtc.client.wssSignalingServer
-import io.github.alexandrepiveteau.echo.webrtc.signaling.PeerIdentifier
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.websocket.*
@@ -53,25 +53,32 @@ data class Configuration(
   }
 }
 
+private fun Configuration.toExchange(): Exchange<Incoming, Outgoing> {
+  val builder = if (secure) Client::wssExchange else Client::wsExchange
+  return builder(
+          // Receiver.
+          {
+            this.port = this@toExchange.port
+            url {
+              this.host = this@toExchange.host
+              path("$signalingServerPath/rcv")
+            }
+          },
+          // Sender.
+          {
+            this.port = this@toExchange.port
+            url {
+              this.host = this@toExchange.host
+              path("$signalingServerPath/snd")
+            }
+          },
+      )
+      .decodeFromFrame()
+}
+
 /** The [HttpClient] which will be used to create the exchanges from configurations. */
 private val Client = HttpClient(Js) { install(WebSockets) }
 
-suspend fun Configuration.sync(
-    exchange: Exchange<Incoming, Outgoing>,
-    onParticipantsChanged: (Set<PeerIdentifier>) -> Unit = {},
-) {
-  val config = this
-  val server = if (secure) Client::wssSignalingServer else Client::wsSignalingServer
-  server(
-      exchange,
-      {
-        port = config.port
-        url {
-          host = config.host
-          path(config.signalingServerPath)
-        }
-      },
-  ) {
-    this.sync(exchange, onParticipantsChanged)
-  }
+suspend fun Configuration.sync(exchange: Exchange<Incoming, Outgoing>) {
+  io.github.alexandrepiveteau.echo.sync(exchange, toExchange())
 }
