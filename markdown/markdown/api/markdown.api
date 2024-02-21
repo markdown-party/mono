@@ -1,0 +1,622 @@
+public final class party/markdown/MarkdownParty {
+	public fun <init> (Lparty/markdown/cursors/Cursors;Lparty/markdown/tree/TreeNode;Ljava/util/Map;)V
+	public final fun component1 ()Lparty/markdown/cursors/Cursors;
+	public final fun component2 ()Lparty/markdown/tree/TreeNode;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun copy (Lparty/markdown/cursors/Cursors;Lparty/markdown/tree/TreeNode;Ljava/util/Map;)Lparty/markdown/MarkdownParty;
+	public static synthetic fun copy$default (Lparty/markdown/MarkdownParty;Lparty/markdown/cursors/Cursors;Lparty/markdown/tree/TreeNode;Ljava/util/Map;ILjava/lang/Object;)Lparty/markdown/MarkdownParty;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCursors ()Lparty/markdown/cursors/Cursors;
+	public final fun getDocuments ()Ljava/util/Map;
+	public final fun getTree ()Lparty/markdown/tree/TreeNode;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class party/markdown/MarkdownPartyEvent {
+	public static final field Companion Lparty/markdown/MarkdownPartyEvent$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lparty/markdown/MarkdownPartyEvent;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/MarkdownPartyEvent$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$Cursor : party/markdown/MarkdownPartyEvent {
+	public static final field Companion Lparty/markdown/MarkdownPartyEvent$Cursor$Companion;
+	public synthetic fun <init> (ILparty/markdown/cursors/CursorEvent;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public fun <init> (Lparty/markdown/cursors/CursorEvent;)V
+	public final fun component1 ()Lparty/markdown/cursors/CursorEvent;
+	public final fun copy (Lparty/markdown/cursors/CursorEvent;)Lparty/markdown/MarkdownPartyEvent$Cursor;
+	public static synthetic fun copy$default (Lparty/markdown/MarkdownPartyEvent$Cursor;Lparty/markdown/cursors/CursorEvent;ILjava/lang/Object;)Lparty/markdown/MarkdownPartyEvent$Cursor;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvent ()Lparty/markdown/cursors/CursorEvent;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/MarkdownPartyEvent$Cursor;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/MarkdownPartyEvent$Cursor$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/MarkdownPartyEvent$Cursor$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/MarkdownPartyEvent$Cursor;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/MarkdownPartyEvent$Cursor;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$Cursor$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$RGA : party/markdown/MarkdownPartyEvent {
+	public static final field Companion Lparty/markdown/MarkdownPartyEvent$RGA$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lparty/markdown/rga/RGAEvent;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLparty/markdown/rga/RGAEvent;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()Lparty/markdown/rga/RGAEvent;
+	public final fun copy-_R01Hw8 (JLparty/markdown/rga/RGAEvent;)Lparty/markdown/MarkdownPartyEvent$RGA;
+	public static synthetic fun copy-_R01Hw8$default (Lparty/markdown/MarkdownPartyEvent$RGA;JLparty/markdown/rga/RGAEvent;ILjava/lang/Object;)Lparty/markdown/MarkdownPartyEvent$RGA;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDocument-Fj5ptdU ()J
+	public final fun getEvent ()Lparty/markdown/rga/RGAEvent;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/MarkdownPartyEvent$RGA;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/MarkdownPartyEvent$RGA$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/MarkdownPartyEvent$RGA$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/MarkdownPartyEvent$RGA;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/MarkdownPartyEvent$RGA;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$RGA$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$Tree : party/markdown/MarkdownPartyEvent {
+	public static final field Companion Lparty/markdown/MarkdownPartyEvent$Tree$Companion;
+	public synthetic fun <init> (ILparty/markdown/tree/TreeEvent;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public fun <init> (Lparty/markdown/tree/TreeEvent;)V
+	public final fun component1 ()Lparty/markdown/tree/TreeEvent;
+	public final fun copy (Lparty/markdown/tree/TreeEvent;)Lparty/markdown/MarkdownPartyEvent$Tree;
+	public static synthetic fun copy$default (Lparty/markdown/MarkdownPartyEvent$Tree;Lparty/markdown/tree/TreeEvent;ILjava/lang/Object;)Lparty/markdown/MarkdownPartyEvent$Tree;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvent ()Lparty/markdown/tree/TreeEvent;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/MarkdownPartyEvent$Tree;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/MarkdownPartyEvent$Tree$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/MarkdownPartyEvent$Tree$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/MarkdownPartyEvent$Tree;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/MarkdownPartyEvent$Tree;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyEvent$Tree$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/MarkdownPartyHistoryKt {
+	public static final fun MarkdownPartyHistory ()Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;
+}
+
+public final class party/markdown/MarkdownPartyProjection : io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
+	public static final field INSTANCE Lparty/markdown/MarkdownPartyProjection;
+	public synthetic fun backward-xbSDizI (Ljava/lang/Object;JLjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun backward-xbSDizI (Lparty/markdown/MutableMarkdownParty;JLparty/markdown/MarkdownPartyEvent;Lparty/markdown/tree/TreeChange;)Lparty/markdown/MutableMarkdownParty;
+	public synthetic fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+	public fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Lparty/markdown/MutableMarkdownParty;JLparty/markdown/MarkdownPartyEvent;)Lparty/markdown/MutableMarkdownParty;
+}
+
+public final class party/markdown/MutableMarkdownParty {
+	public fun <init> ()V
+	public final fun toMarkdownParty ()Lparty/markdown/MarkdownParty;
+}
+
+public abstract class party/markdown/cursors/CursorEvent {
+	public static final field Companion Lparty/markdown/cursors/CursorEvent$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lparty/markdown/cursors/CursorEvent;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/cursors/CursorEvent$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/cursors/CursorEvent$MoveAfter : party/markdown/cursors/CursorEvent {
+	public static final field Companion Lparty/markdown/cursors/CursorEvent$MoveAfter$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2-Fj5ptdU ()J
+	public final fun copy-sU4dclU (JJ)Lparty/markdown/cursors/CursorEvent$MoveAfter;
+	public static synthetic fun copy-sU4dclU$default (Lparty/markdown/cursors/CursorEvent$MoveAfter;JJILjava/lang/Object;)Lparty/markdown/cursors/CursorEvent$MoveAfter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnchor-Fj5ptdU ()J
+	public final fun getNode-Fj5ptdU ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/cursors/CursorEvent$MoveAfter;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/cursors/CursorEvent$MoveAfter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/cursors/CursorEvent$MoveAfter$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/cursors/CursorEvent$MoveAfter;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/cursors/CursorEvent$MoveAfter;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/cursors/CursorEvent$MoveAfter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/cursors/CursorEventKt {
+	public static final fun getCursorRoot ()J
+}
+
+public final class party/markdown/cursors/CursorProjection : io/github/alexandrepiveteau/echo/projections/OneWayProjection {
+	public static final field INSTANCE Lparty/markdown/cursors/CursorProjection;
+	public synthetic fun forward-fj1MGSY (Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+	public fun forward-fj1MGSY (Lparty/markdown/cursors/MutableCursors;JLparty/markdown/MarkdownPartyEvent;)Lparty/markdown/cursors/MutableCursors;
+}
+
+public final class party/markdown/cursors/Cursors {
+	public fun <init> (Lparty/markdown/cursors/MutableCursors;)V
+	public final fun get--MgKYFQ (J)Ljava/util/Set;
+}
+
+public final class party/markdown/cursors/Cursors$Cursor {
+	public synthetic fun <init> (ILkotlinx/datetime/Instant;JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-ix6DSBw ()I
+	public final fun component2 ()Lkotlinx/datetime/Instant;
+	public final fun component3-Fj5ptdU ()J
+	public final fun copy-F4ikW4I (ILkotlinx/datetime/Instant;J)Lparty/markdown/cursors/Cursors$Cursor;
+	public static synthetic fun copy-F4ikW4I$default (Lparty/markdown/cursors/Cursors$Cursor;ILkotlinx/datetime/Instant;JILjava/lang/Object;)Lparty/markdown/cursors/Cursors$Cursor;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getActor-ix6DSBw ()I
+	public final fun getAnchor-Fj5ptdU ()J
+	public final fun getTimestamp ()Lkotlinx/datetime/Instant;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class party/markdown/cursors/MutableCursors {
+	public fun <init> ()V
+	public final fun insert-u0Lwdzk (JJJ)V
+	public final fun move-u0Lwdzk (JJJ)V
+	public final fun toCursors ()Lparty/markdown/cursors/Cursors;
+}
+
+public final class party/markdown/rga/MutableRGA {
+	public static final field Companion Lparty/markdown/rga/MutableRGA$Companion;
+	public static final field NOT_FOUND I
+	public static final field REMOVED C
+	public fun <init> ()V
+	public final fun insert-JB05VKw (IICJ)V
+	public final fun remove--MgKYFQ (J)V
+	public final fun toCharArray (Z)[C
+	public static synthetic fun toCharArray$default (Lparty/markdown/rga/MutableRGA;ZILjava/lang/Object;)[C
+	public final fun toEventIdentifierArray (Z)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+	public static synthetic fun toEventIdentifierArray$default (Lparty/markdown/rga/MutableRGA;ZILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifierArray;
+}
+
+public final class party/markdown/rga/MutableRGA$Companion {
+}
+
+public abstract class party/markdown/rga/RGAEvent {
+	public static final field Companion Lparty/markdown/rga/RGAEvent$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lparty/markdown/rga/RGAEvent;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/rga/RGAEvent$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/rga/RGAEvent$Insert : party/markdown/rga/RGAEvent {
+	public static final field Companion Lparty/markdown/rga/RGAEvent$Insert$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;CLkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JCLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()C
+	public final fun copy-_R01Hw8 (JC)Lparty/markdown/rga/RGAEvent$Insert;
+	public static synthetic fun copy-_R01Hw8$default (Lparty/markdown/rga/RGAEvent$Insert;JCILjava/lang/Object;)Lparty/markdown/rga/RGAEvent$Insert;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAtom ()C
+	public final fun getOffset-Fj5ptdU ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/rga/RGAEvent$Insert;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/rga/RGAEvent$Insert$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/rga/RGAEvent$Insert$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/rga/RGAEvent$Insert;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/rga/RGAEvent$Insert;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/rga/RGAEvent$Insert$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/rga/RGAEvent$Remove : party/markdown/rga/RGAEvent {
+	public static final field Companion Lparty/markdown/rga/RGAEvent$Remove$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun copy--MgKYFQ (J)Lparty/markdown/rga/RGAEvent$Remove;
+	public static synthetic fun copy--MgKYFQ$default (Lparty/markdown/rga/RGAEvent$Remove;JILjava/lang/Object;)Lparty/markdown/rga/RGAEvent$Remove;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOffset-Fj5ptdU ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/rga/RGAEvent$Remove;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/rga/RGAEvent$Remove$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/rga/RGAEvent$Remove$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/rga/RGAEvent$Remove;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/rga/RGAEvent$Remove;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/rga/RGAEvent$Remove$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/rga/RGAEventKt {
+	public static final fun getRGANodeRoot ()J
+}
+
+public final class party/markdown/rga/RGAProjection : io/github/alexandrepiveteau/echo/projections/OneWayProjection {
+	public static final field INSTANCE Lparty/markdown/rga/RGAProjection;
+	public synthetic fun forward-fj1MGSY (Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+	public fun forward-fj1MGSY (Lparty/markdown/rga/MutableRGA;JLparty/markdown/rga/RGAEvent;)Lparty/markdown/rga/MutableRGA;
+}
+
+public final class party/markdown/tree/MutableTree {
+	public fun <init> ()V
+	public final fun backward (Lparty/markdown/tree/TreeChange;)V
+	public final fun move-UrrPKcQ (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;JJ)V
+	public final fun name-fj1MGSY (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;JLjava/lang/String;)V
+	public final fun newFile--oNUasc (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;J)V
+	public final fun newFolder--oNUasc (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;J)V
+	public final fun remove--oNUasc (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;J)V
+	public final fun toTree ()Lparty/markdown/tree/TreeNode;
+}
+
+public abstract class party/markdown/tree/TreeChange {
+	public static final field Companion Lparty/markdown/tree/TreeChange$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lparty/markdown/tree/TreeChange;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeChange$ChangeName : party/markdown/tree/TreeChange {
+	public static final field Companion Lparty/markdown/tree/TreeChange$ChangeName$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Ljava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLjava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy-_R01Hw8 (JLjava/lang/String;)Lparty/markdown/tree/TreeChange$ChangeName;
+	public static synthetic fun copy-_R01Hw8$default (Lparty/markdown/tree/TreeChange$ChangeName;JLjava/lang/String;ILjava/lang/Object;)Lparty/markdown/tree/TreeChange$ChangeName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIdentifier-Fj5ptdU ()J
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeChange$ChangeName;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeChange$ChangeName$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeChange$ChangeName$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeChange$ChangeName;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeChange$ChangeName;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$ChangeName$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$CreateEdge : party/markdown/tree/TreeChange {
+	public static final field Companion Lparty/markdown/tree/TreeChange$CreateEdge$Companion;
+	public fun <init> (II)V
+	public synthetic fun <init> (IIILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lparty/markdown/tree/TreeChange$CreateEdge;
+	public static synthetic fun copy$default (Lparty/markdown/tree/TreeChange$CreateEdge;IIILjava/lang/Object;)Lparty/markdown/tree/TreeChange$CreateEdge;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChild ()I
+	public final fun getParent ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeChange$CreateEdge;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeChange$CreateEdge$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeChange$CreateEdge$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeChange$CreateEdge;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeChange$CreateEdge;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$CreateEdge$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$Move : party/markdown/tree/TreeChange {
+	public static final field Companion Lparty/markdown/tree/TreeChange$Move$Companion;
+	public synthetic fun <init> (IILjava/lang/Integer;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public fun <init> (ILjava/lang/Integer;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun copy (ILjava/lang/Integer;)Lparty/markdown/tree/TreeChange$Move;
+	public static synthetic fun copy$default (Lparty/markdown/tree/TreeChange$Move;ILjava/lang/Integer;ILjava/lang/Object;)Lparty/markdown/tree/TreeChange$Move;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnchor ()Ljava/lang/Integer;
+	public final fun getVertex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeChange$Move;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeChange$Move$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeChange$Move$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeChange$Move;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeChange$Move;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$Move$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$RemoveVertex : party/markdown/tree/TreeChange {
+	public static final field Companion Lparty/markdown/tree/TreeChange$RemoveVertex$Companion;
+	public synthetic fun <init> (IILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (IJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2-Fj5ptdU ()J
+	public final fun copy--oNUasc (IJ)Lparty/markdown/tree/TreeChange$RemoveVertex;
+	public static synthetic fun copy--oNUasc$default (Lparty/markdown/tree/TreeChange$RemoveVertex;IJILjava/lang/Object;)Lparty/markdown/tree/TreeChange$RemoveVertex;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIdentifier-Fj5ptdU ()J
+	public final fun getVertex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeChange$RemoveVertex;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeChange$RemoveVertex$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeChange$RemoveVertex$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeChange$RemoveVertex;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeChange$RemoveVertex;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeChange$RemoveVertex$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class party/markdown/tree/TreeEvent {
+	public static final field Companion Lparty/markdown/tree/TreeEvent$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lparty/markdown/tree/TreeEvent;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeEvent$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Move : party/markdown/tree/TreeEvent {
+	public static final field Companion Lparty/markdown/tree/TreeEvent$Move$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2-Fj5ptdU ()J
+	public final fun copy-sU4dclU (JJ)Lparty/markdown/tree/TreeEvent$Move;
+	public static synthetic fun copy-sU4dclU$default (Lparty/markdown/tree/TreeEvent$Move;JJILjava/lang/Object;)Lparty/markdown/tree/TreeEvent$Move;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnchor-Fj5ptdU ()J
+	public final fun getElement-Fj5ptdU ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeEvent$Move;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeEvent$Move$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeEvent$Move$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeEvent$Move;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeEvent$Move;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Move$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Name : party/markdown/tree/TreeEvent {
+	public static final field Companion Lparty/markdown/tree/TreeEvent$Name$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Ljava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLjava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy-_R01Hw8 (JLjava/lang/String;)Lparty/markdown/tree/TreeEvent$Name;
+	public static synthetic fun copy-_R01Hw8$default (Lparty/markdown/tree/TreeEvent$Name;JLjava/lang/String;ILjava/lang/Object;)Lparty/markdown/tree/TreeEvent$Name;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getElement-Fj5ptdU ()J
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeEvent$Name;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeEvent$Name$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeEvent$Name$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeEvent$Name;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeEvent$Name;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Name$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$NewFile : party/markdown/tree/TreeEvent {
+	public static final field INSTANCE Lparty/markdown/tree/TreeEvent$NewFile;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$NewFolder : party/markdown/tree/TreeEvent {
+	public static final field INSTANCE Lparty/markdown/tree/TreeEvent$NewFolder;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Remove : party/markdown/tree/TreeEvent {
+	public static final field Companion Lparty/markdown/tree/TreeEvent$Remove$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/EventIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun copy--MgKYFQ (J)Lparty/markdown/tree/TreeEvent$Remove;
+	public static synthetic fun copy--MgKYFQ$default (Lparty/markdown/tree/TreeEvent$Remove;JILjava/lang/Object;)Lparty/markdown/tree/TreeEvent$Remove;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getElement-Fj5ptdU ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lparty/markdown/tree/TreeEvent$Remove;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class party/markdown/tree/TreeEvent$Remove$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lparty/markdown/tree/TreeEvent$Remove$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lparty/markdown/tree/TreeEvent$Remove;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lparty/markdown/tree/TreeEvent$Remove;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEvent$Remove$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class party/markdown/tree/TreeEventKt {
+	public static final fun getTreeNodeRoot ()J
+}
+
+public abstract interface class party/markdown/tree/TreeNode {
+	public abstract fun contains (Lparty/markdown/tree/TreeNode;)Z
+	public abstract fun getId-Fj5ptdU ()J
+	public abstract fun getName ()Ljava/lang/String;
+}
+
+public final class party/markdown/tree/TreeNode$Folder : party/markdown/tree/TreeNode {
+	public synthetic fun <init> (JLjava/util/Set;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()Ljava/util/Set;
+	public final fun component3 ()Ljava/lang/String;
+	public fun contains (Lparty/markdown/tree/TreeNode;)Z
+	public final fun copy-5SCpV9Q (JLjava/util/Set;Ljava/lang/String;)Lparty/markdown/tree/TreeNode$Folder;
+	public static synthetic fun copy-5SCpV9Q$default (Lparty/markdown/tree/TreeNode$Folder;JLjava/util/Set;Ljava/lang/String;ILjava/lang/Object;)Lparty/markdown/tree/TreeNode$Folder;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChildren ()Ljava/util/Set;
+	public fun getId-Fj5ptdU ()J
+	public fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class party/markdown/tree/TreeNode$MarkdownFile : party/markdown/tree/TreeNode {
+	public synthetic fun <init> (JLjava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-Fj5ptdU ()J
+	public final fun component2 ()Ljava/lang/String;
+	public fun contains (Lparty/markdown/tree/TreeNode;)Z
+	public final fun copy-_R01Hw8 (JLjava/lang/String;)Lparty/markdown/tree/TreeNode$MarkdownFile;
+	public static synthetic fun copy-_R01Hw8$default (Lparty/markdown/tree/TreeNode$MarkdownFile;JLjava/lang/String;ILjava/lang/Object;)Lparty/markdown/tree/TreeNode$MarkdownFile;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getId-Fj5ptdU ()J
+	public fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class party/markdown/tree/TreeProjection : io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
+	public static final field INSTANCE Lparty/markdown/tree/TreeProjection;
+	public synthetic fun backward-xbSDizI (Ljava/lang/Object;JLjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun backward-xbSDizI (Lparty/markdown/tree/MutableTree;JLparty/markdown/tree/TreeEvent;Lparty/markdown/tree/TreeChange;)Lparty/markdown/tree/MutableTree;
+	public synthetic fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+	public fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Lparty/markdown/tree/MutableTree;JLparty/markdown/tree/TreeEvent;)Lparty/markdown/tree/MutableTree;
+}
+

@@ -1,0 +1,251 @@
+public abstract interface class io/github/alexandrepiveteau/echo/Exchange : io/github/alexandrepiveteau/echo/ReceiveExchange, io/github/alexandrepiveteau/echo/SendExchange {
+}
+
+public final class io/github/alexandrepiveteau/echo/ExchangeKt {
+	public static final fun asReceiveExchange (Lio/github/alexandrepiveteau/echo/ReceiveExchange;)Lio/github/alexandrepiveteau/echo/ReceiveExchange;
+	public static final fun asSendExchange (Lio/github/alexandrepiveteau/echo/SendExchange;)Lio/github/alexandrepiveteau/echo/SendExchange;
+}
+
+public final class io/github/alexandrepiveteau/echo/Exchanges {
+	public static final fun buffer (Lio/github/alexandrepiveteau/echo/Exchange;I)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static synthetic fun buffer$default (Lio/github/alexandrepiveteau/echo/Exchange;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun exchange (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun exchange ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/SyncStrategy;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static synthetic fun exchange$default (Lio/github/alexandrepiveteau/echo/core/log/MutableEventLog;Lio/github/alexandrepiveteau/echo/SyncStrategy;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static synthetic fun exchange$default ([Lkotlin/Pair;Lio/github/alexandrepiveteau/echo/SyncStrategy;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun flowOn (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/coroutines/CoroutineContext;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun getDefaultBinaryFormat ()Lkotlinx/serialization/BinaryFormat;
+	public static final fun map (Lio/github/alexandrepiveteau/echo/MutableSite;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun mapToBinary ([Lkotlin/Pair;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)[Lkotlin/Pair;
+	public static final fun mutableSite-UQNCs_s (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static synthetic fun mutableSite-UQNCs_s$default (ILio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/MutableSite;
+	public static final fun site (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Site;
+	public static synthetic fun site$default (Lio/github/alexandrepiveteau/echo/core/log/MutableHistory;Lio/github/alexandrepiveteau/echo/SyncStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/Site;
+	public static final fun sync (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sync ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun syncAll ([Lio/github/alexandrepiveteau/echo/Exchange;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/MutableSite : io/github/alexandrepiveteau/echo/Site {
+	public abstract fun event (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getIdentifier-ix6DSBw ()I
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/ReceiveExchange {
+	public abstract fun receive (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/SendExchange {
+	public abstract fun send (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/Site : io/github/alexandrepiveteau/echo/Exchange {
+	public abstract fun getValue ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/alexandrepiveteau/echo/SyncStrategy : java/lang/Enum {
+	public static final field Continuous Lio/github/alexandrepiveteau/echo/SyncStrategy;
+	public static final field Once Lio/github/alexandrepiveteau/echo/SyncStrategy;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/SyncStrategy;
+	public static fun values ()[Lio/github/alexandrepiveteau/echo/SyncStrategy;
+}
+
+public final class io/github/alexandrepiveteau/echo/UnitProjection : io/github/alexandrepiveteau/echo/projections/OneWayProjection {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/UnitProjection;
+	public synthetic fun forward-fj1MGSY (Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+	public fun forward-fj1MGSY (Lkotlin/Unit;JLjava/lang/Object;)V
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/events/EventScope {
+	public abstract fun yield-UaA2Q5I (Ljava/lang/Object;)J
+	public abstract fun yieldAll (Ljava/lang/Iterable;)V
+	public abstract fun yieldAll (Ljava/util/Iterator;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/events/EventScope$DefaultImpls {
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/lang/Iterable;)V
+	public static fun yieldAll (Lio/github/alexandrepiveteau/echo/events/EventScope;Ljava/util/Iterator;)V
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/projections/ChangeScope {
+	public abstract fun push (Ljava/lang/Object;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/projections/OneWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
+	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/OneWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/projections/OneWayProjection {
+	public abstract fun forward-fj1MGSY (Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/alexandrepiveteau/echo/projections/TwoWayMutableProjection : io/github/alexandrepiveteau/echo/core/log/MutableProjection {
+	public fun <init> (Lio/github/alexandrepiveteau/echo/projections/TwoWayProjection;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/BinaryFormat;)V
+	public fun backward-9x6AE2g (Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;IILio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+	public fun forward-EosKLBc (Lio/github/alexandrepiveteau/echo/core/log/ChangeScope;Ljava/lang/Object;JLio/github/alexandrepiveteau/echo/core/buffer/MutableByteGapBuffer;II)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/alexandrepiveteau/echo/projections/TwoWayProjection {
+	public abstract fun backward-xbSDizI (Ljava/lang/Object;JLjava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun forward-JkDpjPE (Lio/github/alexandrepiveteau/echo/projections/ChangeScope;Ljava/lang/Object;JLjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message {
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message$Incoming : io/github/alexandrepiveteau/echo/protocol/Message {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement$Companion;
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/SiteIdentifier;Lio/github/alexandrepiveteau/echo/core/causality/SequenceNumber;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-ix6DSBw ()I
+	public final fun component2-iWHgJgY ()I
+	public final fun copy-qD4jLd8 (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
+	public static synthetic fun copy-qD4jLd8$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextSeqno-iWHgJgY ()I
+	public final fun getSite-ix6DSBw ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Advertisement$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events$Companion;
+	public fun <init> ()V
+	public synthetic fun <init> (ILjava/util/List;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public fun <init> (Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;
+	public static synthetic fun copy$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;Ljava/util/List;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvents ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Events$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Incoming$Ready : io/github/alexandrepiveteau/echo/protocol/Message$Incoming {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Incoming$Ready;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing : io/github/alexandrepiveteau/echo/protocol/Message {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge$Companion;
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/SiteIdentifier;Lio/github/alexandrepiveteau/echo/core/causality/SequenceNumber;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-ix6DSBw ()I
+	public final fun component2-iWHgJgY ()I
+	public final fun copy-qD4jLd8 (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;
+	public static synthetic fun copy-qD4jLd8$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextSeqno-iWHgJgY ()I
+	public final fun getSite-ix6DSBw ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Acknowledge$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request : io/github/alexandrepiveteau/echo/protocol/Message$Outgoing {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request$Companion;
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/core/causality/SiteIdentifier;Lkotlin/UInt;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-ix6DSBw ()I
+	public final fun component2-pVg5ArA ()I
+	public final fun copy-dQX4oo0 (II)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
+	public static synthetic fun copy-dQX4oo0$default (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;IIILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCount-pVg5ArA ()I
+	public final fun getSite-ix6DSBw ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/protocol/Message$Outgoing$Request$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+

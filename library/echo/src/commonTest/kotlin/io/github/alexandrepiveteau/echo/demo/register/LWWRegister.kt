@@ -1,0 +1,109 @@
+package io.github.alexandrepiveteau.echo.demo.register
+
+import io.github.alexandrepiveteau.echo.SyncStrategy
+import io.github.alexandrepiveteau.echo.core.causality.EventIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.SiteIdentifier
+import io.github.alexandrepiveteau.echo.core.causality.isSpecified
+import io.github.alexandrepiveteau.echo.core.causality.toSiteIdentifier
+import io.github.alexandrepiveteau.echo.mutableSite
+import io.github.alexandrepiveteau.echo.projections.OneWayProjection
+import io.github.alexandrepiveteau.echo.sync
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
+
+/**
+ * A simple LWW register, where concurrent writes are resolved by looking at the highest absolute
+ * timestamp.
+ */
+@Serializable
+private sealed class LWWRegisterEvent {
+
+  /** Sets the [value] in the register. */
+  @Serializable data class Set(val value: Int) : LWWRegisterEvent()
+}
+
+/**
+ * Aggregates the [LWWProjection] events. The [LWWRegisterEvent.Set] operation is commutative,
+ * associate and idempotent, so we can use a [OneWayProjection].
+ */
+private class LWWProjection : OneWayProjection<Pair<EventIdentifier, Int>, LWWRegisterEvent> {
+
+  override fun forward(
+      model: Pair<EventIdentifier, Int>,
+      identifier: EventIdentifier,
+      event: LWWRegisterEvent,
+  ): Pair<EventIdentifier, Int> =
+      when (event) {
+        is LWWRegisterEvent.Set ->
+            if (model.first > identifier) model else identifier to event.value
+      }
+}
+
+/** A class representing a [LWWRegister]. */
+private class LWWRegister(site: SiteIdentifier) {
+
+  /** The backing [exchange] for the [LWWRegister]. */
+  val exchange =
+      mutableSite(
+          identifier = site,
+          initial = EventIdentifier.Unspecified to 0,
+          projection = LWWProjection(),
+          strategy = SyncStrategy.Once,
+      )
+
+  /** The latest available value from the [LWWRegister]. */
+  val value: Flow<Int?> = exchange.value.map { (id, value) -> value.takeIf { id.isSpecified } }
+
+  suspend fun set(value: Int) {
+    // By default, events are added with a highest seqno than whatever they've received until now.
+    exchange.event { yield(LWWRegisterEvent.Set(value)) }
+  }
+}
+
+class LWWRegisterTest {
+
+  @Test
+  fun twoSites_converge() = runTest {
+    val alice = 123U.toSiteIdentifier()
+    val aliceRegister = LWWRegister(alice)
+
+    val bob = 456U.toSiteIdentifier()
+    val bobRegister = LWWRegister(bob)
+
+    aliceRegister.set(123)
+    bobRegister.set(456)
+
+    assertEquals(123, aliceRegister.value.first())
+    assertEquals(456, bobRegister.value.first())
+
+    // Sync once.
+    sync(aliceRegister.exchange, bobRegister.exchange)
+
+    // Ensure convergence over a non-null value.
+    val aliceValue = aliceRegister.value.first()
+    val bobValue = bobRegister.value.first()
+    assertEquals(aliceValue, bobValue)
+
+    // Let the "other" site issue an event.
+    val register =
+        when (aliceValue) {
+          123 -> bobRegister
+          456 -> aliceRegister
+          else -> fail("Expected convergence over 123 or 456.")
+        }
+
+    // Set the shared value and sync once.
+    register.set(789)
+    sync(aliceRegister.exchange, bobRegister.exchange)
+
+    // Ensure convergence over a non-null value.
+    assertEquals(789, aliceRegister.value.first())
+    assertEquals(789, bobRegister.value.first())
+  }
+}

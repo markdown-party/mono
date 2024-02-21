@@ -1,0 +1,9 @@
+public final class io/github/alexandrepiveteau/echo/ktor/WebsocketKt {
+	public static final fun wsExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun wsReceiveExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/ReceiveExchange;
+	public static final fun wsSendExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/SendExchange;
+	public static final fun wssExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/Exchange;
+	public static final fun wssReceiveExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/ReceiveExchange;
+	public static final fun wssSendExchange (Lio/ktor/client/HttpClient;Lkotlin/jvm/functions/Function1;)Lio/github/alexandrepiveteau/echo/SendExchange;
+}
+

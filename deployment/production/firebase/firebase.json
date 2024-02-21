@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "./markdown/markdown-frontend-compose/build/distributions",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

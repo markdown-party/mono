@@ -1,0 +1,40 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url = "https://maven.pkg.jetbrains.space/public/p/compose/dev" }
+        google()
+    }
+}
+
+rootProject.name = 'kotlin-echo'
+
+// echo replication libraries
+include ':library:echo-core'
+include ':library:echo'
+
+// Websockets support
+include ':library:echo-ktor-client'
+include ':library:echo-ktor-server'
+include ':library:echo-ktor-websockets'
+
+// WebRTC support
+include ':library:echo-webrtc-client'
+include ':library:echo-webrtc-server'
+include ':library:echo-webrtc-signaling'
+
+// Persistence
+include ':library:echo-indexeddb'
+
+// markdown-party
+include ':markdown:markdown'
+include ':markdown:markdown-backend'
+include ':markdown:markdown-frontend-compose'
+
+// samples
+include ':samples:drawing'
+include ':samples:walkthrough'
+
+// Enable Gradle's version catalog support
+// https://docs.gradle.org/current/userguide/platforms.html
+enableFeaturePreview("VERSION_CATALOGS")

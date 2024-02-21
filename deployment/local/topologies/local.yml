@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+
+  frontend:
+    build:
+      context: ../../..
+      dockerfile: ./deployment/local/images/frontend/Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - CONF_HOST=localhost
+      - CONF_PORT=8081
+      - CONF_SECURE=false
+      - CONF_PATH=groups/
+      # Populate the config.js file with the local server information.
+      - CONFIG_VARS=CONF_HOST,CONF_PORT,CONF_SECURE,CONF_PATH
+
+  backend:
+    build:
+      context: ../../..
+      dockerfile: ./deployment/local/images/backend/Dockerfile
+    ports:
+      - "8081:1234"

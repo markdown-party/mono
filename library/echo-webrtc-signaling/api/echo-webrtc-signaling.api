@@ -1,0 +1,381 @@
+public abstract class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer : io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer$Companion;
+	public synthetic fun <init> (ILjava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-VkyadFM ()Ljava/lang/String;
+	public final fun copy-WG5L41w (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;
+	public static synthetic fun copy-WG5L41w$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;Ljava/lang/String;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnswer-VkyadFM ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Answer$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee : io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee$Companion;
+	public synthetic fun <init> (ILjava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-uhxLwOY ()Ljava/lang/String;
+	public final fun copy-CzaDrz0 (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;
+	public static synthetic fun copy-CzaDrz0$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;Ljava/lang/String;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIce-uhxLwOY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCallee$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller : io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller$Companion;
+	public synthetic fun <init> (ILjava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-uhxLwOY ()Ljava/lang/String;
+	public final fun copy-CzaDrz0 (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;
+	public static synthetic fun copy-CzaDrz0$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;Ljava/lang/String;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIce-uhxLwOY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$IceCaller$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer : io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer$Companion;
+	public synthetic fun <init> (ILjava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-VkyadFM ()Ljava/lang/String;
+	public final fun copy-WG5L41w (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;
+	public static synthetic fun copy-WG5L41w$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;Ljava/lang/String;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOffer-VkyadFM ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage$Offer$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getJson ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize-FpuK9V4 (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/String;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize-NcLa1jA (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/IceCandidate$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize-r2H9weE (Lkotlinx/serialization/encoding/Decoder;)I
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize-hkiMSzo (Lkotlinx/serialization/encoding/Encoder;I)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getJson ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize-tgWAj_o (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/String;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize-Auw57k8 (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SessionDescription$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public abstract class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public abstract fun getTo-qLvGGs8 ()I
+	public abstract fun toServerToClient-FUjxg9Y (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-qLvGGs8 ()I
+	public final fun component2 ()Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;
+	public final fun copy-tpvsp38 (ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;
+	public static synthetic fun copy-tpvsp38$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;
+	public fun getTo-qLvGGs8 ()I
+	public fun hashCode ()I
+	public fun toServerToClient-FUjxg9Y (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;
+	public synthetic fun toServerToClient-FUjxg9Y (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient;
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ClientToServer$Forward$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier;Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-qLvGGs8 ()I
+	public final fun component2 ()Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;
+	public final fun copy-tpvsp38 (ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;
+	public static synthetic fun copy-tpvsp38$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;ILio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;ILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFrom-qLvGGs8 ()I
+	public final fun getMessage ()Lio/github/alexandrepiveteau/echo/webrtc/signaling/ClientToClientMessage;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$GotMessage$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-qLvGGs8 ()I
+	public final fun copy-FUjxg9Y (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;
+	public static synthetic fun copy-FUjxg9Y$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPeer-qLvGGs8 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerJoined$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft : io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient {
+	public static final field Companion Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft$Companion;
+	public synthetic fun <init> (ILio/github/alexandrepiveteau/echo/webrtc/signaling/PeerIdentifier;Lkotlinx/serialization/internal/SerializationConstructorMarker;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-qLvGGs8 ()I
+	public final fun copy-FUjxg9Y (I)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;
+	public static synthetic fun copy-FUjxg9Y$default (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;IILjava/lang/Object;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPeer-qLvGGs8 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public static final fun write$Self (Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft$$serializer;
+	public static final synthetic field descriptor Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/alexandrepiveteau/echo/webrtc/signaling/SignalingMessage$ServerToClient$PeerLeft$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+

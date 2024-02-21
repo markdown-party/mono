@@ -1,0 +1,30 @@
+name: deploy backend
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎁 Checkout repo
+        uses: actions/checkout@v2
+      - name: ☕️ Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: 🐳 Build the Docker image
+        run: |
+          ./deployment/production/heroku/build-image.sh
+      - name: 🚀 Publish the image to Heroku
+        env:
+          HEROKU_TOKEN: ${{ secrets.HEROKU_TOKEN }}
+        run: |
+          ./deployment/production/heroku/publish-image-heroku.sh
+      - name: 🏁 Release the image on Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_TOKEN }}
+        run: |
+          heroku container:login
+          heroku container:release -a markdown-party web
