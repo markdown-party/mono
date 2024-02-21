@@ -1,0 +1,408 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>MutableEventIterator</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>kotlin-echo</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="echo-core::io.github.alexandrepiveteau.echo.core.log/MutableEventIterator///PointingToDeclaration//-1548968483">
+  <div class="breadcrumbs"><a href="../../index.html">echo-core</a><span class="delimiter">/</span><a href="../index.html">io.github.alexandrepiveteau.echo.core.log</a><span class="delimiter">/</span><a href="index.html">MutableEventIterator</a></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Mutable</span><wbr><span>Event</span><wbr><span><span>Iterator</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">MutableEventIterator</a> : <a href="../-event-iterator/index.html">EventIterator</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/index.html">MutableListIterator</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-event/index.html">Event</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">A mutable variation of <a href="../-event-iterator/index.html">EventIterator</a>, which may be used to mutate an underlying log of events.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-1951403194%2FFunctions%2F-1548968483" anchor-label="add" id="-1951403194%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1334936624%2FFunctions%2F-1548968483"><span><span>add</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1951403194%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#1334936624%2FFunctions%2F-1548968483"><span class="token function">add</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">element<span class="token operator">: </span><a href="../-event/index.html">Event</a></span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><br><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="add.html"><span class="token function">add</span></a><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;seqno<span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;site<span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;event<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;from<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;until<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>event.size</span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Adds an event at the current implicit cursor position, and moves the cursor after the inserted element.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="232602732%2FFunctions%2F-1548968483" anchor-label="hasNext" id="232602732%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#232602732%2FFunctions%2F-1548968483"><span>has</span><wbr><span><span>Next</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="232602732%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="index.html#232602732%2FFunctions%2F-1548968483"><span class="token function">hasNext</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1472436248%2FFunctions%2F-1548968483" anchor-label="hasPrevious" id="-1472436248%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1472436248%2FFunctions%2F-1548968483"><span>has</span><wbr><span><span>Previous</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1472436248%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1472436248%2FFunctions%2F-1548968483"><span class="token function">hasPrevious</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1306584343%2FFunctions%2F-1548968483" anchor-label="moveNext" id="-1306584343%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/move-next.html"><span>move</span><wbr><span><span>Next</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1306584343%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-event-iterator/move-next.html"><span class="token function">moveNext</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Moves the <a href="../-event-iterator/index.html">EventIterator</a> to the next event, without allocations.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2092908571%2FFunctions%2F-1548968483" anchor-label="movePrevious" id="-2092908571%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/move-previous.html"><span>move</span><wbr><span><span>Previous</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2092908571%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-event-iterator/move-previous.html"><span class="token function">movePrevious</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Moves the <a href="../-event-iterator/index.html">EventIterator</a> to the previous event, without allocations.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="296073454%2FFunctions%2F-1548968483" anchor-label="next" id="296073454%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#296073454%2FFunctions%2F-1548968483"><span><span>next</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="296073454%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="index.html#296073454%2FFunctions%2F-1548968483"><span class="token function">next</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-event/index.html">Event</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="171882682%2FFunctions%2F-1548968483" anchor-label="nextIndex" id="171882682%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#171882682%2FFunctions%2F-1548968483"><span>next</span><wbr><span><span>Index</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="171882682%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#171882682%2FFunctions%2F-1548968483"><span class="token function">nextIndex</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1653527402%2FFunctions%2F-1548968483" anchor-label="previous" id="1653527402%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1653527402%2FFunctions%2F-1548968483"><span><span>previous</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1653527402%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#1653527402%2FFunctions%2F-1548968483"><span class="token function">previous</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-event/index.html">Event</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="344902590%2FFunctions%2F-1548968483" anchor-label="previousIndex" id="344902590%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#344902590%2FFunctions%2F-1548968483"><span>previous</span><wbr><span><span>Index</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="344902590%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#344902590%2FFunctions%2F-1548968483"><span class="token function">previousIndex</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-240864619%2FFunctions%2F-1548968483" anchor-label="remove" id="-240864619%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-240864619%2FFunctions%2F-1548968483"><span><span>remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-240864619%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-240864619%2FFunctions%2F-1548968483"><span class="token function">remove</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2097147633%2FFunctions%2F-1548968483" anchor-label="set" id="2097147633%2FFunctions%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#2097147633%2FFunctions%2F-1548968483"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2097147633%2FFunctions%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#2097147633%2FFunctions%2F-1548968483"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">element<span class="token operator">: </span><a href="../-event/index.html">Event</a></span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="243373862%2FProperties%2F-1548968483" anchor-label="nextEvent" id="243373862%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-event.html">nextEvent</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="243373862%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="243373862%2FProperties%2F-1548968483" anchor-label="nextEvent" id="243373862%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-event.html">nextEvent</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.buffer/-mutable-byte-gap-buffer/index.html">MutableByteGapBuffer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="243373862%2FProperties%2F-1548968483" anchor-label="nextEvent" id="243373862%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The body of the next event, between <a href="../-event-iterator/next-from.html">nextFrom</a> and <a href="../-event-iterator/next-until.html">nextUntil</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="23847741%2FProperties%2F-1548968483" anchor-label="nextEventIdentifier" id="23847741%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-event-identifier.html">nextEventIdentifier</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="23847741%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="23847741%2FProperties%2F-1548968483" anchor-label="nextEventIdentifier" id="23847741%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-event-identifier.html">nextEventIdentifier</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="23847741%2FProperties%2F-1548968483" anchor-label="nextEventIdentifier" id="23847741%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a> of the next event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-245934544%2FProperties%2F-1548968483" anchor-label="nextFrom" id="-245934544%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-from.html">nextFrom</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-245934544%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-245934544%2FProperties%2F-1548968483" anchor-label="nextFrom" id="-245934544%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-from.html">nextFrom</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-245934544%2FProperties%2F-1548968483" anchor-label="nextFrom" id="-245934544%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The start of the next event body.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1707964896%2FProperties%2F-1548968483" anchor-label="nextSeqno" id="-1707964896%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-seqno.html">nextSeqno</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1707964896%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-1707964896%2FProperties%2F-1548968483" anchor-label="nextSeqno" id="-1707964896%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-seqno.html">nextSeqno</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1707964896%2FProperties%2F-1548968483" anchor-label="nextSeqno" id="-1707964896%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a> of the next event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1562941133%2FProperties%2F-1548968483" anchor-label="nextSite" id="-1562941133%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-site.html">nextSite</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1562941133%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-1562941133%2FProperties%2F-1548968483" anchor-label="nextSite" id="-1562941133%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-site.html">nextSite</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1562941133%2FProperties%2F-1548968483" anchor-label="nextSite" id="-1562941133%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a> of the next event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1112756510%2FProperties%2F-1548968483" anchor-label="nextUntil" id="-1112756510%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/next-until.html">nextUntil</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1112756510%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-1112756510%2FProperties%2F-1548968483" anchor-label="nextUntil" id="-1112756510%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/next-until.html">nextUntil</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1112756510%2FProperties%2F-1548968483" anchor-label="nextUntil" id="-1112756510%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The end (non-inclusive) of next event body.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1598746666%2FProperties%2F-1548968483" anchor-label="previousEvent" id="1598746666%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-event.html">previousEvent</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1598746666%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="1598746666%2FProperties%2F-1548968483" anchor-label="previousEvent" id="1598746666%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-event.html">previousEvent</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.buffer/-mutable-byte-gap-buffer/index.html">MutableByteGapBuffer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1598746666%2FProperties%2F-1548968483" anchor-label="previousEvent" id="1598746666%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The body of the previous event, between <a href="../-event-iterator/previous-from.html">previousFrom</a> and <a href="../-event-iterator/previous-until.html">previousUntil</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2136160447%2FProperties%2F-1548968483" anchor-label="previousEventIdentifier" id="-2136160447%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-event-identifier.html">previousEventIdentifier</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2136160447%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-2136160447%2FProperties%2F-1548968483" anchor-label="previousEventIdentifier" id="-2136160447%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-event-identifier.html">previousEventIdentifier</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-2136160447%2FProperties%2F-1548968483" anchor-label="previousEventIdentifier" id="-2136160447%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a> of the previous event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="490523820%2FProperties%2F-1548968483" anchor-label="previousFrom" id="490523820%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-from.html">previousFrom</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="490523820%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="490523820%2FProperties%2F-1548968483" anchor-label="previousFrom" id="490523820%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-from.html">previousFrom</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="490523820%2FProperties%2F-1548968483" anchor-label="previousFrom" id="490523820%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The start of the previous event body.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-352592092%2FProperties%2F-1548968483" anchor-label="previousSeqno" id="-352592092%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-seqno.html">previousSeqno</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-352592092%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-352592092%2FProperties%2F-1548968483" anchor-label="previousSeqno" id="-352592092%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-seqno.html">previousSeqno</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-352592092%2FProperties%2F-1548968483" anchor-label="previousSeqno" id="-352592092%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a> of the previous event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-826482769%2FProperties%2F-1548968483" anchor-label="previousSite" id="-826482769%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-site.html">previousSite</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-826482769%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="-826482769%2FProperties%2F-1548968483" anchor-label="previousSite" id="-826482769%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-site.html">previousSite</a><span class="token operator">: </span><a href="../../io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-826482769%2FProperties%2F-1548968483" anchor-label="previousSite" id="-826482769%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The <a href="../../io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a> of the previous event.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="242616294%2FProperties%2F-1548968483" anchor-label="previousUntil" id="242616294%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo-core:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-event-iterator/previous-until.html">previousUntil</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="242616294%2FProperties%2F-1548968483"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo-core:dokkaHtmlPartial/commonMain"><a data-name="242616294%2FProperties%2F-1548968483" anchor-label="previousUntil" id="242616294%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-event-iterator/previous-until.html">previousUntil</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="242616294%2FProperties%2F-1548968483" anchor-label="previousUntil" id="242616294%2FProperties%2F-1548968483" data-filterable-set=":library:echo-core:dokkaHtmlPartial/commonMain"></a><p class="paragraph">The end (non-inclusive) of previous event body.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+
+</body></html>
+

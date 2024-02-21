@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>MutableRGA</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>kotlin-echo</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="markdown::party.markdown.rga/MutableRGA///PointingToDeclaration//-1318602165">
+  <div class="breadcrumbs"><a href="../../index.html">markdown</a><span class="delimiter">/</span><a href="../index.html">party.markdown.rga</a><span class="delimiter">/</span><a href="index.html">MutableRGA</a></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Mutable</span><wbr><span><span>RGA</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">MutableRGA</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">A <a href="index.html">MutableRGA</a> aggregates <a href="../-r-g-a-event/index.html">RGAEvent</a> and mutates its internal state to compute a distributed sequence of <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html">Char</a>.</p><p class="paragraph">Conceptually, a <a href="index.html">MutableRGA</a> stores all the characters that were inserted in the distributed sequence. When a character is inserted, it references an anchor. The nodes are then traversed using BFS, sorting adjacent nodes by their insertion timestamp.</p><p class="paragraph">Additionally, characters may get deleted. In this case, their content is discarded, but their identifier may be kept in memory to guarantee the ordering of future insertions.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="835662056%2FConstructors%2F-1318602165" anchor-label="MutableRGA" id="835662056%2FConstructors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-mutable-r-g-a.html"><span>Mutable</span><wbr><span><span>RGA</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="835662056%2FConstructors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-mutable-r-g-a.html"><span class="token function">MutableRGA</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-470654829%2FClasslikes%2F-1318602165" anchor-label="Companion" id="-470654829%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-470654829%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-119115531%2FFunctions%2F-1318602165" anchor-label="insert" id="-119115531%2FFunctions%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="insert.html"><span><span>insert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-119115531%2FFunctions%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="insert.html"><span class="token function">insert</span></a><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;site<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;seqno<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html">Char</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;offset<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a></span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Inserts a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html">Char</a> atom after the given <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a> offset. The inserted <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html">Char</a> has a unique identifier.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1895954330%2FFunctions%2F-1318602165" anchor-label="remove" id="1895954330%2FFunctions%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove.html"><span><span>remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1895954330%2FFunctions%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove.html"><span class="token function">remove</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a></span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Removes the given <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a> from the <a href="index.html">MutableRGA</a>. If the atom at the given <a href="remove.html">offset</a> is not integrated yet, the <a href="remove.html">offset</a> will be temporarily buffered and the removal applied when the relevant <a href="insert.html">insert</a> operation occurs.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1234814057%2FFunctions%2F-1318602165" anchor-label="toCharArray" id="1234814057%2FFunctions%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="to-char-array.html"><span>to</span><wbr><span>Char</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1234814057%2FFunctions%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="to-char-array.html"><span class="token function">toCharArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">includeRemoved<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char-array/index.html">CharArray</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns a new <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char-array/index.html">CharArray</a> built with all the characters from the <a href="index.html">MutableRGA</a>, concatenated. The characters which were deleted will not be included in the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char-array/index.html">CharArray</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="521976290%2FFunctions%2F-1318602165" anchor-label="toEventIdentifierArray" id="521976290%2FFunctions%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="to-event-identifier-array.html"><span>to</span><wbr><span>Event</span><wbr><span>Identifier</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="521976290%2FFunctions%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="to-event-identifier-array.html"><span class="token function">toEventIdentifierArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">includeRemoved<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier-array/index.html">EventIdentifierArray</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns a new <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier-array/index.html">EventIdentifierArray</a> with all the identifiers from the <a href="index.html">MutableRGA</a>, concatenated. The characters which were deleted will not see their <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a> be included in the <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier-array/index.html">EventIdentifierArray</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+
+</body></html>
+

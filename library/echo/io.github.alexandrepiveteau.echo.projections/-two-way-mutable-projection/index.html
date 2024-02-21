@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>TwoWayMutableProjection</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>kotlin-echo</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="echo::io.github.alexandrepiveteau.echo.projections/TwoWayMutableProjection///PointingToDeclaration//-794790961">
+  <div class="breadcrumbs"><a href="../../index.html">echo</a><span class="delimiter">/</span><a href="../index.html">io.github.alexandrepiveteau.echo.projections</a><span class="delimiter">/</span><a href="index.html">TwoWayMutableProjection</a></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Two</span><wbr><span>Way</span><wbr><span>Mutable</span><wbr><span><span>Projection</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">TwoWayMutableProjection</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;projection<span class="token operator">: </span><a href="../-two-way-projection/index.html">TwoWayProjection</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;changeSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;eventSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;format<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/BinaryFormat///PointingToDeclaration/">BinaryFormat</span></span></span><span class="token punctuation">)</span> : <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.log/-mutable-projection/index.html">MutableProjection</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">M</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">An implementation of a <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.log/-mutable-projection/index.html">MutableProjection</a> which wraps a <a href="../-two-way-projection/index.html">TwoWayProjection</a> with some dedicated serializers. This lets consumers of <a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.log/-mutable-projection/index.html">MutableProjection</a> offer a higher-level API which works on generic types, rather than sequences of bytes.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Parameters">Parameters</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Parameters</h2>
+      <div data-togglable="Parameters">
+        <div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>projection</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the backing <a href="../-two-way-projection/index.html">TwoWayProjection</a>.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span>change</span><wbr><span><span>Serializer</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span> for the changes.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span>event</span><wbr><span><span>Serializer</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span> for the events.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>format</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the <span data-unresolved-link="kotlinx.serialization/BinaryFormat///PointingToDeclaration/">BinaryFormat</span> to use to store events.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>M</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the type of the model.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>T</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the type of the events.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>C</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">the type of the changes.</p></div></div></div></div></div></div></div></div></div>
+      </div>
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="475189349%2FConstructors%2F-794790961" anchor-label="TwoWayMutableProjection" id="475189349%2FConstructors%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-two-way-mutable-projection.html"><span>Two</span><wbr><span>Way</span><wbr><span>Mutable</span><wbr><span><span>Projection</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="475189349%2FConstructors%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt; </span><a href="-two-way-mutable-projection.html"><span class="token function">TwoWayMutableProjection</span></a><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;projection<span class="token operator">: </span><a href="../-two-way-projection/index.html">TwoWayProjection</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;changeSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;eventSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;format<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/BinaryFormat///PointingToDeclaration/">BinaryFormat</span></span></span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-507387272%2FFunctions%2F-794790961" anchor-label="backward" id="-507387272%2FFunctions%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="backward.html"><span><span>backward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-507387272%2FFunctions%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="backward.html"><span class="token function">backward</span></a><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;model<span class="token operator">: </span><a href="index.html">M</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;identifier<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;data<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.buffer/-mutable-byte-gap-buffer/index.html">MutableByteGapBuffer</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;from<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;until<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;changeData<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.buffer/-mutable-byte-gap-buffer/index.html">MutableByteGapBuffer</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;changeFrom<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;changeUntil<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">M</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1526289657%2FFunctions%2F-794790961" anchor-label="forward" id="-1526289657%2FFunctions%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="forward.html"><span><span>forward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1526289657%2FFunctions%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.log/-change-scope/index.html">ChangeScope</a><span class="token punctuation">.</span><a href="forward.html"><span class="token function">forward</span></a><span class="token punctuation">(</span><span class="parameters wrapped"><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;model<span class="token operator">: </span><a href="index.html">M</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;identifier<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-event-identifier/index.html">EventIdentifier</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;data<span class="token operator">: </span><a href="../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.buffer/-mutable-byte-gap-buffer/index.html">MutableByteGapBuffer</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;from<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter indented">&nbsp;&nbsp;&nbsp;&nbsp;until<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">M</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+
+</body></html>
+

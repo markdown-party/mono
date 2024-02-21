@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>TreeEvent</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>kotlin-echo</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="markdown::party.markdown.tree/TreeEvent///PointingToDeclaration//-1318602165">
+  <div class="breadcrumbs"><a href="../../index.html">markdown</a><span class="delimiter">/</span><a href="../index.html">party.markdown.tree</a><span class="delimiter">/</span><a href="index.html">TreeEvent</a></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Tree</span><wbr><span><span>Event</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">A <a href="index.html">TreeEvent</a> defines the operations which are available on a replicated tree : creating files, creating folders, moving them around, renaming them, and deleting them.</p><p class="paragraph">These operations operate on some <code class="lang-kotlin">element</code>, and might reference an <code class="lang-kotlin">anchor</code>. The <code class="lang-kotlin">element</code> will be the identifier of the node that is affected, and the <code class="lang-kotlin">anchor</code> may indicate a destination.</p><p class="paragraph">Operations which are not compatible with the current tree structure will simply be skipped.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="1434810004%2FClasslikes%2F-1318602165" anchor-label="Move" id="1434810004%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-move/index.html"><span><span>Move</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1434810004%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-move/index.html">Move</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>element<span class="token operator">: </span><a href="../index.html#2094497742%2FClasslikes%2F-1318602165">TreeNodeIdentifier</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>anchor<span class="token operator">: </span><a href="../index.html#2094497742%2FClasslikes%2F-1318602165">TreeNodeIdentifier</a></span></span><span class="token punctuation">)</span> : <a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Moves the file or folder reference to be a child of the given <a href="-move/anchor.html">anchor</a>. If the file was to be moved at the top-level, the <a href="../-tree-node-root.html">TreeNodeRoot</a> value should be specified as the <a href="-move/anchor.html">anchor</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1334664474%2FClasslikes%2F-1318602165" anchor-label="Name" id="1334664474%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-name/index.html"><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1334664474%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-name/index.html">Name</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>element<span class="token operator">: </span><a href="../index.html#2094497742%2FClasslikes%2F-1318602165">TreeNodeIdentifier</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span> : <a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Names the given file or folder. If multiple files or folders have the same name, an artificial suffix will be given to them.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="418219745%2FClasslikes%2F-1318602165" anchor-label="NewFile" id="418219745%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-new-file/index.html"><span>New</span><wbr><span><span>File</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="418219745%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-new-file/index.html">NewFile</a> : <a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Creates a new file at the root of the tree. This file will not have any parent, and will be populated with a default name.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-404637393%2FClasslikes%2F-1318602165" anchor-label="NewFolder" id="-404637393%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-new-folder/index.html"><span>New</span><wbr><span><span>Folder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-404637393%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-new-folder/index.html">NewFolder</a> : <a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Creates a new folder at the root of the tree. This folder will not have any parent, and will be populated with a default name.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1468195905%2FClasslikes%2F-1318602165" anchor-label="Remove" id="1468195905%2FClasslikes%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-remove/index.html"><span><span>Remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1468195905%2FClasslikes%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":markdown:markdown:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-remove/index.html">Remove</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>element<span class="token operator">: </span><a href="../index.html#2094497742%2FClasslikes%2F-1318602165">TreeNodeIdentifier</a></span></span><span class="token punctuation">)</span> : <a href="index.html">TreeEvent</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Deletes the given file or folder. If a folder is deleted, its children will also be deleted recursively. Concurrent moves of the children should not result in the children being deleted; rather, a <a href="-remove/index.html">Remove</a> operation could be seen as moving the file to a separate root of deleted and unavailable files.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Inheritors</h2>
+      <div class="table" data-togglable="Inheritors"><a data-name="418219745%2FInheritors%2F-1318602165" anchor-label="NewFile" id="418219745%2FInheritors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-new-file/index.html">NewFile</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="418219745%2FInheritors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="-404637393%2FInheritors%2F-1318602165" anchor-label="NewFolder" id="-404637393%2FInheritors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-new-folder/index.html">NewFolder</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-404637393%2FInheritors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="1434810004%2FInheritors%2F-1318602165" anchor-label="Move" id="1434810004%2FInheritors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-move/index.html">Move</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1434810004%2FInheritors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="1334664474%2FInheritors%2F-1318602165" anchor-label="Name" id="1334664474%2FInheritors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-name/index.html">Name</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1334664474%2FInheritors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="1468195905%2FInheritors%2F-1318602165" anchor-label="Remove" id="1468195905%2FInheritors%2F-1318602165" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":markdown:markdown:dokkaHtmlPartial/commonMain" data-filterable-set=":markdown:markdown:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-remove/index.html">Remove</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1468195905%2FInheritors%2F-1318602165"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+
+</body></html>
+

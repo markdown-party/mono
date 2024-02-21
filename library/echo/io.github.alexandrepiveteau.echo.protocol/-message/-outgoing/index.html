@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Outgoing</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../../index.html">
+<span>kotlin-echo</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="echo::io.github.alexandrepiveteau.echo.protocol/Message.Outgoing///PointingToDeclaration//-794790961">
+  <div class="breadcrumbs"><a href="../../../index.html">echo</a><span class="delimiter">/</span><a href="../../index.html">io.github.alexandrepiveteau.echo.protocol</a><span class="delimiter">/</span><a href="../index.html">Message</a><span class="delimiter">/</span><a href="index.html">Outgoing</a></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Outgoing</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Outgoing</a> : <a href="../index.html">Message</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="322480010%2FClasslikes%2F-794790961" anchor-label="Acknowledge" id="322480010%2FClasslikes%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-acknowledge/index.html"><span><span>Acknowledge</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="322480010%2FClasslikes%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-acknowledge/index.html">Acknowledge</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>site<span class="token operator">: </span><a href="../../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nextSeqno<span class="token operator">: </span><a href="../../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-sequence-number/index.html">SequenceNumber</a></span></span><span class="token punctuation">)</span> : <a href="index.html">Message.Outgoing</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Indicates the next sequence number that is not known by the <a href="index.html">Outgoing</a> side for a specific site. The <a href="../-incoming/index.html">Incoming</a> side will only messages for acknowledged sites with a remaining request count greater than 0.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="194354778%2FClasslikes%2F-794790961" anchor-label="Companion" id="194354778%2FClasslikes%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="194354778%2FClasslikes%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1635982985%2FClasslikes%2F-794790961" anchor-label="Request" id="-1635982985%2FClasslikes%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-request/index.html"><span><span>Request</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1635982985%2FClasslikes%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":library:echo:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-request/index.html">Request</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>site<span class="token operator">: </span><a href="../../../../../library/echo-core/io.github.alexandrepiveteau.echo.core.causality/-site-identifier/index.html">SiteIdentifier</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>count<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-u-int/index.html">UInt</a></span></span><span class="token punctuation">)</span> : <a href="index.html">Message.Outgoing</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Indicates that the <a href="index.html">Outgoing</a> side of the Link is ready to receive some events. A <a href="-request/index.html">Request</a> message can not be sent before the <a href="../-incoming/-ready/index.html">Incoming.Ready</a> message has already been received.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Inheritors</h2>
+      <div class="table" data-togglable="Inheritors"><a data-name="322480010%2FInheritors%2F-794790961" anchor-label="Acknowledge" id="322480010%2FInheritors%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-acknowledge/index.html">Acknowledge</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="322480010%2FInheritors%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="-1635982985%2FInheritors%2F-794790961" anchor-label="Request" id="-1635982985%2FInheritors%2F-794790961" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":library:echo:dokkaHtmlPartial/commonMain" data-filterable-set=":library:echo:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-request/index.html">Request</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1635982985%2FInheritors%2F-794790961"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+
+</body></html>
+
